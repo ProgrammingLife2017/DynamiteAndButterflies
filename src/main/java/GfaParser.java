@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class GfaParser {
 
-    private ArrayList<Node> nodes;
+    private ArrayList<Node2> node2s;
 
     public static void main(String[] args) throws Exception {
         GfaParser parser = new GfaParser();
@@ -25,18 +25,18 @@ public class GfaParser {
             line = br.readLine();
             String header2 = line.split("H")[1];
 
-            nodes = new ArrayList<Node>();
+            node2s = new ArrayList<Node2>();
             while ((line = br.readLine()) != null) {
-                Node node;
+                Node2 node2;
                 if(line.startsWith("S")) {
                     String[] data = line.split("\t");
-                    node = new Node(Integer.parseInt(data[1]), data[2]);
-                    nodes.add(node);
+                    node2 = new Node2(Integer.parseInt(data[1]), data[2]);
+                    node2s.add(node2);
                 }
                 else if(line.startsWith("L")){
                     String[] edgeDataString = line.split("\t");
                     int childNode = Integer.parseInt(edgeDataString[3]);
-                    nodes.get(Integer.parseInt(edgeDataString[1]) - 1).addChild(childNode);
+                    node2s.get(Integer.parseInt(edgeDataString[1]) - 1).addChild(childNode);
                 }
             }
         }

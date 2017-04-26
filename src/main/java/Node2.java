@@ -5,17 +5,17 @@
 import java.util.ArrayList;
 
 /**
- * Class Node, which represents sequences of DNA. A sequence is a part of a genome.
+ * Class Node2, which represents sequences of DNA. A sequence is a part of a genome.
  * The sequence is a String consisting of A, C T and G.
  */
-public class Node {
+public class Node2 {
     private int id;
     private String seq;
     private ArrayList<Integer> parent;
     private ArrayList<Integer> child;
 
 
-    public Node(int id, String seq){
+    public Node2(int id, String seq){
         this.id = id;
         this.seq = seq;
         this.child = new ArrayList<Integer>();
