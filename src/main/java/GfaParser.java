@@ -12,13 +12,14 @@ public class GfaParser {
 
     public static void main(String[] args) throws Exception {
         GfaParser parser = new GfaParser();
-        parser.parse(new File("/home/marc/IdeaProjects/DynamiteAndButterflies/TB10.gfa"));
+        InputStream in = GfaParser.class.getClass().getResourceAsStream("/TB10.gfa");
+        parser.parse(in);
         System.out.println("hey");
     }
 
-    private void parse(File file) {
+    private void parse(InputStream in) {
         try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = br.readLine();
             String header1 = line.split("H")[1];
             line = br.readLine();
@@ -30,18 +31,13 @@ public class GfaParser {
                 if(line.startsWith("S")) {
                     String[] data = line.split("\t");
                     node = new Node(Integer.parseInt(data[1]), data[2]);
-                    line = br.readLine();
                     nodes.add(node);
-                    while (line.startsWith("L")) {
-                        String[] edgeDataString = line.split("\t");
-                        int childNode = Integer.parseInt(edgeDataString[3]);
-                        line = br.readLine();
-                        node.addChild(childNode);
-                    }
-
-
                 }
-
+                else if(line.startsWith("L")){
+                    String[] edgeDataString = line.split("\t");
+                    int childNode = Integer.parseInt(edgeDataString[3]);
+                    nodes.get(Integer.parseInt(edgeDataString[1]) - 1).addChild(childNode);
+                }
             }
         }
         catch(IOException e) {
