@@ -1,13 +1,17 @@
-import org.graphstream.graph.*;
-import org.graphstream.graph.implementations.*;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
+
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class GraphConstructor {
     public static void main(String args[]) {
-        new GraphConstructor();
+        new GraphConstructor(new GfaParser());
     }
 
-    public GraphConstructor() {
+    public GraphConstructor(GfaParser parser) {
         Graph graph = new SingleGraph("tutorial 1");
 
         graph.addAttribute("ui.stylesheet", styleSheet);
@@ -15,20 +19,30 @@ public class GraphConstructor {
         graph.setStrict(false);
         graph.display();
 
+        InputStream in = GfaParser.class.getClass().getResourceAsStream("/test (1).gfa");
+        parser.parse(in);
+        ArrayList<Node2> set = parser.getList();
+        parser.makeNodes(graph);
 
-        graph.addEdge("AB", "A", "B");
-        graph.addEdge("BC", "B", "C");
-        graph.addEdge("CA", "C", "A");
-        graph.addEdge("AD", "A", "D");
-        graph.addEdge("DE", "D", "E");
-        graph.addEdge("DF", "D", "F");
-        graph.addEdge("EF", "E", "F");
+        for(int j = 0; j < set.size(); j++) {
+            Node2 n = set.get(j);
 
-        for (Node node : graph) {
-            node.addAttribute("ui.label", node.getId());
+            Node tempNode = graph.getNode("" + n.getId());
+            tempNode.setAttribute("seq", n.getSeq());
+
+            ArrayList<Integer> children = n.getChild();
+            for(int i = 0; i < children.size(); i++) {
+                int child = children.get(i);
+                graph.addEdge("" + i, "" + n.getId(), "" + child);
+            }
+
         }
 
-        explore(graph.getNode("A"));
+//        for (Node node : graph) {
+//            node.addAttribute("ui.label", node.getId());
+//        }
+
+        explore(graph.getNode("1"));
     }
 
     public void explore(Node source) {
