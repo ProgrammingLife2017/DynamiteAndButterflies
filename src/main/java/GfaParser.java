@@ -1,6 +1,11 @@
-import java.io.*;
-import java.util.ArrayList;
+import com.mxgraph.view.mxGraph;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 /**
@@ -17,7 +22,7 @@ public class GfaParser {
         System.out.println("hey");
     }
 
-    private void parse(InputStream in) {
+    public void parse(InputStream in) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = br.readLine();
@@ -43,5 +48,25 @@ public class GfaParser {
         catch(IOException e) {
                 e.printStackTrace();
             }
+    }
+
+    public ArrayList<Node2> getList() {
+        return node2s;
+    }
+
+    public HashMap<Integer, Object> makeNodes(mxGraph graph) {
+        Object parent = graph.getDefaultParent();
+        HashMap<Integer, Object> hash = new HashMap<Integer, Object>();
+        for (int i = 0; i < node2s.size(); i++) {
+            Node2 node = node2s.get(i);
+            try {
+                Object obj = graph.insertVertex(parent, "" + node.getId(), node.getSeq(), 20 * (i * 10), 20 * (i * 10), 80, 30);
+                hash.put(node.getId(), obj);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Ging iets mis met een vertex adden in de visualisation.");
+            }
+        }
+        return hash;
     }
 }
