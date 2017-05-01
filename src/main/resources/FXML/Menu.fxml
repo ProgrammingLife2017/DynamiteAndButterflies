@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MenuController">
+   <children>
+      <Button layoutX="26.0" layoutY="30.0" mnemonicParsing="false" text="Some button" />
+      <Label layoutX="162.0" layoutY="494.0" text="Some info" />
+      <Label layoutX="162.0" layoutY="533.0" text="Some info" />
+      <Button layoutX="26.0" layoutY="82.0" mnemonicParsing="false" text="Some button" />
+      <StackPane fx:id="graphPane" layoutX="162.0" layoutY="21.0" prefHeight="462.0" prefWidth="805.0" style="-fx-border-color: BLACK;" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0" />
+   </children>
+</AnchorPane>
