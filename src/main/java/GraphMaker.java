@@ -15,9 +15,19 @@ public class GraphMaker extends JFrame
      */
     public static void main(String[] args)
     {
+//        InputStream in = GfaParser.class.getClass().getResourceAsStream("/test (1).gfa");
+//        GfaParser parser = new GfaParser();
+//        parser.parse(in);
+//
+//        ArrayList<Node2> set = parser.getList();
+//        HashMap<Integer, Node2> allNodes = hashNode2s(set);
+//        setAllParents(set, allNodes);
+//        recursiveColumns(set, allNodes);
+
         GraphMaker frame = new GraphMaker("/test (1).gfa");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 320);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 
@@ -55,7 +65,7 @@ public class GraphMaker extends JFrame
             for (Integer aChild : children) {
                 Object child = hash.get(aChild);
                 try {
-                    graph.insertEdge(parOfEdge, null, "Edge", par, child);
+                    graph.insertEdge(parOfEdge, null, null, par, child);
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.out.println("Something went wrong adding an edge");
@@ -83,6 +93,48 @@ public class GraphMaker extends JFrame
         }
         graph.getModel().endUpdate();
         return hash;
+    }
+
+    public static HashMap<Integer, Node2> hashNode2s (ArrayList<Node2> set) {
+        HashMap<Integer, Node2> allNodes = new HashMap<Integer, Node2>();
+        for (Node2 node : set) {
+            allNodes.put(node.getId(), node);
+        }
+        return allNodes;
+    }
+
+    public static void recursiveColumns(ArrayList<Node2> nodeList, HashMap<Integer, Node2> allNodes) {
+        for(int i = 0; i < nodeList.size(); i++) {
+            Node2 parent = nodeList.get(i);
+            ArrayList<Node2> children = parent.getChildrenNodes(allNodes);
+            for(int j = 0; j < children.size(); j++) {
+                Node2 child = children.get(j);
+                child.incrementColumn(parent.getColumnID());
+            }
+        }
+    }
+
+    public static void setAllParents(ArrayList<Node2> nodes, HashMap<Integer, Node2> hash) {
+        for (Node2 node : nodes) {
+            ArrayList<Integer> children = node.getChild();
+            for (Integer aChildren : children) {
+                Node2 child = hash.get(aChildren);
+                child.addParent(node.getId());
+            }
+        }
+    }
+
+    //Not yet complete, needs to check the double layer, should become recursive.
+    public boolean mutationCheck (ArrayList<Node2> children) {
+        for(int i = 0; i < children.size(); i++) {
+            Node2 test = children.get(i);
+            for (Node2 that : children) {
+                if (test.amIYourChild(that)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }
