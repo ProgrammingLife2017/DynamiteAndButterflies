@@ -95,4 +95,15 @@ public class Node2 {
     public int getColumnID() {
         return columnID;
     }
+
+    //A method that can add all parents to a list of nodes. Needs a hashmap from NodeIDs to Nodes to do so.
+    public static void setAllParents(ArrayList<Node2> nodes, HashMap<Integer, Node2> hash) {
+        for (Node2 node : nodes) {
+            ArrayList<Integer> children = node.getChild();
+            for (Integer aChildren : children) {
+                Node2 child = hash.get(aChildren);
+                child.addParent(node.getId());
+            }
+        }
+    }
 }
