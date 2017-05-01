@@ -79,7 +79,7 @@ public class GraphMaker extends JFrame
         for (int i = 0; i < set.size(); i++) {
             Node2 node = set.get(i);
             try {
-                Object obj = graph.insertVertex(parent, "" + node.getId(), node.getSeq(), 20 * (i * 5), 20 * (i * 5), 80, 30);
+                Object obj = graph.insertVertex(parent, "" + node.getId(), node.getSeq(), 100 + 20 * (node.getColumnID() * 5), 200, 80, 30);
                 hash.put(node.getId(), obj);
             } catch (Exception e) {
                 e.printStackTrace();
