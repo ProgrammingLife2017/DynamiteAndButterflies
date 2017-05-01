@@ -15,6 +15,7 @@ public class Node2 {
     private ArrayList<Integer> parent;
     private ArrayList<Integer> child;
     private int columnID;
+    private int mutationLevel;
 
 
     public Node2(int id, String seq){
@@ -23,6 +24,7 @@ public class Node2 {
         this.child = new ArrayList<Integer>();
         this.parent = new ArrayList<Integer>();
         this.columnID = 0;
+        this.mutationLevel = 0;
     }
 
     public ArrayList<Integer> getParent() {
@@ -65,6 +67,14 @@ public class Node2 {
         this.seq = seq;
     }
 
+    public int getMutationLevel() {
+        return this.mutationLevel;
+    }
+
+    public void incrementMutationLevel(int currentMutLvl) {
+        this.mutationLevel = currentMutLvl + 1;
+    }
+
     public boolean amIYourChild (Node2 your){
         if(your.equals(this)) {
             return false;
@@ -72,6 +82,15 @@ public class Node2 {
 
         ArrayList<Integer> theirChildren = your.getChild();
         return theirChildren.contains(this.getId());
+    }
+
+    public ArrayList<Node2> getParentNodes (HashMap<Integer, Node2> hash) {
+        ArrayList<Integer> parents = this.getParent();
+        ArrayList<Node2> res = new ArrayList<Node2>();
+        for (Integer parent : parents) {
+            res.add(hash.get(parent));
+        }
+        return res;
     }
 
     public ArrayList<Node2> getChildrenNodes (HashMap<Integer, Node2> hash) {

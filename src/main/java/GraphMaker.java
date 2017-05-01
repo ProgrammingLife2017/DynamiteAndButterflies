@@ -37,6 +37,11 @@ public class GraphMaker extends JFrame
 
         HashMap<Integer, Node2> allNodes = hashNode2s(set);
         assignColumns(set, allNodes);
+        Node2.setAllParents(set, allNodes);
+        for(int i = 0; i < set.size(); i++) {
+            Node2 node = set.get(i);
+            mutationCheck(node, allNodes);
+        }
 
         buildGraph(graph, set);
 
@@ -79,7 +84,7 @@ public class GraphMaker extends JFrame
         for (int i = 0; i < set.size(); i++) {
             Node2 node = set.get(i);
             try {
-                Object obj = graph.insertVertex(parent, "" + node.getId(), node.getSeq(), 100 + 20 * (node.getColumnID() * 5), 200, 80, 30);
+                Object obj = graph.insertVertex(parent, "" + node.getId(), node.getSeq(), 100 + 20 * (node.getColumnID() * 5), 200 + (100 *  node.getMutationLevel()), 80, 30);
                 hash.put(node.getId(), obj);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -109,12 +114,20 @@ public class GraphMaker extends JFrame
         }
     }
 
-    //Not yet complete, needs to check the double layer, should become recursive.
-    public boolean mutationCheck (ArrayList<Node2> children) {
-        for(int i = 0; i < children.size(); i++) {
-            Node2 test = children.get(i);
-            for (Node2 that : children) {
-                if (test.amIYourChild(that)) {
+    //Not yet complete, needs to check the second layer
+    public boolean mutationCheck (Node2 node, HashMap<Integer, Node2> allNodes) {
+        ArrayList<Node2> parents = node.getParentNodes(allNodes);
+        ArrayList<Node2> children = node.getChildrenNodes(allNodes);
+
+        for(int i = 0; i < parents.size(); i++) {
+            Node2 parent = parents.get(i);
+
+            for (Node2 child : children) {
+                if (child.amIYourChild(parent)) {
+
+                    int curMutLvl = Math.max(parent.getMutationLevel(), child.getMutationLevel());
+                    node.incrementMutationLevel(curMutLvl);
+
                     return true;
                 }
             }
