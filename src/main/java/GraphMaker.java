@@ -55,7 +55,6 @@ public class GraphMaker extends JFrame
     }
 
     public void createEdges(mxGraph graph, HashMap<Integer, Object> hash, ArrayList<Node2> set) {
-
         graph.getModel().beginUpdate();
         for (Node2 n : set) {
             Object parOfEdge = graph.getDefaultParent();
@@ -81,25 +80,11 @@ public class GraphMaker extends JFrame
         Object parent = graph.getDefaultParent();
         HashMap<Integer, Object> hash = new HashMap<Integer, Object>();
         HashMap<Integer, Integer> columns = new HashMap<Integer, Integer>();
-        int columnHandler;
 
         for (Node2 node : set) {
-
-            int columnId = node.getColumnID();
-
-            if (columns.get(columnId) == null) {
-                columns.put(columnId, 0);
-            }
-            columns.put(columnId, columns.get(columnId) + 1);
-
-            if((columns.get(columnId) % 2) == 1) {
-                columnHandler = columns.get(columnId);
-            } else {
-                columnHandler = -1 * (columns.get(columnId) - 1);
-            }
-
-            int xCo = 100 + 20 * (node.getColumnID() * 5);
-            int yCo = 200 + (50 * node.getMutationLevel()) + (columnHandler * 25);
+            int columnHandler = createColumnHandler(node, columns);
+            int xCo = createXCo(node);
+            int yCo = createYCo(node, columnHandler);
 
             try {
                 Object obj = graph.insertVertex(parent, "" + node.getId(), node.getSeq(), xCo, yCo, 80, 30);
@@ -111,6 +96,33 @@ public class GraphMaker extends JFrame
         }
         graph.getModel().endUpdate();
         return hash;
+    }
+
+    private int createYCo(Node2 node, int columnHandler) {
+        return 200 + (50 * node.getMutationLevel()) + (columnHandler * 25);
+    }
+
+    private int createXCo(Node2 node) {
+        return 100 + 20 * (node.getColumnID() * 5);
+    }
+
+    private int createColumnHandler(Node2 node, HashMap<Integer, Integer> columns) {
+        int res;
+        int columnId = node.getColumnID();
+
+        if (columns.get(columnId) == null) {    //initialize hashMap if necessary
+            columns.put(columnId, 0);
+        }
+
+        columns.put(columnId, columns.get(columnId) + 1);   //Update number of nodes in a column
+
+        if((columns.get(columnId) % 2) == 1) {      // Space these nodes correctly from each other
+            res = columns.get(columnId);
+        } else {
+            res = -1 * (columns.get(columnId) - 1);
+        }
+
+        return res;
     }
 
     public HashMap<Integer, Node2> hashNode2s (ArrayList<Node2> set) {
@@ -155,5 +167,4 @@ public class GraphMaker extends JFrame
         }
         return false;
     }
-
 }
