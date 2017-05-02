@@ -40,7 +40,7 @@ public class GraphMaker extends JFrame
         Node2.setAllParents(set, allNodes);
         for(int i = 0; i < set.size(); i++) {
             Node2 node = set.get(i);
-            mutationCheck(node, allNodes);
+            addMutations(node, allNodes);
         }
 
         buildGraph(graph, set);
@@ -114,15 +114,18 @@ public class GraphMaker extends JFrame
         }
     }
 
-    //Not yet complete, needs to check the second layer
-    public boolean mutationCheck (Node2 node, HashMap<Integer, Node2> allNodes) {
+    public boolean addMutations (Node2 node, HashMap<Integer, Node2> allNodes) {
         ArrayList<Node2> parents = node.getParentNodes(allNodes);
         ArrayList<Node2> children = node.getChildrenNodes(allNodes);
 
         for(int i = 0; i < parents.size(); i++) {
             Node2 parent = parents.get(i);
+            parents.addAll(parent.getParentNodes(allNodes));
 
-            for (Node2 child : children) {
+            for (int j = 0; j < children.size(); j++) {
+                Node2 child = children.get(j);
+                children.addAll(child.getChildrenNodes(allNodes));
+
                 if (child.amIYourChild(parent)) {
 
                     int curMutLvl = Math.max(parent.getMutationLevel(), child.getMutationLevel());
