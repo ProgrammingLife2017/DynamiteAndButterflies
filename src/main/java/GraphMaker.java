@@ -80,11 +80,29 @@ public class GraphMaker extends JFrame
 
         Object parent = graph.getDefaultParent();
         HashMap<Integer, Object> hash = new HashMap<Integer, Object>();
+        HashMap<Integer, Integer> columns = new HashMap<Integer, Integer>();
+        int columnHandler;
 
-        for (int i = 0; i < set.size(); i++) {
-            Node2 node = set.get(i);
+        for (Node2 node : set) {
+
+            int columnId = node.getColumnID();
+
+            if (columns.get(columnId) == null) {
+                columns.put(columnId, 0);
+            }
+            columns.put(columnId, columns.get(columnId) + 1);
+
+            if((columns.get(columnId) % 2) == 1) {
+                columnHandler = columns.get(columnId);
+            } else {
+                columnHandler = -1 * (columns.get(columnId) - 1);
+            }
+
+            int xCo = 100 + 20 * (node.getColumnID() * 5);
+            int yCo = 200 + (50 * node.getMutationLevel()) + (columnHandler * 25);
+
             try {
-                Object obj = graph.insertVertex(parent, "" + node.getId(), node.getSeq(), 100 + 20 * (node.getColumnID() * 5), 200 + (100 *  node.getMutationLevel()), 80, 30);
+                Object obj = graph.insertVertex(parent, "" + node.getId(), node.getSeq(), xCo, yCo, 80, 30);
                 hash.put(node.getId(), obj);
             } catch (Exception e) {
                 e.printStackTrace();
