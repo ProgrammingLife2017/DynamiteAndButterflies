@@ -15,7 +15,8 @@ public class GraphMaker extends JFrame
      */
     public static void main(String[] args)
     {
-        GraphMaker frame = new GraphMaker("/test (1).gfa");
+        //GraphMaker frame = new GraphMaker("/test (1).gfa");
+        GraphMaker frame = new GraphMaker("/TB10.gfa");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 320);
         frame.setLocationRelativeTo(null);
@@ -87,7 +88,8 @@ public class GraphMaker extends JFrame
             int yCo = createYCo(node, columnHandler);
 
             try {
-                Object obj = graph.insertVertex(parent, "" + node.getId(), node.getSeq(), xCo, yCo, 80, 30);
+                //Object obj = graph.insertVertex(parent, "" + node.getId(), node.getSeq(), xCo, yCo, 80, 30);
+                Object obj = graph.insertVertex(parent, "" + node.getId(), "", xCo, yCo, 80, 30);
                 hash.put(node.getId(), obj);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -150,12 +152,9 @@ public class GraphMaker extends JFrame
 
         for(int i = 0; i < parents.size(); i++) {
             Node2 parent = parents.get(i);
-            parents.addAll(parent.getParentNodes(allNodes));
 
             for (int j = 0; j < children.size(); j++) {
                 Node2 child = children.get(j);
-                children.addAll(child.getChildrenNodes(allNodes));
-
                 if (child.amIYourChild(parent)) {
 
                     int curMutLvl = Math.max(parent.getMutationLevel(), child.getMutationLevel());
