@@ -1,9 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * Created by eric on 4-5-17.
- */
 public class SequenceGraph   {
 
 
@@ -33,6 +30,9 @@ public class SequenceGraph   {
         return nodes.get(id);
     }
 
+    public HashMap<Integer, SequenceNode> getNodes() {
+        return this.nodes;
+    }
 
     public void initialize() {
 
