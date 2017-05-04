@@ -4,16 +4,7 @@ import org.biojava.nbio.core.sequence.ProteinSequence; import org.biojava.nbio.c
 public class main {
 
     public static void main(String[] args) throws Exception{
-       /*
-        * Method 1: With the FastaReaderHelper
-        */
-        //Try with the FastaReaderHelper
-        LinkedHashMap<String, ProteinSequence> a = FastaReaderHelper.readFastaProteinSequence(new File("/home/marc/IdeaProjects/DynamiteAndButterflies/out.fa"));
-        //FastaReaderHelper.readFastaDNASequence for DNA sequences
 
-        for (  Entry<String, ProteinSequence> entry : a.entrySet() ) {
-            System.out.println( entry.getValue().getOriginalHeader() + "=" + entry.getValue().getSequenceAsString() );
-        }
     }
 
 }

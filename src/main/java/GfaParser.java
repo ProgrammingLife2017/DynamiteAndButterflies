@@ -10,16 +10,29 @@ import java.util.ArrayList;
  */
 public class GfaParser {
 
-    private ArrayList<Node2> node2s;
 
     public static void main(String[] args) throws Exception {
+
+
+
+
+        long startTime = System.currentTimeMillis();
         GfaParser parser = new GfaParser();
-        InputStream in = GfaParser.class.getClass().getResourceAsStream("/TB10.gfa");
-        parser.parse(in);
-        System.out.println("hey");
+        InputStream in = GfaParser.class.getClass().getResourceAsStream("/chr19.hg38.w115.gfa");
+        SequenceGraph graph = parser.parse(in);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Total execution time: " + (endTime - startTime) );
+
+
+        long sT = System.currentTimeMillis();
+        graph.initialize();
+        long eT = System.currentTimeMillis();
+        System.out.println("Total execution time: " + (eT - sT) );
+
     }
 
-    public void parse(InputStream in) {
+    public SequenceGraph parse(InputStream in) {
+        SequenceGraph sequenceGraph = new SequenceGraph();
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = br.readLine();
@@ -27,27 +40,29 @@ public class GfaParser {
             line = br.readLine();
             String header2 = line.split("H")[1];
 
-            node2s = new ArrayList<Node2>();
+
             while ((line = br.readLine()) != null) {
-                Node2 node2;
+
                 if(line.startsWith("S")) {
                     String[] data = line.split("\t");
-                    node2 = new Node2(Integer.parseInt(data[1]), data[2]);
-                    node2s.add(node2);
+                    SequenceNode node = new SequenceNode(Integer.parseInt(data[1]), data[2]);
+                    sequenceGraph.addNode(node);
                 }
                 else if(line.startsWith("L")){
                     String[] edgeDataString = line.split("\t");
-                    int childNode = Integer.parseInt(edgeDataString[3]);
-                    node2s.get(Integer.parseInt(edgeDataString[1]) - 1).addChild(childNode);
+                    int parentId = (Integer.parseInt(edgeDataString[1]));
+                    int childId = Integer.parseInt(edgeDataString[3]);
+                    Edge edge = new Edge(parentId, childId);
+                    sequenceGraph.getEdges().add(edge);
                 }
             }
+
         }
         catch(IOException e) {
                 e.printStackTrace();
             }
+            return sequenceGraph;
+
     }
 
-    public ArrayList<Node2> getList() {
-        return node2s;
-    }
 }
