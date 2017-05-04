@@ -12,7 +12,7 @@
 
 <AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MenuController">
    <children>
-      <BorderPane prefHeight="607.0" prefWidth="1095.0">
+      <BorderPane prefHeight="600.0" prefWidth="1000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
             <MenuBar prefHeight="32.0" prefWidth="1095.0" BorderPane.alignment="CENTER">
               <menus>
@@ -35,7 +35,7 @@
             </MenuBar>
          </top>
          <bottom>
-            <Pane maxWidth="1.7976931348623157E308" prefHeight="150.0" prefWidth="1095.0" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
+            <Pane maxWidth="1.7976931348623157E308" prefHeight="150.0" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
                <children>
                   <Label layoutX="44.0" layoutY="42.0" text="Some info" />
                   <Label layoutX="44.0" layoutY="14.0" text="Some info" />
@@ -43,7 +43,7 @@
             </Pane>
          </bottom>
          <left>
-            <Pane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="475.0" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
+            <Pane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
                <children>
                   <Button layoutX="22.0" layoutY="30.0" mnemonicParsing="false" text="Some button" />
                   <Button layoutX="22.0" layoutY="75.0" mnemonicParsing="false" text="Some button" />
@@ -54,7 +54,7 @@
             </Pane>
          </left>
          <center>
-            <Pane fx:id="graphPane" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER" />
+            <Pane fx:id="graphPane" style="-fx-border-color: BLACK; -fx-background-color: white;" BorderPane.alignment="CENTER" />
          </center>
       </BorderPane>
    </children>
