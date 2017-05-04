@@ -1,12 +1,12 @@
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
-import javafx.scene.Group;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 
 /**
@@ -17,7 +17,7 @@ public class MenuController {
     @FXML
     private AnchorPane anchorPane;
     @FXML
-    private StackPane graphPane;
+    private Pane graphPane;
     private JPanel graphPanel;
 
     @FXML
@@ -38,7 +38,7 @@ public class MenuController {
         Stage stage = (Stage) anchorPane.getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
-        System.out.println(this.getClass().getResource("test (1).gfa"));
+        System.out.println(this.getClass().getResource("TB10.gfa"));
         //fileChooser.setInitialDirectory(this.getClass().getResource("/resources").toString());
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
@@ -50,11 +50,12 @@ public class MenuController {
         final SwingNode swingNode = new SwingNode();
         graphPanel = new JPanel();
         System.out.println(file.getName());
-        graphPanel.add(new GraphMaker().buildGraph("/" + file.getName()));
+        graphPanel.add(new GraphMaker().buildGraph("/" + file.getName()), BorderLayout.CENTER);
+        graphPanel.setSize((int) graphPane.getWidth(), (int) graphPane.getHeight());
         createSwingContent(swingNode);
-        Group group = new Group();
-        group.getChildren().add(swingNode);
-        //group.setAutoSizeChildren(false);
-        graphPane.getChildren().add(group);
+        graphPane.getChildren().add(swingNode);
+        System.out.println(graphPane.getWidth() + ",  " + graphPane.getHeight());
+        System.out.println(graphPanel.getWidth() + ",  " + graphPanel.getHeight());
+
     }
 }
