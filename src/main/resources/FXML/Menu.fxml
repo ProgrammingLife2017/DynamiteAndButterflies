@@ -1,16 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 
-<AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MenuController">
+<AnchorPane prefHeight="607.0" prefWidth="1095.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MenuController">
    <children>
-      <Button layoutX="26.0" layoutY="30.0" mnemonicParsing="false" text="Some button" />
-      <Label layoutX="162.0" layoutY="494.0" text="Some info" />
-      <Label layoutX="162.0" layoutY="533.0" text="Some info" />
-      <Button layoutX="26.0" layoutY="82.0" mnemonicParsing="false" text="Some button" />
-      <StackPane fx:id="graphPane" layoutX="162.0" layoutY="21.0" prefHeight="462.0" prefWidth="805.0" style="-fx-border-color: BLACK;" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0" />
+      <StackPane fx:id="graphPane" layoutX="162.0" layoutY="21.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" style="-fx-border-color: BLACK;" AnchorPane.bottomAnchor="130.0" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
+         <padding>
+            <Insets bottom="15.0" left="15.0" />
+         </padding></StackPane>
+      <Pane layoutY="16.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefWidth="120.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0">
+         <children>
+            <Button layoutX="18.0" layoutY="24.0" mnemonicParsing="false" text="Some button" />
+            <Button layoutX="18.0" layoutY="61.0" mnemonicParsing="false" text="Some button" />
+         </children>
+         <padding>
+            <Insets right="15.0" />
+         </padding>
+      </Pane>
+      <Pane layoutX="134.0" layoutY="520.0" maxWidth="1.7976931348623157E308" prefHeight="100.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="15.0">
+         <children>
+            <Label layoutX="44.0" layoutY="42.0" text="Some info" />
+            <Label layoutX="44.0" layoutY="14.0" text="Some info" />
+         </children>
+      </Pane>
    </children>
 </AnchorPane>
