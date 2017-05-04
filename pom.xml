@@ -8,41 +8,4 @@
     <artifactId>1</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-
-    <dependencies>
-
-        <!-- This imports the latest version of BioJava genomics module -->
-        <dependency>
-
-            <groupId>org.biojava</groupId>
-            <artifactId>biojava-genome</artifactId>
-            <version>4.2.0</version>
-            <!-- note: the genomics module depends on the BioJava-core module and will import it automatically -->
-        </dependency>
-
-        <!-- other biojava jars as needed -->
-        <!-- This imports the latest version of BioJava structure module -->
-        <dependency>
-
-            <groupId>org.biojava</groupId>
-            <artifactId>biojava-structure</artifactId>
-            <version>4.2.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.graphstream</groupId>
-            <artifactId>gs-core</artifactId>
-            <version>1.3</version>
-            <optional>false</optional>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.tinyjee.jgraphx/jgraphx -->
-        <dependency>
-            <groupId>org.tinyjee.jgraphx</groupId>
-            <artifactId>jgraphx</artifactId>
-            <version>3.4.1.3</version>
-        </dependency>
-
-
-    </dependencies>
 </project>
