@@ -6,8 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.io.InputStream;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.HashMap;
 
 public class App extends Application {
@@ -27,29 +26,31 @@ public class App extends Application {
         Group root = new Group();
         Canvas canvas = new Canvas(600, 250);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        drawShapes(gc);
+        try {
+            drawShapes(gc);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         root.getChildren().add(canvas);
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 
-    private void drawShapes(GraphicsContext gc) {
-        ArrayList<Node2> nodes = loadGraph();
-        HashMap<Integer, Node2> hash = GraphMaker.hashNode2s(nodes);
-        GraphMaker.assignColumns(nodes, hash);
-        for(Node2 node : nodes) {
+    private void drawShapes(GraphicsContext gc) throws IOException {
+
+        GfaParser parser = new GfaParser();
+        SequenceGraph graph = parser.parse("src/main/resources/test (1).gfa");
+        graph.initialize();
+        graph.layerizeGraph();
+        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
+
+        for(int i = 1; i <= nodes.size(); i++) {
+            SequenceNode node = nodes.get(i);
             gc.setFill(Color.BLUE);
-            gc.fillRoundRect((node.getColumnID() * (Xsize + lengthEdge)) + 50, yBase, Xsize, Ysize, 10, 10);
+            gc.fillRoundRect((node.getColumn() * (Xsize + lengthEdge)) + 50, yBase, Xsize, Ysize, 10, 10);
             gc.setStroke(Color.BLACK);
             gc.setLineWidth(1);
-            gc.strokeLine((node.getColumnID() * (Xsize + lengthEdge)) + Xsize + 50,43, node.getColumnID() * (Xsize + Xsize + lengthEdge) + 50, 43);
+            gc.strokeLine((node.getColumn() * (Xsize + lengthEdge)) + Xsize + 50,43, node.getColumn() * (Xsize + Xsize + lengthEdge) + 50, 43);
         }
-    }
-
-    public ArrayList<Node2> loadGraph() {
-        InputStream in = GfaParser.class.getClass().getResourceAsStream("/TB10.gfa");
-        GfaParser parser = new GfaParser();
-        parser.parse(in);
-        return parser.getList();
     }
 }
