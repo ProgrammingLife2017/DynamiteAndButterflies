@@ -3,7 +3,6 @@
  */
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Class Node2, which represents sequences of DNA. A sequence is a part of a genome.
@@ -14,12 +13,14 @@ public class SequenceNode {
     private String seq;
     private ArrayList<SequenceNode> adjecencyList;
     private ArrayList<Integer> ids;
+    private int column;
 
     public SequenceNode(int id, String seq){
         this.id = id;
         this.seq = seq;
         this.adjecencyList = new ArrayList<SequenceNode>();
         this.ids = new ArrayList<Integer>();
+        this.column = 0;
     }
 
     public void addId(Integer id) {
@@ -57,6 +58,16 @@ public class SequenceNode {
 
     public String getSequence() {
         return this.seq;
+    }
+
+    public int getColumn() { return column; }
+
+    public void setColumn(int newColumn) { this.column = newColumn;}
+
+    public void incrementColumn(int parColumn) {
+        if (this.column < parColumn + 1) {
+            this.column = parColumn + 1;
+        }
     }
 
 }

@@ -42,10 +42,38 @@ public class SequenceGraph   {
         }
     }
 
+    /**
+     * Will add columns to all the nodes and to all the edges
+     */
     public void layerizeGraph() {
-//        Start at first node
-//        Get all children
-//        Assign layer
+            createColumns();
+            createEdgeColumns();
+    }
+
+    /**
+     * Gives each node a column where it should be built
+     */
+    public void createColumns() {
+        for(int i = 1; i <= size; i++) {
+            SequenceNode parent = nodes.get(i);     // Start at first node
+            ArrayList<SequenceNode> children = parent.getChildren();    // Get all children
+            for (SequenceNode child : children) {
+                child.incrementColumn(parent.getColumn());      // Assign layer
+            }
+        }
+    }
+
+    /**
+     * Gives each edge it's ghost nodes
+     */
+    public void createEdgeColumns() {
+
+        for(int i = 0; i < edges.size(); i++) {
+            Edge edge = edges.get(i);
+            int parColumn = nodes.get(edge.getParent()).getColumn();
+            int childColumn = nodes.get(edge.getChild()).getColumn();
+            edge.setEntireColumnSpan(parColumn, childColumn);
+        }
     }
 
 }
