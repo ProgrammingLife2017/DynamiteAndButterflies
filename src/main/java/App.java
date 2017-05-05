@@ -12,9 +12,10 @@ import java.util.HashMap;
 
 public class App extends Application {
 
-    public int Xsize = 20;
-    public int Ysize = 12;
-    public int lengthEdge = 10;
+    private int Xsize = 10;
+    private int Ysize = 6;
+    private int lengthEdge = 2;
+    private int yBase = 40;
 
     public static void main(String[] args) {
         launch(args);
@@ -38,10 +39,10 @@ public class App extends Application {
         GraphMaker.assignColumns(nodes, hash);
         for(Node2 node : nodes) {
             gc.setFill(Color.BLUE);
-            gc.fillRoundRect(node.getColumnID() * (Xsize + lengthEdge) + 50, 40, Xsize, Ysize, 10, 10);
+            gc.fillRoundRect((node.getColumnID() * (Xsize + lengthEdge)) + 50, yBase, Xsize, Ysize, 10, 10);
             gc.setStroke(Color.BLACK);
-            gc.setLineWidth(2);
-            gc.strokeLine(node.getColumnID() * (Xsize + Xsize) + 50,46, node.getColumnID() * (Xsize + Xsize + lengthEdge) + 50, 46);
+            gc.setLineWidth(1);
+            gc.strokeLine((node.getColumnID() * (Xsize + lengthEdge)) + Xsize + 50,43, node.getColumnID() * (Xsize + Xsize + lengthEdge) + 50, 43);
         }
     }
 
