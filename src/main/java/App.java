@@ -48,9 +48,9 @@ public class App extends Application {
             SequenceNode node = nodes.get(i);
             gc.setFill(Color.BLUE);
             gc.fillRoundRect((node.getColumn() * (Xsize + lengthEdge)) + 50, yBase, Xsize, Ysize, 10, 10);
-            gc.setStroke(Color.BLACK);
-            gc.setLineWidth(1);
-            gc.strokeLine((node.getColumn() * (Xsize + lengthEdge)) + Xsize + 50,43, node.getColumn() * (Xsize + Xsize + lengthEdge) + 50, 43);
+//            gc.setStroke(Color.BLACK);
+//            gc.setLineWidth(1);
+//            gc.strokeLine((node.getColumn() * (Xsize + lengthEdge)) + Xsize + 50,43, node.getColumn() * (Xsize + Xsize + lengthEdge) + 50, 43);
         }
     }
 }
