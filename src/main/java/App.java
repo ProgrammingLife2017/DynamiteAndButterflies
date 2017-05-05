@@ -4,13 +4,17 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class App extends Application {
+
+    public int Xsize = 20;
+    public int Ysize = 12;
+    public int lengthEdge = 10;
 
     public static void main(String[] args) {
         launch(args);
@@ -29,26 +33,19 @@ public class App extends Application {
     }
 
     private void drawShapes(GraphicsContext gc) {
-
-        int counter = 10;
-
         ArrayList<Node2> nodes = loadGraph();
+        HashMap<Integer, Node2> hash = GraphMaker.hashNode2s(nodes);
+        GraphMaker.assignColumns(nodes, hash);
         for(Node2 node : nodes) {
-            gc.setStroke(Color.BLUE);
-            gc.setLineWidth(10);
-            gc.strokeLine(counter,40, counter + node.getSeq().length() + 20, 40);
-            counter += node.getSeq().length() + 25;
+            gc.setFill(Color.BLUE);
+            gc.fillRoundRect(node.getColumnID() * (Xsize + lengthEdge) + 50, 40, Xsize, Ysize, 10, 10);
             gc.setStroke(Color.BLACK);
             gc.setLineWidth(2);
-            gc.strokeLine(counter,40, counter + 5, 40);
-            counter += 10;
+            gc.strokeLine(node.getColumnID() * (Xsize + Xsize) + 50,46, node.getColumnID() * (Xsize + Xsize + lengthEdge) + 50, 46);
         }
-
-
-
     }
 
-    public ArrayList loadGraph() {
+    public ArrayList<Node2> loadGraph() {
         InputStream in = GfaParser.class.getClass().getResourceAsStream("/TB10.gfa");
         GfaParser parser = new GfaParser();
         parser.parse(in);

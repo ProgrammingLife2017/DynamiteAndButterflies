@@ -127,7 +127,7 @@ public class GraphMaker extends JFrame
         return res;
     }
 
-    public HashMap<Integer, Node2> hashNode2s (ArrayList<Node2> set) {
+    public static HashMap<Integer, Node2> hashNode2s (ArrayList<Node2> set) {
         HashMap<Integer, Node2> allNodes = new HashMap<Integer, Node2>();
         for (Node2 node : set) {
             allNodes.put(node.getId(), node);
@@ -135,7 +135,7 @@ public class GraphMaker extends JFrame
         return allNodes;
     }
 
-    public void assignColumns (ArrayList<Node2> nodeList, HashMap<Integer, Node2> allNodes) {
+    public static void assignColumns (ArrayList<Node2> nodeList, HashMap<Integer, Node2> allNodes) {
         for(int i = 0; i < nodeList.size(); i++) {
             Node2 parent = nodeList.get(i);
             ArrayList<Node2> children = parent.getChildrenNodes(allNodes);
