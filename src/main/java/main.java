@@ -1,14 +1,16 @@
-import graph.SequenceGraph;
-import parser.GfaParser;
+import gui.App;
 
+//CHECKSTYLE: OFF
+/**
+ * The main class. Run this to run the application.
+ */
 public class main {
 
-    public static void main(String[] args) throws Exception{
-        GfaParser parser = new GfaParser();
-        SequenceGraph graph = parser.parse("src/main/resources/test (1).gfa");
-        graph.initialize();
-        graph.layerizeGraph();
-        System.out.println("Done");
+    /**
+     * The main method that is run to launch the application.
+     * @param args Arguments that might be need to run
+     */
+    public static void main(String[] args) {
+        App.main(args);
     }
-
 }

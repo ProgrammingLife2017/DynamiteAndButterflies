@@ -1,11 +1,10 @@
-package GUI;
+package gui;
 
 import graph.SequenceGraph;
-import parser.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import parser.SequenceNode;
 
-import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -21,6 +20,11 @@ public class GraphDrawer {
     private SequenceGraph graph;
     private GraphicsContext gc;
 
+    /**
+     * Constructor of the graphDrawer.
+     * @param graph Needs a graph to draw
+     * @param gc and a GraphicsContext to draw on
+     */
     public GraphDrawer(SequenceGraph graph, GraphicsContext gc) {
         this.graph = graph;
         this.gc = gc;
@@ -28,16 +32,24 @@ public class GraphDrawer {
         graph.layerizeGraph();
     }
 
-    public void drawShapes() throws IOException {
+    /**
+     * Draws all the nodes.
+     */
+    public void drawShapes() {
         HashMap<Integer, SequenceNode> nodes = graph.getNodes();
 
-        for(int i = 1; i <= nodes.size(); i++) {
+        for (int i = 1; i <= nodes.size(); i++) {
             SequenceNode node = nodes.get(i);
             gc.setFill(Color.BLUE);
-            gc.fillRoundRect((node.getColumn() * (X_SIZE + EDGE_LENGTH)) + 50, Y_BASE, X_SIZE, Y_SIZE, 10, 10);
+            //CHECKSTYLE: OFF
+            gc.fillRoundRect((node.getColumn() * (X_SIZE + EDGE_LENGTH)) + 50,
+                                Y_BASE, X_SIZE, Y_SIZE, 10, 10);
 //            gc.setStroke(Color.BLACK);
 //            gc.setLineWidth(1);
-//            gc.strokeLine((node.getColumn() * (Xsize + lengthEdge)) + Xsize + 50,43, node.getColumn() * (Xsize + Xsize + lengthEdge) + 50, 43);
+//            gc.strokeLine((node.getColumn() * (Xsize + lengthEdge)) + Xsize + 50,43,
+//            node.getColumn() * (Xsize + Xsize + lengthEdge) + 50, 43);
+
+            //CHECKSTYLE: ON
         }
     }
 }

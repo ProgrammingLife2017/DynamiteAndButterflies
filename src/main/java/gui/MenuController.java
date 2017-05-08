@@ -1,4 +1,4 @@
-package GUI;
+package gui;
 
 import graph.SequenceGraph;
 import javafx.fxml.FXML;
@@ -24,11 +24,17 @@ public class MenuController {
     private GraphicsContext gc;
     private GraphDrawer drawer;
 
+    /**
+     * Initializes the canvas.
+     */
     @FXML
     public void initialize() {
         gc = canvas.getGraphicsContext2D();
     }
 
+    /**
+     * Implements the file chooser when choosing that option from teh file menu.
+     */
     @FXML
     public void openFileClicked() {
         Stage stage = (Stage) anchorPane.getScene().getWindow();
@@ -40,7 +46,7 @@ public class MenuController {
             try {
                 GfaParser parser = new GfaParser();
                 System.out.println("src/main/resources/" + file.getName());
-                SequenceGraph graph = graph = parser.parse(file.getAbsolutePath());
+                SequenceGraph graph = parser.parse(file.getAbsolutePath());
                 drawer = new GraphDrawer(graph, gc);
                 drawer.drawShapes();
             } catch (IOException e) {
