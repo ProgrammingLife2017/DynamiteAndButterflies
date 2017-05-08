@@ -1,3 +1,7 @@
+package GUI;
+
+import graph.SequenceGraph;
+import parser.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
