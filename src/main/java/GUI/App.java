@@ -10,12 +10,23 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+/**
+ * Created by Jasper van Tilburg on 1-5-2017.
+ *
+ * Class to startup the application.
+ */
 public class App extends Application {
 
     public static void main(String[] args) {
         launch(args);
     }
 
+    /**
+     * Launches the application with Menu.fxml as default scene.
+     * @param stageIn
+     * @throws UnsupportedEncodingException
+     * @throws FileNotFoundException
+     */
     public void start(Stage stageIn) throws UnsupportedEncodingException, FileNotFoundException {
         stage = stageIn;
         stage.setTitle("Programming Life");
@@ -25,6 +36,11 @@ public class App extends Application {
     private static Stage stage;
     private static AnchorPane pane;
 
+    /**
+     * This method is able to load FXML files onto the stage.
+     * @param path Path of the FXML file to be loaded on the screen
+     * @return The FXMLLoader
+     */
     public static FXMLLoader loadScene(String path) {
 
         try {

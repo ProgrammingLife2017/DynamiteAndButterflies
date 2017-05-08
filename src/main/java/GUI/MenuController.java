@@ -13,7 +13,9 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Created by TUDelft SID on 1-5-2017.
+ * Created by Jasper van Tilburg on 1-5-2017.
+ *
+ * Controller for the Menu scene. Used to run all functionality in the main screen of the application.
  */
 public class MenuController {
 
@@ -24,11 +26,17 @@ public class MenuController {
     private GraphicsContext gc;
     private GraphDrawer drawer;
 
+    /**
+     * Initializes the controller.
+     */
     @FXML
     public void initialize() {
         gc = canvas.getGraphicsContext2D();
     }
 
+    /**
+     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa can be selected and directly be visualised on the screen.
+     */
     @FXML
     public void openFileClicked() {
         Stage stage = (Stage) anchorPane.getScene().getWindow();

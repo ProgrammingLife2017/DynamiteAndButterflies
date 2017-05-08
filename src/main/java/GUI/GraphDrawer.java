@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.util.HashMap;
 
 /**
- * Created by TUDelft SID on 8-5-2017.
+ * Created by Jasper van Tilburg on 8-5-2017.
+ *
+ * Class used to draw shapes on the canvas.
  */
 public class GraphDrawer {
 
@@ -21,6 +23,11 @@ public class GraphDrawer {
     private SequenceGraph graph;
     private GraphicsContext gc;
 
+    /**
+     * Constructor
+     * @param graph The sequencegraph to be drawn to the canvas.
+     * @param gc The graphics context used to actually draw shapes.
+     */
     public GraphDrawer(SequenceGraph graph, GraphicsContext gc) {
         this.graph = graph;
         this.gc = gc;
@@ -28,6 +35,10 @@ public class GraphDrawer {
         graph.layerizeGraph();
     }
 
+    /**
+     * Iterates over all of the nodes in the sequence graph to visualize it in shapes.
+     * @throws IOException
+     */
     public void drawShapes() throws IOException {
         HashMap<Integer, SequenceNode> nodes = graph.getNodes();
 
