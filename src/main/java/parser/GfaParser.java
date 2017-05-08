@@ -1,16 +1,20 @@
+package parser;
+
+import graph.SequenceGraph;
+
 import java.io.*;
 import java.util.ArrayList;
 
 
-class GfaParser {
+public class GfaParser {
     private String header1;
     private String header2;
 
     /**
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
-        GfaParser parser = new GfaParser();
-        SequenceGraph graph = parser.parse("src/main/resources/TB10.gfa");
+        parser.GfaParser parser = new parser.GfaParser();
+        graph.SequenceGraph graph = parser.parse("src/main/resources/TB10.gfa");
         long endTime = System.currentTimeMillis();
         System.out.println("Total execution time: " + (endTime - startTime) );
         long sT = System.currentTimeMillis();

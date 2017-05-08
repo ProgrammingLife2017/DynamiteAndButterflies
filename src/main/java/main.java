@@ -1,3 +1,6 @@
+import graph.SequenceGraph;
+import parser.GfaParser;
+
 public class main {
 
     public static void main(String[] args) throws Exception{
