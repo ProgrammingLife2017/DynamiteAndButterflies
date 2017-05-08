@@ -5,7 +5,6 @@ package graph;
  */
 public class DummyNode extends Node {
 
-    public DummyNode(int id) {
-        super(id);
+    public DummyNode() {
     }
 }

@@ -10,11 +10,23 @@ import java.util.ArrayList;
  */
 public class SequenceNode extends Node {
 
+    private int id;
     private String seq;
+    private ArrayList<Integer> ids;
 
     public SequenceNode(int id, String seq){
-        super(id);
+        this.id = id;
         this.seq = seq;
+        this.ids = new ArrayList<Integer>();
+
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void addId(Integer id) {
+        this.ids.add(id);
     }
 
     public void setSequence(String seq) {

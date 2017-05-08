@@ -9,18 +9,12 @@ public class Edge {
 
     private final Integer parent;
     private final Integer child;
-    private boolean original;
     private ArrayList<Integer> columnSpan;
 
     public Edge(Integer parent, Integer child) {
         this.child = child;
         this.parent = parent;
-        this.original = true;
         this.columnSpan = new ArrayList<Integer>();
-    }
-
-    public void setDummy() {
-        this.original = false;
     }
 
     public Integer getChild() {

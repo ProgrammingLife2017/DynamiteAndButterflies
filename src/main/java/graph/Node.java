@@ -6,15 +6,11 @@ import java.util.ArrayList;
  * Created by Jasper van Tilburg on 8-5-2017.
  */
 public class Node {
-    private int id;
     private ArrayList<SequenceNode> adjecencyList;
-    private ArrayList<Integer> ids;
     private int column;
 
-    public Node(int id){
-        this.id = id;
+    public Node(){
         this.adjecencyList = new ArrayList<SequenceNode>();
-        this.ids = new ArrayList<Integer>();
         this.column = 0;
     }
 
@@ -33,9 +29,6 @@ public class Node {
         this.getChildren().add(child);
     }
 
-    public Integer getId() {
-        return id;
-    }
 
     public int getColumn() { return column; }
 
@@ -45,10 +38,6 @@ public class Node {
         if (this.column < parColumn + 1) {
             this.column = parColumn + 1;
         }
-    }
-
-    public void addId(Integer id) {
-        this.ids.add(id);
     }
 
 }

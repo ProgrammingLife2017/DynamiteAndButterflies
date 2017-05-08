@@ -2,6 +2,8 @@ package graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class SequenceGraph   {
 
@@ -16,7 +18,6 @@ public class SequenceGraph   {
         this.nodes = new HashMap<Integer, SequenceNode>();
         this.initialized = false;
         this.edges = new ArrayList<Edge>();
-
     }
 
     public ArrayList<Edge> getEdges() {
@@ -76,6 +77,28 @@ public class SequenceGraph   {
             int childColumn = nodes.get(edge.getChild()).getColumn();
             edge.setEntireColumnSpan(parColumn, childColumn);
         }
+    }
+
+    public ArrayList<ArrayList<Node>> getColumnList() {
+        ArrayList<ArrayList<Node>> columns = new ArrayList<ArrayList<Node>>();
+
+        Iterator it = nodes.entrySet().iterator();
+        while(it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            if (columns.size() <= node.getColumn()) {
+                columns.add(new ArrayList());
+            }
+            columns.get(node.getColumn()).add(node);
+            it.remove();
+        }
+
+        for(Edge edge : edges) {
+            for(int i : edge.getColumnSpan()) {
+                columns.get(i).add(0, new DummyNode());
+            }
+        }
+        return columns;
     }
 
 }

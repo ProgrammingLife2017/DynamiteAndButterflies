@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import parser.GfaParser;
@@ -23,6 +24,8 @@ public class MenuController {
     private AnchorPane anchorPane;
     @FXML
     private Canvas canvas;
+    @FXML
+    private Pane canvasPanel;
     private GraphicsContext gc;
     private GraphDrawer drawer;
 
@@ -31,6 +34,8 @@ public class MenuController {
      */
     @FXML
     public void initialize() {
+        canvas.widthProperty().bind(canvasPanel.widthProperty());
+        canvas.heightProperty().bind(canvasPanel.heightProperty());
         gc = canvas.getGraphicsContext2D();
     }
 

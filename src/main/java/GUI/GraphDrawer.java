@@ -1,11 +1,14 @@
 package GUI;
 
+import graph.DummyNode;
+import graph.Node;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -15,9 +18,9 @@ import java.util.HashMap;
  */
 public class GraphDrawer {
 
-    public static final int X_SIZE = 10;
-    public static final int Y_SIZE = 6;
-    public static final int EDGE_LENGTH = 2;
+    public static final int X_SIZE = 50;
+    public static final int Y_SIZE = 10;
+    public static final int EDGE_LENGTH = 30;
     public static final int Y_BASE = 40;
 
     private SequenceGraph graph;
@@ -39,7 +42,7 @@ public class GraphDrawer {
      * Iterates over all of the nodes in the sequence graph to visualize it in shapes.
      * @throws IOException
      */
-    public void drawShapes() throws IOException {
+    public void drawShapes2() throws IOException {
         HashMap<Integer, SequenceNode> nodes = graph.getNodes();
 
         for(int i = 1; i <= nodes.size(); i++) {
@@ -49,6 +52,22 @@ public class GraphDrawer {
 //            gc.setStroke(Color.BLACK);
 //            gc.setLineWidth(1);
 //            gc.strokeLine((node.getColumn() * (Xsize + lengthEdge)) + Xsize + 50,43, node.getColumn() * (Xsize + Xsize + lengthEdge) + 50, 43);
+        }
+    }
+
+    public void drawShapes() throws IOException {
+        ArrayList<ArrayList<Node>> columns = graph.getColumnList();
+        gc.setFill(Color.BLUE);
+
+        for(int j = 0; j < columns.size(); j++) {
+            ArrayList<Node> column = columns.get(j);
+            for (int i = 0; i < column.size(); i++) {
+                if (column.get(i) instanceof DummyNode) {
+                    gc.setFill(Color.BLACK);
+                }
+                gc.fillRoundRect((j * (X_SIZE + EDGE_LENGTH)) + 50, Y_BASE + (i * 50), X_SIZE, Y_SIZE, 10, 10);
+                gc.setFill(Color.BLUE);
+            }
         }
     }
 }
