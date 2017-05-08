@@ -11,6 +11,6 @@ public class main {
      * @param args Arguments that might be need to run
      */
     public static void main(String[] args) {
-        App.launch(args);
+        App.main(args);
     }
 }

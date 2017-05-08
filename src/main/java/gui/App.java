@@ -17,6 +17,14 @@ import java.io.UnsupportedEncodingException;
 public class App extends Application {
 
     /**
+     * A main method that launches the application.
+     * @param args arguments that might be neccesary later
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    /**
      * Intializes the application.
      * @param stageIn The Stage on which the application is built
      * @throws UnsupportedEncodingException If it cannot encode
