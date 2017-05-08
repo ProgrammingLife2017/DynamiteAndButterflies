@@ -37,7 +37,7 @@ public class MenuController {
             try {
                 GfaParser parser = new GfaParser();
                 System.out.println("src/main/resources/" + file.getName());
-                SequenceGraph graph = graph = parser.parse("src/main/resources/" + file.getName());
+                SequenceGraph graph = graph = parser.parse(file.getAbsolutePath());
                 drawer = new GraphDrawer(graph, gc);
                 drawer.drawShapes();
             } catch (IOException e) {
