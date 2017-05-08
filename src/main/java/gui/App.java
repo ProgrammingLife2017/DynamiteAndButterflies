@@ -1,4 +1,4 @@
-package GUI;
+package gui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -10,12 +10,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+/**
+ * The Application class.
+ * This class creates and maintains the different elements of the GUI.
+ */
 public class App extends Application {
 
-    public static void main(String[] args) {
-        launch(args);
-    }
-
+    /**
+     * Intializes the application.
+     * @param stageIn The Stage on which the application is built
+     * @throws UnsupportedEncodingException If it cannot encode
+     * @throws FileNotFoundException If it cannot find the file
+     */
     public void start(Stage stageIn) throws UnsupportedEncodingException, FileNotFoundException {
         stage = stageIn;
         stage.setTitle("Programming Life");
@@ -25,6 +31,11 @@ public class App extends Application {
     private static Stage stage;
     private static AnchorPane pane;
 
+    /**
+     * This method loads the FMXL files.
+     * @param path The place where the FXML file is
+     * @return A FMXLLoader which contains the file that is specified in path.
+     */
     public static FXMLLoader loadScene(String path) {
 
         try {
