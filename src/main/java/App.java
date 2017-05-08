@@ -1,12 +1,14 @@
 import javafx.application.Application;
-import javafx.scene.Group;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 public class App extends Application {
@@ -20,20 +22,36 @@ public class App extends Application {
         launch(args);
     }
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Drawing Operations Test");
-        Group root = new Group();
-        Canvas canvas = new Canvas(600, 250);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+    public void start(Stage stageIn) throws UnsupportedEncodingException, FileNotFoundException {
+        stage = stageIn;
+        stage.setTitle("Programming Life");
+        loadScene("/FXML/Menu.fxml");
+    }
+
+    private static Stage stage;
+    private static AnchorPane pane;
+
+    public static FXMLLoader loadScene(String path) {
+
         try {
-            drawShapes(gc);
+            // Load the anchor pane
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(App.class.getResource(path));
+            pane = loader.load();
+
+            // Set the pane onto the scene
+            Scene scene = new Scene(pane);
+            stage.setScene(scene);
+            stage.setResizable(true);
+            stage.show();
+            System.out.println(path + " loaded on the stage");
+            return loader;
         } catch (IOException e) {
             e.printStackTrace();
+            System.out
+                    .println("Something went wrong while loading the fxml file");
         }
-        root.getChildren().add(canvas);
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
+        return null;
     }
 
     private void drawShapes(GraphicsContext gc) throws IOException {
@@ -53,4 +71,5 @@ public class App extends Application {
 //            gc.strokeLine((node.getColumn() * (Xsize + lengthEdge)) + Xsize + 50,43, node.getColumn() * (Xsize + Xsize + lengthEdge) + 50, 43);
         }
     }
+
 }
