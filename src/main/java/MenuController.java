@@ -7,6 +7,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by TUDelft SID on 1-5-2017.
@@ -18,12 +19,11 @@ public class MenuController {
     @FXML
     private Canvas canvas;
     private GraphicsContext gc;
+    private GraphDrawer drawer;
 
     @FXML
     public void initialize() {
         gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.BLUE);
-        gc.fillRect(10,10,20,20);
     }
 
     @FXML
@@ -34,11 +34,16 @@ public class MenuController {
         //fileChooser.setInitialDirectory(this.getClass().getResource("/resources").toString());
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-            openFile(file);
+            try {
+                GfaParser parser = new GfaParser();
+                System.out.println("src/main/resources/" + file.getName());
+                SequenceGraph graph = graph = parser.parse("src/main/resources/" + file.getName());
+                drawer = new GraphDrawer(graph, gc);
+                drawer.drawShapes();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public void openFile(File file) {
-        //TODO
-    }
 }
