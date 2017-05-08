@@ -9,10 +9,10 @@ import java.util.HashMap;
  */
 public class GraphDrawer {
 
-    private int Xsize = 10;
-    private int Ysize = 6;
-    private int lengthEdge = 2;
-    private int yBase = 40;
+    public static final int X_SIZE = 10;
+    public static final int Y_SIZE = 6;
+    public static final int EDGE_LENGTH = 2;
+    public static final int Y_BASE = 40;
 
     private SequenceGraph graph;
     private GraphicsContext gc;
@@ -30,7 +30,7 @@ public class GraphDrawer {
         for(int i = 1; i <= nodes.size(); i++) {
             SequenceNode node = nodes.get(i);
             gc.setFill(Color.BLUE);
-            gc.fillRoundRect((node.getColumn() * (Xsize + lengthEdge)) + 50, yBase, Xsize, Ysize, 10, 10);
+            gc.fillRoundRect((node.getColumn() * (X_SIZE + EDGE_LENGTH)) + 50, Y_BASE, X_SIZE, Y_SIZE, 10, 10);
 //            gc.setStroke(Color.BLACK);
 //            gc.setLineWidth(1);
 //            gc.strokeLine((node.getColumn() * (Xsize + lengthEdge)) + Xsize + 50,43, node.getColumn() * (Xsize + Xsize + lengthEdge) + 50, 43);
