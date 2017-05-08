@@ -37,6 +37,7 @@ public class App extends Application {
             Scene scene = new Scene(pane);
             stage.setScene(scene);
             stage.setResizable(true);
+            stage.setMaximized(true);
             stage.show();
             System.out.println(path + " loaded on the stage");
             return loader;
