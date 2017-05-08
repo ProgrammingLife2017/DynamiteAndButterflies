@@ -1,8 +1,5 @@
 package graph;
 
-import parser.Edge;
-import parser.SequenceNode;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 

@@ -1,32 +1,22 @@
-package parser; /**
- * Created by Lex on 25-4-17.
- */
+package graph;
 
 import java.util.ArrayList;
 
 /**
- * Class Node2, which represents sequences of DNA. A sequence is a part of a genome.
- * The sequence is a String consisting of A, C T and G.
+ * Created by Jasper van Tilburg on 8-5-2017.
  */
-public class SequenceNode {
+public class Node {
     private int id;
-    private String seq;
     private ArrayList<SequenceNode> adjecencyList;
     private ArrayList<Integer> ids;
     private int column;
 
-    public SequenceNode(int id, String seq){
+    public Node(int id){
         this.id = id;
-        this.seq = seq;
         this.adjecencyList = new ArrayList<SequenceNode>();
         this.ids = new ArrayList<Integer>();
         this.column = 0;
     }
-
-    public void addId(Integer id) {
-        this.ids.add(id);
-    }
-
 
     public ArrayList<SequenceNode> getChildren() {
         return this.adjecencyList;
@@ -47,19 +37,6 @@ public class SequenceNode {
         return id;
     }
 
-
-    public String getSeq() {
-        return seq;
-    }
-
-    public void setSeq(String seq) {
-        this.seq = seq;
-    }
-
-    public String getSequence() {
-        return this.seq;
-    }
-
     public int getColumn() { return column; }
 
     public void setColumn(int newColumn) { this.column = newColumn;}
@@ -68,6 +45,10 @@ public class SequenceNode {
         if (this.column < parColumn + 1) {
             this.column = parColumn + 1;
         }
+    }
+
+    public void addId(Integer id) {
+        this.ids.add(id);
     }
 
 }
