@@ -1,12 +1,11 @@
-import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 
 /**
@@ -17,20 +16,14 @@ public class MenuController {
     @FXML
     private AnchorPane anchorPane;
     @FXML
-    private Pane graphPane;
-    private JPanel graphPanel;
+    private Canvas canvas;
+    private GraphicsContext gc;
 
     @FXML
     public void initialize() {
-
-    }
-
-    private void createSwingContent(final SwingNode swingNode) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                swingNode.setContent(graphPanel);
-            }
-        });
+        gc = canvas.getGraphicsContext2D();
+        gc.setFill(Color.BLUE);
+        gc.fillRect(10,10,20,20);
     }
 
     @FXML
@@ -38,7 +31,6 @@ public class MenuController {
         Stage stage = (Stage) anchorPane.getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
-        System.out.println(this.getClass().getResource("TB10.gfa"));
         //fileChooser.setInitialDirectory(this.getClass().getResource("/resources").toString());
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
@@ -47,15 +39,6 @@ public class MenuController {
     }
 
     public void openFile(File file) {
-        final SwingNode swingNode = new SwingNode();
-        graphPanel = new JPanel();
-        System.out.println(file.getName());
-        graphPanel.add(new GraphMaker().buildGraph("/" + file.getName()), BorderLayout.CENTER);
-        graphPanel.setSize((int) graphPane.getWidth(), (int) graphPane.getHeight());
-        createSwingContent(swingNode);
-        graphPane.getChildren().add(swingNode);
-        System.out.println(graphPane.getWidth() + ",  " + graphPane.getHeight());
-        System.out.println(graphPanel.getWidth() + ",  " + graphPanel.getHeight());
-
+        //TODO
     }
 }
