@@ -90,7 +90,7 @@ public class SequenceGraph   {
                 columns.add(new ArrayList());
             }
             columns.get(node.getColumn()).add(node);
-            it.remove();
+            //it.remove();
         }
 
         for(Edge edge : edges) {

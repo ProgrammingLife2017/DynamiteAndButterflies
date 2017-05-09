@@ -4,6 +4,7 @@ import graph.SequenceGraph;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
@@ -26,6 +27,10 @@ public class MenuController {
     private Canvas canvas;
     @FXML
     private Pane canvasPanel;
+    @FXML
+    private Label numNodesLabel;
+    @FXML
+    private Label numEdgesLabel;
     private GraphicsContext gc;
     private GraphDrawer drawer;
 
@@ -51,15 +56,25 @@ public class MenuController {
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             try {
-                GfaParser parser = new GfaParser();
-                System.out.println("src/main/resources/" + file.getName());
-                SequenceGraph graph = graph = parser.parse(file.getAbsolutePath());
-                drawer = new GraphDrawer(graph, gc);
-                drawer.drawShapes();
+                openFile(file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void openFile(File file) throws IOException {
+        GfaParser parser = new GfaParser();
+        System.out.println("src/main/resources/" + file.getName());
+        SequenceGraph graph = parser.parse(file.getAbsolutePath());
+        drawer = new GraphDrawer(graph, gc);
+        drawer.drawShapes();
+        displayInfo(graph);
+    }
+
+    public void displayInfo(SequenceGraph graph) {
+        numNodesLabel.setText(graph.getNodes().size() + "");
+        numEdgesLabel.setText(graph.getEdges().size() + "");
     }
 
 }
