@@ -50,8 +50,8 @@
          <left>
             <Pane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
                <children>
-                  <Button layoutX="22.0" layoutY="30.0" mnemonicParsing="false" text="Some button" />
-                  <Button layoutX="22.0" layoutY="75.0" mnemonicParsing="false" text="Some button" />
+                  <Button layoutX="22.0" layoutY="30.0" mnemonicParsing="false" onAction="#zoomInClicked" text="Zoom in" />
+                  <Button layoutX="22.0" layoutY="75.0" mnemonicParsing="false" onAction="#zoomOutClicked" text="Zoom out" />
                </children>
                <padding>
                   <Insets right="15.0" />

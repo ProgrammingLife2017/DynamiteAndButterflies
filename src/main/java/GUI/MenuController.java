@@ -77,4 +77,16 @@ public class MenuController {
         numEdgesLabel.setText(graph.getEdges().size() + "");
     }
 
+    @FXML
+    public void zoomInClicked() throws IOException {
+        drawer.zoom(0.5);
+        drawer.drawShapes();
+    }
+
+    @FXML
+    public void zoomOutClicked() throws IOException {
+        drawer.zoom(2);
+        drawer.drawShapes();
+    }
+
 }
