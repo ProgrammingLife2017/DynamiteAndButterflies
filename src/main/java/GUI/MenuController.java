@@ -98,6 +98,8 @@ public class MenuController {
     public void zoomOutClicked() throws IOException {
         drawer.zoom(2);
         drawer.drawShapes();
+
+        flagView = false;
     }
 
     private double pressedX;
