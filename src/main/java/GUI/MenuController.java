@@ -79,13 +79,13 @@ public class MenuController {
 
     @FXML
     public void zoomInClicked() throws IOException {
-        drawer.zoom(0.5);
+        drawer.zoomIn(0.8);
         drawer.drawShapes();
     }
 
     @FXML
     public void zoomOutClicked() throws IOException {
-        drawer.zoom(2);
+        drawer.zoomOut(1.25);
         drawer.drawShapes();
     }
 
