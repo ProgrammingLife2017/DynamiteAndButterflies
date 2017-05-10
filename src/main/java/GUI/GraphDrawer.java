@@ -79,10 +79,11 @@ public class GraphDrawer {
                     gc.strokeLine(j * (((gc.getCanvas().getWidth()) / zoomLevel) + xSize), 0, j * (((gc.getCanvas().getWidth() - 20) / zoomLevel) + xSize), gc.getCanvas().getHeight());
                 }
                 //gc.fillRoundRect((j * (xSize + EDGE_LENGTH)) + 50, Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
-                gc.fillRoundRect(j * ((gc.getCanvas().getWidth() - 20) / zoomLevel) , Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
+                gc.fillRoundRect(j * ((gc.getCanvas().getWidth() - 20) / zoomLevel) , Y_BASE + (i * 50), 0.9 * ((gc.getCanvas().getWidth() - 20) / zoomLevel), Y_SIZE, 10, 10);
                 gc.setFill(Color.BLUE);
             }
         }
     }
+
 }
 
