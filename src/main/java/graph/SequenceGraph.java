@@ -1,111 +1,168 @@
 package graph;
 
-import parser.Edge;
-import parser.SequenceNode;
+import com.rits.cloning.Cloner;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 
-/**
- * This class is the SequenceGraph.
- * A Graph handling a Directed-Acyclic-Graph.
- * This is our own data structure we will use to draw the eventual graph.
- */
-public class SequenceGraph   {
+public class SequenceGraph {
 
+    private final int ROOTNODEKEY = 1;
 
     private Integer size;
-    private HashMap<Integer, SequenceNode> nodes;
+    private HashMap<Integer, AbstractNode> nodes;
     private boolean initialized;
     private ArrayList<Edge> edges;
+    private LinkedList<Integer> list;
+    private int[] layers;
 
-    /**
-     * Initializes the SequenceGraph with it's basic values.
-     */
     public SequenceGraph() {
         this.size = 0;
-        this.nodes = new HashMap<Integer, SequenceNode>();
+        this.nodes = new HashMap<Integer, AbstractNode>();
         this.initialized = false;
         this.edges = new ArrayList<Edge>();
 
+
     }
 
-    /**
-     * Returns all the edges contained in the graph.
-     * @return a arrayList of Edges containing all the edges of the graph.
-     */
     public ArrayList<Edge> getEdges() {
         return this.edges;
     }
 
-    /**
-     * Adds a node to the graph.
-     * @param node a new node for the graph
+    /** Adds a node to the Hashmap and increments the size of the Graph
+     *
+     * @param node - the node to be added
      */
-    public void addNode(SequenceNode node) {
+    public void addNode(AbstractNode node) {
         this.nodes.put(node.getId(), node);
         this.size++;
     }
 
-    /**
-     * Returns one of the nodes in the graph.
-     * @param id An id specifying the node.
-     * @return A node specified by its id.
-     */
-    public SequenceNode getNode(Integer id) {
+
+    public AbstractNode getNode(Integer id) {
         return nodes.get(id);
     }
 
-    /**
-     * Returns all nodes contained in the graph.
-     * @return A HashMap of all nodes and their IDs contained in the graph.
-     */
-    public HashMap<Integer, SequenceNode> getNodes() {
-        return this.nodes;
-    }
 
-    /**
-     * Will initialize all the edges of the graph.
+    /** Initializer function that calls the setup functions for the graph
+     *
      */
     public void initialize() {
+
         for (Edge edge : getEdges()) {
             // aan elke parent de child toevoegen
-            this.getNode(edge.getParent()).addChild(this.getNode(edge.getChild()));
+            this.getNode(edge.getParent()).addChild(edge.getChild());
+        }
+        this.list = this.createTopologicalOrder();
+        this.createLayers();
+        this.addDummies();
+        this.initialized = true;
+    }
+
+    /** Creates a topological ordering of the graph and returns this ordering in the form of a LinkedList
+     *
+     * @return list - LinkedList<Integer>
+     */
+    public LinkedList<Integer> createTopologicalOrder() {
+//        LinkedList<graph.SequenceNode> list = new Stack<graph.SequenceNode>();
+        LinkedList<Integer> queue = new LinkedList<Integer>();
+        LinkedList<Integer> list = new LinkedList<Integer>();
+        AbstractNode root = this.getNode(ROOTNODEKEY);
+        boolean[] visited = new boolean[this.size+1];
+        queue.add(ROOTNODEKEY);
+        visited[ROOTNODEKEY] = true;
+        while (queue.size() != 0) {
+            AbstractNode current = this.getNode(queue.poll());
+            list.add(current.getId());
+            for (int i: current.getChildren()) {
+                if (!visited[i])
+                {
+                    visited[i] = true;
+                    queue.add(i);
+                }
+            }
+        }
+//        createTopologicalOrderHelper(list, root, visited);
+        return list;
+    }
+
+    /** Creates a deep copy of the topological ordered list.
+     *
+     * @return list
+     */
+    public LinkedList<Integer> getDeepCopyTopologicalOrderedList() {
+        Cloner cloner = new Cloner();
+        return cloner.deepClone(this.list);
+    }
+
+    /** Assigns each node with a layer using the longest path algorithm.
+     *
+     */
+    public void createLayers() {
+        LinkedList<Integer> list = getDeepCopyTopologicalOrderedList();
+
+
+        this.getNode(list.peek()).setLayer(1);
+
+        while (!list.isEmpty()) {
+            AbstractNode current = this.getNode(list.poll());
+            for (int i : current.getChildren()) {
+                this.getNode(i).incrementLayer(current.getLayer());
+            }
+        }
+
+        for (int i = 1; i < this.nodes.size(); i++) {
+            System.out.println("Node: " + this.getNode(i).getId() + " in layer: " + this.getNode(i).getLayer());
+
         }
     }
 
-    /**
-     * Will add columns to all the nodes and to all the edges.
+    /** Adds dummy nodes to the graph for visualisation purposes.
+     *
      */
-    public void layerizeGraph() {
-            createColumns();
-            createEdgeColumns();
-    }
-
-    /**
-     * Gives each node a column where it should be built.
-     */
-    public void createColumns() {
-        for (int i = 1; i <= size; i++) {
-            SequenceNode parent = nodes.get(i);     // Start at first node
-            ArrayList<SequenceNode> children = parent.getChildren();    // Get all children
-            for (SequenceNode child : children) {
-                child.incrementColumn(parent.getColumn());      // Assign layer
+    public void addDummies() {
+        LinkedList<Integer> list = getDeepCopyTopologicalOrderedList();
+        while (!list.isEmpty()){
+            AbstractNode parent = this.getNode(list.poll());
+            int size = parent.getChildren().size();
+            for (int i = 0; i < size; i++) {
+                int childId = parent.getChildren().get(i);
+                int span = getNode(childId).getLayer() - parent.getLayer();
+                if (span > 1) {
+                    addDummyHelper(span, parent, getNode(childId));
+                }
             }
         }
     }
 
-    /**
-     * Gives each edge it's ghost nodes.
-     */
-    public void createEdgeColumns() {
 
-        for (int i = 0; i < edges.size(); i++) {
-            Edge edge = edges.get(i);
-            int parColumn = nodes.get(edge.getParent()).getColumn();
-            int childColumn = nodes.get(edge.getChild()).getColumn();
-            edge.setEntireColumnSpan(parColumn, childColumn);
+    /** Helper function for addDummy()
+     *
+     * @param span - the difference in layer level of parent and child
+     * @param parent - the parent node
+     * @param target - the target node
+     */
+    public void addDummyHelper(int span, AbstractNode parent, AbstractNode target) {
+        if (span > 1) {
+            DummyNode dummy = new DummyNode(this.size+1, parent.getLayer() + 1);
+            int size = parent.getChildren().size();
+            for (int i = 0; i < size; i++) {
+                if (parent.getChildren().get(i) == target.getId()) {
+                    parent.getChildren().remove(i);
+                    parent.addChild(dummy.getId());
+                    break;
+                }
+            }
+            dummy.addChild(target.getId());
+            this.addNode(dummy);
+            span --;
+            addDummyHelper(span, dummy, target);
         }
+    }
+
+    public void layerizeGraph() {
+//        Start at first node
+//        Get all children
+//        Assign layer
     }
 
 }

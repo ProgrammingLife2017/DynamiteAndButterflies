@@ -1,6 +1,8 @@
 package parser;
 
+import graph.Edge;
 import graph.SequenceGraph;
+import graph.SequenceNode;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

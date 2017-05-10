@@ -1,9 +1,9 @@
 package gui;
 
 import graph.SequenceGraph;
+import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import parser.SequenceNode;
 
 import java.util.HashMap;
 
