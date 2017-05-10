@@ -59,7 +59,7 @@
             </Pane>
          </left>
          <center>
-            <Pane fx:id="canvasPanel" BorderPane.alignment="CENTER">
+            <Pane fx:id="canvasPanel" onMouseClicked="#clickMouse" onMouseDragged="#dragMouse" BorderPane.alignment="CENTER">
                <children>
                   <Canvas fx:id="canvas" />
                </children>

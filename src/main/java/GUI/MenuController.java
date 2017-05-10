@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
@@ -33,6 +34,7 @@ public class MenuController {
     private Label numEdgesLabel;
     private GraphicsContext gc;
     private GraphDrawer drawer;
+    private SequenceGraph graph;
 
     /**
      * Initializes the controller.
@@ -66,7 +68,7 @@ public class MenuController {
     public void openFile(File file) throws IOException {
         GfaParser parser = new GfaParser();
         System.out.println("src/main/resources/" + file.getName());
-        SequenceGraph graph = parser.parse(file.getAbsolutePath());
+        graph = parser.parse(file.getAbsolutePath());
         drawer = new GraphDrawer(graph, gc);
         drawer.drawShapes();
         displayInfo(graph);
@@ -89,4 +91,21 @@ public class MenuController {
         drawer.drawShapes();
     }
 
+    double pressedX;
+    double pressedY;
+
+    @FXML
+    public void clickMouse(MouseEvent mouseEvent) {
+        pressedX = mouseEvent.getX();
+        pressedY = mouseEvent.getY();
+    }
+
+    @FXML
+    public void dragMouse(MouseEvent mouseEvent) {
+        double xDifference = pressedX - mouseEvent.getX();
+        //double yDifference = pressedY - mouseEvent.getY();
+
+        drawer.reShape(xDifference);
+
+    }
 }

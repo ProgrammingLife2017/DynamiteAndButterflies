@@ -3,13 +3,11 @@ package GUI;
 import graph.DummyNode;
 import graph.Node;
 import graph.SequenceGraph;
-import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
@@ -64,6 +62,26 @@ public class GraphDrawer {
                 }
                 //gc.fillRoundRect((j * (xSize + EDGE_LENGTH)) + 50, Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
                 gc.fillRoundRect(j * (((gc.getCanvas().getWidth() - 20) / zoomLevel) + xSize), Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
+                gc.setFill(Color.BLUE);
+            }
+        }
+    }
+
+    public void reShape(double xDifference) {
+        gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
+        ArrayList<ArrayList<Node>> columns = graph.getColumnList();
+        gc.setFill(Color.BLUE);
+        for(int j = 0; j < columns.size(); j++) {
+            ArrayList<Node> column = columns.get(j);
+            for (int i = 0; i < column.size(); i++) {
+                if (column.get(i) instanceof DummyNode) {
+                    gc.setFill(Color.BLACK);
+                }
+                //gc.fillRoundRect((j * (xSize + EDGE_LENGTH)) + 50, Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
+                gc.fillRoundRect(
+                        j * (((gc.getCanvas().getWidth() - 20) / zoomLevel) + xSize) - xDifference,
+                        Y_BASE + (i * 50), xSize, Y_SIZE,
+                        10, 10);
                 gc.setFill(Color.BLUE);
             }
         }
