@@ -1,8 +1,8 @@
 package graph;
-
 import com.rits.cloning.Cloner;
-import java.util.*;
-
+import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SequenceGraph {
 
@@ -13,15 +13,12 @@ public class SequenceGraph {
     private boolean initialized;
     private ArrayList<Edge> edges;
     private LinkedList<Integer> list;
-    private int[] layers;
 
     public SequenceGraph() {
         this.size = 0;
         this.nodes = new HashMap<Integer, AbstractNode>();
         this.initialized = false;
         this.edges = new ArrayList<Edge>();
-
-
     }
 
     public ArrayList<Edge> getEdges() {
@@ -159,10 +156,5 @@ public class SequenceGraph {
         }
     }
 
-    public void layerizeGraph() {
-//        Start at first node
-//        Get all children
-//        Assign layer
-    }
 
 }

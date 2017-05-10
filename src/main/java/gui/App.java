@@ -11,8 +11,14 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
+<<<<<<< HEAD:src/main/java/gui/App.java
  * The Application class.
  * This class creates and maintains the different elements of the GUI.
+=======
+ * Created by Jasper van Tilburg on 1-5-2017.
+ *
+ * Class to startup the application.
+>>>>>>> BasicVisualization:src/main/java/GUI/App.java
  */
 public class App extends Application {
 
@@ -25,10 +31,17 @@ public class App extends Application {
     }
 
     /**
+<<<<<<< HEAD:src/main/java/gui/App.java
      * Intializes the application.
      * @param stageIn The Stage on which the application is built
      * @throws UnsupportedEncodingException If it cannot encode
      * @throws FileNotFoundException If it cannot find the file
+=======
+     * Launches the application with Menu.fxml as default scene.
+     * @param stageIn
+     * @throws UnsupportedEncodingException
+     * @throws FileNotFoundException
+>>>>>>> BasicVisualization:src/main/java/GUI/App.java
      */
     public void start(Stage stageIn) throws UnsupportedEncodingException, FileNotFoundException {
         stage = stageIn;
@@ -40,9 +53,15 @@ public class App extends Application {
     private static AnchorPane pane;
 
     /**
+<<<<<<< HEAD:src/main/java/gui/App.java
      * This method loads the FMXL files.
      * @param path The place where the FXML file is
      * @return A FMXLLoader which contains the file that is specified in path.
+=======
+     * This method is able to load FXML files onto the stage.
+     * @param path Path of the FXML file to be loaded on the screen
+     * @return The FXMLLoader
+>>>>>>> BasicVisualization:src/main/java/GUI/App.java
      */
     public static FXMLLoader loadScene(String path) {
 
@@ -56,6 +75,7 @@ public class App extends Application {
             Scene scene = new Scene(pane);
             stage.setScene(scene);
             stage.setResizable(true);
+            stage.setMaximized(true);
             stage.show();
             System.out.println(path + " loaded on the stage");
             return loader;
