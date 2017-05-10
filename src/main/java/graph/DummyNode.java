@@ -12,11 +12,21 @@ public class DummyNode extends AbstractNode {
     private ArrayList<Integer> adjacencyList;
     private int layer;
     private int id;
+    private int xCoordinate;
+    private int yCoordinate;
 
     public DummyNode(int id, int layer) {
         this.layer = layer;
         this.id = id;
         this.adjacencyList = new ArrayList<Integer>();
+    }
+
+    public void setxCoordinate(int x) {
+        this.xCoordinate = x;
+    }
+
+    public void setyCoordinate(int y) {
+        this.yCoordinate = y;
     }
 
     public ArrayList<Integer> getChildren() {
@@ -43,6 +53,14 @@ public class DummyNode extends AbstractNode {
         if (this.layer < parLayer + 1) {
             this.layer = parLayer + 1;
         }
+    }
+
+    public int getxCoordinate() {
+        return xCoordinate;
+    }
+
+    public int getyCoordinate() {
+        return yCoordinate;
     }
 }
 

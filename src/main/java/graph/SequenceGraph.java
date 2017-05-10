@@ -39,6 +39,10 @@ public class SequenceGraph {
         return nodes.get(id);
     }
 
+    public HashMap<Integer, AbstractNode> getNodes() {
+        return nodes;
+    }
+
 
     /** Initializer function that calls the setup functions for the graph
      *

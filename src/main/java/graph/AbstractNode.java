@@ -13,4 +13,6 @@ public abstract class AbstractNode {
     abstract int getId();
     abstract void setLayer(int layer);
     abstract void incrementLayer(int Parentlayer);
+    abstract void setxCoordinate(int x);
+    abstract void setyCoordinate(int y);
 }

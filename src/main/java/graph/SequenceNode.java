@@ -15,6 +15,8 @@ public class SequenceNode extends AbstractNode {
     private ArrayList<Integer> adjacencyList;
     private ArrayList<Integer> ids;
     private int layer;
+    private int xCoordinate;
+    private int yCoordinate;
 
     public SequenceNode(int id, String seq){
         this.id = id;
@@ -74,4 +76,19 @@ public class SequenceNode extends AbstractNode {
         return this.seq;
     }
 
+    public void setxCoordinate(int xCoordinate) {
+        this.xCoordinate = xCoordinate;
+    }
+
+    public void setyCoordinate(int yCoordinate) {
+        this.yCoordinate = yCoordinate;
+    }
+
+    public int getxCoordinate() {
+        return xCoordinate;
+    }
+
+    public int getyCoordinate() {
+        return yCoordinate;
+    }
 }

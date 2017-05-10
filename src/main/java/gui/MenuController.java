@@ -1,6 +1,10 @@
 package gui;
 
+import com.sun.xml.internal.bind.v2.TODO;
+import graph.AbstractNode;
+import graph.DummyNode;
 import graph.SequenceGraph;
+import graph.SequenceNode;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -11,8 +15,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import parser.GfaParser;
 
+import javax.sound.midi.Sequence;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -35,11 +42,7 @@ public class MenuController {
     private GraphDrawer drawer;
 
     /**
-<<<<<<< HEAD:src/main/java/gui/MenuController.java
      * Initializes the canvas.
-=======
-     * Initializes the controller.
->>>>>>> BasicVisualization:src/main/java/GUI/MenuController.java
      */
     @FXML
     public void initialize() {
@@ -49,11 +52,7 @@ public class MenuController {
     }
 
     /**
-<<<<<<< HEAD:src/main/java/gui/MenuController.java
-     * Implements the file chooser when choosing that option from teh file menu.
-=======
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa can be selected and directly be visualised on the screen.
->>>>>>> BasicVisualization:src/main/java/GUI/MenuController.java
      */
     @FXML
     public void openFileClicked() {
@@ -64,15 +63,7 @@ public class MenuController {
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             try {
-<<<<<<< HEAD:src/main/java/gui/MenuController.java
-                GfaParser parser = new GfaParser();
-                System.out.println("src/main/resources/" + file.getName());
-                SequenceGraph graph = parser.parse(file.getAbsolutePath());
-                drawer = new GraphDrawer(graph, gc);
-                drawer.drawShapes();
-=======
                 openFile(file);
->>>>>>> BasicVisualization:src/main/java/GUI/MenuController.java
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -83,26 +74,40 @@ public class MenuController {
         GfaParser parser = new GfaParser();
         System.out.println("src/main/resources/" + file.getName());
         SequenceGraph graph = parser.parse(file.getAbsolutePath());
+        graph.initialize();
+        assignCoordinates(graph);
         drawer = new GraphDrawer(graph, gc);
         drawer.drawShapes();
-        displayInfo(graph);
     }
 
-    public void displayInfo(SequenceGraph graph) {
-        numNodesLabel.setText(graph.getNodes().size() + "");
-        numEdgesLabel.setText(graph.getEdges().size() + "");
+    public void assignCoordinates(SequenceGraph graph) {
+        int[] layers = new int[graph.getNodes().size()];
+        for (int i = 0; i < graph.getNodes().size(); i++) {
+            if (graph.getNode(i + 1) instanceof SequenceNode) {
+                SequenceNode node = (SequenceNode) graph.getNode(i + 1);
+                int x = (int) (node.getLayer() * (canvas.getWidth() / graph.getNodes().size()));
+                node.setxCoordinate(x);
+                int y = layers[node.getLayer()] * 100 + 100;
+                layers[node.getLayer()]++;
+                node.setyCoordinate(y);
+            } else {
+                DummyNode node = (DummyNode) graph.getNode(i + 1);
+                int x = (int) (node.getLayer() * (canvas.getWidth() / graph.getNodes().size()));
+                node.setxCoordinate(x);
+                int y = layers[node.getLayer()] * 100 + 100;
+                layers[node.getLayer()]++;
+                node.setyCoordinate(y);
+            }
+        }
     }
 
     @FXML
     public void zoomInClicked() throws IOException {
-        drawer.zoom(0.5);
-        drawer.drawShapes();
+        //TODO
     }
 
     @FXML
     public void zoomOutClicked() throws IOException {
-        drawer.zoom(2);
-        drawer.drawShapes();
+        //TODO
     }
-
 }
