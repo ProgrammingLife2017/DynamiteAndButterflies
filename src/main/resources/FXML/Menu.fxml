@@ -59,11 +59,11 @@
             </Pane>
          </left>
          <center>
-            <Pane fx:id="canvasPanel" BorderPane.alignment="CENTER">
+            <AnchorPane fx:id="canvasPanel" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
                <children>
-                  <Canvas fx:id="canvas" />
+                  <Canvas fx:id="canvas" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
-            </Pane>
+            </AnchorPane>
          </center>
       </BorderPane>
    </children>

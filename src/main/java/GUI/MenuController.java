@@ -26,7 +26,7 @@ public class MenuController {
     @FXML
     private Canvas canvas;
     @FXML
-    private Pane canvasPanel;
+    private AnchorPane canvasPanel;
     @FXML
     private Label numNodesLabel;
     @FXML
