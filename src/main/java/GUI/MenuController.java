@@ -1,6 +1,7 @@
 package GUI;
 
 import graph.SequenceGraph;
+import graph.SequenceNode;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -74,7 +75,7 @@ public class MenuController {
         System.out.println("src/main/resources/" + file.getName());
         graph = parser.parse(file.getAbsolutePath());
         drawer = new GraphDrawer(graph, gc);
-        drawer.drawShapes();
+        drawer.moveShapes(0);
         displayInfo(graph);
     }
 
@@ -85,20 +86,12 @@ public class MenuController {
 
     @FXML
     public void zoomInClicked() throws IOException {
-        drawer.zoom(0.8);
-        if (flagView) {
-            drawer.drawShapes(getStartColumn(), getEndColumn());
-        } else {
-            drawer.drawShapes();
-        }
+        drawer.zoomIn(0.8, getStartColumn(drawer.getRealCentreNode()));
     }
 
     @FXML
     public void zoomOutClicked() throws IOException {
-        drawer.zoomOut(1.25);
-        drawer.drawShapes();
-
-        flagView = false;
+        drawer.zoomOut(1.25, getStartColumn(drawer.getRealCentreNode()));
     }
 
     private double pressedX;
@@ -110,8 +103,8 @@ public class MenuController {
 
     @FXML
     public void dragMouse(MouseEvent mouseEvent) {
-        double xDifference = pressedX - mouseEvent.getX();
-        drawer.reShape(xDifference);
+        double xDifference = pressedX - mouseEvent.getX() / 2;
+        drawer.moveShapes(xDifference);
     }
 
     /**
@@ -119,8 +112,9 @@ public class MenuController {
      */
     public void traverseGraphClicked() {
         flagView = true;
+        int radius = Integer.parseInt(radiusTextField.getText());
 
-        drawer.drawShapes(getStartColumn(), getEndColumn());
+        drawer.changeZoom(radius * 2, getStartColumn());
     }
 
     /**
@@ -139,16 +133,20 @@ public class MenuController {
         return graph.getNode(startNode).getColumn();
     }
 
-    /**
-     * Gets the end column based on the text fields.
-     * @return a integer representing the last column
-     */
-    private int getEndColumn() {
-        int centreNode = Integer.parseInt(nodeTextField.getText());
-        int radius = Integer.parseInt(radiusTextField.getText());
+    private int getStartColumn(SequenceNode centreNode) {
+        if (!nodeTextField.getText().equals("")) {
+            return getStartColumn();
+        } else {
+            String text = nodeTextField.getText();
+            int radius = 2000;
+            int centreNum = centreNode.getId();
 
-        int endNode = centreNode + radius;
+            int startNode = centreNum - radius;
+            if (startNode < 1) {
+                startNode = 1;
+            }
 
-        return graph.getNode(endNode).getColumn();
+            return graph.getNode(startNode).getColumn();
+        }
     }
 }

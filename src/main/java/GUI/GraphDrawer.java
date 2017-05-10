@@ -3,6 +3,7 @@ package GUI;
 import graph.DummyNode;
 import graph.Node;
 import graph.SequenceGraph;
+import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -43,15 +44,16 @@ public class GraphDrawer {
         zoomLevel = columns.size();
     }
 
-    public void zoom(double factor) {
+    public void zoomIn (double factor, int column) {
         this.zoomLevel = (int) (zoomLevel * factor);
         this.xSize += 0.1;
-        //System.out.println(zoomLevel + ", " + xSize);
+        moveShapes(getRealCentreNode().getColumn());
     }
 
-    public void zoomOut(double factor) {
+    public void zoomOut(double factor, int column) {
         this.zoomLevel = (int) (zoomLevel * factor);
         this.xSize -= 0.1;
+        moveShapes(getRealCentreNode().getColumn());
     }
 
     public int getZoomLevel() {
@@ -62,7 +64,7 @@ public class GraphDrawer {
      * Iterates over all of the nodes in the sequence graph to visualize it in shapes.
      * @throws IOException
      */
-    public void drawShapes() throws IOException {
+    public void drawShapes() {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         gc.setFill(Color.BLUE);
         for(int j = 0; j < columns.size(); j++) {
@@ -82,41 +84,46 @@ public class GraphDrawer {
         }
     }
 
-    public void drawShapes(int startColumn, int endColumn) {
-        gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
-        ArrayList<ArrayList<Node>> columns = graph.getColumnList();
-        gc.setFill(Color.BLUE);
-        int counter = 0;
-        int lastColumn = Math.min(endColumn, columns.size());
-        for (int j = startColumn; j < lastColumn; j++) {
-            counter++;
-            ArrayList<Node> column = columns.get(j);
-            for (int i = 0; i < column.size(); i++) {
-                if (column.get(i) instanceof DummyNode) {
-                    gc.setFill(Color.BLACK);
-                }
-                //gc.fillRoundRect((j * (xSize + EDGE_LENGTH)) + 50, Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
-                gc.fillRoundRect(counter * ((gc.getCanvas().getWidth() - 20) / zoomLevel) , Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
-                gc.setFill(Color.BLUE);
-            }
-        }
+    public void changeZoom(int newZoom, int column) {
+        zoomLevel = newZoom;
+        double xDifference = column;
+        //double xDifference = column * (gc.getCanvas().getWidth() - 20);
+        moveShapes(xDifference);
     }
 
     //Still needs to handle the centre node etc.
-    public void reShape(double xDifference) {
+    public void moveShapes(double xDifference) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
-        ArrayList<ArrayList<Node>> columns = graph.getColumnList();
+        gc.setFill(Color.BLUE);
         for(int j = 0; j < columns.size(); j++) {
             ArrayList<Node> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
                 if (column.get(i) instanceof DummyNode) {
                     gc.setFill(Color.BLACK);
                 }
+                if (j == columns.size() - 1) {
+                    gc.setFill(Color.RED);
+                    gc.strokeLine(j * (((gc.getCanvas().getWidth()) / zoomLevel) + xSize), 0, j * (((gc.getCanvas().getWidth() - 20) / zoomLevel) + xSize), gc.getCanvas().getHeight());
+                }
 
-                gc.fillRoundRect(j * ((gc.getCanvas().getWidth() - 20) / zoomLevel) - xDifference , Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
+                gc.fillRoundRect((j - xDifference) * ((gc.getCanvas().getWidth() - 20) / zoomLevel) , Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
                 gc.setFill(Color.BLUE);
             }
         }
+    }
+
+    public ArrayList<Node> getCentreColumn() {
+        return columns.get(columns.size() / 2);
+    }
+
+    public SequenceNode getRealCentreNode() {
+        ArrayList<Node> set = getCentreColumn();
+        for (Node test : set) {
+            if (test instanceof SequenceNode) {
+                return (SequenceNode) test;
+            }
+        }
+        return null;
     }
 }
 
