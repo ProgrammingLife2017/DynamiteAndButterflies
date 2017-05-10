@@ -86,7 +86,7 @@ public class SequenceGraph   {
         while(it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             SequenceNode node = (SequenceNode) pair.getValue();
-            if (columns.size() <= node.getColumn()) {
+            while (columns.size() <= node.getColumn()) {
                 columns.add(new ArrayList());
             }
             columns.get(node.getColumn()).add(node);

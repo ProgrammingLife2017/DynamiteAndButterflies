@@ -8,7 +8,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import parser.GfaParser;
@@ -31,7 +30,7 @@ public class MenuController {
     @FXML
     private Canvas canvas;
     @FXML
-    private Pane canvasPanel;
+    private AnchorPane canvasPanel;
     @FXML
     private Label numNodesLabel;
     @FXML
@@ -86,7 +85,7 @@ public class MenuController {
 
     @FXML
     public void zoomInClicked() throws IOException {
-        drawer.zoom(0.5);
+        drawer.zoom(0.8);
         if (flagView) {
             drawer.drawShapes(getStartColumn(), getEndColumn());
         } else {
@@ -96,7 +95,7 @@ public class MenuController {
 
     @FXML
     public void zoomOutClicked() throws IOException {
-        drawer.zoom(2);
+        drawer.zoomOut(1.25);
         drawer.drawShapes();
 
         flagView = false;
