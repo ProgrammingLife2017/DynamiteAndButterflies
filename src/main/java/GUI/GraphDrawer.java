@@ -7,6 +7,7 @@ import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import javax.sound.midi.Sequence;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -47,13 +48,13 @@ public class GraphDrawer {
     public void zoomIn (double factor, int column) {
         this.zoomLevel = (int) (zoomLevel * factor);
         this.xSize += 0.1;
-        moveShapes(getRealCentreNode().getColumn());
+        moveShapes(column - zoomLevel / 2);
     }
 
     public void zoomOut(double factor, int column) {
         this.zoomLevel = (int) (zoomLevel * factor);
         this.xSize -= 0.1;
-        moveShapes(getRealCentreNode().getColumn());
+        moveShapes(column - zoomLevel / 2);
     }
 
     public int getZoomLevel() {
@@ -72,10 +73,6 @@ public class GraphDrawer {
             for (int i = 0; i < column.size(); i++) {
                 if (column.get(i) instanceof DummyNode) {
                     gc.setFill(Color.BLACK);
-                }
-                if (j == columns.size() - 1) {
-                    gc.setFill(Color.RED);
-                    gc.strokeLine(j * (((gc.getCanvas().getWidth()) / zoomLevel) + xSize), 0, j * (((gc.getCanvas().getWidth() - 20) / zoomLevel) + xSize), gc.getCanvas().getHeight());
                 }
                 //gc.fillRoundRect((j * (xSize + EDGE_LENGTH)) + 50, Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
                 gc.fillRoundRect(j * ((gc.getCanvas().getWidth() - 20) / zoomLevel) , Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
@@ -101,11 +98,6 @@ public class GraphDrawer {
                 if (column.get(i) instanceof DummyNode) {
                     gc.setFill(Color.BLACK);
                 }
-                if (j == columns.size() - 1) {
-                    gc.setFill(Color.RED);
-                    gc.strokeLine(j * (((gc.getCanvas().getWidth()) / zoomLevel) + xSize), 0, j * (((gc.getCanvas().getWidth() - 20) / zoomLevel) + xSize), gc.getCanvas().getHeight());
-                }
-
                 gc.fillRoundRect((j - xDifference) * ((gc.getCanvas().getWidth() - 20) / zoomLevel) , Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
                 gc.setFill(Color.BLUE);
             }
@@ -124,6 +116,20 @@ public class GraphDrawer {
             }
         }
         return null;
+    }
+
+    //TODO: Loop over the  nodes in the graph (O(n*m) > O(k))
+    public int getColumnId(int nodeId){
+        for(ArrayList<Node> list : columns) {
+            for(Node node : list){
+                if(node instanceof SequenceNode) {
+                    if(((SequenceNode) node).getId() == nodeId) {
+                        return node.getColumn();
+                    }
+                }
+            }
+        }
+        return -1;
     }
 }
 

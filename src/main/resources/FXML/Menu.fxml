@@ -53,7 +53,7 @@
                <children>
                   <Button layoutX="22.0" layoutY="30.0" mnemonicParsing="false" onAction="#zoomInClicked" text="Zoom in" />
                   <Button layoutX="22.0" layoutY="75.0" mnemonicParsing="false" onAction="#zoomOutClicked" text="Zoom out" />
-                  <TextField fx:id="nodeTextField" alignment="CENTER" layoutX="23.0" layoutY="113.0" prefHeight="29.0" prefWidth="97.0" promptText="Centre node" />
+                  <TextField fx:id="nodeTextField" alignment="CENTER" layoutX="22.0" layoutY="113.0" prefHeight="29.0" prefWidth="97.0" promptText="Centre node" />
                   <Button layoutX="22.0" layoutY="142.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
                   <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="22.0" layoutY="167.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
                </children>

@@ -75,7 +75,7 @@ public class MenuController {
         System.out.println("src/main/resources/" + file.getName());
         graph = parser.parse(file.getAbsolutePath());
         drawer = new GraphDrawer(graph, gc);
-        drawer.moveShapes(0);
+        drawer.drawShapes();
         displayInfo(graph);
     }
 
@@ -86,12 +86,21 @@ public class MenuController {
 
     @FXML
     public void zoomInClicked() throws IOException {
-        drawer.zoomIn(0.8, getStartColumn(drawer.getRealCentreNode()));
+        if(!nodeTextField.getText().equals("")) {
+            int columnId = drawer.getColumnId(Integer.parseInt(nodeTextField.getText()));
+        } else {
+            drawer.zoomIn(0.8, drawer.getRealCentreNode().getColumn());
+        }
+
     }
 
     @FXML
     public void zoomOutClicked() throws IOException {
-        drawer.zoomOut(1.25, getStartColumn(drawer.getRealCentreNode()));
+        if(!nodeTextField.getText().equals("")) {
+            drawer.zoomIn(1.2, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
+        } else {
+            drawer.zoomIn(1.2, drawer.getRealCentreNode().getColumn());
+        }
     }
 
     private double pressedX;
@@ -145,7 +154,6 @@ public class MenuController {
             if (startNode < 1) {
                 startNode = 1;
             }
-
             return graph.getNode(startNode).getColumn();
         }
     }
