@@ -1,40 +1,23 @@
-package parser; /**
- * Created by Lex on 25-4-17.
- */
+package graph;
 
 import java.util.ArrayList;
 
 /**
+ * Created by Jasper van Tilburg on 8-5-2017.
  * A class specifying nodes to be used to draw the graph.
  * A sequence is a part of a genome.
  * The sequence is a String consisting of A, C T and G.
  */
-public class SequenceNode {
-    private int id;
-    private String seq;
+public class Node {
     private ArrayList<SequenceNode> adjecencyList;
-    private ArrayList<Integer> ids;
     private int column;
 
     /**
-     * Constructor of the Sequence node object.
-     * @param id The id the node should receive
-     * @param seq The sequence the node should receive
+     * Constructor of the Node object.
      */
-    public SequenceNode(int id, String seq) {
-        this.id = id;
-        this.seq = seq;
+    public Node(){
         this.adjecencyList = new ArrayList<SequenceNode>();
-        this.ids = new ArrayList<Integer>();
         this.column = 0;
-    }
-
-    /**
-     * Adds an id to the node.
-     * @param id a new id to be added
-     */
-    public void addId(Integer id) {
-        this.ids.add(id);
     }
 
     /**
@@ -70,38 +53,6 @@ public class SequenceNode {
     }
 
     /**
-     * Returns the id of the node.
-     * @return the id of the node
-     */
-    public Integer getId() {
-        return id;
-    }
-
-    /**
-     * Returns the sequence of the node.
-     * @return the sequence of the node
-     */
-    public String getSeq() {
-        return seq;
-    }
-
-    /**
-     * Sets the sequence of the node to a different one.
-     * @param seq The new sequence for the node
-     */
-    public void setSeq(String seq) {
-        this.seq = seq;
-    }
-
-    /**
-     * Returns the sequence of the node.
-     * @return the sequence of the node
-     */
-    public String getSequence() {
-        return getSeq();
-    }
-
-    /**
      * Gets the column of the node.
      * @return the column of the node.
      */
@@ -126,5 +77,4 @@ public class SequenceNode {
             setColumn(parColumn + 1);
         }
     }
-
 }

@@ -1,56 +1,155 @@
 package gui;
 
+import graph.DummyNode;
+import graph.Node;
 import graph.SequenceGraph;
+import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import parser.SequenceNode;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 /**
- * Created by TUDelft SID on 8-5-2017.
+ * Created by Jasper van Tilburg on 8-5-2017.
+ *
+ * Class used to draw shapes on the canvas.
  */
-public class GraphDrawer {
-
-    public static final int X_SIZE = 10;
-    public static final int Y_SIZE = 6;
-    public static final int EDGE_LENGTH = 2;
-    public static final int Y_BASE = 40;
-
-    private SequenceGraph graph;
-    private GraphicsContext gc;
+public final class GraphDrawer {
 
     /**
-     * Constructor of the graphDrawer.
-     * @param graph Needs a graph to draw
-     * @param gc and a GraphicsContext to draw on
+     * Height of drawn nodes.
      */
-    public GraphDrawer(SequenceGraph graph, GraphicsContext gc) {
-        this.graph = graph;
+    private static final int Y_SIZE = 5;
+
+    /**
+     * Base line for Nodes.
+     */
+    private static final int Y_BASE = 100;
+
+    /**
+     * The number of Columns to be displayed in the Canvas.
+     */
+    private int zoomLevel;
+
+    /**
+     * The size of the nodes.
+     */
+    private double xSize;
+
+    /**
+     * The graphics context used to actually draw shapes.
+     */
+    private GraphicsContext gc;
+
+    private ArrayList<ArrayList<Node>> columns;
+
+    /**
+     * Constructor.
+     * @param graph The sequencegraph to be drawn to the canvas.
+     * @param gc The graphics context used to actually draw shapes.
+     */
+    GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
+        xSize = 1;
         graph.initialize();
         graph.layerizeGraph();
+        columns = graph.getColumnList();
+        zoomLevel = columns.size();
     }
 
     /**
-     * Draws all the nodes.
+     * Function what to do on ZoomIn.
+     * @param factor Zooming factor.
+     * @param column The Column that has to be in the centre.
      */
-    public void drawShapes() {
-        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
+    void zoomIn(final double factor, final int column) {
+        this.zoomLevel = (int) (zoomLevel * factor);
+        this.xSize += 0.1;
+        moveShapes(column - zoomLevel / 2);
+    }
 
-        for (int i = 1; i <= nodes.size(); i++) {
-            SequenceNode node = nodes.get(i);
-            gc.setFill(Color.BLUE);
-            //CHECKSTYLE: OFF
-            gc.fillRoundRect((node.getColumn() * (X_SIZE + EDGE_LENGTH)) + 50,
-                                Y_BASE, X_SIZE, Y_SIZE, 10, 10);
-//            gc.setStroke(Color.BLACK);
-//            gc.setLineWidth(1);
-//            gc.strokeLine((node.getColumn() * (Xsize + lengthEdge)) + Xsize + 50,43,
-//            node.getColumn() * (Xsize + Xsize + lengthEdge) + 50, 43);
+    /**
+     * Function what to do on ZoomOut.
+     * @param factor Zooming factor.
+     * @param column The column that has to be in the centre.
+     */
+    public void zoomOut(final double factor, final int column) {
+        this.zoomLevel = (int) (zoomLevel * factor);
+        this.xSize -= 0.1;
+        moveShapes(column - zoomLevel / 2);
+    }
 
-            //CHECKSTYLE: ON
+    /**
+     * Change the zoom (invoked by user by clicking on "Go to this Node".
+     * @param newZoom The new radius.
+     * @param column The new Column to be in the centre.
+     */
+    void changeZoom(final int newZoom, final int column) {
+        zoomLevel = newZoom;
+        moveShapes(column - zoomLevel / 2);
+    }
+
+    /**
+     * Draws the Graph.
+     * @param xDifference Variable to determine which column should be in the centre.
+     */
+    void moveShapes(final double xDifference) {
+        gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
+        gc.setFill(Color.BLUE);
+        for (int j = 0; j < columns.size(); j++) {
+            ArrayList<Node> column = columns.get(j);
+            for (int i = 0; i < column.size(); i++) {
+                if (column.get(i) instanceof DummyNode) {
+                    gc.setFill(Color.BLACK);
+                }
+                gc.fillRoundRect((j - xDifference) * ((gc.getCanvas().getWidth() - 20) / zoomLevel),
+                                Y_BASE + (i * 50), 0.9 * ((gc.getCanvas().getWidth() - 20) / zoomLevel), Y_SIZE,
+                                10, 10);
+
+                gc.setFill(Color.BLUE);
+            }
         }
+    }
+
+    /**
+     * Gets the real Centre Column.
+     * @return the Centre Column.
+     */
+    private ArrayList<Node> getCentreColumn() {
+        return columns.get(columns.size() / 2);
+    }
+
+    /**
+     * Returns the First SequenceNode (not Dummy) Object from the centre Column.
+     * @return The Centre Node.
+     */
+    SequenceNode getRealCentreNode() {
+        ArrayList<Node> set = getCentreColumn();
+        for (Node test : set) {
+            if (test instanceof SequenceNode) {
+                return (SequenceNode) test;
+            }
+        }
+        return null;
+    }
+
+    //TODO: Loop over the  nodes in the graph (O(n*m) > O(k))
+    /**
+     * Returns the ColumnId of a Node at the users Choice.
+     * @param nodeId The Id of the Node you want to find the Column of.
+     * @return The ColumnId
+     */
+    int getColumnId(final int nodeId) {
+        for (ArrayList<Node> list : columns) {
+            for (Node node : list) {
+                if (node instanceof SequenceNode) {
+                    if (((SequenceNode) node).getId() == nodeId) {
+                        return node.getColumn();
+                    }
+                }
+            }
+        }
+        return -1;
     }
 }
 

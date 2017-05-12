@@ -7,9 +7,11 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Line?>
 
 <AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MenuController">
    <children>
@@ -38,16 +40,22 @@
          <bottom>
             <Pane maxWidth="1.7976931348623157E308" prefHeight="150.0" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
                <children>
-                  <Label layoutX="44.0" layoutY="42.0" text="Some info" />
-                  <Label layoutX="44.0" layoutY="14.0" text="Some info" />
+                  <Label layoutX="14.0" layoutY="14.0" text="Nodes:" />
+                  <Label layoutX="14.0" layoutY="37.0" text="Edges:" />
+                  <Label fx:id="numNodesLabel" layoutX="73.0" layoutY="14.0" text="0" />
+                  <Label fx:id="numEdgesLabel" layoutX="73.0" layoutY="37.0" text="0" />
+                  <Line endX="50.0" endY="120.0" layoutX="101.0" layoutY="14.0" startX="50.0" stroke="#c9c4c4" strokeLineCap="ROUND" strokeLineJoin="ROUND" />
                </children>
             </Pane>
          </bottom>
          <left>
             <Pane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
                <children>
-                  <Button layoutX="22.0" layoutY="30.0" mnemonicParsing="false" text="Some button" />
-                  <Button layoutX="22.0" layoutY="75.0" mnemonicParsing="false" text="Some button" />
+                  <Button layoutX="22.0" layoutY="30.0" mnemonicParsing="false" onAction="#zoomInClicked" text="Zoom in" />
+                  <Button layoutX="22.0" layoutY="75.0" mnemonicParsing="false" onAction="#zoomOutClicked" text="Zoom out" />
+                  <TextField fx:id="nodeTextField" alignment="CENTER" layoutX="22.0" layoutY="113.0" prefHeight="29.0" prefWidth="97.0" promptText="Centre node" />
+                  <Button layoutX="22.0" layoutY="142.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
+                  <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="22.0" layoutY="167.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
                </children>
                <padding>
                   <Insets right="15.0" />
@@ -55,9 +63,9 @@
             </Pane>
          </left>
          <center>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: Black; -fx-background-color: White;" BorderPane.alignment="CENTER">
+            <AnchorPane fx:id="canvasPanel" onMouseClicked="#clickMouse" onMouseDragged="#dragMouse" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
                <children>
-                  <Canvas fx:id="canvas" height="418.0" width="850.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-0.0" AnchorPane.topAnchor="0.0" />
+                  <Canvas fx:id="canvas" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
          </center>

@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
+ * Created by Jasper van Tilburg on 1-5-2017.
+ *
  * The Application class.
- * This class creates and maintains the different elements of the GUI.
+ * This class creates and maintains the different elements of the gui.
  */
 public class App extends Application {
 
@@ -25,10 +27,10 @@ public class App extends Application {
     }
 
     /**
-     * Intializes the application.
-     * @param stageIn The Stage on which the application is built
-     * @throws UnsupportedEncodingException If it cannot encode
-     * @throws FileNotFoundException If it cannot find the file
+     * Launches the application with Menu.fxml as default scene.
+     * @param stageIn
+     * @throws UnsupportedEncodingException
+     * @throws FileNotFoundException
      */
     public void start(Stage stageIn) throws UnsupportedEncodingException, FileNotFoundException {
         stage = stageIn;
@@ -40,9 +42,9 @@ public class App extends Application {
     private static AnchorPane pane;
 
     /**
-     * This method loads the FMXL files.
-     * @param path The place where the FXML file is
-     * @return A FMXLLoader which contains the file that is specified in path.
+     * This method is able to load FXML files onto the stage.
+     * @param path Path of the FXML file to be loaded on the screen
+     * @return The FXMLLoader
      */
     public static FXMLLoader loadScene(String path) {
 
@@ -56,6 +58,7 @@ public class App extends Application {
             Scene scene = new Scene(pane);
             stage.setScene(scene);
             stage.setResizable(true);
+            stage.setMaximized(true);
             stage.show();
             System.out.println(path + " loaded on the stage");
             return loader;
