@@ -23,6 +23,9 @@ import java.io.IOException;
  */
 public class MenuController {
 
+
+    @FXML
+    private Label sequenceInfo;
     @FXML
     private TextField nodeTextField;
     @FXML
@@ -83,6 +86,8 @@ public class MenuController {
     private void displayInfo(SequenceGraph graph) {
         numNodesLabel.setText(graph.getNodes().size() + "");
         numEdgesLabel.setText(graph.getEdges().size() + "");
+        nodeTextField.setText(drawer.getRealCentreNode().getId() + "");
+        radiusTextField.setText(drawer.getZoomLevel() + "");
     }
 
     /**
@@ -93,8 +98,10 @@ public class MenuController {
     public void zoomInClicked() throws IOException {
         if (!getNodeTextField().getText().equals("")) {
             drawer.zoomIn(0.8, drawer.getColumnId(Integer.parseInt(getNodeTextField().getText())));
+            radiusTextField.setText(drawer.getZoomLevel() + "");
         } else {
             drawer.zoomIn(0.8, drawer.getRealCentreNode().getColumn());
+            radiusTextField.setText(drawer.getZoomLevel() + "");
         }
 
     }
@@ -107,8 +114,10 @@ public class MenuController {
     public void zoomOutClicked() throws IOException {
         if (!getNodeTextField().getText().equals("")) {
             drawer.zoomOut(1.2, drawer.getColumnId(Integer.parseInt(getNodeTextField().getText())));
+            radiusTextField.setText(drawer.getZoomLevel() + "");
         } else {
             drawer.zoomOut(1.2, drawer.getRealCentreNode().getColumn());
+            radiusTextField.setText(drawer.getZoomLevel() + "");
         }
     }
 
@@ -139,6 +148,7 @@ public class MenuController {
     public void traverseGraphClicked() {
         int centreNodeID = Integer.parseInt(getNodeTextField().getText());
         drawer.changeZoom(getEndColumn() - getStartColumn(), drawer.getColumnId(centreNodeID));
+        sequenceInfo.setText("Sequence: " + graph.getNode(centreNodeID).getSequence());
     }
 
     /**
