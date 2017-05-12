@@ -1,32 +1,56 @@
 package graph;
 
-import graph.AbstractNode;
-
 import java.util.ArrayList;
 
-/**
- * Created by eric on 10-5-17.
- */
+
 public class DummyNode extends AbstractNode {
 
-    private ArrayList<Integer> adjacencyList;
-    private int layer;
     private int id;
+    private ArrayList<Integer> adjacencyList;
+    private ArrayList<Integer> parents;
+    private int index;
+    private int layer;
+    private float baryCenterValue;
     private int xCoordinate;
     private int yCoordinate;
 
-    public DummyNode(int id, int layer) {
+    DummyNode(int id, int layer) {
         this.layer = layer;
         this.id = id;
         this.adjacencyList = new ArrayList<Integer>();
+        this.parents = new ArrayList<Integer>();
     }
 
-    public void setxCoordinate(int x) {
-        this.xCoordinate = x;
+    void addParent(int id) {
+        this.parents.add(id);
     }
 
-    public void setyCoordinate(int y) {
-        this.yCoordinate = y;
+    ArrayList<Integer> getParents() {
+        return this.parents;
+    }
+
+    void setParents(ArrayList<Integer> parents) {
+        this.parents = parents;
+    }
+
+    int getIndex() {
+        return this.index;
+    }
+
+    void setIndex(int index) {
+        this.index = index;
+    }
+
+    float getBaryCenterValue() {
+        return this.baryCenterValue;
+    }
+
+    void setBaryCenterValue(float value) {
+        this.baryCenterValue = value;
+    }
+
+    public void updateBaryCenterValue(int value) {
+        this.baryCenterValue += value;
     }
 
     public ArrayList<Integer> getChildren() {
@@ -37,16 +61,16 @@ public class DummyNode extends AbstractNode {
         return this.layer;
     }
 
+    public void setLayer(int layer) {
+        this.layer = layer;
+    }
+
     public void addChild(int childId) {
         this.adjacencyList.add(childId);
     }
 
     public int getId() {
         return this.id;
-    }
-
-    public void setLayer(int layer) {
-        this.layer = layer;
     }
 
     public void incrementLayer(int parLayer) {
@@ -59,8 +83,16 @@ public class DummyNode extends AbstractNode {
         return xCoordinate;
     }
 
+    public void setxCoordinate(int x) {
+        this.xCoordinate = x;
+    }
+
     public int getyCoordinate() {
         return yCoordinate;
+    }
+
+    public void setyCoordinate(int y) {
+        this.yCoordinate = y;
     }
 }
 
