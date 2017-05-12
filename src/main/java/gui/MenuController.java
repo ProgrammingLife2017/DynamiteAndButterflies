@@ -106,9 +106,9 @@ public class MenuController {
     @FXML
     public void zoomOutClicked() throws IOException {
         if (!getNodeTextField().getText().equals("")) {
-            drawer.zoomIn(1.2, drawer.getColumnId(Integer.parseInt(getNodeTextField().getText())));
+            drawer.zoomOut(1.2, drawer.getColumnId(Integer.parseInt(getNodeTextField().getText())));
         } else {
-            drawer.zoomIn(1.2, drawer.getRealCentreNode().getColumn());
+            drawer.zoomOut(1.2, drawer.getRealCentreNode().getColumn());
         }
     }
 
@@ -137,8 +137,8 @@ public class MenuController {
      * Adds a button to traverse the graph with.
      */
     public void traverseGraphClicked() {
-        int radius = Integer.parseInt(getRadiusTextField().getText());
-        drawer.changeZoom(radius * 2, getStartColumn());
+        int centreNodeID = Integer.parseInt(getNodeTextField().getText());
+        drawer.changeZoom(getEndColumn() - getStartColumn(), drawer.getColumnId(centreNodeID));
     }
 
     /**
@@ -154,7 +154,19 @@ public class MenuController {
         if (startNode < 1) {
             startNode = 1;
         }
-        return graph.getNode(startNode).getColumn();
+        return drawer.getColumnId(startNode);
+    }
+
+    private int getEndColumn() {
+        String text = getNodeTextField().getText();
+        int centreNode = Integer.parseInt(getNodeTextField().getText());
+        int radius = Integer.parseInt(getRadiusTextField().getText());
+
+        int endNode = centreNode + radius;
+        if (endNode > graph.getNodes().size()) {
+            endNode = graph.getNodes().size();
+        }
+        return drawer.getColumnId(endNode);
     }
 
     /**

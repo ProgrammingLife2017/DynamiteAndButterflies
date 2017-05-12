@@ -8,7 +8,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
@@ -87,7 +86,7 @@ public final class GraphDrawer {
      */
     void changeZoom(final int newZoom, final int column) {
         zoomLevel = newZoom;
-        moveShapes((double) column);
+        moveShapes(column - zoomLevel / 2);
     }
 
     /**
