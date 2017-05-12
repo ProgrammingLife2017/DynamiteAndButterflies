@@ -7,8 +7,6 @@ import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import javax.sound.midi.Sequence;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -59,26 +57,6 @@ public class GraphDrawer {
 
     public int getZoomLevel() {
         return this.zoomLevel;
-    }
-
-    /**
-     * Iterates over all of the nodes in the sequence graph to visualize it in shapes.
-     * @throws IOException
-     */
-    public void drawShapes() {
-        gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
-        gc.setFill(Color.BLUE);
-        for(int j = 0; j < columns.size(); j++) {
-            ArrayList<Node> column = columns.get(j);
-            for (int i = 0; i < column.size(); i++) {
-                if (column.get(i) instanceof DummyNode) {
-                    gc.setFill(Color.BLACK);
-                }
-                //gc.fillRoundRect((j * (xSize + EDGE_LENGTH)) + 50, Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
-                gc.fillRoundRect(j * ((gc.getCanvas().getWidth() - 20) / zoomLevel) , Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
-                gc.setFill(Color.BLUE);
-            }
-        }
     }
 
     public void changeZoom(int newZoom, int column) {

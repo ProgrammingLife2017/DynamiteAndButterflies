@@ -1,7 +1,6 @@
 package GUI;
 
 import graph.SequenceGraph;
-import graph.SequenceNode;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -75,7 +74,7 @@ public class MenuController {
         System.out.println("src/main/resources/" + file.getName());
         graph = parser.parse(file.getAbsolutePath());
         drawer = new GraphDrawer(graph, gc);
-        drawer.drawShapes();
+        drawer.moveShapes(0.0);
         displayInfo(graph);
     }
 
@@ -87,7 +86,7 @@ public class MenuController {
     @FXML
     public void zoomInClicked() throws IOException {
         if(!nodeTextField.getText().equals("")) {
-            int columnId = drawer.getColumnId(Integer.parseInt(nodeTextField.getText()));
+            drawer.zoomIn(0.8, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
         } else {
             drawer.zoomIn(0.8, drawer.getRealCentreNode().getColumn());
         }
@@ -140,21 +139,5 @@ public class MenuController {
             startNode = 1;
         }
         return graph.getNode(startNode).getColumn();
-    }
-
-    private int getStartColumn(SequenceNode centreNode) {
-        if (!nodeTextField.getText().equals("")) {
-            return getStartColumn();
-        } else {
-            String text = nodeTextField.getText();
-            int radius = 2000;
-            int centreNum = centreNode.getId();
-
-            int startNode = centreNum - radius;
-            if (startNode < 1) {
-                startNode = 1;
-            }
-            return graph.getNode(startNode).getColumn();
-        }
     }
 }
