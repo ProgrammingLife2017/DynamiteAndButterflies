@@ -18,13 +18,15 @@ import java.io.IOException;
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
  *
- * Controller for the Menu scene. Used to run all functionality in the main screen of the application.
+ * Controller for the Menu scene. Used to run all functionality
+ * in the main screen of the application.
  */
 public class MenuController {
 
-    public TextField nodeTextField;
-    public TextField radiusTextField;
-    private boolean flagView;
+    @FXML
+    private TextField nodeTextField;
+    @FXML
+    private TextField radiusTextField;
     @FXML
     private AnchorPane anchorPane;
     @FXML
@@ -47,11 +49,11 @@ public class MenuController {
         canvas.widthProperty().bind(canvasPanel.widthProperty());
         canvas.heightProperty().bind(canvasPanel.heightProperty());
         gc = canvas.getGraphicsContext2D();
-        flagView = false;
     }
 
     /**
-     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa can be selected and directly be visualised on the screen.
+     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
+     * can be selected and directly be visualised on the screen.
      */
     @FXML
     public void openFileClicked() {
@@ -69,7 +71,7 @@ public class MenuController {
         }
     }
 
-    public void openFile(File file) throws IOException {
+    private void openFile(File file) throws IOException {
         GfaParser parser = new GfaParser();
         System.out.println("src/main/resources/" + file.getName());
         graph = parser.parse(file.getAbsolutePath());
@@ -78,25 +80,33 @@ public class MenuController {
         displayInfo(graph);
     }
 
-    public void displayInfo(SequenceGraph graph) {
+    private void displayInfo(SequenceGraph graph) {
         numNodesLabel.setText(graph.getNodes().size() + "");
         numEdgesLabel.setText(graph.getEdges().size() + "");
     }
 
+    /**
+     * ZoomIn Action Handler.
+     * @throws IOException exception.
+     */
     @FXML
     public void zoomInClicked() throws IOException {
-        if(!nodeTextField.getText().equals("")) {
-            drawer.zoomIn(0.8, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
+        if (!getNodeTextField().getText().equals("")) {
+            drawer.zoomIn(0.8, drawer.getColumnId(Integer.parseInt(getNodeTextField().getText())));
         } else {
             drawer.zoomIn(0.8, drawer.getRealCentreNode().getColumn());
         }
 
     }
 
+    /**
+     * ZoomOut Action Handler.
+     * @throws IOException exception.
+     */
     @FXML
     public void zoomOutClicked() throws IOException {
-        if(!nodeTextField.getText().equals("")) {
-            drawer.zoomIn(1.2, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
+        if (!getNodeTextField().getText().equals("")) {
+            drawer.zoomIn(1.2, drawer.getColumnId(Integer.parseInt(getNodeTextField().getText())));
         } else {
             drawer.zoomIn(1.2, drawer.getRealCentreNode().getColumn());
         }
@@ -104,11 +114,19 @@ public class MenuController {
 
     private double pressedX;
 
+    /**
+     * Get the X-Coordinate of the cursor on click.
+     * @param mouseEvent the mouse event.
+     */
     @FXML
     public void clickMouse(MouseEvent mouseEvent) {
         pressedX = mouseEvent.getX();
     }
 
+    /**
+     *  The eventHandler for dragging the mouse.
+     * @param mouseEvent The MouseEvent for dragging.
+     */
     @FXML
     public void dragMouse(MouseEvent mouseEvent) {
         double xDifference = pressedX - mouseEvent.getX() / 2;
@@ -119,9 +137,7 @@ public class MenuController {
      * Adds a button to traverse the graph with.
      */
     public void traverseGraphClicked() {
-        flagView = true;
-        int radius = Integer.parseInt(radiusTextField.getText());
-
+        int radius = Integer.parseInt(getRadiusTextField().getText());
         drawer.changeZoom(radius * 2, getStartColumn());
     }
 
@@ -130,14 +146,30 @@ public class MenuController {
      * @return integer representing the starting column
      */
     private int getStartColumn() {
-        String text = nodeTextField.getText();
-        int centreNode = Integer.parseInt(nodeTextField.getText());
-        int radius = Integer.parseInt(radiusTextField.getText());
+        String text = getNodeTextField().getText();
+        int centreNode = Integer.parseInt(getNodeTextField().getText());
+        int radius = Integer.parseInt(getRadiusTextField().getText());
 
         int startNode = centreNode - radius;
         if (startNode < 1) {
             startNode = 1;
         }
         return graph.getNode(startNode).getColumn();
+    }
+
+    /**
+     * Getter for the Node textfield.
+     * @return The text in the textfield.
+     */
+    private TextField getNodeTextField() {
+        return nodeTextField;
+    }
+
+    /**
+     * Getter for the radius textfield.
+     * @return The text in the textfield.
+     */
+    private TextField getRadiusTextField() {
+        return radiusTextField;
     }
 }
