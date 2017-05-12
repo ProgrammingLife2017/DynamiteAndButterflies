@@ -1,4 +1,4 @@
-package GUI;
+package gui;
 
 import graph.DummyNode;
 import graph.Node;
@@ -8,6 +8,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
@@ -40,7 +41,6 @@ public final class GraphDrawer {
      * The graphics context used to actually draw shapes.
      */
     private GraphicsContext gc;
-
 
     private ArrayList<ArrayList<Node>> columns;
 

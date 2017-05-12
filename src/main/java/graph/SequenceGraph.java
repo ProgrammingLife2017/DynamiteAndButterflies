@@ -5,7 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+<<<<<<< HEAD
  * Our own Graph Class.
+=======
+ * This class is the SequenceGraph.
+ * A Graph handling a Directed-Acyclic-Graph.
+ * This is our own data structure we will use to draw the eventual graph.
+>>>>>>> master
  */
 public class SequenceGraph   {
 
@@ -15,7 +21,7 @@ public class SequenceGraph   {
     private ArrayList<Edge> edges;
 
     /**
-     * Constructor.
+     * The constructor initializes the SequenceGraph with it's basic values.
      */
     public SequenceGraph() {
         this.size = 0;
@@ -24,8 +30,8 @@ public class SequenceGraph   {
     }
 
     /**
-     * Get function for the ArrayList of Edges.
-     * @return The Edges.
+     * Returns all the edges contained in the graph.
+     * @return a arrayList of Edges containing all the edges of the graph.
      */
     public ArrayList<Edge> getEdges() {
         return this.edges;
@@ -50,8 +56,8 @@ public class SequenceGraph   {
     }
 
     /**
-     * Getter for the HashmMap with Nodes.
-     * @return The Hashmap with Nodes.
+     * Returns all nodes contained in the graph.
+     * @return A HashMap of all nodes and their IDs contained in the graph.
      */
     public HashMap<Integer, SequenceNode> getNodes() {
         return this.nodes;
@@ -61,7 +67,6 @@ public class SequenceGraph   {
      * Add a child to each Node.
      */
     public void initialize() {
-
         for (Edge edge : getEdges()) {
             // aan elke parent de child toevoegen
             this.getNode(edge.getParent()).addChild(this.getNode(edge.getChild()));
@@ -93,7 +98,6 @@ public class SequenceGraph   {
      * Gives each edge it's ghost nodes.
      */
     private void createEdgeColumns() {
-
         for (Edge edge : edges) {
             int parColumn = nodes.get(edge.getParent()).getColumn();
             int childColumn = nodes.get(edge.getChild()).getColumn();

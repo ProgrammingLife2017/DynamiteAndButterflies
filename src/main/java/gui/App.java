@@ -1,4 +1,4 @@
-package GUI;
+package gui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -13,10 +13,15 @@ import java.io.UnsupportedEncodingException;
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
  *
- * Class to startup the application.
+ * The Application class.
+ * This class creates and maintains the different elements of the gui.
  */
 public class App extends Application {
 
+    /**
+     * A main method that launches the application.
+     * @param args arguments that might be neccesary later
+     */
     public static void main(String[] args) {
         launch(args);
     }

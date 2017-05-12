@@ -1,4 +1,4 @@
-package GUI;
+package gui;
 
 import graph.SequenceGraph;
 import javafx.fxml.FXML;
@@ -38,11 +38,11 @@ public class MenuController {
     @FXML
     private Label numEdgesLabel;
     private GraphicsContext gc;
-    private GraphDrawer drawer;
+    private gui.GraphDrawer drawer;
     private SequenceGraph graph;
 
     /**
-     * Initializes the controller.
+     * Initializes the canvas.
      */
     @FXML
     public void initialize() {
