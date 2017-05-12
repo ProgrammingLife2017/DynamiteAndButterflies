@@ -103,7 +103,9 @@ public final class GraphDrawer {
                     gc.setFill(Color.BLACK);
                 }
                 gc.fillRoundRect((j - xDifference) * ((gc.getCanvas().getWidth() - 20) / zoomLevel),
-                        Y_BASE + (i * 50), xSize, Y_SIZE, 10, 10);
+                                Y_BASE + (i * 50), 0.9 * ((gc.getCanvas().getWidth() - 20) / zoomLevel), Y_SIZE,
+                                10, 10);
+
                 gc.setFill(Color.BLUE);
             }
         }
