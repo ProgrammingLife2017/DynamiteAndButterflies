@@ -151,5 +151,13 @@ public final class GraphDrawer {
         }
         return -1;
     }
+
+    /**
+     * Get function for zoom level.
+     * @return the Zoom level.
+     */
+    public int getZoomLevel(){
+        return zoomLevel;
+    }
 }
 

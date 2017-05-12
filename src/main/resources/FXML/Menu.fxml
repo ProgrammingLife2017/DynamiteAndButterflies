@@ -44,6 +44,7 @@
                   <Label layoutX="14.0" layoutY="37.0" text="Edges:" />
                   <Label fx:id="numNodesLabel" layoutX="73.0" layoutY="14.0" text="0" />
                   <Label fx:id="numEdgesLabel" layoutX="73.0" layoutY="37.0" text="0" />
+                  <Label fx:id="sequenceInfo" layoutX="160.0" layoutY="14.0" text="Select a Node" />
                   <Line endX="50.0" endY="120.0" layoutX="101.0" layoutY="14.0" startX="50.0" stroke="#c9c4c4" strokeLineCap="ROUND" strokeLineJoin="ROUND" />
                </children>
             </Pane>
