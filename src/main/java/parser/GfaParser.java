@@ -1,18 +1,18 @@
 package parser;
 
+import graph.Edge;
 import graph.SequenceGraph;
+import graph.SequenceNode;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * This class contains a parser to parse a .gfa file into our data structure.
  */
 public class GfaParser {
+    HashMap<Integer, String> sequenceHashMap;
     private String header1;
     private String header2;
 
@@ -22,7 +22,8 @@ public class GfaParser {
      * @return Returns a sequenceGraph
      * @throws IOException For instance when the file is not found
      */
-    public SequenceGraph parse(String filepath) throws IOException {
+    public SequenceGraph parseGraph(String filepath) throws IOException {
+        sequenceHashMap = new HashMap<Integer, String>();
         SequenceGraph sequenceGraph = new SequenceGraph();
         InputStream in = new FileInputStream(filepath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
@@ -33,7 +34,8 @@ public class GfaParser {
         while ((line = br.readLine()) != null) {
             if (line.startsWith("S")) {
                 String[] data = line.split("\t");
-                SequenceNode node = new SequenceNode(Integer.parseInt(data[1]), data[2]);
+                SequenceNode node = new SequenceNode(Integer.parseInt(data[1]));
+                sequenceHashMap.put(Integer.parseInt(data[1]), data[2]);
                 sequenceGraph.addNode(node);
             }
             else if (line.startsWith("L")) {
@@ -46,6 +48,12 @@ public class GfaParser {
         }
         return sequenceGraph;
     }
+
+
+    public HashMap<Integer, String> getSequenceHashMap() {
+        return sequenceHashMap;
+    }
+
 
     /**
      * Cretes an ArrayList of Strings specifying headers.

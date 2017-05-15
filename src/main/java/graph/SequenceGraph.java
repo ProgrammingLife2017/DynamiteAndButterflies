@@ -1,33 +1,32 @@
 package graph;
 
-import parser.Edge;
-import parser.SequenceNode;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
+<<<<<<< HEAD
+ * Our own Graph Class.
+=======
  * This class is the SequenceGraph.
  * A Graph handling a Directed-Acyclic-Graph.
  * This is our own data structure we will use to draw the eventual graph.
+>>>>>>> master
  */
 public class SequenceGraph   {
 
 
     private Integer size;
     private HashMap<Integer, SequenceNode> nodes;
-    private boolean initialized;
     private ArrayList<Edge> edges;
 
     /**
-     * Initializes the SequenceGraph with it's basic values.
+     * The constructor initializes the SequenceGraph with it's basic values.
      */
     public SequenceGraph() {
         this.size = 0;
         this.nodes = new HashMap<Integer, SequenceNode>();
-        this.initialized = false;
         this.edges = new ArrayList<Edge>();
-
     }
 
     /**
@@ -39,8 +38,8 @@ public class SequenceGraph   {
     }
 
     /**
-     * Adds a node to the graph.
-     * @param node a new node for the graph
+     * Add a node to the ArrayList of Nodes.
+     * @param node The node to be added.
      */
     public void addNode(SequenceNode node) {
         this.nodes.put(node.getId(), node);
@@ -48,9 +47,9 @@ public class SequenceGraph   {
     }
 
     /**
-     * Returns one of the nodes in the graph.
-     * @param id An id specifying the node.
-     * @return A node specified by its id.
+     * Get a specific Node.
+     * @param id The Id of the Node to get.
+     * @return The Node with the given Id.
      */
     public SequenceNode getNode(Integer id) {
         return nodes.get(id);
@@ -65,7 +64,7 @@ public class SequenceGraph   {
     }
 
     /**
-     * Will initialize all the edges of the graph.
+     * Add a child to each Node.
      */
     public void initialize() {
         for (Edge edge : getEdges()) {
@@ -85,7 +84,7 @@ public class SequenceGraph   {
     /**
      * Gives each node a column where it should be built.
      */
-    public void createColumns() {
+    private void createColumns() {
         for (int i = 1; i <= size; i++) {
             SequenceNode parent = nodes.get(i);     // Start at first node
             ArrayList<SequenceNode> children = parent.getChildren();    // Get all children
@@ -98,14 +97,37 @@ public class SequenceGraph   {
     /**
      * Gives each edge it's ghost nodes.
      */
-    public void createEdgeColumns() {
-
-        for (int i = 0; i < edges.size(); i++) {
-            Edge edge = edges.get(i);
+    private void createEdgeColumns() {
+        for (Edge edge : edges) {
             int parColumn = nodes.get(edge.getParent()).getColumn();
             int childColumn = nodes.get(edge.getChild()).getColumn();
             edge.setEntireColumnSpan(parColumn, childColumn);
         }
+    }
+
+    /**
+     * Get the List of all Columns.
+     * @return The List of Columns.
+     */
+    public ArrayList<ArrayList<Node>> getColumnList() {
+        ArrayList<ArrayList<Node>> columns = new ArrayList<ArrayList<Node>>();
+
+        for (Object o : nodes.entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
+            SequenceNode node = (SequenceNode) pair.getValue();
+            while (columns.size() <= node.getColumn()) {
+                columns.add(new ArrayList<Node>());
+            }
+            columns.get(node.getColumn()).add(node);
+            //it.remove();
+        }
+
+        for (Edge edge : edges) {
+            for (int i : edge.getColumnSpan()) {
+                columns.get(i).add(0, new DummyNode());
+            }
+        }
+        return columns;
     }
 
 }

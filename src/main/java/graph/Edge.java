@@ -1,4 +1,4 @@
-package parser;
+package graph;
 
 import java.util.ArrayList;
 
@@ -10,7 +10,6 @@ public class Edge {
 
     private final Integer parent;
     private final Integer child;
-    private boolean original;
     private ArrayList<Integer> columnSpan;
 
     /**
@@ -21,12 +20,7 @@ public class Edge {
     public Edge(Integer parent, Integer child) {
         this.child = child;
         this.parent = parent;
-        this.original = true;
         this.columnSpan = new ArrayList<Integer>();
-    }
-
-    public void setDummy() {
-        this.original = false;
     }
 
     /**
@@ -80,5 +74,5 @@ public class Edge {
         }
     }
 
-    //Add a setEntireColumnSpan method without parameters.
+    //TODO Add a setEntireColumnSpan method without parameters.
 }
