@@ -15,6 +15,7 @@ import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.prefs.Preferences;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -49,6 +50,8 @@ public class MenuController {
     private GraphicsContext gc;
     private gui.GraphDrawer drawer;
     private SequenceGraph graph;
+    private Preferences prefs = Preferences.userRoot();
+    private int numOfBookmarks = 1;
 
     /**
      * Initializes the canvas.
@@ -78,6 +81,10 @@ public class MenuController {
                 e.printStackTrace();
             }
         }
+
+        String realBM = "";
+        realBM = prefs.get("bm" + numOfBookmarks, realBM);
+        updateBookmarks(realBM);
     }
 
     private void openFile(File file) throws IOException {
@@ -225,9 +232,13 @@ public class MenuController {
     public void saveTheBookmarks() {
         TextField nodes = getNodeTextField();
         TextField radius = getRadiusTextField();
+        prefs.put("bm" + numOfBookmarks, nodes.getText() + "-" + radius.getText());
+        updateBookmarks(nodes.getText() + "-" + radius.getText());
+    }
 
+    private void updateBookmarks(String newBookmark) {
         bookmark2.setText(bookmark1.getText());
-        bookmark1.setText(nodes.getText() + "-" + radius.getText());
+        bookmark1.setText(newBookmark);
     }
 
     /**
