@@ -64,6 +64,9 @@ public class MenuController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
         //fileChooser.setInitialDirectory(this.getClass().getResource("/resources").toString());
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("GFA", "*.gfa")
+        );
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             try {
