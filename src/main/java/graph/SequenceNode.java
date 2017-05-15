@@ -11,12 +11,10 @@ import java.util.ArrayList;
 public class SequenceNode extends Node {
 
     private int id;
-    private String seq;
     private ArrayList<Integer> ids;
 
-    public SequenceNode(int id, String seq){
+    public SequenceNode(int id) {
         this.id = id;
-        this.seq = seq;
         this.ids = new ArrayList<Integer>();
 
     }
@@ -27,14 +25,6 @@ public class SequenceNode extends Node {
 
     public void addId(Integer id) {
         this.ids.add(id);
-    }
-
-    public void setSequence(String seq) {
-        this.seq = seq;
-    }
-
-    public String getSequence() {
-        return this.seq;
     }
 
 
