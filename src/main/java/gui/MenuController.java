@@ -63,7 +63,9 @@ public class MenuController {
         Stage stage = (Stage) anchorPane.getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
-        //fileChooser.setInitialDirectory(this.getClass().getResource("/resources").toString());
+        fileChooser.setInitialDirectory(
+                new File(System.getProperty("user.dir"))
+        );
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("GFA", "*.gfa")
         );
