@@ -5,16 +5,19 @@ import graph.SequenceGraph;
 import graph.SequenceNode;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * This class contains a parser to parse a .gfa file into our data structure.
  */
 public class GfaParser {
-    HashMap<Integer, String> sequenceHashMap;
+    HashMap<Integer, byte[]> sequenceHashMap;
     private String header1;
     private String header2;
+    private Boolean duplicate = false;
 
     /**
      * This method parses the file specified in filepath into a sequence graph.
@@ -23,7 +26,7 @@ public class GfaParser {
      * @throws IOException For instance when the file is not found
      */
     public SequenceGraph parseGraph(String filepath) throws IOException {
-        sequenceHashMap = new HashMap<Integer, String>();
+        sequenceHashMap = new HashMap<Integer, byte[]>();
         SequenceGraph sequenceGraph = new SequenceGraph();
         InputStream in = new FileInputStream(filepath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
@@ -31,12 +34,18 @@ public class GfaParser {
         header1 = line.split("H")[1];
         line = br.readLine();
         header2 = line.split("H")[1];
+        int count = 0;
         while ((line = br.readLine()) != null) {
             if (line.startsWith("S")) {
-                String[] data = line.split("\t");
-                SequenceNode node = new SequenceNode(Integer.parseInt(data[1]));
-                sequenceHashMap.put(Integer.parseInt(data[1]), data[2]);
+                int id = Integer.parseInt(line.split("\t")[1]);
+                SequenceNode node = new SequenceNode(id);
+                byte[] seq = encodeSequence(line.split("\t")[2]);
+                sequenceHashMap.put(id, seq);
                 sequenceGraph.addNode(node);
+                count++;
+                if(count%100000 == 0) {
+                    System.out.println(count);
+                }
             }
             else if (line.startsWith("L")) {
                 String[] edgeDataString = line.split("\t");
@@ -50,7 +59,7 @@ public class GfaParser {
     }
 
 
-    public HashMap<Integer, String> getSequenceHashMap() {
+    public HashMap<Integer, byte[]> getSequenceHashMap() {
         return sequenceHashMap;
     }
 
@@ -64,5 +73,54 @@ public class GfaParser {
         headers.add(header1);
         headers.add(header2);
         return headers;
+    }
+
+    public byte[] encodeSequence(String seq) {
+        List<String> binString = new ArrayList<String>();
+        for (int i = 0; i < seq.length(); i += 4) {
+            binString.add(convert(seq.substring(i, Math.min(i + 4, seq.length()))));
+        }
+        duplicate = false;
+        String encodedBinString = binString.get(0);
+        for (int i = 1; i < binString.size(); i++) {
+            if (binString.get(i).equals(binString.get(i - 1))) {
+                if (!duplicate) {
+                    encodedBinString = encodedBinString.concat("1");
+                    duplicate = true;
+                } else {
+                    encodedBinString = encodedBinString.concat(binString.get(i));
+                    duplicate = false;
+                }
+            } else {
+                encodedBinString = encodedBinString.concat("0");
+                encodedBinString = encodedBinString.concat(binString.get(i));
+                duplicate = false;
+            }
+        }
+        if(encodedBinString.equals("")) {
+            encodedBinString = "Could not read this sequence.";
+        }
+        byte[] sequence = new BigInteger(encodedBinString, 2).toByteArray();
+        return sequence;
+    }
+
+    public String decodeSequence(Byte[] encodedBinString) {
+        String result = "";
+        System.out.println(result);
+        return result;
+    }
+
+    private String convert(String seq) {
+        String result = "";
+        for (int i = 0; i < seq.length(); i++) {
+            switch (seq.charAt(i)) {
+                case 'A': result = result.concat("00"); break;
+                case 'C': result = result.concat("01"); break;
+                case 'G': result = result.concat("10"); break;
+                case 'T': result = result.concat("11"); break;
+                case 'N': result = result.concat("0"); break;
+            }
+        }
+        return result;
     }
 }
