@@ -51,7 +51,6 @@ public class MenuController {
     private gui.GraphDrawer drawer;
     private SequenceGraph graph;
     private Preferences prefs = Preferences.userRoot();
-    private int numOfBookmarks = 1;
 
     /**
      * Initializes the canvas.
@@ -61,6 +60,13 @@ public class MenuController {
         canvas.widthProperty().bind(canvasPanel.widthProperty());
         canvas.heightProperty().bind(canvasPanel.heightProperty());
         gc = canvas.getGraphicsContext2D();
+        prefs.put("numOfBookmarks", "1");
+        
+        String realBM = "";
+        String numOfBookmarks = "";
+        int newIndex = Integer.parseInt(prefs.get("numOfBookmarks", numOfBookmarks));
+        realBM = prefs.get("bm" + newIndex, realBM);
+        updateBookmarks(realBM);
     }
 
     /**
@@ -81,10 +87,6 @@ public class MenuController {
                 e.printStackTrace();
             }
         }
-
-        String realBM = "";
-        realBM = prefs.get("bm" + numOfBookmarks, realBM);
-        updateBookmarks(realBM);
     }
 
     private void openFile(File file) throws IOException {
@@ -232,7 +234,13 @@ public class MenuController {
     public void saveTheBookmarks() {
         TextField nodes = getNodeTextField();
         TextField radius = getRadiusTextField();
-        prefs.put("bm" + numOfBookmarks, nodes.getText() + "-" + radius.getText());
+
+        String numOfBookmarks = "";
+        int newIndex = Integer.parseInt(prefs.get("numOfBookmarks", numOfBookmarks));
+        newIndex++;
+        prefs.put("bm" + newIndex, nodes.getText() + "-" + radius.getText());
+        prefs.put("numOfBookmarks", "" + newIndex);
+
         updateBookmarks(nodes.getText() + "-" + radius.getText());
     }
 
