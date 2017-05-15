@@ -44,7 +44,7 @@ public class MenuController {
     private GraphicsContext gc;
     private gui.GraphDrawer drawer;
     private SequenceGraph graph;
-    private HashMap<Integer, String> sequenceHashMap;
+    private HashMap<Integer, byte[]> sequenceHashMap;
     private double pressedX;
 
     /**
