@@ -1,133 +1,274 @@
 package graph;
+import com.rits.cloning.Cloner;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-/**
-<<<<<<< HEAD
- * Our own Graph Class.
-=======
- * This class is the SequenceGraph.
- * A Graph handling a Directed-Acyclic-Graph.
- * This is our own data structure we will use to draw the eventual graph.
->>>>>>> master
- */
-public class SequenceGraph   {
+public class SequenceGraph {
 
-
+    private final int ROOTNODEKEY = 1;
+    private HashMap<Integer, List<Integer>> layoutHashMap = new HashMap<Integer, List<Integer>>();
     private Integer size;
-    private HashMap<Integer, SequenceNode> nodes;
+    private HashMap<Integer, AbstractNode> nodes;
+    private boolean initialized;
     private ArrayList<Edge> edges;
+    private LinkedList<Integer> list;
+    private int maxDepth = Integer.MIN_VALUE;
 
-    /**
-     * The constructor initializes the SequenceGraph with it's basic values.
-     */
     public SequenceGraph() {
         this.size = 0;
-        this.nodes = new HashMap<Integer, SequenceNode>();
+        this.nodes = new HashMap<Integer, AbstractNode>();
+        this.initialized = false;
         this.edges = new ArrayList<Edge>();
     }
 
-    /**
-     * Returns all the edges contained in the graph.
-     * @return a arrayList of Edges containing all the edges of the graph.
-     */
     public ArrayList<Edge> getEdges() {
         return this.edges;
     }
 
-    /**
-     * Add a node to the ArrayList of Nodes.
-     * @param node The node to be added.
+    /** Adds a node to the Hashmap and increments the size of the Graph
+     *
+     * @param node - the node to be added
      */
-    public void addNode(SequenceNode node) {
+    public void addNode(AbstractNode node) {
         this.nodes.put(node.getId(), node);
         this.size++;
     }
 
-    /**
-     * Get a specific Node.
-     * @param id The Id of the Node to get.
-     * @return The Node with the given Id.
-     */
-    public SequenceNode getNode(Integer id) {
+
+    public AbstractNode getNode(Integer id) {
         return nodes.get(id);
     }
 
-    /**
-     * Returns all nodes contained in the graph.
-     * @return A HashMap of all nodes and their IDs contained in the graph.
-     */
-    public HashMap<Integer, SequenceNode> getNodes() {
-        return this.nodes;
+    public HashMap<Integer, AbstractNode> getNodes() {
+        return nodes;
     }
 
-    /**
-     * Add a child to each Node.
+
+    /** Initializer function that calls the setup functions for the graph
+     *
      */
     public void initialize() {
+
         for (Edge edge : getEdges()) {
             // aan elke parent de child toevoegen
-            this.getNode(edge.getParent()).addChild(this.getNode(edge.getChild()));
+            this.getNode(edge.getParent()).addChild(edge.getChild());
+        }
+        this.list = this.createTopologicalOrder();
+        this.createLayers();
+        this.addDummies();
+        this.initializeParents();
+        this.createLayoutHashMap();
+        this.assignIndex();
+        this.baryCenterAssignment();
+        this.initialized = true;
+    }
+
+    /** Creates a topological ordering of the graph and returns this ordering in the form of a LinkedList
+     *
+     * @return list - LinkedList<Integer>
+     */
+    private LinkedList<Integer> createTopologicalOrder() {
+        LinkedList<Integer> queue = new LinkedList<Integer>();
+        LinkedList<Integer> list = new LinkedList<Integer>();
+        AbstractNode root = this.getNode(ROOTNODEKEY);
+        boolean[] visited = new boolean[this.size+1];
+        queue.add(ROOTNODEKEY);
+        visited[ROOTNODEKEY] = true;
+        while (queue.size() != 0) {
+            AbstractNode current = this.getNode(queue.poll());
+            list.add(current.getId());
+            for (int i: current.getChildren()) {
+                if (!visited[i])
+                {
+                    visited[i] = true;
+                    queue.add(i);
+                }
+            }
+        }
+//        createTopologicalOrderHelper(list, root, visited);
+        return list;
+    }
+
+    /**
+     * Creates a deep copy of the topological ordered list.
+     * @return list
+     */
+    private LinkedList<Integer> getDeepCopyTopologicalOrderedList() {
+        Cloner cloner = new Cloner();
+        return cloner.deepClone(this.list);
+    }
+
+    /**
+     * Assigns each node with a layer using the longest path algorithm.
+     */
+    private void createLayers() {
+        LinkedList<Integer> list = getDeepCopyTopologicalOrderedList();
+
+        AbstractNode firstNode = this.getNode(list.peek());
+        firstNode.setLayer(1);
+        firstNode.setIndex(1);
+
+        while (!list.isEmpty()) {
+            AbstractNode current = this.getNode(list.poll());
+            for (int i : current.getChildren()) {
+                this.getNode(i).incrementLayer(current.getLayer());
+                if (this.getNode(i).getLayer() > maxDepth)
+                    maxDepth = this.getNode(i).getLayer();
+            }
+        }
+    }
+
+
+    /**
+     * Creates a hashmap with key = int layer and value = List<Integer> ids
+     */
+    private void createLayoutHashMap() {
+        for (int i = 1; i < this.nodes.size(); i++) {
+            int currentNodeId = this.getNode(i).getId();
+            int currentNodeLayer = this.getNode(i).getLayer();
+            addToList(currentNodeLayer, currentNodeId);
         }
     }
 
     /**
-     * Will add columns to all the nodes and to all the edges.
+     * Adds dummy nodes to the graph for visualisation purposes.
      */
-    public void layerizeGraph() {
-            createColumns();
-            createEdgeColumns();
+    private void addDummies() {
+        LinkedList<Integer> list = getDeepCopyTopologicalOrderedList();
+        while (!list.isEmpty()){
+            AbstractNode parent = this.getNode(list.poll());
+            int size = parent.getChildren().size();
+            for (int i = 0; i < size; i++) {
+                int childId = parent.getChildren().get(i);
+                int span = getNode(childId).getLayer() - parent.getLayer();
+                if (span > 1) {
+                    addDummyHelper(span, parent, getNode(childId));
+                }
+            }
+        }
+    }
+
+
+    /** Helper function for addDummy()
+     *
+     * @param span - the difference in layer level of parent and child
+     * @param parent - the parent node
+     * @param target - the target node
+     */
+    private void addDummyHelper(int span, AbstractNode parent, AbstractNode target) {
+        if (span > 1) {
+            DummyNode dummy = new DummyNode(this.size+1, parent.getLayer() + 1);
+            int size = parent.getChildren().size();
+            for (int i = 0; i < size; i++) {
+                if (parent.getChildren().get(i) == target.getId()) {
+                    parent.getChildren().remove(i);
+                    parent.addChild(dummy.getId());
+                    break;
+                }
+            }
+            dummy.addChild(target.getId());
+            this.addNode(dummy);
+            span --;
+            addDummyHelper(span, dummy, target);
+        }
     }
 
     /**
-     * Gives each node a column where it should be built.
+     * Assigns all nodes with an index.
      */
-    private void createColumns() {
-        for (int i = 1; i <= size; i++) {
-            SequenceNode parent = nodes.get(i);     // Start at first node
-            ArrayList<SequenceNode> children = parent.getChildren();    // Get all children
-            for (SequenceNode child : children) {
-                child.incrementColumn(parent.getColumn());      // Assign layer
+    private void assignIndex() {
+        for (int i = 1; i <= maxDepth; i++) {
+            List<Integer> layer = layoutHashMap.get(i);
+            for (int j = 0; j < layer.size(); j++) {
+                int currentNodeID = layer.get(j);
+                this.getNode(currentNodeID).setIndex(j + 1);
             }
         }
     }
 
     /**
-     * Gives each edge it's ghost nodes.
+     * Sorts the layers in the layoutHashMap using barycenter heuristics.
+     * Which reduces the number of crossing edges.
      */
-    private void createEdgeColumns() {
-        for (Edge edge : edges) {
-            int parColumn = nodes.get(edge.getParent()).getColumn();
-            int childColumn = nodes.get(edge.getChild()).getColumn();
-            edge.setEntireColumnSpan(parColumn, childColumn);
+    private void baryCenterAssignment() {
+        // loop over layers
+        for (int i = 1; i < maxDepth; i++) {
+            List<Integer> parentLayer = layoutHashMap.get(i);
+            List<Integer> childLayer = layoutHashMap.get(i + 1);
+
+            // loop over childlayer
+            for (int id : childLayer) {
+                AbstractNode currentNode = this.getNode(id);
+                currentNode.setBaryCenterValue(getBaryCenterValue(currentNode));
+            }
+
+            // sort childlayer based on barycenter values.
+            Collections.sort(childLayer, new Comparator<Integer>() {
+                public int compare(Integer o1, Integer o2) {
+                    float baryVal1 = nodes.get(o1).getBaryCenterValue();
+                    float baryVal2 = nodes.get(o2).getBaryCenterValue();
+                    if (baryVal1 < baryVal2) {
+                        return 1;
+                    } else if (baryVal1 > baryVal2) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }
+            });
+
+            // reassign index
+            for (int j = 0; j < childLayer.size(); j++) {
+                AbstractNode currentNode = this.getNode(childLayer.get(j));
+                currentNode.setIndex(j + 1);
+            }
+
+            layoutHashMap.put(i + 1, childLayer);
         }
     }
 
     /**
-     * Get the List of all Columns.
-     * @return The List of Columns.
+     * Calculates the barycentric value for a node.
+     *
+     * @param node - the node to calculate the value for.
+     * @return the barycenter value
      */
-    public ArrayList<ArrayList<Node>> getColumnList() {
-        ArrayList<ArrayList<Node>> columns = new ArrayList<ArrayList<Node>>();
-
-        for (Object o : nodes.entrySet()) {
-            Map.Entry pair = (Map.Entry) o;
-            SequenceNode node = (SequenceNode) pair.getValue();
-            while (columns.size() <= node.getColumn()) {
-                columns.add(new ArrayList<Node>());
-            }
-            columns.get(node.getColumn()).add(node);
-            //it.remove();
+    private float getBaryCenterValue(AbstractNode node) {
+        for (int id : node.getParents()) {
+            node.updateBaryCenterValue(this.getNode(id).getIndex());
         }
+        return (node.getBaryCenterValue() / node.getParents().size());
+    }
 
-        for (Edge edge : edges) {
-            for (int i : edge.getColumnSpan()) {
-                columns.get(i).add(0, new DummyNode());
+    /**
+     * Creates parents for each node.
+     */
+    private void initializeParents() {
+        for (AbstractNode node : this.nodes.values()) {
+            for (int id : node.getChildren()) {
+                this.getNode(id).addParent(node.getId());
             }
         }
-        return columns;
+    }
+
+    /**
+     * Adder for Hashmap<Integer, List<Integer>)
+     *
+     * @param mapKey - the key in which to add a nodeID
+     * @param nodeID - the nodeID to be added
+     */
+    private synchronized void addToList(Integer mapKey, Integer nodeID) {
+        List<Integer> idList = layoutHashMap.get(mapKey);
+
+        // if list does not exist create it
+        if (idList == null) {
+            idList = new ArrayList<Integer>();
+            idList.add(nodeID);
+            layoutHashMap.put(mapKey, idList);
+        } else {
+            // add if item is not already in list
+            if (!idList.contains(nodeID)) idList.add(nodeID);
+        }
     }
 
 }

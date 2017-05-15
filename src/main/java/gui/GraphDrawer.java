@@ -160,4 +160,3 @@ public final class GraphDrawer {
         return zoomLevel;
     }
 }
-
