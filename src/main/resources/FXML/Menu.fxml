@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
@@ -43,6 +44,7 @@
                   <Label layoutX="14.0" layoutY="37.0" text="Edges:" />
                   <Label fx:id="numNodesLabel" layoutX="73.0" layoutY="14.0" text="0" />
                   <Label fx:id="numEdgesLabel" layoutX="73.0" layoutY="37.0" text="0" />
+                  <Label fx:id="sequenceInfo" layoutX="160.0" layoutY="14.0" text="Select a Node" />
                   <Line endX="50.0" endY="120.0" layoutX="101.0" layoutY="14.0" startX="50.0" stroke="#c9c4c4" strokeLineCap="ROUND" strokeLineJoin="ROUND" />
                </children>
             </Pane>
@@ -52,6 +54,9 @@
                <children>
                   <Button layoutX="22.0" layoutY="30.0" mnemonicParsing="false" onAction="#zoomInClicked" text="Zoom in" />
                   <Button layoutX="22.0" layoutY="75.0" mnemonicParsing="false" onAction="#zoomOutClicked" text="Zoom out" />
+                  <TextField fx:id="nodeTextField" alignment="CENTER" layoutX="22.0" layoutY="113.0" prefHeight="29.0" prefWidth="97.0" promptText="Centre node" />
+                  <Button layoutX="22.0" layoutY="142.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
+                  <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="22.0" layoutY="167.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
                </children>
                <padding>
                   <Insets right="15.0" />
@@ -59,11 +64,11 @@
             </Pane>
          </left>
          <center>
-            <Pane fx:id="canvasPanel" BorderPane.alignment="CENTER">
+            <AnchorPane fx:id="canvasPanel" onMouseClicked="#clickMouse" onMouseDragged="#dragMouse" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
                <children>
-                  <Canvas fx:id="canvas" />
+                  <Canvas fx:id="canvas" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
-            </Pane>
+            </AnchorPane>
          </center>
       </BorderPane>
    </children>

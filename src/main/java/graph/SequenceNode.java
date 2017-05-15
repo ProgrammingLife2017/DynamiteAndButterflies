@@ -133,5 +133,4 @@ public class SequenceNode extends AbstractNode {
     public void updateBaryCenterValue(int value) {
         this.baryCenterValue += value;
     }
-
 }
