@@ -53,7 +53,7 @@ public final class GraphDrawer {
         xSize = 1;
         graph.initialize();
         graph.layerizeGraph();
-        columns = graph.getColumnList();
+        columns = graph.getColumns();
         zoomLevel = columns.size();
     }
 

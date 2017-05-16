@@ -5,13 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
-<<<<<<< HEAD
  * Our own Graph Class.
-=======
  * This class is the SequenceGraph.
  * A Graph handling a Directed-Acyclic-Graph.
  * This is our own data structure we will use to draw the eventual graph.
->>>>>>> master
  */
 public class SequenceGraph   {
 
@@ -19,6 +16,7 @@ public class SequenceGraph   {
     private Integer size;
     private HashMap<Integer, SequenceNode> nodes;
     private ArrayList<Edge> edges;
+    private ArrayList<ArrayList<Node>> columns;
 
     /**
      * The constructor initializes the SequenceGraph with it's basic values.
@@ -28,6 +26,15 @@ public class SequenceGraph   {
         this.nodes = new HashMap<Integer, SequenceNode>();
         this.edges = new ArrayList<Edge>();
     }
+
+    /**
+     * Getter for the column list
+     * @return the column arraylist with an arraylist with nodes.
+     */
+    public ArrayList<ArrayList<Node>> getColumns() {
+        return this.columns;
+    }
+
 
     /**
      * Returns all the edges contained in the graph.
@@ -69,7 +76,7 @@ public class SequenceGraph   {
     public void initialize() {
         for (Edge edge : getEdges()) {
             // aan elke parent de child toevoegen
-            this.getNode(edge.getParent()).addChild(this.getNode(edge.getChild()));
+            this.getNode(edge.getParent()).addChild(edge.getChild());
         }
     }
 
@@ -79,7 +86,24 @@ public class SequenceGraph   {
     public void layerizeGraph() {
             createColumns();
             createEdgeColumns();
+            this.columns = createColumnList();
+            createIndex();
+
     }
+
+    /**
+     * assigns indices to all nodes in the column list.
+     */
+    private void createIndex() {
+        for(int i = 0; i < columns.size(); i++) {
+            ArrayList<Node> column = columns.get(i);
+            for(int j = 0; j < column.size(); j++) {
+                this.columns.get(i).get(j).setIndex(j);
+            }
+        }
+
+    }
+
 
     /**
      * Gives each node a column where it should be built.
@@ -87,9 +111,9 @@ public class SequenceGraph   {
     private void createColumns() {
         for (int i = 1; i <= size; i++) {
             SequenceNode parent = nodes.get(i);     // Start at first node
-            ArrayList<SequenceNode> children = parent.getChildren();    // Get all children
-            for (SequenceNode child : children) {
-                child.incrementColumn(parent.getColumn());      // Assign layer
+            ArrayList<Integer> children = parent.getChildren();    // Get all children
+            for (Integer child : children) {
+                this.getNode(child).incrementColumn(parent.getColumn());
             }
         }
     }
@@ -105,11 +129,13 @@ public class SequenceGraph   {
         }
     }
 
+
+
     /**
      * Get the List of all Columns.
      * @return The List of Columns.
      */
-    public ArrayList<ArrayList<Node>> getColumnList() {
+    private ArrayList<ArrayList<Node>> createColumnList() {
         ArrayList<ArrayList<Node>> columns = new ArrayList<ArrayList<Node>>();
 
         for (Object o : nodes.entrySet()) {
