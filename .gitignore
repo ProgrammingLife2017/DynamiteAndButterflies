@@ -113,6 +113,9 @@ modules.xml
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
+# database files
+*.db
+
 # Package Files #
 *.jar
 *.war

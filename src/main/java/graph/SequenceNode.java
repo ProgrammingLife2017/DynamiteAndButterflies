@@ -11,21 +11,13 @@ import java.util.ArrayList;
 public class SequenceNode extends Node {
 
     private int id;
-    private ArrayList<Integer> ids;
 
     public SequenceNode(int id) {
         this.id = id;
-        this.ids = new ArrayList<Integer>();
 
     }
 
     public Integer getId() {
         return id;
     }
-
-    public void addId(Integer id) {
-        this.ids.add(id);
-    }
-
-
 }

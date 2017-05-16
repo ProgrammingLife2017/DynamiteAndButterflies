@@ -3,12 +3,17 @@ package parser;
 import graph.Edge;
 import graph.SequenceGraph;
 import graph.SequenceNode;
+import org.mapdb.*;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
 
 import java.io.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static java.lang.Math.toIntExact;
 
 /**
  * This class contains a parser to parse a .gfa file into our data structure.
@@ -25,8 +30,10 @@ public class GfaParser {
      * @return Returns a sequenceGraph
      * @throws IOException For instance when the file is not found
      */
+    @SuppressWarnings("Since15")
     public SequenceGraph parseGraph(String filepath) throws IOException {
-        sequenceHashMap = new HashMap<Integer, byte[]>();
+        DB db = DBMaker.fileDB("fileDB").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
+        BTreeMap<Long, String> sequenceMap = db.treeMap("sequenceMap").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
         SequenceGraph sequenceGraph = new SequenceGraph();
         InputStream in = new FileInputStream(filepath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
@@ -37,24 +44,27 @@ public class GfaParser {
         int count = 0;
         while ((line = br.readLine()) != null) {
             if (line.startsWith("S")) {
-                int id = Integer.parseInt(line.split("\t")[1]);
-                SequenceNode node = new SequenceNode(id);
-                byte[] seq = encodeSequence(line.split("\t")[2]);
-                sequenceHashMap.put(id, seq);
+                String[] data = line.split(("\t"));
+                int id = Integer.parseInt(data[1]);
+                SequenceNode node = new SequenceNode(toIntExact(id));
+                //String seq = encodeSequence(data[2]);
+                sequenceMap.put((long) (id), data[2]);
                 sequenceGraph.addNode(node);
                 count++;
                 if(count%100000 == 0) {
                     System.out.println(count);
                 }
-            }
-            else if (line.startsWith("L")) {
+            } /*else if (line.startsWith("L")) {
                 String[] edgeDataString = line.split("\t");
                 int parentId = (Integer.parseInt(edgeDataString[1]));
                 int childId = Integer.parseInt(edgeDataString[3]);
                 Edge edge = new Edge(parentId, childId);
                 sequenceGraph.getEdges().add(edge);
-            }
+            }*/
         }
+        db.close();
+        in.close();
+        br.close();
         return sequenceGraph;
     }
 
@@ -75,7 +85,7 @@ public class GfaParser {
         return headers;
     }
 
-    public byte[] encodeSequence(String seq) {
+    public String encodeSequence(String seq) {
         List<String> binString = new ArrayList<String>();
         for (int i = 0; i < seq.length(); i += 4) {
             binString.add(convert(seq.substring(i, Math.min(i + 4, seq.length()))));
@@ -97,11 +107,7 @@ public class GfaParser {
                 duplicate = false;
             }
         }
-        if(encodedBinString.equals("")) {
-            encodedBinString = "Could not read this sequence.";
-        }
-        byte[] sequence = new BigInteger(encodedBinString, 2).toByteArray();
-        return sequence;
+        return encodedBinString;
     }
 
     public String decodeSequence(Byte[] encodedBinString) {
