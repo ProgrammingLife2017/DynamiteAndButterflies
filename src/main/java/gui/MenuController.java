@@ -50,7 +50,8 @@ public class MenuController {
     private GraphicsContext gc;
     private gui.GraphDrawer drawer;
     private SequenceGraph graph;
-    private Preferences prefs = Preferences.userRoot();
+
+    static Preferences prefs = Preferences.userRoot();
 
     /**
      * Initializes the canvas.
@@ -60,13 +61,9 @@ public class MenuController {
         canvas.widthProperty().bind(canvasPanel.widthProperty());
         canvas.heightProperty().bind(canvasPanel.heightProperty());
         gc = canvas.getGraphicsContext2D();
-        prefs.put("numOfBookmarks", "1");
-        
-        String realBM = "";
-        String numOfBookmarks = "";
-        int newIndex = Integer.parseInt(prefs.get("numOfBookmarks", numOfBookmarks));
-        realBM = prefs.get("bm" + newIndex, realBM);
-        updateBookmarks(realBM);
+        if (prefs.get("numOfBookmarks", "def").equals("def")) {
+            prefs.put("numOfBookmarks", "0");
+        }
     }
 
     /**
@@ -80,12 +77,25 @@ public class MenuController {
         fileChooser.setTitle("Open Resource File");
         //fileChooser.setInitialDirectory(this.getClass().getResource("/resources").toString());
         File file = fileChooser.showOpenDialog(stage);
+        prefs.put("file", file.toString());
+
         if (file != null) {
             try {
                 openFile(file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        int largestIndex = Integer.parseInt(prefs.get("numOfBookmarks", "def"));
+        int i = 0;
+        String stringFile = file.toString();
+
+        while (i <= largestIndex) {
+            int newIndex = i;
+            String realBM = prefs.get(stringFile + newIndex, "-");
+            updateBookmarks(realBM);
+            i++;
         }
     }
 
@@ -238,7 +248,8 @@ public class MenuController {
         String numOfBookmarks = "";
         int newIndex = Integer.parseInt(prefs.get("numOfBookmarks", numOfBookmarks));
         newIndex++;
-        prefs.put("bm" + newIndex, nodes.getText() + "-" + radius.getText());
+        String file = prefs.get("file", "def");
+        prefs.put(file + newIndex, nodes.getText() + "-" + radius.getText());
         prefs.put("numOfBookmarks", "" + newIndex);
 
         updateBookmarks(nodes.getText() + "-" + radius.getText());
