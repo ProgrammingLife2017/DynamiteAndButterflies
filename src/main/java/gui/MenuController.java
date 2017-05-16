@@ -265,9 +265,7 @@ public class MenuController {
      */
     @FXML
     public void pressBookmark1() {
-        if (!bookmark1.getText().equals("-")) {
-            bookmarked(bookmark1);
-        }
+        bookmarked(bookmark1);
     }
 
     /**
@@ -275,9 +273,7 @@ public class MenuController {
      */
     @FXML
     public void pressBookmark2() {
-        if (!bookmark2.getText().equals("-")) {
-            bookmarked(bookmark2);
-        }
+        bookmarked(bookmark2);
     }
 
     /**
@@ -285,10 +281,12 @@ public class MenuController {
      * @param bookmark the button that specifies the bookmark
      */
     private void bookmarked(Button bookmark) {
-        String string = bookmark.getText();
-        String[] parts = string.split("-");
-        String centre = parts[0];
-        String radius = parts[1];
-        traverseGraphClicked(centre, radius);
+        if (!bookmark.getText().equals("-")) {
+            String string = bookmark.getText();
+            String[] parts = string.split("-");
+            String centre = parts[0];
+            String radius = parts[1];
+            traverseGraphClicked(centre, radius);
+        }
     }
 }
