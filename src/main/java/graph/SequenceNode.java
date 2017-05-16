@@ -11,11 +11,13 @@ public class SequenceNode extends Node {
     private int id;
     private int index;
     private ArrayList<Integer> ids;
+    private boolean isDummy;
 
     public SequenceNode(int id) {
         this.id = id;
         this.ids = new ArrayList<Integer>();
         this.index = 0;
+        this.isDummy = false;
 
     }
 
@@ -28,4 +30,11 @@ public class SequenceNode extends Node {
     }
 
 
+    public boolean isDummy() {
+        return isDummy;
+    }
+
+    public void setDummy(boolean dummy) {
+        isDummy = dummy;
+    }
 }

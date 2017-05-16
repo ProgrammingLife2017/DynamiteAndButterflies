@@ -41,7 +41,7 @@ public final class GraphDrawer {
      */
     private GraphicsContext gc;
 
-    private ArrayList<ArrayList<Node>> columns;
+    private ArrayList<ArrayList<SequenceNode>> columns;
 
     /**
      * Constructor.
@@ -96,10 +96,11 @@ public final class GraphDrawer {
     void moveShapes(final double xDifference) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         gc.setFill(Color.BLUE);
+
         for (int j = 0; j < columns.size(); j++) {
-            ArrayList<Node> column = columns.get(j);
+            ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
-                if (column.get(i) instanceof DummyNode) {
+                if (column.get(i).isDummy()) {
                     gc.setFill(Color.BLACK);
                 }
                 gc.fillRoundRect((j - xDifference) * ((gc.getCanvas().getWidth() - 20) / zoomLevel),
@@ -115,7 +116,7 @@ public final class GraphDrawer {
      * Gets the real Centre Column.
      * @return the Centre Column.
      */
-    private ArrayList<Node> getCentreColumn() {
+    private ArrayList<SequenceNode> getCentreColumn() {
         return columns.get(columns.size() / 2);
     }
 
@@ -124,7 +125,7 @@ public final class GraphDrawer {
      * @return The Centre Node.
      */
     SequenceNode getRealCentreNode() {
-        ArrayList<Node> set = getCentreColumn();
+        ArrayList<SequenceNode> set = getCentreColumn();
         for (Node test : set) {
             if (test instanceof SequenceNode) {
                 return (SequenceNode) test;
@@ -140,7 +141,7 @@ public final class GraphDrawer {
      * @return The ColumnId
      */
     int getColumnId(final int nodeId) {
-        for (ArrayList<Node> list : columns) {
+        for (ArrayList<SequenceNode> list : columns) {
             for (Node node : list) {
                 if (node instanceof SequenceNode) {
                     if (((SequenceNode) node).getId() == nodeId) {

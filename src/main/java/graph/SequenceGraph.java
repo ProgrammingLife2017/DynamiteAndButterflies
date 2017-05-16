@@ -16,7 +16,7 @@ public class SequenceGraph   {
     private Integer size;
     private HashMap<Integer, SequenceNode> nodes;
     private ArrayList<Edge> edges;
-    private ArrayList<ArrayList<Node>> columns;
+    private ArrayList<ArrayList<SequenceNode>> columns;
 
     /**
      * The constructor initializes the SequenceGraph with it's basic values.
@@ -31,7 +31,7 @@ public class SequenceGraph   {
      * Getter for the column list
      * @return the column arraylist with an arraylist with nodes.
      */
-    public ArrayList<ArrayList<Node>> getColumns() {
+    public ArrayList<ArrayList<SequenceNode>> getColumns() {
         return this.columns;
     }
 
@@ -95,10 +95,9 @@ public class SequenceGraph   {
      * assigns indices to all nodes in the column list.
      */
     private void createIndex() {
-        for(int i = 0; i < columns.size(); i++) {
-            ArrayList<Node> column = columns.get(i);
-            for(int j = 0; j < column.size(); j++) {
-                this.columns.get(i).get(j).setIndex(j);
+        for (ArrayList<SequenceNode> column : columns) {
+            for (int j = 0; j < column.size(); j++) {
+                column.get(j).setIndex(j);
             }
         }
 
@@ -135,22 +134,26 @@ public class SequenceGraph   {
      * Get the List of all Columns.
      * @return The List of Columns.
      */
-    private ArrayList<ArrayList<Node>> createColumnList() {
-        ArrayList<ArrayList<Node>> columns = new ArrayList<ArrayList<Node>>();
+    private ArrayList<ArrayList<SequenceNode>> createColumnList() {
+        ArrayList<ArrayList<SequenceNode>> columns = new ArrayList<ArrayList<SequenceNode>>();
 
         for (Object o : nodes.entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             SequenceNode node = (SequenceNode) pair.getValue();
             while (columns.size() <= node.getColumn()) {
-                columns.add(new ArrayList<Node>());
+                columns.add(new ArrayList<SequenceNode>());
             }
             columns.get(node.getColumn()).add(node);
             //it.remove();
         }
 
+        int counter = nodes.size()+1;
         for (Edge edge : edges) {
             for (int i : edge.getColumnSpan()) {
-                columns.get(i).add(0, new DummyNode());
+                SequenceNode dummyNode = new SequenceNode(counter);
+                dummyNode.setDummy(true);
+                columns.get(i).add(0, dummyNode);
+                counter++;
             }
         }
         return columns;
