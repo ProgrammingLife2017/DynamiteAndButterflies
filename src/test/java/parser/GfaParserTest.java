@@ -1,6 +1,7 @@
+package parser;
+
 import graph.SequenceGraph;
 import org.junit.Test;
-import parser.GfaParser;
 
 import java.io.FileNotFoundException;
 

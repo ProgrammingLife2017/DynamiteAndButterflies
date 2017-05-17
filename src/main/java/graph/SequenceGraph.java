@@ -44,6 +44,10 @@ public class SequenceGraph   {
         return this.edges;
     }
 
+    public void setEdges(ArrayList<Edge> allEdges) {
+        this.edges = allEdges;
+    }
+
     /**
      * Add a node to the ArrayList of Nodes.
      * @param node The node to be added.
@@ -68,6 +72,10 @@ public class SequenceGraph   {
      */
     public HashMap<Integer, SequenceNode> getNodes() {
         return this.nodes;
+    }
+
+    public void setNodes(HashMap<Integer, SequenceNode> hash) {
+        this.nodes = hash;
     }
 
     /**

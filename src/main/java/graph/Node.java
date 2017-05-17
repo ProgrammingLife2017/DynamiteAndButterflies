@@ -66,7 +66,7 @@ public class Node {
      * Sets the column of the node.
      * @param newColumn the newColumn value of the node
      */
-    private void setColumn(int newColumn) {
+    public void setColumn(int newColumn) {
         this.column = newColumn;
     }
 
@@ -86,5 +86,13 @@ public class Node {
      */
     void setIndex(int index) {
         this.index = index;
+    }
+
+    /**
+     * Getter for the index of a node.
+     * @return index the index value of the node.
+     */
+    int getIndex() {
+        return index;
     }
 }

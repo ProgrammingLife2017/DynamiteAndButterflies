@@ -29,7 +29,7 @@ public class SequenceNode extends Node {
         this.ids.add(id);
     }
 
-
+    
     public boolean isDummy() {
         return isDummy;
     }
