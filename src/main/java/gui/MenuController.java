@@ -86,11 +86,11 @@ public class MenuController {
 
         String stringFile = file.toString();
 
-        if (prefs.get("bookmarkNum" + stringFile, "def").equals("def")) {
-            prefs.put("bookmarkNum" + stringFile, "0");
+        if (prefs.getInt("bookmarkNum" + stringFile, -1) == -1) {
+            prefs.putInt("bookmarkNum" + stringFile, 0);
         }
 
-        int largestIndex = Integer.parseInt(prefs.get("bookmarkNum" + stringFile, "def"));
+        int largestIndex = prefs.getInt("bookmarkNum" + stringFile, -1);
         int i = 0;
 
         while (i <= largestIndex) {
@@ -248,10 +248,10 @@ public class MenuController {
         TextField radius = getRadiusTextField();
 
         String stringFile = prefs.get("file", "def");
-        int newIndex = Integer.parseInt(prefs.get("bookmarkNum" + stringFile, "def"));
+        int newIndex = prefs.getInt("bookmarkNum" + stringFile, -1);
         newIndex++;
         prefs.put(stringFile + newIndex, nodes.getText() + "-" + radius.getText());
-        prefs.put("bookmarkNum" + stringFile, "" + newIndex);
+        prefs.putInt("bookmarkNum" + stringFile, newIndex);
 
         updateBookmarks(nodes.getText() + "-" + radius.getText());
     }
