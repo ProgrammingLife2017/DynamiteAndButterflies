@@ -61,9 +61,6 @@ public class MenuController {
         canvas.widthProperty().bind(canvasPanel.widthProperty());
         canvas.heightProperty().bind(canvasPanel.heightProperty());
         gc = canvas.getGraphicsContext2D();
-        if (prefs.get("numOfBookmarks", "def").equals("def")) {
-            prefs.put("numOfBookmarks", "0");
-        }
     }
 
     /**
@@ -87,9 +84,14 @@ public class MenuController {
             }
         }
 
-        int largestIndex = Integer.parseInt(prefs.get("numOfBookmarks", "def"));
-        int i = 0;
         String stringFile = file.toString();
+
+        if (prefs.get("bookmarkNum" + stringFile, "def").equals("def")) {
+            prefs.put("bookmarkNum" + stringFile, "0");
+        }
+
+        int largestIndex = Integer.parseInt(prefs.get("bookmarkNum" + stringFile, "def"));
+        int i = 0;
 
         while (i <= largestIndex) {
             int newIndex = i;
@@ -245,17 +247,17 @@ public class MenuController {
         TextField nodes = getNodeTextField();
         TextField radius = getRadiusTextField();
 
-        String numOfBookmarks = "";
-        int newIndex = Integer.parseInt(prefs.get("numOfBookmarks", numOfBookmarks));
+        String stringFile = prefs.get("file", "def");
+        int newIndex = Integer.parseInt(prefs.get("bookmarkNum" + stringFile, "def"));
         newIndex++;
-        String file = prefs.get("file", "def");
-        prefs.put(file + newIndex, nodes.getText() + "-" + radius.getText());
-        prefs.put("numOfBookmarks", "" + newIndex);
+        prefs.put(stringFile + newIndex, nodes.getText() + "-" + radius.getText());
+        prefs.put("bookmarkNum" + stringFile, "" + newIndex);
 
         updateBookmarks(nodes.getText() + "-" + radius.getText());
     }
 
     private void updateBookmarks(String newBookmark) {
+        //TODO Add more visuals to this update
         bookmark2.setText(bookmark1.getText());
         bookmark1.setText(newBookmark);
     }
