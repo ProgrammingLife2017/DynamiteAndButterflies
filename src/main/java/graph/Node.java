@@ -9,22 +9,24 @@ import java.util.ArrayList;
  * The sequence is a String consisting of A, C T and G.
  */
 public class Node {
-    private ArrayList<SequenceNode> adjecencyList;
+    private ArrayList<Integer> adjecencyList;
     private int column;
+    private int index;
 
     /**
      * Constructor of the Node object.
      */
     public Node(){
-        this.adjecencyList = new ArrayList<SequenceNode>();
+        this.adjecencyList = new ArrayList<Integer>();
         this.column = 0;
+        this.index = 0;
     }
 
     /**
      * Returns all the children that the node has.
      * @return An ArrayList of nodes that contain all the children of the node
      */
-    public ArrayList<SequenceNode> getChildren() {
+    ArrayList<Integer> getChildren() {
         return this.adjecencyList;
     }
 
@@ -32,7 +34,7 @@ public class Node {
      * Returns all the children that the node has.
      * @return An ArrayList of nodes that contain all the children of the node
      */
-    public ArrayList<SequenceNode> returnChildren() {
+    public ArrayList<Integer> returnChildren() {
         return this.getChildren();
     }
 
@@ -46,10 +48,10 @@ public class Node {
 
     /**
      * Adds a child to the node.
-     * @param child a node to be added as a child to this node.
+     * @param childID a nodeID to be added as a child to this node.
      */
-    public void addChild(SequenceNode child) {
-        this.getChildren().add(child);
+    void addChild(Integer childID) {
+        this.getChildren().add(childID);
     }
 
     /**
@@ -64,7 +66,7 @@ public class Node {
      * Sets the column of the node.
      * @param newColumn the newColumn value of the node
      */
-    public void setColumn(int newColumn) {
+    private void setColumn(int newColumn) {
         this.column = newColumn;
     }
 
@@ -72,9 +74,17 @@ public class Node {
      * Increments the column of the node.
      * @param parColumn the column that might overwrite.
      */
-    public void incrementColumn(int parColumn) {
+    void incrementColumn(int parColumn) {
         if (this.column < parColumn + 1) {
             setColumn(parColumn + 1);
         }
+    }
+
+    /**
+     * Sets the index of the node.
+     * @param index the index value of the node
+     */
+    void setIndex(int index) {
+        this.index = index;
     }
 }
