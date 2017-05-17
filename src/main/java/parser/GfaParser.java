@@ -54,13 +54,13 @@ public class GfaParser {
                 if(count%100000 == 0) {
                     System.out.println(count);
                 }
-            } /*else if (line.startsWith("L")) {
+            } else if (line.startsWith("L")) {
                 String[] edgeDataString = line.split("\t");
                 int parentId = (Integer.parseInt(edgeDataString[1]));
                 int childId = Integer.parseInt(edgeDataString[3]);
                 Edge edge = new Edge(parentId, childId);
                 sequenceGraph.getEdges().add(edge);
-            }*/
+            }
         }
         db.close();
         in.close();
