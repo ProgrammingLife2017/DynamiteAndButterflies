@@ -32,7 +32,7 @@ public class GfaParser {
      */
     @SuppressWarnings("Since15")
     public SequenceGraph parseGraph(String filepath) throws IOException {
-        DB db = DBMaker.fileDB("fileDB").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
+        DB db = DBMaker.tempFileDB().fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
         BTreeMap<Long, String> sequenceMap = db.treeMap("sequenceMap").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
         SequenceGraph sequenceGraph = new SequenceGraph();
         InputStream in = new FileInputStream(filepath);
@@ -51,7 +51,7 @@ public class GfaParser {
                 sequenceMap.put((long) (id), data[2]);
                 sequenceGraph.addNode(node);
                 count++;
-                if(count%100000 == 0) {
+                if (count % 100000 == 0) {
                     System.out.println(count);
                 }
             } else if (line.startsWith("L")) {
