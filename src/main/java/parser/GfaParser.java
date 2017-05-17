@@ -10,8 +10,6 @@ import org.mapdb.Serializer;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import static java.lang.Math.toIntExact;
 
@@ -34,6 +32,7 @@ public class GfaParser {
     public SequenceGraph parseGraph(String filePath) throws IOException {
         String[] partPaths = filePath.split("\\\\");
         String partPath = partPaths[partPaths.length-1];
+        System.out.println(partPath);
         db = DBMaker.fileDB(partPath).fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
         if (db.get(partPath) != null) {
             sequenceMap = db.hashMap(partPath).keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();

@@ -81,6 +81,7 @@ public class App extends Application {
         int numOfBookmarks = prefs.getInt("bookmarkNum" + stringOfFile, -1);
         prefs.putInt("bookmarkNum" + stringOfFile, numOfBookmarks);
         MenuController controller = loader.getController();
-        controller.getSequenceHashMap().close();
+        if (controller.getSequenceHashMap() != null)
+            controller.getSequenceHashMap().close();
     }
 }
