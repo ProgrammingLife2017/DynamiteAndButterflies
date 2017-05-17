@@ -71,9 +71,4 @@ public class App extends Application {
         return null;
     }
 
-    @Override
-    public void stop() {
-        String numOfBookmarksString = MenuController.prefs.get("numOfBookmarks", "def");
-        MenuController.prefs.put("numOfBookmarks", numOfBookmarksString);
-    }
 }
