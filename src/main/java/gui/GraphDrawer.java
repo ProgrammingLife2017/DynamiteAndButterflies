@@ -48,7 +48,7 @@ public final class GraphDrawer {
      * @param graph The sequencegraph to be drawn to the canvas.
      * @param gc The graphics context used to actually draw shapes.
      */
-    GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
+    public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
         xSize = 1;
         graph.initialize();
@@ -62,7 +62,7 @@ public final class GraphDrawer {
      * @param factor Zooming factor.
      * @param column The Column that has to be in the centre.
      */
-    void zoomIn(final double factor, final int column) {
+    public void zoomIn(final double factor, final int column) {
         this.zoomLevel = (int) (zoomLevel * factor);
         this.xSize += 0.1;
         moveShapes(column - zoomLevel / 2);
@@ -84,7 +84,7 @@ public final class GraphDrawer {
      * @param newZoom The new radius.
      * @param column The new Column to be in the centre.
      */
-    void changeZoom(final int newZoom, final int column) {
+    public void changeZoom(final int newZoom, final int column) {
         zoomLevel = newZoom;
         moveShapes(column - zoomLevel / 2);
     }
@@ -93,7 +93,7 @@ public final class GraphDrawer {
      * Draws the Graph.
      * @param xDifference Variable to determine which column should be in the centre.
      */
-    void moveShapes(final double xDifference) {
+    public void moveShapes(final double xDifference) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         gc.setFill(Color.BLUE);
 
@@ -124,7 +124,7 @@ public final class GraphDrawer {
      * Returns the First SequenceNode (not Dummy) Object from the centre Column.
      * @return The Centre Node.
      */
-    SequenceNode getRealCentreNode() {
+    public SequenceNode getRealCentreNode() {
         ArrayList<SequenceNode> set = getCentreColumn();
         for (Node test : set) {
             if (test instanceof SequenceNode) {
@@ -140,7 +140,7 @@ public final class GraphDrawer {
      * @param nodeId The Id of the Node you want to find the Column of.
      * @return The ColumnId
      */
-    int getColumnId(final int nodeId) {
+    public int getColumnId(final int nodeId) {
         for (ArrayList<SequenceNode> list : columns) {
             for (Node node : list) {
                 if (node instanceof SequenceNode) {
