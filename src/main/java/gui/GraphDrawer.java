@@ -15,8 +15,6 @@ import java.util.HashMap;
  */
 public class GraphDrawer {
 
-    private static final int Y_SIZE = 5;
-    private static final int Y_BASE = 100;
     private static final int ARC_SIZE = 10;
     private static final int X_OFFSET = 20;
     private static final double RELATIVE_X_DISTANCE = 0.8;
@@ -25,6 +23,7 @@ public class GraphDrawer {
     private static final double MIN_LINE_WIDTH = 0.01;
     private static final double MAX_LINE_WIDTH = 1;
 
+    private int yBase;
     private int zoomLevel;
     private GraphicsContext gc;
     private ArrayList<ArrayList<SequenceNode>> columns;
@@ -38,6 +37,7 @@ public class GraphDrawer {
     GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
         this.graph = graph;
+        this.yBase = (int) (gc.getCanvas().getHeight() / 4);
         graph.initialize();
         graph.layerizeGraph();
         columns = graph.getColumns();
@@ -90,8 +90,8 @@ public class GraphDrawer {
                 }
                 double stepSize = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel);
                 double x = (j - xDifference) * stepSize;
-                double y = Y_BASE + (i * RELATIVE_Y_DISTANCE);
-                gc.fillRoundRect(x, y, RELATIVE_X_DISTANCE * stepSize, Y_SIZE, ARC_SIZE, ARC_SIZE);
+                double y = yBase + (i * RELATIVE_Y_DISTANCE);
+                gc.fillRoundRect(x, y, RELATIVE_X_DISTANCE * stepSize, getYSize(), ARC_SIZE, ARC_SIZE);
                 gc.setFill(Color.BLUE);
             }
         }
@@ -111,12 +111,22 @@ public class GraphDrawer {
                 SequenceNode child = graph.getNode(parent.getChild(j));
                 double stepSize = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel);
                 double startx = stepSize * ((parent.getColumn() - xDifference) + RELATIVE_X_DISTANCE);
-                double starty = Y_BASE + (parent.getIndex() * RELATIVE_Y_DISTANCE);
+                double starty = yBase + (parent.getIndex() * RELATIVE_Y_DISTANCE) + getYSize() / 2;
                 double endx = (child.getColumn() - xDifference) * stepSize;
-                double endy = Y_BASE + (child.getIndex() * RELATIVE_Y_DISTANCE);
+                double endy = yBase + (child.getIndex() * RELATIVE_Y_DISTANCE) + getYSize() / 2;
                 gc.strokeLine(startx, starty, endx, endy);
             }
         }
+    }
+
+    /**
+     * Set the height of the node depending on the level of zoom.
+     */
+    private double getYSize() {
+        double size = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel) * 0.2;
+        if (size < 1) { size = 1; }
+        if (size > 20) { size = 20; }
+        return size;
     }
 
     /**
