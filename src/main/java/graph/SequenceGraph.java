@@ -27,6 +27,10 @@ public class SequenceGraph   {
         this.edges = new ArrayList<Edge>();
     }
 
+    public int size() {
+        return nodes.size();
+    }
+
     /**
      * Getter for the column list
      * @return the column arraylist with an arraylist with nodes.
