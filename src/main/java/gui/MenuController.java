@@ -16,6 +16,7 @@ import parser.GfaParser;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.prefs.Preferences;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -26,11 +27,11 @@ import java.util.HashMap;
 public class MenuController {
 
     @FXML
-    private Button saveBookmark;
+    public Button saveBookmark;
     @FXML
-    private static Button bookmark1;
+    private Button bookmark1;
     @FXML
-    private static Button bookmark2;
+    private Button bookmark2;
     @FXML
     private Label sequenceInfo;
     @FXML
@@ -52,6 +53,9 @@ public class MenuController {
     private SequenceGraph graph;
     private HashMap<Integer, String> sequenceHashMap;
     private double pressedX;
+    private static Preferences prefs;
+
+    private BookmarkController bookmarkController;
 
     /**
      * Initializes the canvas.
@@ -61,6 +65,8 @@ public class MenuController {
         canvas.widthProperty().bind(canvasPanel.widthProperty());
         canvas.heightProperty().bind(canvasPanel.heightProperty());
         gc = canvas.getGraphicsContext2D();
+        bookmarkController = new BookmarkController(bookmark1, bookmark2);
+        prefs = Preferences.userRoot();
     }
 
     /**
@@ -74,8 +80,7 @@ public class MenuController {
         fileChooser.setTitle("Open Resource File");
         //fileChooser.setInitialDirectory(this.getClass().getResource("/resources").toString());
         File file = fileChooser.showOpenDialog(stage);
-        Bookmarks.prefs.put("file", file.toString());
-
+        prefs.put("file", file.toString());
         if (file != null) {
             try {
                 openFile(file);
@@ -83,8 +88,7 @@ public class MenuController {
                 e.printStackTrace();
             }
         }
-
-        Bookmarks.loadBookmarks(file.toString());
+        bookmarkController.loadBookmarks(file.toString());
     }
 
     private void openFile(File file) throws IOException {
@@ -117,7 +121,6 @@ public class MenuController {
             drawer.zoomIn(0.8, drawer.getRealCentreNode().getColumn());
             radiusTextField.setText(drawer.getZoomLevel() + "");
         }
-
     }
 
     /**
@@ -232,17 +235,7 @@ public class MenuController {
         TextField nodes = getNodeTextField();
         TextField radius = getRadiusTextField();
 
-        Bookmarks.saving(nodes.getText(), radius.getText());
-    }
-
-    /**
-     * Uodates all bookmarks.
-     * @param newBookmark The string that should be added.
-     */
-    static void updateBookmarks(String newBookmark) {
-        //TODO Add more visuals to this update
-        bookmark2.setText(bookmark1.getText());
-        bookmark1.setText(newBookmark);
+        bookmarkController.saving(nodes.getText(), radius.getText());
     }
 
     /**
