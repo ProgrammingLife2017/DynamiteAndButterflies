@@ -15,7 +15,6 @@ import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.prefs.Preferences;
 import java.util.HashMap;
 
 /**
@@ -29,9 +28,9 @@ public class MenuController {
     @FXML
     private Button saveBookmark;
     @FXML
-    private Button bookmark1;
+    private static Button bookmark1;
     @FXML
-    private Button bookmark2;
+    private static Button bookmark2;
     @FXML
     private Label sequenceInfo;
     @FXML
@@ -54,8 +53,6 @@ public class MenuController {
     private HashMap<Integer, String> sequenceHashMap;
     private double pressedX;
 
-    static Preferences prefs = Preferences.userRoot();
-
     /**
      * Initializes the canvas.
      */
@@ -77,7 +74,7 @@ public class MenuController {
         fileChooser.setTitle("Open Resource File");
         //fileChooser.setInitialDirectory(this.getClass().getResource("/resources").toString());
         File file = fileChooser.showOpenDialog(stage);
-        prefs.put("file", file.toString());
+        Bookmarks.prefs.put("file", file.toString());
 
         if (file != null) {
             try {
@@ -87,21 +84,7 @@ public class MenuController {
             }
         }
 
-        String stringFile = file.toString();
-
-        if (prefs.getInt("bookmarkNum" + stringFile, -1) == -1) {
-            prefs.putInt("bookmarkNum" + stringFile, 0);
-        }
-
-        int largestIndex = prefs.getInt("bookmarkNum" + stringFile, -1);
-        int i = 0;
-
-        while (i <= largestIndex) {
-            int newIndex = i;
-            String realBM = prefs.get(stringFile + newIndex, "-");
-            updateBookmarks(realBM);
-            i++;
-        }
+        Bookmarks.loadBookmarks(file.toString());
     }
 
     private void openFile(File file) throws IOException {
@@ -249,16 +232,14 @@ public class MenuController {
         TextField nodes = getNodeTextField();
         TextField radius = getRadiusTextField();
 
-        String stringFile = prefs.get("file", "def");
-        int newIndex = prefs.getInt("bookmarkNum" + stringFile, -1);
-        newIndex++;
-        prefs.put(stringFile + newIndex, nodes.getText() + "-" + radius.getText());
-        prefs.putInt("bookmarkNum" + stringFile, newIndex);
-
-        updateBookmarks(nodes.getText() + "-" + radius.getText());
+        Bookmarks.saving(nodes.getText(), radius.getText());
     }
 
-    private void updateBookmarks(String newBookmark) {
+    /**
+     * Uodates all bookmarks.
+     * @param newBookmark The string that should be added.
+     */
+    static void updateBookmarks(String newBookmark) {
         //TODO Add more visuals to this update
         bookmark2.setText(bookmark1.getText());
         bookmark1.setText(newBookmark);
