@@ -65,6 +65,9 @@ public class ZoomController {
         drawer.changeZoom(endColumn - startColumn, drawer.getColumnId(centreNodeID));
     }
 
+    /**
+     * Displays the centre node and radius of the current view.
+     */
     public void displayInfo() {
         nodeTextField.setText(drawer.getRealCentreNode().getId() + "");
         radiusTextField.setText(drawer.getZoomLevel() + "");

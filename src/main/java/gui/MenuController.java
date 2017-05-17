@@ -61,13 +61,15 @@ public class MenuController {
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
      * can be selected and directly be visualised on the screen.
+     * @throws IOException if there is no file specified.
      */
     @FXML
     public void openFileClicked() throws IOException {
         fileController.openFileClicked(anchorPane, gc);
 
 
-        zoomController = new ZoomController(fileController.getDrawer(), nodeTextField, radiusTextField);
+        zoomController = new ZoomController(fileController.getDrawer(),
+                                nodeTextField, radiusTextField);
 
         displayInfo(fileController.getGraph());
     }

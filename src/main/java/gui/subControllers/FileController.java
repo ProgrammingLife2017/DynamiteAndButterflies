@@ -18,10 +18,13 @@ import java.util.HashMap;
  */
 public class FileController {
 
-    SequenceGraph graph;
+    private SequenceGraph graph;
     private gui.GraphDrawer drawer;
     private HashMap<Integer, String> sequenceHashMap;
 
+    /**
+     * Constructor of the FileController object to control the Files.
+     */
     public FileController() {
         graph = new SequenceGraph();
         sequenceHashMap = new HashMap<Integer, String>();
@@ -40,11 +43,14 @@ public class FileController {
     }
 
     /**
-     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
+     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa.
      * can be selected and directly be visualised on the screen.
+     * @param anchorPane the pane where we will be drawing
+     * @param gc the graphicscontext we will use
+     * @throws IOException exception if no file is found
      */
     @FXML
-    public SequenceGraph openFileClicked(AnchorPane anchorPane, GraphicsContext gc) throws IOException {
+    public void openFileClicked(AnchorPane anchorPane, GraphicsContext gc) throws IOException {
         Stage stage = (Stage) anchorPane.getScene().getWindow();
         File file = chooseFile(stage);
         GfaParser parser = new GfaParser();
@@ -54,18 +60,28 @@ public class FileController {
 
         drawer = new GraphDrawer(graph, gc);
         drawer.moveShapes(0.0);
-
-        return graph;
     }
 
+    /**
+     * Gets the sequenceHashMap.
+     * @return the sequenceHashMap with all the sequences
+     */
     public HashMap<Integer, String> getSequenceHashMap() {
         return sequenceHashMap;
     }
 
+    /**
+     * Gets the GraphDrawer.
+     * @return the graphDrawer.
+     */
     public GraphDrawer getDrawer() {
         return drawer;
     }
 
+    /**
+     * Gets the graph.
+     * @return the graph.
+     */
     public SequenceGraph getGraph() {
         return graph;
     }
