@@ -57,9 +57,6 @@
                   <TextField fx:id="nodeTextField" alignment="CENTER" layoutX="22.0" layoutY="113.0" prefHeight="29.0" prefWidth="97.0" promptText="Centre node" />
                   <Button layoutX="22.0" layoutY="142.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
                   <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="22.0" layoutY="167.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
-                  <Button fx:id="saveBookmark" layoutX="26.0" layoutY="293.0" mnemonicParsing="false" onAction="#saveTheBookmarks" text="Save Bookmark" />
-                  <Button fx:id="bookmark1" layoutX="27.0" layoutY="332.0" mnemonicParsing="false" onAction="#pressBookmark1" prefHeight="24.0" prefWidth="98.0" text="-" textAlignment="CENTER" />
-                  <Button fx:id="bookmark2" layoutX="27.0" layoutY="368.0" mnemonicParsing="false" onAction="#pressBookmark2" prefHeight="24.0" prefWidth="97.0" text="-" textAlignment="CENTER" />
                </children>
                <padding>
                   <Insets right="15.0" />
