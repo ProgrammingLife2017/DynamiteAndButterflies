@@ -1,6 +1,5 @@
 package gui;
 
-import graph.Edge;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
@@ -14,37 +13,18 @@ import java.util.HashMap;
  *
  * Class used to draw shapes on the canvas.
  */
-public final class GraphDrawer {
+public class GraphDrawer {
 
-    /**
-     * Height of drawn nodes.
-     */
     private static final int Y_SIZE = 5;
-
-    /**
-     * Base line for Nodes.
-     */
     private static final int Y_BASE = 100;
+    private static final int ARC_SIZE = 10;
+    private static final int X_OFFSET = 20;
+    private static final double RELATIVE_X_DISTANCE = 0.8;
+    private static final double RELATIVE_Y_DISTANCE = 50;
 
-    private static final double RELATIVE_DISTANCE = 0.8;
-
-    /**
-     * The number of Columns to be displayed in the Canvas.
-     */
     private int zoomLevel;
-
-    /**
-     * The size of the nodes.
-     */
-    private double xSize;
-
-    /**
-     * The graphics context used to actually draw shapes.
-     */
     private GraphicsContext gc;
-
     private ArrayList<ArrayList<SequenceNode>> columns;
-
     private SequenceGraph graph;
 
     /**
@@ -55,7 +35,6 @@ public final class GraphDrawer {
     GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
         this.graph = graph;
-        xSize = 1;
         graph.initialize();
         graph.layerizeGraph();
         columns = graph.getColumns();
@@ -69,7 +48,6 @@ public final class GraphDrawer {
      */
     void zoomIn(final double factor, final int column) {
         this.zoomLevel = (int) (zoomLevel * factor);
-        this.xSize += 0.1;
         moveShapes(column - zoomLevel / 2);
     }
 
@@ -80,7 +58,6 @@ public final class GraphDrawer {
      */
     public void zoomOut(final double factor, final int column) {
         this.zoomLevel = (int) (zoomLevel * factor);
-        this.xSize -= 0.1;
         moveShapes(column - zoomLevel / 2);
     }
 
@@ -108,28 +85,31 @@ public final class GraphDrawer {
                 if (column.get(i).isDummy()) {
                     gc.setFill(Color.BLACK);
                 }
-                double stepSize = ((gc.getCanvas().getWidth() - 20) / zoomLevel);
-                gc.fillRoundRect((j - xDifference) * stepSize,
-                                Y_BASE + (i * 50), RELATIVE_DISTANCE * stepSize, Y_SIZE,
-                                10, 10);
-
+                double stepSize = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel);
+                double x = (j - xDifference) * stepSize;
+                double y = Y_BASE + (i * RELATIVE_Y_DISTANCE);
+                gc.fillRoundRect(x, y, RELATIVE_X_DISTANCE * stepSize, Y_SIZE, ARC_SIZE, ARC_SIZE);
                 gc.setFill(Color.BLUE);
             }
         }
         drawEdges(xDifference);
     }
 
-    public void drawEdges(double xDifference) {
+    /**
+     * Draws the edges.
+     * @param xDifference Variable to determine which column should be in the centre.
+     */
+    private void drawEdges(double xDifference) {
         HashMap<Integer, SequenceNode> nodes = graph.getNodes();
         for (int i = 1; i <= nodes.size(); i++) {
             SequenceNode parent = nodes.get(i);
             for (int j = 0; j < parent.getChildren().size(); j++) {
                 SequenceNode child = graph.getNode(parent.getChild(j));
-                double stepSize = ((gc.getCanvas().getWidth() - 20) / zoomLevel);
-                double startx = (parent.getColumn() - xDifference) * stepSize + RELATIVE_DISTANCE * stepSize;
-                double starty = Y_BASE + (parent.getIndex() * 50);
+                double stepSize = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel);
+                double startx = stepSize * ((parent.getColumn() - xDifference) + RELATIVE_X_DISTANCE);
+                double starty = Y_BASE + (parent.getIndex() * RELATIVE_Y_DISTANCE);
                 double endx = (child.getColumn() - xDifference) * stepSize;
-                double endy = Y_BASE + (child.getIndex() * 50);
+                double endy = Y_BASE + (child.getIndex() * RELATIVE_Y_DISTANCE);
                 gc.strokeLine(startx, starty, endx, endy);
             }
         }
@@ -176,7 +156,7 @@ public final class GraphDrawer {
      * Get function for zoom level.
      * @return the Zoom level.
      */
-    public int getZoomLevel(){
+    public int getZoomLevel() {
         return zoomLevel;
     }
 }
