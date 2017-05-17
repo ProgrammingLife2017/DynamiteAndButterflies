@@ -1,6 +1,5 @@
 package gui;
 
-import graph.DummyNode;
 import graph.Node;
 import graph.SequenceGraph;
 import graph.SequenceNode;
@@ -14,7 +13,7 @@ import java.util.ArrayList;
  *
  * Class used to draw shapes on the canvas.
  */
-public final class GraphDrawer {
+public class GraphDrawer {
 
     /**
      * Height of drawn nodes.

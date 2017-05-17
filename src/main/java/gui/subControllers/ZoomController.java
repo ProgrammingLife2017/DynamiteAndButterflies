@@ -33,11 +33,10 @@ public class ZoomController {
     public void zoomInClicked() throws IOException {
         if (!nodeTextField.getText().equals("")) {
             drawer.zoomIn(0.8, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
-            radiusTextField.setText(drawer.getZoomLevel() + "");
         } else {
             drawer.zoomIn(0.8, drawer.getRealCentreNode().getColumn());
-            radiusTextField.setText(drawer.getZoomLevel() + "");
         }
+        updateRadius(drawer.getZoomLevel() + "");
     }
 
     /**
@@ -47,11 +46,10 @@ public class ZoomController {
     public void zoomOutClicked() throws IOException {
         if (!nodeTextField.getText().equals("")) {
             drawer.zoomOut(1.2, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
-            radiusTextField.setText(drawer.getZoomLevel() + "");
         } else {
             drawer.zoomOut(1.2, drawer.getRealCentreNode().getColumn());
-            radiusTextField.setText(drawer.getZoomLevel() + "");
         }
+        updateRadius(drawer.getZoomLevel() + "");
     }
 
     /**
@@ -87,6 +85,14 @@ public class ZoomController {
      */
     private int getRadius() {
         return Integer.parseInt(radiusTextField.getText());
+    }
+
+    private void updateRadius(String newRadius) {
+        radiusTextField.setText(newRadius);
+    }
+
+    private void updateCentreNode(String newCentreNode) {
+        radiusTextField.setText(newCentreNode);
     }
 
     /**
