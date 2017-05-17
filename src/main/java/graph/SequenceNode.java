@@ -18,12 +18,12 @@ public class SequenceNode extends Node {
         this.ids = new ArrayList<Integer>();
         this.index = 0;
         this.isDummy = false;
-
     }
 
     public Integer getId() {
         return id;
     }
+
 
     public void addId(Integer id) {
         this.ids.add(id);
