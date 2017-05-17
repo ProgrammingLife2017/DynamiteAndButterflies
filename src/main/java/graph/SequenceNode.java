@@ -34,6 +34,9 @@ public class SequenceNode {
         this.children.add(id);
     }
 
+    public boolean hasChildren() {
+        return children.size() > 0;
+    }
     public ArrayList<Integer> getChildren() {
         return this.children;
     }
@@ -60,6 +63,10 @@ public class SequenceNode {
      */
     public int getColumn() {
         return column;
+    }
+
+    public void setColumn(int col) {
+        this.column = col;
     }
 
     public void incrementColumn(int i) {

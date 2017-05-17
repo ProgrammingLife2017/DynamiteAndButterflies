@@ -4,6 +4,7 @@ import graph.SequenceGraph;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -15,6 +16,7 @@ import parser.GfaParser;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.prefs.Preferences;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -24,7 +26,12 @@ import java.util.HashMap;
  */
 public class MenuController {
 
-
+    @FXML
+    public Button saveBookmark;
+    @FXML
+    private Button bookmark1;
+    @FXML
+    private Button bookmark2;
     @FXML
     private Label sequenceInfo;
     @FXML
@@ -46,6 +53,9 @@ public class MenuController {
     private SequenceGraph graph;
     private HashMap<Integer, String> sequenceHashMap;
     private double pressedX;
+    private static Preferences prefs;
+
+    private BookmarkController bookmarkController;
 
     /**
      * Initializes the canvas.
@@ -55,6 +65,8 @@ public class MenuController {
         canvas.widthProperty().bind(canvasPanel.widthProperty());
         canvas.heightProperty().bind(canvasPanel.heightProperty());
         gc = canvas.getGraphicsContext2D();
+        bookmarkController = new BookmarkController(bookmark1, bookmark2);
+        prefs = Preferences.userRoot();
     }
 
     /**
@@ -68,6 +80,7 @@ public class MenuController {
         fileChooser.setTitle("Open Resource File");
         //fileChooser.setInitialDirectory(this.getClass().getResource("/resources").toString());
         File file = fileChooser.showOpenDialog(stage);
+        prefs.put("file", file.toString());
         if (file != null) {
             try {
                 openFile(file);
@@ -75,6 +88,7 @@ public class MenuController {
                 e.printStackTrace();
             }
         }
+        bookmarkController.loadBookmarks(file.toString());
     }
 
     private void openFile(File file) throws IOException {
@@ -107,7 +121,6 @@ public class MenuController {
             drawer.zoomIn(0.8, drawer.getRealCentreNode().getColumn());
             radiusTextField.setText(drawer.getZoomLevel() + "");
         }
-
     }
 
     /**
@@ -154,13 +167,27 @@ public class MenuController {
     }
 
     /**
+     * Adds a button to traverse the graph with.
+     * @param centreNode specifies the centre node to be showed
+     * @param radius specifies the radius to be showed
+     */
+    private void traverseGraphClicked(String centreNode, String radius) {
+        int centreNodeID = Integer.parseInt(centreNode);
+        drawer.changeZoom(getEndColumn(centreNode, radius) - getStartColumn(centreNode, radius), drawer.getColumnId(centreNodeID));
+        sequenceInfo.setText("Sequence: " + sequenceHashMap.get(centreNodeID));
+    }
+
+    /**
      * Gets the start column based on the text fields.
      * @return integer representing the starting column
      */
     private int getStartColumn() {
-        String text = getNodeTextField().getText();
-        int centreNode = Integer.parseInt(getNodeTextField().getText());
-        int radius = Integer.parseInt(getRadiusTextField().getText());
+        return getStartColumn(getNodeTextField().getText(), getRadiusTextField().getText());
+    }
+
+    private int getStartColumn(String centre, String rad) {
+        int centreNode = Integer.parseInt(centre);
+        int radius = Integer.parseInt(rad);
 
         int startNode = centreNode - radius;
         if (startNode < 1) {
@@ -170,9 +197,12 @@ public class MenuController {
     }
 
     private int getEndColumn() {
-        String text = getNodeTextField().getText();
-        int centreNode = Integer.parseInt(getNodeTextField().getText());
-        int radius = Integer.parseInt(getRadiusTextField().getText());
+        return getEndColumn(getNodeTextField().getText(), getRadiusTextField().getText());
+    }
+
+    private int getEndColumn(String centre, String rad) {
+        int centreNode = Integer.parseInt(centre);
+        int radius = Integer.parseInt(rad);
 
         int endNode = centreNode + radius;
         if (endNode > graph.getNodes().size()) {
@@ -195,5 +225,46 @@ public class MenuController {
      */
     private TextField getRadiusTextField() {
         return radiusTextField;
+    }
+
+    /**
+     * Updates and saves the bookmarks.
+     */
+    @FXML
+    public void saveTheBookmarks() {
+        TextField nodes = getNodeTextField();
+        TextField radius = getRadiusTextField();
+
+        bookmarkController.saving(nodes.getText(), radius.getText());
+    }
+
+    /**
+     * Pressed of the bookmark1 button.
+     */
+    @FXML
+    public void pressBookmark1() {
+        bookmarked(bookmark1);
+    }
+
+    /**
+     * Pressed of the bookmark2 button.
+     */
+    @FXML
+    public void pressBookmark2() {
+        bookmarked(bookmark2);
+    }
+
+    /**
+     * Method used to not duplicate code in working out bookmarks.
+     * @param bookmark the button that specifies the bookmark
+     */
+    private void bookmarked(Button bookmark) {
+        if (!bookmark.getText().equals("-")) {
+            String string = bookmark.getText();
+            String[] parts = string.split("-");
+            String centre = parts[0];
+            String radius = parts[1];
+            traverseGraphClicked(centre, radius);
+        }
     }
 }

@@ -2,3 +2,12 @@
 
 # DynamiteAndButterflies
 Genome parser and visualisation
+
+## Team members
+| Jasper van Tilburg                        | Lex Boleij                             | Eric Dammeijer                          | Marc Visser                             | Jip Rietveld                           |
+|-------------------------------------------|----------------------------------------|-----------------------------------------|-----------------------------------------|----------------------------------------|
+| ![jasper](http://i.imgur.com/xHGjfa3.jpg) | ![Lex](http://i.imgur.com/s8z6wXz.jpg) | ![Eric](http://i.imgur.com/N381Hu6.jpg) | ![marc](http://i.imgur.com/3Y9fqJA.jpg) | ![jip](http://i.imgur.com/W3MpLr7.jpg) |
+## Preview
+![main screen](http://i.imgur.com/f3fXR66.png)
+![file picker](http://i.imgur.com/4EkWHN8.png)
+![zooming](http://i.imgur.com/qE3CEvL.png)
