@@ -116,6 +116,9 @@ modules.xml
 # database files
 *.db
 
+# gfa files
+*.gfa
+
 # Package Files #
 *.jar
 *.war

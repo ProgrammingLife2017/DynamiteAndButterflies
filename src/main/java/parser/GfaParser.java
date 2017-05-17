@@ -3,12 +3,12 @@ package parser;
 import graph.Edge;
 import graph.SequenceGraph;
 import graph.SequenceNode;
-import org.mapdb.*;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
+import org.mapdb.Serializer;
 
 import java.io.*;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,38 +22,60 @@ public class GfaParser {
     HashMap<Integer, byte[]> sequenceHashMap;
     private String header1;
     private String header2;
-    private Boolean duplicate = false;
+    private HTreeMap<Long, String> sequenceMap;
+    public DB db;
 
     /**
      * This method parses the file specified in filepath into a sequence graph.
-     * @param filepath A string specifying where the file is stored
+     * @param filePath A string specifying where the file is stored.
      * @return Returns a sequenceGraph
      * @throws IOException For instance when the file is not found
      */
     @SuppressWarnings("Since15")
-    public SequenceGraph parseGraph(String filepath) throws IOException {
-        DB db = DBMaker.tempFileDB().fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
-        BTreeMap<Long, String> sequenceMap = db.treeMap("sequenceMap").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
+    public SequenceGraph parseGraph(String filePath) throws IOException {
+        String partPath = filePath.substring(filePath.length()-10, filePath.length());
+        db = DBMaker.fileDB(partPath).fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
+        if (db.get(partPath) != null) {
+            return parseSpecific(filePath, true);
+        } else {
+            sequenceMap = db.hashMap(partPath).keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
+            return parseSpecific(filePath, false);
+        }
+    }
+
+    /**
+     * Getter for the sequenceHashMap.
+     * @return The HashMap.
+     */
+    public HashMap<Integer, byte[]> getSequenceHashMap() {
+        return sequenceHashMap;
+    }
+
+    /**
+     * Parses the file with a boolean whether to create a db file or not. Creates the Graph
+     * @param filePath The file to parse/
+     * @param exists Does the db file already exist?
+     * @return The sequenceGraph
+     * @throws IOException Reader.
+     */
+    @SuppressWarnings("Since15")
+    private SequenceGraph parseSpecific(String filePath, Boolean exists) throws IOException {
         SequenceGraph sequenceGraph = new SequenceGraph();
-        InputStream in = new FileInputStream(filepath);
+        InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line = br.readLine();
         header1 = line.split("H")[1];
         line = br.readLine();
         header2 = line.split("H")[1];
-        int count = 0;
         while ((line = br.readLine()) != null) {
             if (line.startsWith("S")) {
                 String[] data = line.split(("\t"));
                 int id = Integer.parseInt(data[1]);
                 SequenceNode node = new SequenceNode(toIntExact(id));
-                //String seq = encodeSequence(data[2]);
-                sequenceMap.put((long) (id), data[2]);
-                sequenceGraph.addNode(node);
-                count++;
-                if (count % 100000 == 0) {
-                    System.out.println(count);
+                if (!exists) {
+                    sequenceMap.put((long) (id), data[2]);
                 }
+                sequenceGraph.addNode(node);
             } else if (line.startsWith("L")) {
                 String[] edgeDataString = line.split("\t");
                 int parentId = (Integer.parseInt(edgeDataString[1]));
@@ -62,15 +84,9 @@ public class GfaParser {
                 sequenceGraph.getEdges().add(edge);
             }
         }
-        db.close();
         in.close();
         br.close();
         return sequenceGraph;
-    }
-
-
-    public HashMap<Integer, byte[]> getSequenceHashMap() {
-        return sequenceHashMap;
     }
 
 
@@ -85,12 +101,17 @@ public class GfaParser {
         return headers;
     }
 
+    /**
+     * Try for encoding sequences (not used (yet)).
+     * @param seq The sequence to encode.
+     * @return The encoded sequence.
+     */
     public String encodeSequence(String seq) {
         List<String> binString = new ArrayList<String>();
         for (int i = 0; i < seq.length(); i += 4) {
             binString.add(convert(seq.substring(i, Math.min(i + 4, seq.length()))));
         }
-        duplicate = false;
+        Boolean duplicate = false;
         String encodedBinString = binString.get(0);
         for (int i = 1; i < binString.size(); i++) {
             if (binString.get(i).equals(binString.get(i - 1))) {
@@ -98,6 +119,7 @@ public class GfaParser {
                     encodedBinString = encodedBinString.concat("1");
                     duplicate = true;
                 } else {
+                    encodedBinString = encodedBinString.concat("0");
                     encodedBinString = encodedBinString.concat(binString.get(i));
                     duplicate = false;
                 }
