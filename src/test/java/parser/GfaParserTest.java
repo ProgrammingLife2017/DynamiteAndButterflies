@@ -1,8 +1,9 @@
+package parser;
+
 import graph.SequenceGraph;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import parser.GfaParser;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
