@@ -19,7 +19,6 @@ import static java.lang.Math.toIntExact;
  * This class contains a parser to parse a .gfa file into our data structure.
  */
 public class GfaParser {
-    HashMap<Integer, byte[]> sequenceHashMap;
     private String header1;
     private String header2;
     private HTreeMap<Long, String> sequenceMap;
@@ -33,9 +32,11 @@ public class GfaParser {
      */
     @SuppressWarnings("Since15")
     public SequenceGraph parseGraph(String filePath) throws IOException {
-        String partPath = filePath.substring(filePath.length()-10, filePath.length());
+        String[] partPaths = filePath.split("\\\\");
+        String partPath = partPaths[partPaths.length-1];
         db = DBMaker.fileDB(partPath).fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
         if (db.get(partPath) != null) {
+            sequenceMap = db.hashMap(partPath).keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
             return parseSpecific(filePath, true);
         } else {
             sequenceMap = db.hashMap(partPath).keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
@@ -47,8 +48,8 @@ public class GfaParser {
      * Getter for the sequenceHashMap.
      * @return The HashMap.
      */
-    public HashMap<Integer, byte[]> getSequenceHashMap() {
-        return sequenceHashMap;
+    public HTreeMap<Long, String> getSequenceHashMap() {
+        return sequenceMap;
     }
 
     /**
@@ -86,6 +87,7 @@ public class GfaParser {
         }
         in.close();
         br.close();
+        db.commit();
         return sequenceGraph;
     }
 
@@ -99,56 +101,5 @@ public class GfaParser {
         headers.add(header1);
         headers.add(header2);
         return headers;
-    }
-
-    /**
-     * Try for encoding sequences (not used (yet)).
-     * @param seq The sequence to encode.
-     * @return The encoded sequence.
-     */
-    public String encodeSequence(String seq) {
-        List<String> binString = new ArrayList<String>();
-        for (int i = 0; i < seq.length(); i += 4) {
-            binString.add(convert(seq.substring(i, Math.min(i + 4, seq.length()))));
-        }
-        Boolean duplicate = false;
-        String encodedBinString = binString.get(0);
-        for (int i = 1; i < binString.size(); i++) {
-            if (binString.get(i).equals(binString.get(i - 1))) {
-                if (!duplicate) {
-                    encodedBinString = encodedBinString.concat("1");
-                    duplicate = true;
-                } else {
-                    encodedBinString = encodedBinString.concat("0");
-                    encodedBinString = encodedBinString.concat(binString.get(i));
-                    duplicate = false;
-                }
-            } else {
-                encodedBinString = encodedBinString.concat("0");
-                encodedBinString = encodedBinString.concat(binString.get(i));
-                duplicate = false;
-            }
-        }
-        return encodedBinString;
-    }
-
-    public String decodeSequence(Byte[] encodedBinString) {
-        String result = "";
-        System.out.println(result);
-        return result;
-    }
-
-    private String convert(String seq) {
-        String result = "";
-        for (int i = 0; i < seq.length(); i++) {
-            switch (seq.charAt(i)) {
-                case 'A': result = result.concat("00"); break;
-                case 'C': result = result.concat("01"); break;
-                case 'G': result = result.concat("10"); break;
-                case 'T': result = result.concat("11"); break;
-                case 'N': result = result.concat("0"); break;
-            }
-        }
-        return result;
     }
 }

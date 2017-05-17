@@ -11,6 +11,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.mapdb.HTreeMap;
 import parser.GfaParser;
 
 import java.io.File;
@@ -51,7 +52,9 @@ public class MenuController {
     private GraphicsContext gc;
     private gui.GraphDrawer drawer;
     private SequenceGraph graph;
-    private HashMap<Integer, byte[]> sequenceHashMap;
+
+
+    private HTreeMap<Long, String> sequenceHashMap;
     private double pressedX;
     private static Preferences prefs;
 
@@ -163,7 +166,7 @@ public class MenuController {
     public void traverseGraphClicked() {
         int centreNodeID = Integer.parseInt(getNodeTextField().getText());
         drawer.changeZoom(getEndColumn() - getStartColumn(), drawer.getColumnId(centreNodeID));
-        sequenceInfo.setText("Sequence: " + sequenceHashMap.get(centreNodeID));
+        sequenceInfo.setText("Sequence: " + sequenceHashMap.get(new Long(centreNodeID)));
     }
 
     /**
@@ -174,7 +177,7 @@ public class MenuController {
     private void traverseGraphClicked(String centreNode, String radius) {
         int centreNodeID = Integer.parseInt(centreNode);
         drawer.changeZoom(getEndColumn(centreNode, radius) - getStartColumn(centreNode, radius), drawer.getColumnId(centreNodeID));
-        sequenceInfo.setText("Sequence: " + sequenceHashMap.get(centreNodeID));
+        sequenceInfo.setText("Sequence: " + sequenceHashMap.get(new Long(centreNodeID)));
     }
 
     /**
@@ -266,5 +269,9 @@ public class MenuController {
             String radius = parts[1];
             traverseGraphClicked(centre, radius);
         }
+    }
+
+    public HTreeMap<Long, String> getSequenceHashMap() {
+        return sequenceHashMap;
     }
 }
