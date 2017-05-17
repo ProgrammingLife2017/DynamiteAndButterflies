@@ -1,6 +1,4 @@
-package graph; /**
- * Created by Lex on 25-4-17.
- */
+package graph;
 
 import java.util.ArrayList;
 
@@ -11,13 +9,15 @@ import java.util.ArrayList;
 public class SequenceNode extends Node {
 
     private int id;
-    private String seq;
+    private int index;
     private ArrayList<Integer> ids;
+    private boolean isDummy;
 
-    public SequenceNode(int id, String seq){
+    public SequenceNode(int id) {
         this.id = id;
-        this.seq = seq;
         this.ids = new ArrayList<Integer>();
+        this.index = 0;
+        this.isDummy = false;
 
     }
 
@@ -29,13 +29,12 @@ public class SequenceNode extends Node {
         this.ids.add(id);
     }
 
-    public void setSequence(String seq) {
-        this.seq = seq;
+
+    public boolean isDummy() {
+        return isDummy;
     }
 
-    public String getSequence() {
-        return this.seq;
+    public void setDummy(boolean dummy) {
+        isDummy = dummy;
     }
-
-
 }
