@@ -43,6 +43,7 @@ public class App extends Application {
     private static Stage stage;
     private static AnchorPane pane;
     private static Preferences prefs;
+    private static FXMLLoader loader;
 
     /**
      * This method is able to load FXML files onto the stage.
@@ -53,7 +54,7 @@ public class App extends Application {
 
         try {
             // Load the anchor pane
-            FXMLLoader loader = new FXMLLoader();
+            loader = new FXMLLoader();
             loader.setLocation(App.class.getResource(path));
             pane = loader.load();
 
@@ -79,5 +80,8 @@ public class App extends Application {
         String stringOfFile = prefs.get("file", "def");
         int numOfBookmarks = prefs.getInt("bookmarkNum" + stringOfFile, -1);
         prefs.putInt("bookmarkNum" + stringOfFile, numOfBookmarks);
+        MenuController controller = loader.getController();
+        if (controller.getSequenceHashMap() != null)
+            controller.getSequenceHashMap().close();
     }
 }
