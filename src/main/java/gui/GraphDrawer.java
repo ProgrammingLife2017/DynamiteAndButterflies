@@ -1,13 +1,13 @@
 package gui;
 
-import graph.DummyNode;
-import graph.Node;
+import graph.Edge;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
@@ -26,6 +26,8 @@ public final class GraphDrawer {
      */
     private static final int Y_BASE = 100;
 
+    private static final double RELATIVE_DISTANCE = 0.8;
+
     /**
      * The number of Columns to be displayed in the Canvas.
      */
@@ -43,6 +45,8 @@ public final class GraphDrawer {
 
     private ArrayList<ArrayList<SequenceNode>> columns;
 
+    private SequenceGraph graph;
+
     /**
      * Constructor.
      * @param graph The sequencegraph to be drawn to the canvas.
@@ -50,6 +54,7 @@ public final class GraphDrawer {
      */
     GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
+        this.graph = graph;
         xSize = 1;
         graph.initialize();
         graph.layerizeGraph();
@@ -103,11 +108,29 @@ public final class GraphDrawer {
                 if (column.get(i).isDummy()) {
                     gc.setFill(Color.BLACK);
                 }
-                gc.fillRoundRect((j - xDifference) * ((gc.getCanvas().getWidth() - 20) / zoomLevel),
-                                Y_BASE + (i * 50), 0.9 * ((gc.getCanvas().getWidth() - 20) / zoomLevel), Y_SIZE,
+                double stepSize = ((gc.getCanvas().getWidth() - 20) / zoomLevel);
+                gc.fillRoundRect((j - xDifference) * stepSize,
+                                Y_BASE + (i * 50), RELATIVE_DISTANCE * stepSize, Y_SIZE,
                                 10, 10);
 
                 gc.setFill(Color.BLUE);
+            }
+        }
+        drawEdges(xDifference);
+    }
+
+    public void drawEdges(double xDifference) {
+        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
+        for (int i = 1; i <= nodes.size(); i++) {
+            SequenceNode parent = nodes.get(i);
+            for (int j = 0; j < parent.getChildren().size(); j++) {
+                SequenceNode child = graph.getNode(parent.getChild(j));
+                double stepSize = ((gc.getCanvas().getWidth() - 20) / zoomLevel);
+                double startx = (parent.getColumn() - xDifference) * stepSize + RELATIVE_DISTANCE * stepSize;
+                double starty = Y_BASE + (parent.getIndex() * 50);
+                double endx = (child.getColumn() - xDifference) * stepSize;
+                double endy = Y_BASE + (child.getIndex() * 50);
+                gc.strokeLine(startx, starty, endx, endy);
             }
         }
     }
@@ -126,10 +149,8 @@ public final class GraphDrawer {
      */
     SequenceNode getRealCentreNode() {
         ArrayList<SequenceNode> set = getCentreColumn();
-        for (Node test : set) {
-            if (test instanceof SequenceNode) {
-                return (SequenceNode) test;
-            }
+        for (SequenceNode test : set) {
+            return test;
         }
         return null;
     }
@@ -142,11 +163,9 @@ public final class GraphDrawer {
      */
     int getColumnId(final int nodeId) {
         for (ArrayList<SequenceNode> list : columns) {
-            for (Node node : list) {
-                if (node instanceof SequenceNode) {
-                    if (((SequenceNode) node).getId() == nodeId) {
-                        return node.getColumn();
-                    }
+            for (SequenceNode node : list) {
+                if (node.getId() == nodeId) {
+                    return node.getColumn();
                 }
             }
         }
