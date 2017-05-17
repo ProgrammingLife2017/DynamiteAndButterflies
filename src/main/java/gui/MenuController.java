@@ -14,6 +14,7 @@ import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -43,6 +44,8 @@ public class MenuController {
     private GraphicsContext gc;
     private gui.GraphDrawer drawer;
     private SequenceGraph graph;
+    private HashMap<Integer, String> sequenceHashMap;
+    private double pressedX;
 
     /**
      * Initializes the canvas.
@@ -82,7 +85,8 @@ public class MenuController {
     private void openFile(File file) throws IOException {
         GfaParser parser = new GfaParser();
         System.out.println("src/main/resources/" + file.getName());
-        graph = parser.parse(file.getAbsolutePath());
+        graph = parser.parseGraph(file.getAbsolutePath());
+        sequenceHashMap = parser.getSequenceHashMap();
         drawer = new GraphDrawer(graph, gc);
         drawer.moveShapes(0.0);
         displayInfo(graph);
@@ -126,8 +130,6 @@ public class MenuController {
         }
     }
 
-    private double pressedX;
-
     /**
      * Get the X-Coordinate of the cursor on click.
      * @param mouseEvent the mouse event.
@@ -153,7 +155,7 @@ public class MenuController {
     public void traverseGraphClicked() {
         int centreNodeID = Integer.parseInt(getNodeTextField().getText());
         drawer.changeZoom(getEndColumn() - getStartColumn(), drawer.getColumnId(centreNodeID));
-        sequenceInfo.setText("Sequence: " + graph.getNode(centreNodeID).getSequence());
+        sequenceInfo.setText("Sequence: " + sequenceHashMap.get(centreNodeID));
     }
 
     /**

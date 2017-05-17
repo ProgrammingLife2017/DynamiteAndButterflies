@@ -56,6 +56,7 @@ public class App extends Application {
 
             // Set the pane onto the scene
             Scene scene = new Scene(pane);
+            stage.setTitle("Wow!! DynamiteAndButterflies genome visualiser.");
             stage.setScene(scene);
             stage.setResizable(true);
             stage.setMaximized(true);
