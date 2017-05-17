@@ -21,6 +21,9 @@ public class GraphDrawer {
     private static final int X_OFFSET = 20;
     private static final double RELATIVE_X_DISTANCE = 0.8;
     private static final double RELATIVE_Y_DISTANCE = 50;
+    private static final double LINE_WIDTH_FACTOR = 0.01;
+    private static final double MIN_LINE_WIDTH = 0.01;
+    private static final double MAX_LINE_WIDTH = 1;
 
     private int zoomLevel;
     private GraphicsContext gc;
@@ -100,6 +103,7 @@ public class GraphDrawer {
      * @param xDifference Variable to determine which column should be in the centre.
      */
     private void drawEdges(double xDifference) {
+        setLineWidth();
         HashMap<Integer, SequenceNode> nodes = graph.getNodes();
         for (int i = 1; i <= nodes.size(); i++) {
             SequenceNode parent = nodes.get(i);
@@ -113,6 +117,16 @@ public class GraphDrawer {
                 gc.strokeLine(startx, starty, endx, endy);
             }
         }
+    }
+
+    /**
+     * Set the width of the line depending on the level of zoom.
+     */
+    private void setLineWidth() {
+        double width = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel) * LINE_WIDTH_FACTOR;
+        if (width == 0) { width = MIN_LINE_WIDTH; }
+        if (width > 1) { width = MAX_LINE_WIDTH; }
+        gc.setLineWidth(width);
     }
 
     /**
