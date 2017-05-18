@@ -63,6 +63,12 @@ public class ZoomController {
         drawer.changeZoom(endColumn - startColumn, drawer.getColumnId(centreNodeID));
     }
 
+    public void traverseGraphClicked(int graphSize, int centreNode, int radius) {
+        int startColumn = getStartColumn(centreNode, radius);
+        int endColumn = getEndColumn(graphSize, centreNode, radius);
+        drawer.changeZoom(endColumn - startColumn, drawer.getColumnId(centreNode));
+    }
+
     /**
      * Displays the centre node and radius of the current view.
      */
@@ -83,16 +89,39 @@ public class ZoomController {
      * Getter for the radius.
      * @return the radius.
      */
-    private int getRadius() {
+    public int getRadius() {
         return Integer.parseInt(radiusTextField.getText());
     }
 
+    /**
+     * Getter for the centre node.
+     * @return the centre node.
+     */
+    public int getCentreNode() {
+        return Integer.parseInt(nodeTextField.getText());
+    }
+
+    /**
+     * Updates the radius.
+     * @param newRadius the new radius.
+     */
     private void updateRadius(String newRadius) {
         radiusTextField.setText(newRadius);
     }
 
-    private void updateCentreNode(String newCentreNode) {
-        radiusTextField.setText(newCentreNode);
+    /**
+     * Gets the start column based on the given fields.
+     * @param centre the integer representing the centre node.
+     * @param rad the integer representing the radius.
+     * @return integer representing the starting column
+     */
+    private int getStartColumn(int centre, int rad) {
+
+        int startNode = centre - rad;
+        if (startNode < 1) {
+            startNode = 1;
+        }
+        return drawer.getColumnId(startNode);
     }
 
     /**
@@ -103,25 +132,50 @@ public class ZoomController {
         int centreNode = getCentreNodeID();
         int radius = getRadius();
 
-        int startNode = centreNode - radius;
-        if (startNode < 1) {
-            startNode = 1;
-        }
-        return drawer.getColumnId(startNode);
+        return getStartColumn(centreNode, radius);
     }
 
     /**
      * Gets the end column based on the text fields.
+     * @param graphSize the size of the graph.
      * @return integer representing the end column
      */
     private int getEndColumn(int graphSize) {
         int centreNode = getCentreNodeID();
         int radius = getRadius();
 
-        int endNode = centreNode + radius;
+        return getEndColumn(graphSize, centreNode, radius);
+    }
+
+    /**
+     * Gets the end column based on the text fields.
+     * @param graphSize the size of the graph.
+     * @param centre the integer representing the centre node.
+     * @param rad the integer representing the radius.
+     * @return integer representing the end column
+     */
+    private int getEndColumn(int graphSize, int centre, int rad) {
+        int endNode = centre + rad;
         if (endNode > graphSize) {
             endNode = graphSize;
         }
         return drawer.getColumnId(endNode);
     }
+
+    /**
+     * Getter for the Node textfield.
+     * @return The text in the textfield.
+     */
+    private TextField getNodeTextField() {
+        return nodeTextField;
+    }
+
+    /**
+     * Getter for the radius textfield.
+     * @return The text in the textfield.
+     */
+    private TextField getRadiusTextField() {
+        return radiusTextField;
+    }
+
 }

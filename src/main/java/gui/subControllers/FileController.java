@@ -7,11 +7,11 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.mapdb.HTreeMap;
 import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 
 /**
  * Created by Jip on 17-5-2017.
@@ -20,14 +20,13 @@ public class FileController {
 
     private SequenceGraph graph;
     private gui.GraphDrawer drawer;
-    private HashMap<Integer, String> sequenceHashMap;
+    private HTreeMap<Long, String> sequenceHashMap;
 
     /**
      * Constructor of the FileController object to control the Files.
      */
     public FileController() {
         graph = new SequenceGraph();
-        sequenceHashMap = new HashMap<Integer, String>();
     }
 
     /**
@@ -36,7 +35,7 @@ public class FileController {
      * @param stage The stage on which the fileFinder is shown.
      * @return returns the file that can be loaded.
      */
-    public File chooseFile(Stage stage) {
+    private File chooseFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
         return fileChooser.showOpenDialog(stage);
@@ -47,10 +46,11 @@ public class FileController {
      * can be selected and directly be visualised on the screen.
      * @param anchorPane the pane where we will be drawing
      * @param gc the graphicscontext we will use
+     * @return The strign of the file that has just been loaded.
      * @throws IOException exception if no file is found
      */
     @FXML
-    public void openFileClicked(AnchorPane anchorPane, GraphicsContext gc) throws IOException {
+    public String openFileClicked(AnchorPane anchorPane, GraphicsContext gc) throws IOException {
         Stage stage = (Stage) anchorPane.getScene().getWindow();
         File file = chooseFile(stage);
         GfaParser parser = new GfaParser();
@@ -60,13 +60,15 @@ public class FileController {
 
         drawer = new GraphDrawer(graph, gc);
         drawer.moveShapes(0.0);
+
+        return file.toString();
     }
 
     /**
      * Gets the sequenceHashMap.
      * @return the sequenceHashMap with all the sequences
      */
-    public HashMap<Integer, String> getSequenceHashMap() {
+    public HTreeMap<Long, String> getSequenceHashMap() {
         return sequenceHashMap;
     }
 
