@@ -80,4 +80,13 @@ public class SequenceGraphTest {
         assertTrue(graph.getNode(3).hasChildren());
         assertFalse(graph.getNode(4).hasChildren());
     }
+
+    @Test
+    public void sizeTest() throws Exception {
+        graph.addNode(node1);
+        graph.addNode(node2);
+        graph.addNode(node3);
+        graph.addNode(node4);
+        assertEquals(4, graph.size());
+    }
 }

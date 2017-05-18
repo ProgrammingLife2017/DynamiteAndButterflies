@@ -16,7 +16,6 @@ import java.util.HashMap;
  */
 public class GraphDrawer {
 
-    private static final int ARC_SIZE = 10;
     private static final int X_OFFSET = 20;
     private static final double RELATIVE_X_DISTANCE = 0.8;
     private static final double RELATIVE_Y_DISTANCE = 50;
@@ -29,6 +28,7 @@ public class GraphDrawer {
     private GraphicsContext gc;
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
+    private ArrayList<DrawableNode> canvasNodes;
 
     /**
      * Constructor.
@@ -39,10 +39,18 @@ public class GraphDrawer {
         this.gc = gc;
         this.graph = graph;
         this.yBase = (int) (gc.getCanvas().getHeight() / 4);
+        canvasNodes = new ArrayList<DrawableNode>();
+        initializeDrawableNodes();
         graph.initialize();
         graph.layerizeGraph();
         columns = graph.getColumns();
         zoomLevel = columns.size();
+    }
+
+    private void initializeDrawableNodes() {
+        for (int i = 1; i <= graph.size(); i++) {
+            canvasNodes.add(new DrawableNode(i, gc));
+        }
     }
 
     /**
@@ -82,21 +90,28 @@ public class GraphDrawer {
     public void moveShapes(final double xDifference) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         gc.setFill(Color.BLUE);
+        drawNodes(xDifference);
+        drawEdges(xDifference);
+    }
 
+    private void drawNodes(double xDifference) {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
                 if (column.get(i).isDummy()) {
-                    gc.setFill(Color.BLACK);
+                    continue;
+                    //gc.setFill(Color.BLACK);
                 }
                 double stepSize = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel);
                 double x = (j - xDifference) * stepSize;
                 double y = yBase + (i * RELATIVE_Y_DISTANCE);
-                gc.fillRoundRect(x, y, RELATIVE_X_DISTANCE * stepSize, getYSize(), ARC_SIZE, ARC_SIZE);
-                gc.setFill(Color.BLUE);
+                double width = RELATIVE_X_DISTANCE * stepSize;
+                double height = getYSize();
+                DrawableNode node = canvasNodes.get(column.get(i).getId() - 1);
+                node.setCoordinates(x, y, width, height);
+                node.draw();
             }
         }
-        drawEdges(xDifference);
     }
 
     /**
@@ -118,6 +133,19 @@ public class GraphDrawer {
                 gc.strokeLine(startx, starty, endx, endy);
             }
         }
+    }
+
+    public SequenceNode clickNode(double xEvent, double yEvent) {
+        SequenceNode click = null;
+        for (int i = 0; i < canvasNodes.size(); i++) {
+            DrawableNode node = canvasNodes.get(i);
+            node.lowlight();
+            if (node.checkClick(xEvent, yEvent)) {
+                click = graph.getNode(node.getId());
+                node.highlight();
+            }
+        }
+        return click;
     }
 
     /**

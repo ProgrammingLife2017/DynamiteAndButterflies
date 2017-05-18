@@ -5,6 +5,7 @@ import gui.subControllers.BookmarkController;
 import gui.subControllers.FileController;
 import gui.subControllers.InfoController;
 import gui.subControllers.ZoomController;
+import graph.SequenceNode;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -119,6 +120,11 @@ public class MenuController {
     @FXML
     public void clickMouse(MouseEvent mouseEvent) {
         pressedX = mouseEvent.getX();
+        double y = mouseEvent.getY();
+        SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, y);
+        if (clicked != null) {
+            System.out.println(clicked.getId());
+        }
     }
 
     /**

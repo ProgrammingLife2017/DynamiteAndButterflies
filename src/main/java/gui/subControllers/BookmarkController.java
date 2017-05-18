@@ -18,7 +18,7 @@ public class BookmarkController {
      * @param bm1 The button with the first bookmark.
      * @param bm2 The button with the second bookmark.
      */
-    BookmarkController(Button bm1, Button bm2) {
+    public BookmarkController(Button bm1, Button bm2) {
         bookmark1 = bm1;
         bookmark2 = bm2;
 
