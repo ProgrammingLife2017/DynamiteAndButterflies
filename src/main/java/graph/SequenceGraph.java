@@ -27,6 +27,10 @@ public class SequenceGraph   {
         this.edges = new ArrayList<Edge>();
     }
 
+    public int size() {
+        return nodes.size();
+    }
+
     /**
      * Getter for the column list
      * @return the column arraylist with an arraylist with nodes.
@@ -42,6 +46,10 @@ public class SequenceGraph   {
      */
     public ArrayList<Edge> getEdges() {
         return this.edges;
+    }
+
+    public void setEdges(ArrayList<Edge> allEdges) {
+        this.edges = allEdges;
     }
 
     /**
@@ -68,6 +76,10 @@ public class SequenceGraph   {
      */
     public HashMap<Integer, SequenceNode> getNodes() {
         return this.nodes;
+    }
+
+    public void setNodes(HashMap<Integer, SequenceNode> hash) {
+        this.nodes = hash;
     }
 
     /**

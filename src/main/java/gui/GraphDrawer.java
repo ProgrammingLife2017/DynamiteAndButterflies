@@ -1,60 +1,55 @@
 package gui;
 
-import graph.DummyNode;
-import graph.Node;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
  *
  * Class used to draw shapes on the canvas.
  */
-public final class GraphDrawer {
+public class GraphDrawer {
 
-    /**
-     * Height of drawn nodes.
-     */
-    private static final int Y_SIZE = 5;
+    private static final int X_OFFSET = 20;
+    private static final double RELATIVE_X_DISTANCE = 0.8;
+    private static final double RELATIVE_Y_DISTANCE = 50;
+    private static final double LINE_WIDTH_FACTOR = 0.01;
+    private static final double MIN_LINE_WIDTH = 0.01;
+    private static final double MAX_LINE_WIDTH = 1;
 
-    /**
-     * Base line for Nodes.
-     */
-    private static final int Y_BASE = 100;
-
-    /**
-     * The number of Columns to be displayed in the Canvas.
-     */
+    private int yBase;
     private int zoomLevel;
-
-    /**
-     * The size of the nodes.
-     */
-    private double xSize;
-
-    /**
-     * The graphics context used to actually draw shapes.
-     */
     private GraphicsContext gc;
-
     private ArrayList<ArrayList<SequenceNode>> columns;
+    private SequenceGraph graph;
+    private ArrayList<DrawableNode> canvasNodes;
 
     /**
      * Constructor.
      * @param graph The sequencegraph to be drawn to the canvas.
      * @param gc The graphics context used to actually draw shapes.
      */
-    GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
+    public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
-        xSize = 1;
+        this.graph = graph;
+        this.yBase = (int) (gc.getCanvas().getHeight() / 4);
+        canvasNodes = new ArrayList<DrawableNode>();
+        initializeDrawableNodes();
         graph.initialize();
         graph.layerizeGraph();
         columns = graph.getColumns();
         zoomLevel = columns.size();
+    }
+
+    private void initializeDrawableNodes() {
+        for (int i = 1; i <= graph.size(); i++) {
+            canvasNodes.add(new DrawableNode(i, gc));
+        }
     }
 
     /**
@@ -62,9 +57,8 @@ public final class GraphDrawer {
      * @param factor Zooming factor.
      * @param column The Column that has to be in the centre.
      */
-    void zoomIn(final double factor, final int column) {
+    public void zoomIn(final double factor, final int column) {
         this.zoomLevel = (int) (zoomLevel * factor);
-        this.xSize += 0.1;
         moveShapes(column - zoomLevel / 2);
     }
 
@@ -75,7 +69,6 @@ public final class GraphDrawer {
      */
     public void zoomOut(final double factor, final int column) {
         this.zoomLevel = (int) (zoomLevel * factor);
-        this.xSize -= 0.1;
         moveShapes(column - zoomLevel / 2);
     }
 
@@ -84,7 +77,7 @@ public final class GraphDrawer {
      * @param newZoom The new radius.
      * @param column The new Column to be in the centre.
      */
-    void changeZoom(final int newZoom, final int column) {
+    public void changeZoom(final int newZoom, final int column) {
         zoomLevel = newZoom;
         moveShapes(column - zoomLevel / 2);
     }
@@ -93,23 +86,93 @@ public final class GraphDrawer {
      * Draws the Graph.
      * @param xDifference Variable to determine which column should be in the centre.
      */
-    void moveShapes(final double xDifference) {
+    public void moveShapes(final double xDifference) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         gc.setFill(Color.BLUE);
+        drawNodes(xDifference);
+        drawEdges(xDifference);
+    }
 
+    private void drawNodes(double xDifference) {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
                 if (column.get(i).isDummy()) {
-                    gc.setFill(Color.BLACK);
+                    continue;
+                    //gc.setFill(Color.BLACK);
                 }
-                gc.fillRoundRect((j - xDifference) * ((gc.getCanvas().getWidth() - 20) / zoomLevel),
-                                Y_BASE + (i * 50), 0.9 * ((gc.getCanvas().getWidth() - 20) / zoomLevel), Y_SIZE,
-                                10, 10);
-
-                gc.setFill(Color.BLUE);
+                double stepSize = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel);
+                double x = (j - xDifference) * stepSize;
+                double y = yBase + (i * RELATIVE_Y_DISTANCE);
+                double width = RELATIVE_X_DISTANCE * stepSize;
+                double height = getYSize();
+                DrawableNode node = canvasNodes.get(column.get(i).getId() - 1);
+                node.setCoordinates(x, y, width, height);
+                node.draw();
             }
         }
+    }
+
+    /**
+     * Draws the edges.
+     * @param xDifference Variable to determine which column should be in the centre.
+     */
+    private void drawEdges(double xDifference) {
+        setLineWidth();
+        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
+        for (int i = 1; i <= nodes.size(); i++) {
+            SequenceNode parent = nodes.get(i);
+            for (int j = 0; j < parent.getChildren().size(); j++) {
+                SequenceNode child = graph.getNode(parent.getChild(j));
+                double stepSize = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel);
+                double startx = stepSize * ((parent.getColumn() - xDifference) + RELATIVE_X_DISTANCE);
+                double starty = yBase + (parent.getIndex() * RELATIVE_Y_DISTANCE) + getYSize() / 2;
+                double endx = (child.getColumn() - xDifference) * stepSize;
+                double endy = yBase + (child.getIndex() * RELATIVE_Y_DISTANCE) + getYSize() / 2;
+                gc.strokeLine(startx, starty, endx, endy);
+            }
+        }
+    }
+
+    public SequenceNode clickNode(double xEvent, double yEvent) {
+        SequenceNode click = null;
+        for (int i = 0; i < canvasNodes.size(); i++) {
+            DrawableNode node = canvasNodes.get(i);
+            node.lowlight();
+            if (node.checkClick(xEvent, yEvent)) {
+                click = graph.getNode(node.getId());
+                node.highlight();
+            }
+        }
+        return click;
+    }
+
+    /**
+     * Set the height of the node depending on the level of zoom.
+     */
+    private double getYSize() {
+        double size = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel) * 0.3;
+        if (size < 1) {
+            size = 1;
+        }
+        if (size > 20) {
+            size = 20;
+        }
+        return size;
+    }
+
+    /**
+     * Set the width of the line depending on the level of zoom.
+     */
+    private void setLineWidth() {
+        double width = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel) * LINE_WIDTH_FACTOR;
+        if (width == 0) {
+            width = MIN_LINE_WIDTH;
+        }
+        if (width > 1) { 
+            width = MAX_LINE_WIDTH;
+        }
+        gc.setLineWidth(width);
     }
 
     /**
@@ -124,12 +187,10 @@ public final class GraphDrawer {
      * Returns the First SequenceNode (not Dummy) Object from the centre Column.
      * @return The Centre Node.
      */
-    SequenceNode getRealCentreNode() {
+    public SequenceNode getRealCentreNode() {
         ArrayList<SequenceNode> set = getCentreColumn();
-        for (Node test : set) {
-            if (test instanceof SequenceNode) {
-                return (SequenceNode) test;
-            }
+        for (SequenceNode test : set) {
+            return test;
         }
         return null;
     }
@@ -140,13 +201,11 @@ public final class GraphDrawer {
      * @param nodeId The Id of the Node you want to find the Column of.
      * @return The ColumnId
      */
-    int getColumnId(final int nodeId) {
+    public int getColumnId(final int nodeId) {
         for (ArrayList<SequenceNode> list : columns) {
-            for (Node node : list) {
-                if (node instanceof SequenceNode) {
-                    if (((SequenceNode) node).getId() == nodeId) {
-                        return node.getColumn();
-                    }
+            for (SequenceNode node : list) {
+                if (node.getId() == nodeId) {
+                    return node.getColumn();
                 }
             }
         }
@@ -157,7 +216,7 @@ public final class GraphDrawer {
      * Get function for zoom level.
      * @return the Zoom level.
      */
-    public int getZoomLevel(){
+    public int getZoomLevel() {
         return zoomLevel;
     }
 }
