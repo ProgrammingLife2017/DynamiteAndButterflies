@@ -10,6 +10,7 @@ import org.mapdb.Serializer;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import static java.lang.Math.toIntExact;
 
@@ -30,7 +31,8 @@ public class GfaParser {
      */
     @SuppressWarnings("Since15")
     public SequenceGraph parseGraph(String filePath) throws IOException {
-        String[] partPaths = filePath.split("\\\\");
+        String pattern = Pattern.quote(System.getProperty("file.separator"));
+        String[] partPaths = filePath.split(pattern);
         String partPath = partPaths[partPaths.length-1];
         System.out.println(partPath);
         db = DBMaker.fileDB(partPath).fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
