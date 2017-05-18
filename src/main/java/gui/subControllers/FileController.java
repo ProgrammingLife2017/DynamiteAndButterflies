@@ -21,12 +21,14 @@ public class FileController {
     private SequenceGraph graph;
     private gui.GraphDrawer drawer;
     private HTreeMap<Long, String> sequenceHashMap;
+    private File parDirectory;
 
     /**
      * Constructor of the FileController object to control the Files.
      */
     public FileController() {
         graph = new SequenceGraph();
+        parDirectory = null;
     }
 
     /**
@@ -38,13 +40,23 @@ public class FileController {
     private File chooseFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
-        fileChooser.setInitialDirectory(
-                new File(System.getProperty("user.dir"))
-        );
+
+        if (parDirectory == null) {
+            fileChooser.setInitialDirectory(
+                    new File(System.getProperty("user.dir")).getParentFile()
+            );
+        } else {
+            fileChooser.setInitialDirectory(
+                    parDirectory
+            );
+        }
+
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("GFA", "*.gfa")
         );
-        return fileChooser.showOpenDialog(stage);
+        File res = fileChooser.showOpenDialog(stage);
+        parDirectory = res.getParentFile();
+        return res;
     }
 
     /**
