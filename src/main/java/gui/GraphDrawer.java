@@ -1,12 +1,11 @@
 package gui;
 
+import graph.SequenceGraph;
 import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
-
-import java.util.ArrayList;
-import graph.SequenceGraph;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -152,7 +151,7 @@ public class GraphDrawer {
      * Set the height of the node depending on the level of zoom.
      */
     private double getYSize() {
-        double size = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel) * 0.2;
+        double size = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel) * 0.3;
         if (size < 1) {
             size = 1;
         }
@@ -167,8 +166,12 @@ public class GraphDrawer {
      */
     private void setLineWidth() {
         double width = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel) * LINE_WIDTH_FACTOR;
-        if (width == 0) { width = MIN_LINE_WIDTH; }
-        if (width > 1) { width = MAX_LINE_WIDTH; }
+        if (width == 0) {
+            width = MIN_LINE_WIDTH;
+        }
+        if (width > 1) { 
+            width = MAX_LINE_WIDTH;
+        }
         gc.setLineWidth(width);
     }
 
