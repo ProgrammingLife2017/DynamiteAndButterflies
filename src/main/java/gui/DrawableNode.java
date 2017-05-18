@@ -1,6 +1,5 @@
 package gui;
 
-import com.sun.corba.se.impl.orbutil.graph.Graph;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -55,11 +54,7 @@ public class DrawableNode {
     }
 
     public boolean checkClick(double xEvent, double yEvent) {
-        if (xEvent > xCoordinate && xEvent < xCoordinate + width && yEvent > yCoordinate && yEvent < yCoordinate + height) {
-            highlight();
-            return true;
-        }
-        return false;
+        return (xEvent > xCoordinate && xEvent < xCoordinate + width && yEvent > yCoordinate && yEvent < yCoordinate + height);
     }
 
 }

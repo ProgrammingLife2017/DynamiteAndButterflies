@@ -89,20 +89,6 @@ public class GraphDrawer {
     void moveShapes(final double xDifference) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         gc.setFill(Color.BLUE);
-
-        /*for (int j = 0; j < columns.size(); j++) {
-            ArrayList<SequenceNode> column = columns.get(j);
-            for (int i = 0; i < column.size(); i++) {
-                if (column.get(i).isDummy()) {
-                    gc.setFill(Color.BLACK);
-                }
-                double stepSize = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel);
-                double x = (j - xDifference) * stepSize;
-                double y = yBase + (i * RELATIVE_Y_DISTANCE);
-                gc.fillRoundRect(x, y, RELATIVE_X_DISTANCE * stepSize, getYSize(), ARC_SIZE, ARC_SIZE);
-                gc.setFill(Color.BLUE);
-            }
-        }*/
         drawNodes(xDifference);
         drawEdges(xDifference);
     }
@@ -155,6 +141,7 @@ public class GraphDrawer {
             node.lowlight();
             if (node.checkClick(xEvent, yEvent)) {
                 click = graph.getNode(node.getId());
+                node.highlight();
             }
         }
         return click;
