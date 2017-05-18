@@ -123,7 +123,9 @@ public class MenuController {
         double y = mouseEvent.getY();
         SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, y);
         if (clicked != null) {
-            System.out.println(clicked.getId());
+            String newString = "Node ID: " + clicked.getId() + "\nSequence: "
+                    + fileController.getSequenceHashMap().get((long) clicked.getId());
+            infoController.updateSeqLabel(newString);
         }
     }
 
