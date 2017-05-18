@@ -51,7 +51,6 @@ public class MenuController {
     private Label numEdgesLabel;
     private GraphicsContext gc;
 
-    private double pressedX;
     private Preferences prefs;
 
     private BookmarkController bookmarkController;
@@ -119,24 +118,14 @@ public class MenuController {
      */
     @FXML
     public void clickMouse(MouseEvent mouseEvent) {
-        pressedX = mouseEvent.getX();
-        double y = mouseEvent.getY();
-        SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, y);
+        double pressedX = mouseEvent.getX();
+        double pressedY = mouseEvent.getY();
+        SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, pressedY);
         if (clicked != null) {
             String newString = "Node ID: " + clicked.getId() + "\nSequence: "
                     + fileController.getSequenceHashMap().get((long) clicked.getId());
             infoController.updateSeqLabel(newString);
         }
-    }
-
-    /**
-     *  The eventHandler for dragging the mouse.
-     * @param mouseEvent The MouseEvent for dragging.
-     */
-    @FXML
-    public void dragMouse(MouseEvent mouseEvent) {
-        double xDifference = pressedX - mouseEvent.getX() / 2;
-        fileController.getDrawer().moveShapes(xDifference);
     }
 
     /**
