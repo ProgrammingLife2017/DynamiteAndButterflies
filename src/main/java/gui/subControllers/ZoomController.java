@@ -163,19 +163,19 @@ public class ZoomController {
     }
 
     /**
-     * Getter for the Node textfield.
-     * @return The text in the textfield.
+     * Setter for the Node textfield.
+     * @param newCentreNode the new centre node.
      */
-    private TextField getNodeTextField() {
-        return nodeTextField;
+    public void setNodeTextField(String newCentreNode) {
+        nodeTextField.setText(newCentreNode);
     }
 
     /**
-     * Getter for the radius textfield.
-     * @return The text in the textfield.
+     * Setter for the radius textfield.
+     * @param newRadius the new radius.
      */
-    private TextField getRadiusTextField() {
-        return radiusTextField;
+    public void setRadiusTextField(String newRadius) {
+        radiusTextField.setText(newRadius);
     }
 
 }

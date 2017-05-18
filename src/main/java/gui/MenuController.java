@@ -199,6 +199,8 @@ public class MenuController {
             String centre = parts[0];
             String radius = parts[1];
             traverseGraphClicked(centre, radius);
+            zoomController.setNodeTextField(centre);
+            zoomController.setRadiusTextField(radius);
         }
     }
 
