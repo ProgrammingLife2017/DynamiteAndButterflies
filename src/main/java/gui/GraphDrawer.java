@@ -34,7 +34,7 @@ public class GraphDrawer {
      * @param graph The sequencegraph to be drawn to the canvas.
      * @param gc The graphics context used to actually draw shapes.
      */
-    GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
+    public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
         this.graph = graph;
         this.yBase = (int) (gc.getCanvas().getHeight() / 4);
@@ -57,7 +57,7 @@ public class GraphDrawer {
      * @param factor Zooming factor.
      * @param column The Column that has to be in the centre.
      */
-    void zoomIn(final double factor, final int column) {
+    public void zoomIn(final double factor, final int column) {
         this.zoomLevel = (int) (zoomLevel * factor);
         moveShapes(column - zoomLevel / 2);
     }
@@ -77,7 +77,7 @@ public class GraphDrawer {
      * @param newZoom The new radius.
      * @param column The new Column to be in the centre.
      */
-    void changeZoom(final int newZoom, final int column) {
+    public void changeZoom(final int newZoom, final int column) {
         zoomLevel = newZoom;
         moveShapes(column - zoomLevel / 2);
     }
@@ -86,7 +86,7 @@ public class GraphDrawer {
      * Draws the Graph.
      * @param xDifference Variable to determine which column should be in the centre.
      */
-    void moveShapes(final double xDifference) {
+    public void moveShapes(final double xDifference) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         gc.setFill(Color.BLUE);
         drawNodes(xDifference);
@@ -152,8 +152,12 @@ public class GraphDrawer {
      */
     private double getYSize() {
         double size = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel) * 0.3;
-        if (size < 1) { size = 1; }
-        if (size > 20) { size = 20; }
+        if (size < 1) {
+            size = 1;
+        }
+        if (size > 20) {
+            size = 20;
+        }
         return size;
     }
 
@@ -162,8 +166,12 @@ public class GraphDrawer {
      */
     private void setLineWidth() {
         double width = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel) * LINE_WIDTH_FACTOR;
-        if (width == 0) { width = MIN_LINE_WIDTH; }
-        if (width > 1) { width = MAX_LINE_WIDTH; }
+        if (width == 0) {
+            width = MIN_LINE_WIDTH;
+        }
+        if (width > 1) { 
+            width = MAX_LINE_WIDTH;
+        }
         gc.setLineWidth(width);
     }
 
@@ -179,7 +187,7 @@ public class GraphDrawer {
      * Returns the First SequenceNode (not Dummy) Object from the centre Column.
      * @return The Centre Node.
      */
-    SequenceNode getRealCentreNode() {
+    public SequenceNode getRealCentreNode() {
         ArrayList<SequenceNode> set = getCentreColumn();
         for (SequenceNode test : set) {
             return test;
@@ -193,7 +201,7 @@ public class GraphDrawer {
      * @param nodeId The Id of the Node you want to find the Column of.
      * @return The ColumnId
      */
-    int getColumnId(final int nodeId) {
+    public int getColumnId(final int nodeId) {
         for (ArrayList<SequenceNode> list : columns) {
             for (SequenceNode node : list) {
                 if (node.getId() == nodeId) {

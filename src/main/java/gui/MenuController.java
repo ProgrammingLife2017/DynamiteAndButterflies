@@ -1,6 +1,10 @@
 package gui;
 
 import graph.SequenceGraph;
+import gui.subControllers.BookmarkController;
+import gui.subControllers.FileController;
+import gui.subControllers.InfoController;
+import gui.subControllers.ZoomController;
 import graph.SequenceNode;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -10,14 +14,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
-import parser.GfaParser;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.prefs.Preferences;
 
 /**
@@ -51,15 +50,14 @@ public class MenuController {
     @FXML
     private Label numEdgesLabel;
     private GraphicsContext gc;
-    private gui.GraphDrawer drawer;
-    private SequenceGraph graph;
 
-
-    private HTreeMap<Long, String> sequenceHashMap;
     private double pressedX;
-    private static Preferences prefs;
+    private Preferences prefs;
 
     private BookmarkController bookmarkController;
+    private FileController fileController;
+    private ZoomController zoomController;
+    private InfoController infoController;
 
     /**
      * Initializes the canvas.
@@ -69,47 +67,32 @@ public class MenuController {
         canvas.widthProperty().bind(canvasPanel.widthProperty());
         canvas.heightProperty().bind(canvasPanel.heightProperty());
         gc = canvas.getGraphicsContext2D();
-        bookmarkController = new BookmarkController(bookmark1, bookmark2);
+
         prefs = Preferences.userRoot();
+        fileController = new FileController();
+        infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
+        bookmarkController = new BookmarkController(bookmark1, bookmark2);
     }
 
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
      * can be selected and directly be visualised on the screen.
+     * @throws IOException if there is no file specified.
      */
     @FXML
-    public void openFileClicked() {
-        Stage stage = (Stage) anchorPane.getScene().getWindow();
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Resource File");
-        //fileChooser.setInitialDirectory(this.getClass().getResource("/resources").toString());
-        File file = fileChooser.showOpenDialog(stage);
-        prefs.put("file", file.toString());
-        if (file != null) {
-            try {
-                openFile(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        bookmarkController.loadBookmarks(file.toString());
-    }
+    public void openFileClicked() throws IOException {
+        String fileString = fileController.openFileClicked(anchorPane, gc);
+        prefs.put("file", fileString);
+        bookmarkController.loadBookmarks(fileString);
+        zoomController = new ZoomController(fileController.getDrawer(),
+                                nodeTextField, radiusTextField);
 
-    private void openFile(File file) throws IOException {
-        GfaParser parser = new GfaParser();
-        System.out.println("src/main/resources/" + file.getName());
-        graph = parser.parseGraph(file.getAbsolutePath());
-        sequenceHashMap = parser.getSequenceHashMap();
-        drawer = new GraphDrawer(graph, gc);
-        drawer.moveShapes(0.0);
-        displayInfo(graph);
+        displayInfo(fileController.getGraph());
     }
 
     private void displayInfo(SequenceGraph graph) {
-        numNodesLabel.setText(graph.getNodes().size() + "");
-        numEdgesLabel.setText(graph.getEdges().size() + "");
-        nodeTextField.setText(drawer.getRealCentreNode().getId() + "");
-        radiusTextField.setText(drawer.getZoomLevel() + "");
+        infoController.displayInfo(graph);
+        zoomController.displayInfo();
     }
 
     /**
@@ -118,13 +101,7 @@ public class MenuController {
      */
     @FXML
     public void zoomInClicked() throws IOException {
-        if (!getNodeTextField().getText().equals("")) {
-            drawer.zoomIn(0.8, drawer.getColumnId(Integer.parseInt(getNodeTextField().getText())));
-            radiusTextField.setText(drawer.getZoomLevel() + "");
-        } else {
-            drawer.zoomIn(0.8, drawer.getRealCentreNode().getColumn());
-            radiusTextField.setText(drawer.getZoomLevel() + "");
-        }
+        zoomController.zoomInClicked();
     }
 
     /**
@@ -133,13 +110,7 @@ public class MenuController {
      */
     @FXML
     public void zoomOutClicked() throws IOException {
-        if (!getNodeTextField().getText().equals("")) {
-            drawer.zoomOut(1.2, drawer.getColumnId(Integer.parseInt(getNodeTextField().getText())));
-            radiusTextField.setText(drawer.getZoomLevel() + "");
-        } else {
-            drawer.zoomOut(1.2, drawer.getRealCentreNode().getColumn());
-            radiusTextField.setText(drawer.getZoomLevel() + "");
-        }
+        zoomController.zoomOutClicked();
     }
 
     /**
@@ -150,7 +121,7 @@ public class MenuController {
     public void clickMouse(MouseEvent mouseEvent) {
         pressedX = mouseEvent.getX();
         double y = mouseEvent.getY();
-        SequenceNode clicked = drawer.clickNode(pressedX, y);
+        SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, y);
         if (clicked != null) {
             System.out.println(clicked.getId());
         }
@@ -163,16 +134,18 @@ public class MenuController {
     @FXML
     public void dragMouse(MouseEvent mouseEvent) {
         double xDifference = pressedX - mouseEvent.getX() / 2;
-        drawer.moveShapes(xDifference);
+        fileController.getDrawer().moveShapes(xDifference);
     }
 
     /**
      * Adds a button to traverse the graph with.
      */
     public void traverseGraphClicked() {
-        int centreNodeID = Integer.parseInt(getNodeTextField().getText());
-        drawer.changeZoom(getEndColumn() - getStartColumn(), drawer.getColumnId(centreNodeID));
-        sequenceInfo.setText("Sequence: " + sequenceHashMap.get(new Long(centreNodeID)));
+        zoomController.traverseGraphClicked(fileController.getGraph().getNodes().size());
+        int centreNodeID = zoomController.getCentreNodeID();
+        String newString = "Sequence: "
+                            + fileController.getSequenceHashMap().get((long) centreNodeID);
+        infoController.updateSeqLabel(newString);
     }
 
     /**
@@ -182,58 +155,13 @@ public class MenuController {
      */
     private void traverseGraphClicked(String centreNode, String radius) {
         int centreNodeID = Integer.parseInt(centreNode);
-        drawer.changeZoom(getEndColumn(centreNode, radius) - getStartColumn(centreNode, radius), drawer.getColumnId(centreNodeID));
-        sequenceInfo.setText("Sequence: " + sequenceHashMap.get(new Long(centreNodeID)));
-    }
+        int rad = Integer.parseInt(radius);
 
-    /**
-     * Gets the start column based on the text fields.
-     * @return integer representing the starting column
-     */
-    private int getStartColumn() {
-        return getStartColumn(getNodeTextField().getText(), getRadiusTextField().getText());
-    }
-
-    private int getStartColumn(String centre, String rad) {
-        int centreNode = Integer.parseInt(centre);
-        int radius = Integer.parseInt(rad);
-
-        int startNode = centreNode - radius;
-        if (startNode < 1) {
-            startNode = 1;
-        }
-        return drawer.getColumnId(startNode);
-    }
-
-    private int getEndColumn() {
-        return getEndColumn(getNodeTextField().getText(), getRadiusTextField().getText());
-    }
-
-    private int getEndColumn(String centre, String rad) {
-        int centreNode = Integer.parseInt(centre);
-        int radius = Integer.parseInt(rad);
-
-        int endNode = centreNode + radius;
-        if (endNode > graph.getNodes().size()) {
-            endNode = graph.getNodes().size();
-        }
-        return drawer.getColumnId(endNode);
-    }
-
-    /**
-     * Getter for the Node textfield.
-     * @return The text in the textfield.
-     */
-    private TextField getNodeTextField() {
-        return nodeTextField;
-    }
-
-    /**
-     * Getter for the radius textfield.
-     * @return The text in the textfield.
-     */
-    private TextField getRadiusTextField() {
-        return radiusTextField;
+        zoomController.traverseGraphClicked(fileController.getGraph().getNodes().size(),
+                                            centreNodeID, rad);
+        String newString = "Sequence: "
+                + fileController.getSequenceHashMap().get((long) centreNodeID);
+        infoController.updateSeqLabel(newString);
     }
 
     /**
@@ -241,10 +169,7 @@ public class MenuController {
      */
     @FXML
     public void saveTheBookmarks() {
-        TextField nodes = getNodeTextField();
-        TextField radius = getRadiusTextField();
-
-        bookmarkController.saving(nodes.getText(), radius.getText());
+        bookmarkController.saving(zoomController.getCentreNode(), zoomController.getRadius());
     }
 
     /**
@@ -277,7 +202,7 @@ public class MenuController {
         }
     }
 
-    public HTreeMap<Long, String> getSequenceHashMap() {
-        return sequenceHashMap;
+    HTreeMap<Long, String> getSequenceHashMap() {
+        return fileController.getSequenceHashMap();
     }
 }

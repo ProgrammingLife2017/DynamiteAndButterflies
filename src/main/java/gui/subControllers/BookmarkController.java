@@ -1,4 +1,4 @@
-package gui;
+package gui.subControllers;
 
 import javafx.scene.control.*;
 import java.util.prefs.Preferences;
@@ -7,13 +7,18 @@ import java.util.prefs.Preferences;
  * Created by Jip on 17-5-2017.
  * A BookmarkController class moving some logic from the MenuController into a different class.
  */
-class BookmarkController {
+public class BookmarkController {
 
     private static Preferences prefs;
     private String stringFile;
     private Button bookmark1, bookmark2;
 
-    BookmarkController(Button bm1, Button bm2) {
+    /**
+     * Constructor of the bookmark controller to handle the bookmarks.
+     * @param bm1 The button with the first bookmark.
+     * @param bm2 The button with the second bookmark.
+     */
+    public BookmarkController(Button bm1, Button bm2) {
         bookmark1 = bm1;
         bookmark2 = bm2;
 
@@ -25,7 +30,7 @@ class BookmarkController {
      * Loads the bookmarks of the specific file stringFile.
      * @param stringOfFile The file that is being loaded whose bookmarks should be loaded.
      */
-    void loadBookmarks(String stringOfFile) {
+    public void loadBookmarks(String stringOfFile) {
         stringFile = stringOfFile;
 
         if (prefs.getInt("bookmarkNum" + stringFile, -1) == -1) {
@@ -48,7 +53,7 @@ class BookmarkController {
      * @param nodes The centre node
      * @param radius The radius of nodes we should save/show
      */
-    void saving(String nodes, String radius) {
+    public void saving(int nodes, int radius) {
 
         String stringFile = prefs.get("file", "def");
         int newIndex = prefs.getInt("bookmarkNum" + stringFile, -1);
