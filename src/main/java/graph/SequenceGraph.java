@@ -1,5 +1,7 @@
 package graph;
 
+import javafx.util.Pair;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +12,7 @@ import java.util.Map;
  * A Graph handling a Directed-Acyclic-Graph.
  * This is our own data structure we will use to draw the eventual graph.
  */
-public class SequenceGraph   {
+public class SequenceGraph {
 
 
     private Integer size;
@@ -26,9 +28,46 @@ public class SequenceGraph   {
         this.nodes = new HashMap<Integer, SequenceNode>();
         this.edges = new ArrayList<Edge>();
     }
-
     public int size() {
         return nodes.size();
+    }
+
+    public void resetGraph() {
+        this.size = 0;
+        this.nodes = new HashMap<Integer, SequenceNode>();
+        this.edges = new ArrayList<Edge>();
+    }
+
+    public void createSubGraph(int centerNodeID, int range, HashMap<Integer, ArrayList<Integer>> adjacencyList) {
+        resetGraph();
+        Pair upperAndLowerBound = getBounds(centerNodeID, range, adjacencyList);
+        int upperBound = (Integer) upperAndLowerBound.getKey();
+        int lowerBound = (Integer) upperAndLowerBound.getValue();
+
+        for(int id = lowerBound; id <= upperBound; id++) {
+            SequenceNode node = new SequenceNode(id);
+            this.addNode(node);
+            ArrayList<Integer> children = adjacencyList.get(id);
+            for(int i = 0; i < children.size(); i++) {
+                Edge edge = new Edge(id, children.get(i));
+                if(children.get(i) < upperBound) {
+                    this.getEdges().add(edge);
+                }
+            }
+        }
+    }
+
+    private Pair getBounds(int centerNodeID, int range, HashMap<Integer, ArrayList<Integer>> adjacencyList) {
+        int upperBound = adjacencyList.size();
+        int lowerBound = 1;
+        if(centerNodeID - range > 1) {
+            lowerBound = centerNodeID - range;
+        }
+        if(centerNodeID + range < upperBound ) {
+            upperBound = centerNodeID + range;
+        }
+
+        return new Pair<Integer, Integer>(upperBound, lowerBound);
     }
 
     /**
@@ -125,6 +164,7 @@ public class SequenceGraph   {
             ArrayList<Integer> children = parent.getChildren();    // Get all children
             for (Integer child : children) {
                 this.getNode(child).incrementColumn(parent.getColumn());
+                System.out.println(this.getNode(child).getId());
             }
         }
     }
