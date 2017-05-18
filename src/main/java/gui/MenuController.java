@@ -13,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import org.mapdb.HTreeMap;
 
@@ -100,7 +101,7 @@ public class MenuController {
      */
     @FXML
     public void zoomInClicked() throws IOException {
-        zoomController.zoomInClicked();
+        zoomController.zoomIn();
     }
 
     /**
@@ -109,7 +110,17 @@ public class MenuController {
      */
     @FXML
     public void zoomOutClicked() throws IOException {
-        zoomController.zoomOutClicked();
+        zoomController.zoomOut();
+    }
+
+    @FXML
+    public void scrollZoom(ScrollEvent scrollEvent) throws IOException {
+        int column = fileController.getDrawer().mouseLocationColumn(scrollEvent.getX());
+        if (scrollEvent.getDeltaY() > 0){
+            zoomController.zoomIn(column);
+        } else {
+            zoomController.zoomOut(column);
+        }
     }
 
     /**

@@ -52,12 +52,10 @@
          <left>
             <Pane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
                <children>
-                  <Button layoutX="22.0" layoutY="30.0" mnemonicParsing="false" onAction="#zoomInClicked" text="Zoom in" />
-                  <Button layoutX="22.0" layoutY="75.0" mnemonicParsing="false" onAction="#zoomOutClicked" text="Zoom out" />
-                  <TextField fx:id="nodeTextField" alignment="CENTER" layoutX="22.0" layoutY="113.0" prefHeight="29.0" prefWidth="97.0" promptText="Centre node" />
-                  <Button layoutX="22.0" layoutY="142.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
-                  <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="22.0" layoutY="167.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
-                  <Button fx:id="saveBookmark" layoutX="26.0" layoutY="293.0" mnemonicParsing="false" onAction="#saveTheBookmarks" text="Save Bookmark" />
+                  <TextField fx:id="nodeTextField" alignment="CENTER" layoutX="22.0" layoutY="126.0" prefHeight="29.0" prefWidth="97.0" promptText="Centre node" />
+                  <Button layoutX="9.0" layoutY="167.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
+                  <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="22.0" layoutY="209.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
+                  <Button fx:id="saveBookmark" layoutX="14.0" layoutY="293.0" mnemonicParsing="false" onAction="#saveTheBookmarks" text="Save Bookmark" />
                   <Button fx:id="bookmark1" layoutX="27.0" layoutY="332.0" mnemonicParsing="false" onAction="#pressBookmark1" prefHeight="24.0" prefWidth="98.0" text="-" textAlignment="CENTER" />
                   <Button fx:id="bookmark2" layoutX="27.0" layoutY="368.0" mnemonicParsing="false" onAction="#pressBookmark2" prefHeight="24.0" prefWidth="97.0" text="-" textAlignment="CENTER" />
                </children>
@@ -67,9 +65,11 @@
             </Pane>
          </left>
          <center>
-            <AnchorPane fx:id="canvasPanel" onMouseClicked="#clickMouse" onMouseDragged="#dragMouse" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
+            <AnchorPane fx:id="canvasPanel" onMouseClicked="#clickMouse" onScroll="#scrollZoom" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
                <children>
                   <Canvas fx:id="canvas" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <Button layoutX="-1.0" layoutY="359.0" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.bottomAnchor="33.0" AnchorPane.leftAnchor="0.0" />
+                  <Button layoutX="1.0" layoutY="390.0" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
                </children>
             </AnchorPane>
          </center>

@@ -30,12 +30,17 @@ public class ZoomController {
      * ZoomIn.
      * @throws IOException exception.
      */
-    public void zoomInClicked() throws IOException {
+    public void zoomIn() throws IOException {
         if (!nodeTextField.getText().equals("")) {
-            drawer.zoomIn(0.8, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
+            drawer.zoom(0.8, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
         } else {
-            drawer.zoomIn(0.8, drawer.getRealCentreNode().getColumn());
+            drawer.zoom(0.8, drawer.getRealCentreNode().getColumn());
         }
+        updateRadius(drawer.getZoomLevel() + "");
+    }
+
+    public void zoomIn(int column) throws IOException {
+        drawer.zoom(0.9, column);
         updateRadius(drawer.getZoomLevel() + "");
     }
 
@@ -43,12 +48,17 @@ public class ZoomController {
      * ZoomOut.
      * @throws IOException exception.
      */
-    public void zoomOutClicked() throws IOException {
+    public void zoomOut() throws IOException {
         if (!nodeTextField.getText().equals("")) {
-            drawer.zoomOut(1.2, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
+            drawer.zoom(1.25, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
         } else {
-            drawer.zoomOut(1.2, drawer.getRealCentreNode().getColumn());
+            drawer.zoom(1.25, drawer.getRealCentreNode().getColumn());
         }
+        updateRadius(drawer.getZoomLevel() + "");
+    }
+
+    public void zoomOut(int column) throws IOException {
+        drawer.zoom(1.1, column);
         updateRadius(drawer.getZoomLevel() + "");
     }
 
