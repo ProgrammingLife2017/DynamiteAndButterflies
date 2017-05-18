@@ -11,6 +11,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -50,6 +51,8 @@ public class MenuController {
     private Label numNodesLabel;
     @FXML
     private Label numEdgesLabel;
+    @FXML
+    private TextArea consoleArea;
     private GraphicsContext gc;
 
     private Preferences prefs;
@@ -58,6 +61,7 @@ public class MenuController {
     private FileController fileController;
     private ZoomController zoomController;
     private InfoController infoController;
+    private Console console;
 
     /**
      * Initializes the canvas.
@@ -72,6 +76,8 @@ public class MenuController {
         fileController = new FileController();
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2);
+        console = new Console(consoleArea);
+        console.appendText("Test");
     }
 
     /**
