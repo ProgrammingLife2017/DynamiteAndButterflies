@@ -12,6 +12,9 @@ import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.regex.Pattern;
 
 /**
  * Created by Jip on 17-5-2017.
@@ -21,12 +24,18 @@ public class FileController {
     private SequenceGraph graph;
     private gui.GraphDrawer drawer;
     private HTreeMap<Long, String> sequenceHashMap;
+    HTreeMap<Long, int[]> adjacencyMap;
+    private File parDirectory;
+
+    private final int RENDER_RANGE = 5000;
+    private final int NODE_ID = 1;
 
     /**
      * Constructor of the FileController object to control the Files.
      */
     public FileController() {
         graph = new SequenceGraph();
+        parDirectory = null;
     }
 
     /**
@@ -38,7 +47,23 @@ public class FileController {
     private File chooseFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
-        return fileChooser.showOpenDialog(stage);
+
+        if (parDirectory == null) {
+            fileChooser.setInitialDirectory(
+                    new File(System.getProperty("user.dir")).getParentFile()
+            );
+        } else {
+            fileChooser.setInitialDirectory(
+                    parDirectory
+            );
+        }
+
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("GFA", "*.gfa")
+        );
+        File res = fileChooser.showOpenDialog(stage);
+        parDirectory = res.getParentFile();
+        return res;
     }
 
     /**
@@ -53,15 +78,24 @@ public class FileController {
     public String openFileClicked(AnchorPane anchorPane, GraphicsContext gc) throws IOException {
         Stage stage = (Stage) anchorPane.getScene().getWindow();
         File file = chooseFile(stage);
+
         GfaParser parser = new GfaParser();
         System.out.println("src/main/resources/" + file.getName());
-        graph = parser.parseGraph(file.getAbsolutePath());
-        sequenceHashMap = parser.getSequenceHashMap();
 
+        adjacencyMap = parser.parseGraph(file.getAbsolutePath());
+        graph = new SequenceGraph();
+        graph.createSubGraph(NODE_ID,RENDER_RANGE, adjacencyMap);
+        sequenceHashMap = parser.getSequenceHashMap();
         drawer = new GraphDrawer(graph, gc);
         drawer.moveShapes(0.0);
 
-        return file.toString();
+        String filePath = file.getAbsolutePath();
+        String pattern = Pattern.quote(System.getProperty("file.separator"));
+        String[] partPaths = filePath.split(pattern);
+        String fileName = partPaths[partPaths.length - 1];
+        System.out.println(fileName);
+
+        return fileName;
     }
 
     /**

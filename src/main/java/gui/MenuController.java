@@ -73,7 +73,6 @@ public class MenuController {
         canvas.widthProperty().bind(canvasPanel.widthProperty());
         canvas.heightProperty().bind(canvasPanel.heightProperty());
         gc = canvas.getGraphicsContext2D();
-
         prefs = Preferences.userRoot();
         fileController = new FileController();
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
@@ -143,7 +142,7 @@ public class MenuController {
         double pressedY = mouseEvent.getY();
         SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, pressedY);
         if (clicked != null) {
-            String newString = "Node ID: " + clicked.getId() + "\nSequence: "
+            String newString = "Sequence: "
                     + fileController.getSequenceHashMap().get((long) clicked.getId());
             infoController.updateSeqLabel(newString);
         }
@@ -211,6 +210,8 @@ public class MenuController {
             String centre = parts[0];
             String radius = parts[1];
             traverseGraphClicked(centre, radius);
+            zoomController.setNodeTextField(centre);
+            zoomController.setRadiusTextField(radius);
         }
     }
 

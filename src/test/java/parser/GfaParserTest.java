@@ -16,7 +16,7 @@ public class GfaParserTest{
 
     GfaParser parser;
     SequenceGraph graph;
-
+/*
     @Before
     public void initialize() throws IOException {
         parser = new GfaParser();
