@@ -100,7 +100,7 @@ public class ZoomController {
      * @return the radius.
      */
     public int getRadius() {
-        return Integer.parseInt(radiusTextField.getText());
+        return (int) Double.parseDouble(radiusTextField.getText());
     }
 
     /**
