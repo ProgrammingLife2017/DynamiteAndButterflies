@@ -38,7 +38,7 @@ public class BookmarkController {
         }
 
         int largestIndex = prefs.getInt("bookmarkNum" + stringFile, -1);
-        int i = 0;
+        int i = -1;
 
         while (i <= largestIndex) {
             int newIndex = i;
