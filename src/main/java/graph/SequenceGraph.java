@@ -49,9 +49,9 @@ public class SequenceGraph {
             SequenceNode node = new SequenceNode(id);
             this.addNode(node);
             int[] children = adjacencyList.get((long)id);
-            for(int i = 0; i < children.length; i++) {
-                Edge edge = new Edge(id, children[i]);
-                if(children[i] < upperBound) {
+            for (int aChildren : children) {
+                Edge edge = new Edge(id, aChildren);
+                if (aChildren < upperBound) {
                     this.getEdges().add(edge);
                 }
             }
