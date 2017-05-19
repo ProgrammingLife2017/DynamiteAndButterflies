@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 /**
  * Created by Jip on 17-5-2017.
@@ -88,7 +89,13 @@ public class FileController {
         drawer = new GraphDrawer(graph, gc);
         drawer.moveShapes(0.0);
 
-        return file.toString();
+        String filePath = file.getAbsolutePath();
+        String pattern = Pattern.quote(System.getProperty("file.separator"));
+        String[] partPaths = filePath.split(pattern);
+        String fileName = partPaths[partPaths.length - 1];
+        System.out.println(fileName);
+
+        return fileName;
     }
 
     /**
