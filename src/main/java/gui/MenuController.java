@@ -19,6 +19,7 @@ import javafx.scene.layout.AnchorPane;
 import org.mapdb.HTreeMap;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.prefs.Preferences;
 
 /**
@@ -53,6 +54,8 @@ public class MenuController {
     private Label numEdgesLabel;
     @FXML
     private TextArea consoleArea;
+    private PrintStream ps;
+
     private GraphicsContext gc;
 
     private Preferences prefs;
@@ -61,7 +64,6 @@ public class MenuController {
     private FileController fileController;
     private ZoomController zoomController;
     private InfoController infoController;
-    private Console console;
 
     /**
      * Initializes the canvas.
@@ -76,8 +78,10 @@ public class MenuController {
         fileController = new FileController();
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2);
-        console = new Console(consoleArea);
-        console.appendText("Test");
+        ps = new PrintStream(new Console(consoleArea));
+        System.setErr(ps);
+        System.setOut(ps);
+
     }
 
     /**
