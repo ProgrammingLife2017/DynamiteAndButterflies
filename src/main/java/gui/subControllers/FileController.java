@@ -23,10 +23,10 @@ public class FileController {
     private SequenceGraph graph;
     private gui.GraphDrawer drawer;
     private HTreeMap<Long, String> sequenceHashMap;
-    HashMap<Integer, ArrayList<Integer>> adjacencyMap;
+    HTreeMap<Long, int[]> adjacencyMap;
     private File parDirectory;
 
-    private final int RENDER_RANGE = 10000;
+    private final int RENDER_RANGE = 5000;
     private final int NODE_ID = 1;
 
     /**

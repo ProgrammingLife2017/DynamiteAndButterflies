@@ -1,6 +1,7 @@
 package graph;
 
 import javafx.util.Pair;
+import org.mapdb.HTreeMap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +39,7 @@ public class SequenceGraph {
         this.edges = new ArrayList<Edge>();
     }
 
-    public void createSubGraph(int centerNodeID, int range, HashMap<Integer, ArrayList<Integer>> adjacencyList) {
+    public void createSubGraph(int centerNodeID, int range, HTreeMap<Long, int[]> adjacencyList) {
         resetGraph();
         Pair upperAndLowerBound = getBounds(centerNodeID, range, adjacencyList);
         int upperBound = (Integer) upperAndLowerBound.getKey();
@@ -47,17 +48,17 @@ public class SequenceGraph {
         for(int id = lowerBound; id <= upperBound; id++) {
             SequenceNode node = new SequenceNode(id);
             this.addNode(node);
-            ArrayList<Integer> children = adjacencyList.get(id);
-            for(int i = 0; i < children.size(); i++) {
-                Edge edge = new Edge(id, children.get(i));
-                if(children.get(i) < upperBound) {
+            int[] children = adjacencyList.get((long)id);
+            for(int i = 0; i < children.length; i++) {
+                Edge edge = new Edge(id, children[i]);
+                if(children[i] < upperBound) {
                     this.getEdges().add(edge);
                 }
             }
         }
     }
 
-    private Pair getBounds(int centerNodeID, int range, HashMap<Integer, ArrayList<Integer>> adjacencyList) {
+    private Pair getBounds(int centerNodeID, int range, HTreeMap<Long, int[]> adjacencyList) {
         int upperBound = adjacencyList.size();
         int lowerBound = 1;
         if(centerNodeID - range > 1) {

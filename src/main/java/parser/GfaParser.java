@@ -24,8 +24,8 @@ public class GfaParser {
     private String header2;
     private HTreeMap<Long, String> sequenceMap;
     private HTreeMap<Long, int[]> adjacencyHMap;
-    private HashMap<Integer, ArrayList<Integer>> adjacencyMap;
     public DB db;
+    public DB db2;
 
     /**
      * This method parses the file specified in filepath into a sequence graph.
@@ -34,17 +34,22 @@ public class GfaParser {
      * @throws IOException For instance when the file is not found
      */
     @SuppressWarnings("Since15")
-    public HashMap<Integer, ArrayList<Integer>> parseGraph(String filePath) throws IOException {
+    public HTreeMap<Long, int[]> parseGraph(String filePath) throws IOException {
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         String partPath = partPaths[partPaths.length-1];
         System.out.println(partPath);
-        db = DBMaker.fileDB(partPath).fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
-        if (db.get(partPath) != null) {
-            sequenceMap = db.hashMap(partPath).keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
-            return parseSpecific(filePath, true);
+
+
+        db = DBMaker.fileDB(partPath +  ".sequence.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
+        db2 = DBMaker.fileDB(partPath +  ".adjacency.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
+        if (db.get(partPath+ ".sequence.db") != null) {
+            adjacencyHMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.INT_ARRAY).createOrOpen();
+            sequenceMap = db2.hashMap(partPath + ".adjacency.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
+            return adjacencyHMap;
         } else {
-            sequenceMap = db.hashMap(partPath).keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
+            adjacencyHMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.INT_ARRAY).createOrOpen();
+            sequenceMap = db2.hashMap(partPath + ".adjacency.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
             return parseSpecific(filePath, false);
         }
     }
@@ -57,8 +62,12 @@ public class GfaParser {
         return sequenceMap;
     }
 
-    public HashMap<Integer, ArrayList<Integer>> getAdjacencyMap() {
-        return this.adjacencyMap;
+    /**
+     * Getter for the AdjacencyHMap.
+     * @return The HashMap.
+     */
+    public HTreeMap<Long, int[]> getAdjacencyHMap() {
+        return this.adjacencyHMap;
     }
 
     /**
@@ -69,16 +78,25 @@ public class GfaParser {
      * @throws IOException Reader.
      */
     @SuppressWarnings("Since15")
-    private HashMap<Integer, ArrayList<Integer>> parseSpecific(String filePath, Boolean exists) throws IOException {
-        adjacencyMap = new HashMap<Integer, ArrayList<Integer>>();
+    private HTreeMap<Long, int[]> parseSpecific(String filePath, Boolean exists) throws IOException {
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line = br.readLine();
         header1 = line.split("H")[1];
         line = br.readLine();
         header2 = line.split("H")[1];
+        ArrayList<Integer> temp = new ArrayList<Integer>();
+        int parentId = 0;
         while ((line = br.readLine()) != null) {
+            int childId;
             if (line.startsWith("S")) {
+                if(parentId > 0) {
+                    if(!exists) {
+                        adjacencyHMap.put((long) parentId, convertIntegers(temp));
+                        temp = new ArrayList<Integer>();
+                    }
+
+                }
                 String[] data = line.split(("\t"));
                 int id = Integer.parseInt(data[1]);
                 if(id % 10000 == 0) {
@@ -90,22 +108,16 @@ public class GfaParser {
                 }
             } else if (line.startsWith("L")) {
                 String[] edgeDataString = line.split("\t");
-                int parentId = (Integer.parseInt(edgeDataString[1]));
-                int childId = Integer.parseInt(edgeDataString[3]);
-                ArrayList<Integer> temp = new ArrayList<Integer>();
+                parentId = (Integer.parseInt(edgeDataString[1]));
+                childId = Integer.parseInt(edgeDataString[3]);
                 temp.add(childId);
-                addToList(parentId, childId);
-                if(line.startsWith("S")) {
-                    if(!exists) {
-                        adjacencyHMap.put((long) parentId, convertIntegers(temp));
-                    }
-                }
+                //addToList(parentId, childId);
             }
         }
         in.close();
         br.close();
         db.commit();
-        return adjacencyMap;
+        return adjacencyHMap;
     }
 
 
@@ -121,32 +133,10 @@ public class GfaParser {
     }
 
     /**
-     * Adder for Hashmap<Integer, List<Integer>)
-     *
-     * @param mapKey - the key in which to add a nodeID
-     * @param nodeID - the nodeID to be added
+     * Converts an List<Integer> to int[]
+     * @param integers list with integers
+     * @return int[]
      */
-    private synchronized void addToList(Integer mapKey, Integer nodeID) {
-        if (adjacencyMap.get(mapKey) == null) {
-            ArrayList<Integer> idList = new ArrayList<Integer>();
-            idList.add(nodeID);
-            adjacencyMap.put(mapKey, idList);
-
-        }
-        else if(adjacencyMap.get(mapKey) != null) {
-            ArrayList<Integer> idList = adjacencyMap.get(mapKey);
-            // if list does not exist create it
-            if (idList == null) {
-                idList = new ArrayList<Integer>();
-                idList.add(nodeID);
-                adjacencyMap.put(mapKey, idList);
-            } else {
-                // add if item is not already in list
-                if (!idList.contains(nodeID)) idList.add(nodeID);
-            }
-        }
-    }
-
     public static int[] convertIntegers(List<Integer> integers)
     {
         int[] ret = new int[integers.size()];
