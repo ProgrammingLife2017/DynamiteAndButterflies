@@ -11,12 +11,15 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import org.mapdb.HTreeMap;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.prefs.Preferences;
 
 /**
@@ -49,9 +52,12 @@ public class MenuController {
     private Label numNodesLabel;
     @FXML
     private Label numEdgesLabel;
+    @FXML
+    private TextArea consoleArea;
+    private PrintStream ps;
+
     private GraphicsContext gc;
 
-    private double pressedX;
     private Preferences prefs;
 
     private BookmarkController bookmarkController;
@@ -71,6 +77,10 @@ public class MenuController {
         fileController = new FileController();
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2);
+        ps = new PrintStream(new Console(consoleArea));
+        System.setErr(ps);
+        System.setOut(ps);
+
     }
 
     /**
@@ -100,7 +110,7 @@ public class MenuController {
      */
     @FXML
     public void zoomInClicked() throws IOException {
-        zoomController.zoomInClicked();
+        zoomController.zoomIn();
     }
 
     /**
@@ -109,7 +119,17 @@ public class MenuController {
      */
     @FXML
     public void zoomOutClicked() throws IOException {
-        zoomController.zoomOutClicked();
+        zoomController.zoomOut();
+    }
+
+    @FXML
+    public void scrollZoom(ScrollEvent scrollEvent) throws IOException {
+        int column = fileController.getDrawer().mouseLocationColumn(scrollEvent.getX());
+        if (scrollEvent.getDeltaY() > 0){
+            zoomController.zoomIn(column);
+        } else {
+            zoomController.zoomOut(column);
+        }
     }
 
     /**
@@ -118,22 +138,14 @@ public class MenuController {
      */
     @FXML
     public void clickMouse(MouseEvent mouseEvent) {
-        pressedX = mouseEvent.getX();
-        double y = mouseEvent.getY();
-        SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, y);
+        double pressedX = mouseEvent.getX();
+        double pressedY = mouseEvent.getY();
+        SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, pressedY);
         if (clicked != null) {
-            System.out.println(clicked.getId());
+            String newString = "Node ID: " + clicked.getId() + "\nSequence: "
+                    + fileController.getSequenceHashMap().get((long) clicked.getId());
+            infoController.updateSeqLabel(newString);
         }
-    }
-
-    /**
-     *  The eventHandler for dragging the mouse.
-     * @param mouseEvent The MouseEvent for dragging.
-     */
-    @FXML
-    public void dragMouse(MouseEvent mouseEvent) {
-        double xDifference = pressedX - mouseEvent.getX() / 2;
-        fileController.getDrawer().moveShapes(xDifference);
     }
 
     /**
