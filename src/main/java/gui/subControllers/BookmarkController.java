@@ -38,7 +38,13 @@ public class BookmarkController {
         }
 
         int largestIndex = prefs.getInt("bookmarkNum" + stringFile, -1);
-        int i = 0;
+        //As a user,
+        // When viewing a file with bookmarks,
+        // And choosing a new file to view
+        // And that file has no bookmarks
+        // I want to not see the old bookmarks.
+        // Initializing this number as -2 ensures the above user story.
+        int i = -2;
 
         while (i <= largestIndex) {
             int newIndex = i;
