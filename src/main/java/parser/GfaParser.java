@@ -11,6 +11,7 @@ import org.mapdb.Serializer;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static java.lang.Math.toIntExact;
@@ -22,6 +23,7 @@ public class GfaParser {
     private String header1;
     private String header2;
     private HTreeMap<Long, String> sequenceMap;
+    private HTreeMap<Long, int[]> adjacencyHMap;
     private HashMap<Integer, ArrayList<Integer>> adjacencyMap;
     public DB db;
 
@@ -68,7 +70,6 @@ public class GfaParser {
      */
     @SuppressWarnings("Since15")
     private HashMap<Integer, ArrayList<Integer>> parseSpecific(String filePath, Boolean exists) throws IOException {
-        SequenceGraph sequenceGraph = new SequenceGraph();
         adjacencyMap = new HashMap<Integer, ArrayList<Integer>>();
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
@@ -87,12 +88,18 @@ public class GfaParser {
                 if (!exists) {
                     sequenceMap.put((long) (id), data[2]);
                 }
-                sequenceGraph.addNode(node);
             } else if (line.startsWith("L")) {
                 String[] edgeDataString = line.split("\t");
                 int parentId = (Integer.parseInt(edgeDataString[1]));
                 int childId = Integer.parseInt(edgeDataString[3]);
+                ArrayList<Integer> temp = new ArrayList<Integer>();
+                temp.add(childId);
                 addToList(parentId, childId);
+                if(line.startsWith("S")) {
+                    if(!exists) {
+                        adjacencyHMap.put((long) parentId, convertIntegers(temp));
+                    }
+                }
             }
         }
         in.close();
@@ -138,5 +145,15 @@ public class GfaParser {
                 if (!idList.contains(nodeID)) idList.add(nodeID);
             }
         }
+    }
+
+    public static int[] convertIntegers(List<Integer> integers)
+    {
+        int[] ret = new int[integers.size()];
+        for (int i=0; i < ret.length; i++)
+        {
+            ret[i] = integers.get(i).intValue();
+        }
+        return ret;
     }
 }
