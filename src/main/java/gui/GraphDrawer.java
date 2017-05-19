@@ -23,7 +23,9 @@ public class GraphDrawer {
     private static final double MAX_LINE_WIDTH = 1;
 
     private int yBase;
-    private int zoomLevel;
+    private double zoomLevel;
+    private double xDifference;
+    private double stepSize;
     private GraphicsContext gc;
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
@@ -53,23 +55,13 @@ public class GraphDrawer {
     }
 
     /**
-     * Function what to do on ZoomIn.
+     * Function what to do on Zoom.
      * @param factor Zooming factor.
      * @param column The Column that has to be in the centre.
      */
-    public void zoomIn(final double factor, final int column) {
-        this.zoomLevel = (int) (zoomLevel * factor);
-        moveShapes(column - zoomLevel / 2);
-    }
-
-    /**
-     * Function what to do on ZoomOut.
-     * @param factor Zooming factor.
-     * @param column The column that has to be in the centre.
-     */
-    public void zoomOut(final double factor, final int column) {
-        this.zoomLevel = (int) (zoomLevel * factor);
-        moveShapes(column - zoomLevel / 2);
+    public void zoom(final double factor, final int column) {
+        this.zoomLevel = zoomLevel * factor;
+        moveShapes(column - ((column - xDifference) * factor));
     }
 
     /**
@@ -86,14 +78,16 @@ public class GraphDrawer {
      * Draws the Graph.
      * @param xDifference Variable to determine which column should be in the centre.
      */
-    public void moveShapes(final double xDifference) {
+    public void moveShapes(double xDifference) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         gc.setFill(Color.BLUE);
-        drawNodes(xDifference);
-        drawEdges(xDifference);
+        this.xDifference = xDifference;
+        this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
+        drawNodes();
+        drawEdges();
     }
 
-    private void drawNodes(double xDifference) {
+    private void drawNodes() {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
@@ -101,7 +95,6 @@ public class GraphDrawer {
                     continue;
                     //gc.setFill(Color.BLACK);
                 }
-                double stepSize = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel);
                 double x = (j - xDifference) * stepSize;
                 double y = yBase + (i * RELATIVE_Y_DISTANCE);
                 double width = RELATIVE_X_DISTANCE * stepSize;
@@ -115,16 +108,14 @@ public class GraphDrawer {
 
     /**
      * Draws the edges.
-     * @param xDifference Variable to determine which column should be in the centre.
      */
-    private void drawEdges(double xDifference) {
+    private void drawEdges() {
         setLineWidth();
         HashMap<Integer, SequenceNode> nodes = graph.getNodes();
         for (int i = 1; i <= nodes.size(); i++) {
             SequenceNode parent = nodes.get(i);
             for (int j = 0; j < parent.getChildren().size(); j++) {
                 SequenceNode child = graph.getNode(parent.getChild(j));
-                double stepSize = ((gc.getCanvas().getWidth() - X_OFFSET) / zoomLevel);
                 double startx = stepSize * ((parent.getColumn() - xDifference) + RELATIVE_X_DISTANCE);
                 double starty = yBase + (parent.getIndex() * RELATIVE_Y_DISTANCE) + getYSize() / 2;
                 double endx = (child.getColumn() - xDifference) * stepSize;
@@ -216,8 +207,12 @@ public class GraphDrawer {
      * Get function for zoom level.
      * @return the Zoom level.
      */
-    public int getZoomLevel() {
+    public double getZoomLevel() {
         return zoomLevel;
+    }
+
+    public int mouseLocationColumn(double x) {
+        return (int) ((x/stepSize) + xDifference);
     }
 }
 
