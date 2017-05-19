@@ -12,6 +12,8 @@ import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -22,7 +24,11 @@ public class FileController {
     private SequenceGraph graph;
     private gui.GraphDrawer drawer;
     private HTreeMap<Long, String> sequenceHashMap;
+    HTreeMap<Long, int[]> adjacencyMap;
     private File parDirectory;
+
+    private final int RENDER_RANGE = 5000;
+    private final int NODE_ID = 1;
 
     /**
      * Constructor of the FileController object to control the Files.
@@ -76,9 +82,10 @@ public class FileController {
         GfaParser parser = new GfaParser();
         System.out.println("src/main/resources/" + file.getName());
 
-        graph = parser.parseGraph(file.getAbsolutePath());
+        adjacencyMap = parser.parseGraph(file.getAbsolutePath());
+        graph = new SequenceGraph();
+        graph.createSubGraph(NODE_ID,RENDER_RANGE, adjacencyMap);
         sequenceHashMap = parser.getSequenceHashMap();
-
         drawer = new GraphDrawer(graph, gc);
         drawer.moveShapes(0.0);
 
