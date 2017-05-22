@@ -73,10 +73,7 @@ public class GfaParser {
         header1 = line.split("H")[1];
         line = br.readLine();
         header2 = line.split("H")[1];
-        ArrayList<Integer> temp = new ArrayList<Integer>();
-        int parentId = 0;
         while ((line = br.readLine()) != null) {
-            int childId;
             if (line.startsWith("S")) {
                 String[] data = line.split(("\t"));
                 int id = Integer.parseInt(data[1]);
@@ -85,8 +82,8 @@ public class GfaParser {
                 }
             } else if (line.startsWith("L")) {
                 String[] edgeDataString = line.split("\t");
-                parentId = (Integer.parseInt(edgeDataString[1]));
-                childId = Integer.parseInt(edgeDataString[3]);
+                int parentId = (Integer.parseInt(edgeDataString[1]));
+                int childId = Integer.parseInt(edgeDataString[3]);
                 Tuple edge = new Tuple(parentId, childId);
                 edgeList.add(edge);
             }
