@@ -1,18 +1,12 @@
 package gui;
 
 import graph.SequenceGraph;
-import gui.subControllers.BookmarkController;
-import gui.subControllers.FileController;
-import gui.subControllers.InfoController;
-import gui.subControllers.ZoomController;
 import graph.SequenceNode;
+import gui.subControllers.*;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -32,6 +26,8 @@ public class MenuController {
 
     @FXML
     public Button saveBookmark;
+    @FXML
+    private ProgressBar progressBar;
     @FXML
     private Button bookmark1;
     @FXML
@@ -74,9 +70,11 @@ public class MenuController {
         canvas.heightProperty().bind(canvasPanel.heightProperty());
         gc = canvas.getGraphicsContext2D();
         prefs = Preferences.userRoot();
-        fileController = new FileController();
+
+        fileController = new FileController(new ProgressBarController(progressBar));
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2);
+
         ps = new PrintStream(new Console(consoleArea));
         System.setErr(ps);
         System.setOut(ps);
@@ -91,6 +89,7 @@ public class MenuController {
     @FXML
     public void openFileClicked() throws IOException {
         String fileString = fileController.openFileClicked(anchorPane, gc);
+
         prefs.put("file", fileString);
         bookmarkController.loadBookmarks(fileString);
         zoomController = new ZoomController(fileController.getDrawer(),

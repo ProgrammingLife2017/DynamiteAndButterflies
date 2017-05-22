@@ -1,7 +1,5 @@
 package parser;
 
-import graph.Edge;
-import graph.SequenceGraph;
 import graph.SequenceNode;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -10,7 +8,6 @@ import org.mapdb.Serializer;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -19,13 +16,27 @@ import static java.lang.Math.toIntExact;
 /**
  * This class contains a parser to parse a .gfa file into our data structure.
  */
-public class GfaParser {
+public class GfaParser extends Thread {
     private String header1;
     private String header2;
     private HTreeMap<Long, String> sequenceMap;
     private HTreeMap<Long, int[]> adjacencyHMap;
     public DB db;
     public DB db2;
+    String filePath;
+
+    public GfaParser(String absolutePath) {
+        filePath = absolutePath;
+    }
+
+    @Override
+    public void start() {
+        try {
+            parseGraph(filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * This method parses the file specified in filepath into a sequence graph.
@@ -37,13 +48,13 @@ public class GfaParser {
     public HTreeMap<Long, int[]> parseGraph(String filePath) throws IOException {
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
-        String partPath = partPaths[partPaths.length-1];
+        String partPath = partPaths[partPaths.length - 1];
         System.out.println(partPath);
 
 
         db = DBMaker.fileDB(partPath +  ".sequence.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
         db2 = DBMaker.fileDB(partPath +  ".adjacency.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
-        if (db.get(partPath+ ".sequence.db") != null) {
+        if (db.get(partPath + ".sequence.db") != null) {
             adjacencyHMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.INT_ARRAY).createOrOpen();
             sequenceMap = db2.hashMap(partPath + ".adjacency.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
             return adjacencyHMap;
@@ -99,9 +110,6 @@ public class GfaParser {
                 }
                 String[] data = line.split(("\t"));
                 int id = Integer.parseInt(data[1]);
-                if(id % 10000 == 0) {
-                    System.out.println(id);
-                }
                 SequenceNode node = new SequenceNode(toIntExact(id));
                 if (!exists) {
                     sequenceMap.put((long) (id), data[2]);

@@ -2,7 +2,6 @@ package gui.subControllers;
 
 import graph.SequenceGraph;
 import gui.GraphDrawer;
-import javafx.fxml.FXML;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
@@ -12,8 +11,6 @@ import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -26,6 +23,7 @@ public class FileController {
     private HTreeMap<Long, String> sequenceHashMap;
     HTreeMap<Long, int[]> adjacencyMap;
     private File parDirectory;
+    private ProgressBarController progressBarController;
 
     private final int RENDER_RANGE = 5000;
     private final int NODE_ID = 1;
@@ -33,9 +31,10 @@ public class FileController {
     /**
      * Constructor of the FileController object to control the Files.
      */
-    public FileController() {
+    public FileController(ProgressBarController pbc) {
         graph = new SequenceGraph();
         parDirectory = null;
+        progressBarController = pbc;
     }
 
     /**
@@ -74,17 +73,17 @@ public class FileController {
      * @return The strign of the file that has just been loaded.
      * @throws IOException exception if no file is found
      */
-    @FXML
     public String openFileClicked(AnchorPane anchorPane, GraphicsContext gc) throws IOException {
         Stage stage = (Stage) anchorPane.getScene().getWindow();
+        progressBarController.run();
         File file = chooseFile(stage);
-
-        GfaParser parser = new GfaParser();
+        GfaParser parser = new GfaParser(file.getAbsolutePath());
         System.out.println("src/main/resources/" + file.getName());
+        parser.start();
 
-        adjacencyMap = parser.parseGraph(file.getAbsolutePath());
+        adjacencyMap = parser.getAdjacencyHMap();
         graph = new SequenceGraph();
-        graph.createSubGraph(NODE_ID,RENDER_RANGE, adjacencyMap);
+        graph.createSubGraph(NODE_ID, RENDER_RANGE, adjacencyMap);
         sequenceHashMap = parser.getSequenceHashMap();
         drawer = new GraphDrawer(graph, gc);
         drawer.moveShapes(0.0);
@@ -121,4 +120,21 @@ public class FileController {
     public SequenceGraph getGraph() {
         return graph;
     }
+
+//    public Task fileReadTask() {
+//        return new Task() {
+//            @Override
+//            protected Object call() throws Exception {
+//
+//                GfaParser parser = new GfaParser();
+//                System.out.println("src/main/resources/" + file.getName());
+//
+//                adjacencyMap = parser.parseGraph(file.getAbsolutePath());
+//                progressBarController.done();
+//                sequenceHashMap = parser.getSequenceHashMap();
+//
+//                return file.getName();
+//            }
+//        };
+//    };
 }
