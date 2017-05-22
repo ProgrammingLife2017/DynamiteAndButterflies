@@ -31,7 +31,8 @@ public class SequenceNode {
     }
 
     public void addChild(Integer id) {
-        this.children.add(id);
+        if(!this.children.contains(id))
+            this.children.add(id);
     }
 
     public boolean hasChildren() {

@@ -9,11 +9,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
 import parser.GfaParser;
+import parser.Tuple;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -24,7 +26,7 @@ public class FileController {
     private SequenceGraph graph;
     private gui.GraphDrawer drawer;
     private HTreeMap<Long, String> sequenceHashMap;
-    HTreeMap<Long, int[]> adjacencyMap;
+    private List<Tuple> edgeList;
     private File parDirectory;
 
     private final int RENDER_RANGE = 5000;
@@ -82,9 +84,9 @@ public class FileController {
         GfaParser parser = new GfaParser();
         System.out.println("src/main/resources/" + file.getName());
 
-        adjacencyMap = parser.parseGraph(file.getAbsolutePath());
+        edgeList = parser.parseGraph(file.getAbsolutePath());
         graph = new SequenceGraph();
-        graph.createSubGraph(NODE_ID,RENDER_RANGE, adjacencyMap);
+        graph.createSubGraph(NODE_ID,RENDER_RANGE, edgeList);
         sequenceHashMap = parser.getSequenceHashMap();
         drawer = new GraphDrawer(graph, gc);
         drawer.moveShapes(0.0);

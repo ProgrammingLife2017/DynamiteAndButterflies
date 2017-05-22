@@ -23,9 +23,7 @@ public class GfaParser {
     private String header1;
     private String header2;
     private HTreeMap<Long, String> sequenceMap;
-    private HTreeMap<Long, int[]> adjacencyHMap;
     public DB db;
-    public DB db2;
 
     /**
      * This method parses the file specified in filepath into a sequence graph.
@@ -34,7 +32,7 @@ public class GfaParser {
      * @throws IOException For instance when the file is not found
      */
     @SuppressWarnings("Since15")
-    public HTreeMap<Long, int[]> parseGraph(String filePath) throws IOException {
+    public List<Tuple> parseGraph(String filePath) throws IOException {
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         String partPath = partPaths[partPaths.length-1];
@@ -42,14 +40,11 @@ public class GfaParser {
 
 
         db = DBMaker.fileDB(partPath +  ".sequence.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
-        db2 = DBMaker.fileDB(partPath +  ".adjacency.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
         if (db.get(partPath+ ".sequence.db") != null) {
-            adjacencyHMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.INT_ARRAY).createOrOpen();
-            sequenceMap = db2.hashMap(partPath + ".adjacency.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
-            return adjacencyHMap;
+            sequenceMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
+            return parseSpecific(filePath, true);
         } else {
-            adjacencyHMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.INT_ARRAY).createOrOpen();
-            sequenceMap = db2.hashMap(partPath + ".adjacency.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
+            sequenceMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
             return parseSpecific(filePath, false);
         }
     }
@@ -63,14 +58,6 @@ public class GfaParser {
     }
 
     /**
-     * Getter for the AdjacencyHMap.
-     * @return The HashMap.
-     */
-    public HTreeMap<Long, int[]> getAdjacencyHMap() {
-        return this.adjacencyHMap;
-    }
-
-    /**
      * Parses the file with a boolean whether to create a db file or not. Creates the Graph
      * @param filePath The file to parse/
      * @param exists Does the db file already exist?
@@ -78,7 +65,8 @@ public class GfaParser {
      * @throws IOException Reader.
      */
     @SuppressWarnings("Since15")
-    private HTreeMap<Long, int[]> parseSpecific(String filePath, Boolean exists) throws IOException {
+    private List<Tuple> parseSpecific(String filePath, Boolean exists) throws IOException {
+        ArrayList<Tuple> edgeList = new ArrayList<Tuple>();
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line = br.readLine();
@@ -90,19 +78,8 @@ public class GfaParser {
         while ((line = br.readLine()) != null) {
             int childId;
             if (line.startsWith("S")) {
-                if(parentId > 0) {
-                    if(!exists) {
-                        adjacencyHMap.put((long) parentId, convertIntegers(temp));
-                        temp = new ArrayList<Integer>();
-                    }
-
-                }
                 String[] data = line.split(("\t"));
                 int id = Integer.parseInt(data[1]);
-                if(id % 10000 == 0) {
-                    System.out.println(id);
-                }
-                SequenceNode node = new SequenceNode(toIntExact(id));
                 if (!exists) {
                     sequenceMap.put((long) (id), data[2]);
                 }
@@ -110,14 +87,14 @@ public class GfaParser {
                 String[] edgeDataString = line.split("\t");
                 parentId = (Integer.parseInt(edgeDataString[1]));
                 childId = Integer.parseInt(edgeDataString[3]);
-                temp.add(childId);
-                //addToList(parentId, childId);
+                Tuple edge = new Tuple(parentId, childId);
+                edgeList.add(edge);
             }
         }
         in.close();
         br.close();
         db.commit();
-        return adjacencyHMap;
+        return edgeList;
     }
 
 

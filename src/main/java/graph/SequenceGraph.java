@@ -1,10 +1,11 @@
 package graph;
 
 import javafx.util.Pair;
-import org.mapdb.HTreeMap;
+import parser.Tuple;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,7 +17,6 @@ import java.util.Map;
 public class SequenceGraph {
 
 
-    private Integer size;
     private HashMap<Integer, SequenceNode> nodes;
     private ArrayList<Edge> edges;
     private ArrayList<ArrayList<SequenceNode>> columns;
@@ -25,7 +25,6 @@ public class SequenceGraph {
      * The constructor initializes the SequenceGraph with it's basic values.
      */
     public SequenceGraph() {
-        this.size = 0;
         this.nodes = new HashMap<Integer, SequenceNode>();
         this.edges = new ArrayList<Edge>();
     }
@@ -33,42 +32,31 @@ public class SequenceGraph {
         return nodes.size();
     }
 
-    public void resetGraph() {
-        this.size = 0;
-        this.nodes = new HashMap<Integer, SequenceNode>();
-        this.edges = new ArrayList<Edge>();
-    }
 
-    public void createSubGraph(int centerNodeID, int range, HTreeMap<Long, int[]> adjacencyList) {
-        resetGraph();
-        Pair upperAndLowerBound = getBounds(centerNodeID, range, adjacencyList);
-        int upperBound = (Integer) upperAndLowerBound.getKey();
-        int lowerBound = (Integer) upperAndLowerBound.getValue();
+    public void createSubGraph(int centerNodeID, int range, List<Tuple> edgeList) {
+        int upperBoundID = edgeList.get(edgeList.size()-1).childID;
+        int lowerBoundID = 1;
+        if(centerNodeID + range <= upperBoundID) {
+            upperBoundID = centerNodeID + range;
+        }
+        if(centerNodeID - range >= lowerBoundID) {
+            lowerBoundID = centerNodeID - range;
+        }
 
-        for(int id = lowerBound; id <= upperBound; id++) {
-            SequenceNode node = new SequenceNode(id);
-            this.addNode(node);
-            int[] children = adjacencyList.get((long)id);
-            for (int aChildren : children) {
-                Edge edge = new Edge(id, aChildren);
-                if (aChildren < upperBound) {
-                    this.getEdges().add(edge);
-                }
+        for(int i = 0; i < edgeList.size(); i++) {
+            int parentID = edgeList.get(i).parentID;
+            int childID = edgeList.get(i).childID;
+
+            if(parentID >= lowerBoundID && childID <= upperBoundID) {
+                SequenceNode parentNode = new SequenceNode(parentID);
+                parentNode.addChild(childID);
+                SequenceNode childNode = new SequenceNode(childID);
+                this.addNode(parentNode);
+                this.addNode(childNode);
+                Edge edge = new Edge(parentID, childID);
+                this.getEdges().add(edge);
             }
         }
-    }
-
-    private Pair getBounds(int centerNodeID, int range, HTreeMap<Long, int[]> adjacencyList) {
-        int upperBound = adjacencyList.size();
-        int lowerBound = 1;
-        if(centerNodeID - range > 1) {
-            lowerBound = centerNodeID - range;
-        }
-        if(centerNodeID + range < upperBound ) {
-            upperBound = centerNodeID + range;
-        }
-
-        return new Pair<Integer, Integer>(upperBound, lowerBound);
     }
 
     /**
@@ -98,7 +86,6 @@ public class SequenceGraph {
      */
     public void addNode(SequenceNode node) {
         this.nodes.put(node.getId(), node);
-        this.size++;
     }
 
     /**
@@ -155,17 +142,15 @@ public class SequenceGraph {
 
     }
 
-
     /**
      * Gives each node a column where it should be built.
      */
     private void createColumns() {
-        for (int i = 1; i <= size; i++) {
+        for (int i = 1; i <= nodes.size(); i++) {
             SequenceNode parent = nodes.get(i);     // Start at first node
             ArrayList<Integer> children = parent.getChildren();    // Get all children
             for (Integer child : children) {
                 this.getNode(child).incrementColumn(parent.getColumn());
-                System.out.println(this.getNode(child).getId());
             }
         }
     }
