@@ -26,6 +26,7 @@ public class GraphDrawer {
     private double zoomLevel;
     private double xDifference;
     private double stepSize;
+    private int totalColumnSize;
     private GraphicsContext gc;
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
@@ -82,34 +83,91 @@ public class GraphDrawer {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         gc.setFill(Color.BLUE);
         this.xDifference = xDifference;
-        this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
+        computeColumnWidths();
+        this.stepSize = (gc.getCanvas().getWidth() / totalColumnSize);
         drawNodes();
         drawEdges();
     }
 
+    private void computeColumnWidths() {
+        int totalColumnSize = 0;
+        for (int j = 0; j < columns.size(); j++) {
+            if ((j - xDifference) < 0 || (j - xDifference) > zoomLevel) {
+                continue;
+            }
+            ArrayList<SequenceNode> column = columns.get(j);
+            int max = 0;
+            for (int i = 0; i < column.size(); i++) {
+                if (!column.get(i).isDummy()) {
+                    if (max < column.get(i).getSequenceLength()) {
+                        max = column.get(i).getSequenceLength();
+                    }
+                }
+            }
+            if (max > 100) {
+                max = 100;
+            }
+            if (max < 10) {
+                max = 10;
+            }
+            totalColumnSize += max;
+        }
+        this.totalColumnSize = totalColumnSize;
+    }
+
     private void drawNodes() {
+        double currentLoc = -xDifference;
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
+            double maxWidth = 0;
             for (int i = 0; i < column.size(); i++) {
                 if (column.get(i).isDummy()) {
                     continue;
                     //gc.setFill(Color.BLACK);
                 }
-                double x = (j - xDifference) * stepSize;
+                double x = currentLoc * stepSize;
                 double y = yBase + (i * RELATIVE_Y_DISTANCE);
-                double width = RELATIVE_X_DISTANCE * stepSize;
+                //double width = RELATIVE_X_DISTANCE * stepSize;
+                double width = RELATIVE_X_DISTANCE * getXSize(column.get(i));
                 double height = getYSize();
+                if (column.get(i).getSequenceLength() > maxWidth) {
+                    maxWidth = column.get(i).getSequenceLength();
+                }
                 DrawableNode node = canvasNodes.get(column.get(i).getId() - 1);
                 node.setCoordinates(x, y, width, height);
                 node.draw();
             }
+            if (maxWidth > 100) {
+                maxWidth = 100;
+            }
+            if (maxWidth < 10) {
+                maxWidth = 10;
+            }
+            currentLoc += maxWidth;
         }
     }
 
-    /**
+    public void drawEdges() {
+        setLineWidth();
+        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
+        for (int i = 1; i <= nodes.size(); i++) {
+            SequenceNode node = nodes.get(i);
+            DrawableNode parent = canvasNodes.get(node.getId() - 1);
+            for (int j = 0; j < nodes.get(i).getChildren().size(); j++) {
+                DrawableNode child = canvasNodes.get(graph.getNode(node.getChild(j)).getId() - 1);
+                double startx = parent.getxCoordinate() + parent.getWidth();
+                double starty = parent.getyCoordinate() + (parent.getHeight() / 2);
+                double endx = child.getxCoordinate();
+                double endy = child.getyCoordinate() + (child.getHeight() / 2);
+                gc.strokeLine(startx, starty, endx, endy);
+            }
+        }
+    }
+
+/*    *//**
      * Draws the edges.
-     */
-    private void drawEdges() {
+     *//*
+    private void drawEdges2() {
         setLineWidth();
         HashMap<Integer, SequenceNode> nodes = graph.getNodes();
         for (int i = 1; i <= nodes.size(); i++) {
@@ -123,7 +181,7 @@ public class GraphDrawer {
                 gc.strokeLine(startx, starty, endx, endy);
             }
         }
-    }
+    }*/
 
     public SequenceNode clickNode(double xEvent, double yEvent) {
         SequenceNode click = null;
@@ -150,6 +208,17 @@ public class GraphDrawer {
             size = 20;
         }
         return size;
+    }
+
+    private double getXSize(SequenceNode node) {
+        double length = node.getSequenceLength();
+        if (length > 100) {
+            length = 100;
+        }
+        if (length < 10) {
+            length = 10;
+        }
+        return length * stepSize;
     }
 
     /**
