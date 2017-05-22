@@ -1,8 +1,7 @@
 package parser;
 
-import graph.Edge;
-import graph.SequenceGraph;
 import graph.SequenceNode;
+import gui.subControllers.PopUpController;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
@@ -10,7 +9,6 @@ import org.mapdb.Serializer;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -33,25 +31,31 @@ public class GfaParser {
      * @return Returns a sequenceGraph
      * @throws IOException For instance when the file is not found
      */
-    @SuppressWarnings("Since15")
-    public HTreeMap<Long, int[]> parseGraph(String filePath) throws IOException {
+    public HTreeMap<Long, int[]> parseGraph(String filePath) throws IOException{
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
-        String partPath = partPaths[partPaths.length-1];
+        String partPath = partPaths[partPaths.length - 1];
         System.out.println(partPath);
 
+        try {
+            db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().closeOnJvmShutdown().make();
+            db2 = DBMaker.fileDB(partPath + ".adjacency.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().closeOnJvmShutdown().make();
 
-        db = DBMaker.fileDB(partPath +  ".sequence.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
-        db2 = DBMaker.fileDB(partPath +  ".adjacency.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
-        if (db.get(partPath+ ".sequence.db") != null) {
-            adjacencyHMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.INT_ARRAY).createOrOpen();
-            sequenceMap = db2.hashMap(partPath + ".adjacency.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
-            return adjacencyHMap;
-        } else {
-            adjacencyHMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.INT_ARRAY).createOrOpen();
-            sequenceMap = db2.hashMap(partPath + ".adjacency.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
-            return parseSpecific(filePath, false);
+            if (db.get(partPath + ".sequence.db") != null) {
+                sequenceMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
+                adjacencyHMap = db2.hashMap(partPath + ".adjacency.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.INT_ARRAY).createOrOpen();
+                return adjacencyHMap;
+            } else {
+                sequenceMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
+                adjacencyHMap = db2.hashMap(partPath + ".adjacency.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.INT_ARRAY).createOrOpen();
+                return parseSpecific(filePath, false);
+            }
+        } catch (Exception e) {
+            PopUpController controller = new PopUpController();
+            controller.loadPopUp(partPath);
+            controller.setMessage("Database file is corrupted, remove the following files: " + "\n -" + filePath + ".sequence.db" + "\n -" + filePath + ".adjacency.db" + "\n" + "and reopen the Application.");
         }
+        return null;
     }
 
     /**
@@ -99,7 +103,7 @@ public class GfaParser {
                 }
                 String[] data = line.split(("\t"));
                 int id = Integer.parseInt(data[1]);
-                if(id % 10000 == 0) {
+                if(id % 100000 == 0) {
                     System.out.println(id);
                 }
                 SequenceNode node = new SequenceNode(toIntExact(id));

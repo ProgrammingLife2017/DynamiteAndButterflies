@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Button fx:id="popUpOK" layoutX="290.0" layoutY="111.0" mnemonicParsing="false" text="Close Message" />
+      <Button fx:id="openLoc" layoutX="95.0" layoutY="111.0" mnemonicParsing="false" text="Open File Location" />
+      <Label fx:id="message" layoutX="15.0" layoutY="14.0" maxHeight="1.7976931348623157E308" text="DataBase File is Corrupt, remove them and try again" wrapText="true" />
+   </children>
+</AnchorPane>
