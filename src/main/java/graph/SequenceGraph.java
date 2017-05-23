@@ -1,6 +1,7 @@
 package graph;
 
 import javafx.util.Pair;
+import parser.GfaParser;
 import parser.Tuple;
 
 import java.util.ArrayList;
@@ -33,9 +34,9 @@ public class SequenceGraph {
     }
 
 
-    public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray) {
+    public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray, int counter) {
 
-        int upperBoundID = childArray[childArray.length-1];
+        int upperBoundID = childArray[counter-1];
         int lowerBoundID = 1;
         if(centerNodeID + range <= upperBoundID) {
             upperBoundID = centerNodeID + range;
@@ -44,7 +45,7 @@ public class SequenceGraph {
             lowerBoundID = centerNodeID - range;
         }
 
-        for(int i = 0; i < parentArray.length-1; i++) {
+        for(int i = 0; i < counter; i++) {
             int parentID = parentArray[i];
             int childID = childArray[i];
 

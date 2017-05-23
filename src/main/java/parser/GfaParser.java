@@ -26,6 +26,7 @@ public class GfaParser {
 
     private int[] parentArray;
     private int[] childArray;
+    private int counter;
 
     public DB db;
 
@@ -79,7 +80,7 @@ public class GfaParser {
         header1 = line.split("H")[1];
         line = br.readLine();
         header2 = line.split("H")[1];
-        int counter = 0;
+        counter = 0;
         while ((line = br.readLine()) != null) {
             if (line.startsWith("S")) {
                 String[] data = line.split(("\t"));
@@ -133,6 +134,10 @@ public class GfaParser {
     }
 
     public int[] getChildArray() {
-        return this.parentArray;
+        return this.childArray;
+    }
+
+    public int getCounter() {
+        return counter;
     }
 }
