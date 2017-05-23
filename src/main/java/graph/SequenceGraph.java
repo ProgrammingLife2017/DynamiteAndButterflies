@@ -171,7 +171,7 @@ public class SequenceGraph {
     }
 
 
-
+    //TODO: rework placement of nodes and dummy nodes
     /**
      * Get the List of all Columns.
      * @return The List of Columns.
