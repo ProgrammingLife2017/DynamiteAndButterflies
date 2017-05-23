@@ -86,7 +86,7 @@ public class GraphDrawer {
     }
 
     private void drawNodes() {
-        for (int j = 0; j < columns.size(); j++) {
+        for (int j = 1; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
                 if (column.get(i).isDummy()) {

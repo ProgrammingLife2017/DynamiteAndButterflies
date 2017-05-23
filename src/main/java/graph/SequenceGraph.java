@@ -45,7 +45,7 @@ public class SequenceGraph {
             lowerBoundID = centerNodeID - range;
         }
 
-        for(int i = lowerBoundID; i < counter; i++) {
+        for(int i = lowerBoundID-1; i < counter; i++) {
             int parentID = parentArray[i];
             int childID = childArray[i];
 
@@ -150,7 +150,7 @@ public class SequenceGraph {
      * Gives each node a column where it should be built.
      */
     private void createColumns(int lowerBoundID) {
-        for (int i = lowerBoundID; i <= nodes.size(); i++) {
+        for (int i = lowerBoundID; i <= nodes.size() + lowerBoundID - 1; i++) {
             SequenceNode parent = nodes.get(i);     // Start at first node
             ArrayList<Integer> children = parent.getChildren();    // Get all children
             for (Integer child : children) {
