@@ -45,7 +45,7 @@ public class SequenceGraph {
             lowerBoundID = centerNodeID - range;
         }
 
-        for(int i = 0; i < counter; i++) {
+        for(int i = lowerBoundID; i < counter; i++) {
             int parentID = parentArray[i];
             int childID = childArray[i];
 
@@ -59,6 +59,8 @@ public class SequenceGraph {
                 this.getEdges().add(edge);
             }
         }
+        initialize();
+        layerizeGraph(lowerBoundID);
     }
 
     /**
@@ -124,8 +126,8 @@ public class SequenceGraph {
     /**
      * Will add columns to all the nodes and to all the edges.
      */
-    public void layerizeGraph() {
-            createColumns();
+    public void layerizeGraph(int lowerBoundID) {
+            createColumns(lowerBoundID);
             createEdgeColumns();
             this.columns = createColumnList();
             createIndex();
@@ -147,8 +149,8 @@ public class SequenceGraph {
     /**
      * Gives each node a column where it should be built.
      */
-    private void createColumns() {
-        for (int i = 1; i <= nodes.size(); i++) {
+    private void createColumns(int lowerBoundID) {
+        for (int i = lowerBoundID; i <= nodes.size(); i++) {
             SequenceNode parent = nodes.get(i);     // Start at first node
             ArrayList<Integer> children = parent.getChildren();    // Get all children
             for (Integer child : children) {

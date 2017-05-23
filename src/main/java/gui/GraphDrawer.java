@@ -41,9 +41,7 @@ public class GraphDrawer {
         this.graph = graph;
         this.yBase = (int) (gc.getCanvas().getHeight() / 4);
         canvasNodes = new ArrayList<DrawableNode>();
-        initializeDrawableNodes();
-        graph.initialize();
-        graph.layerizeGraph();
+        initializeDrawableNodes();;
         columns = graph.getColumns();
         zoomLevel = columns.size();
     }

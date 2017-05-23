@@ -29,7 +29,7 @@ public class FileController {
     private File parDirectory;
 
     private final int RENDER_RANGE = 5000;
-    private final int NODE_ID = 1;
+    private final int NODE_ID = 6000;
     private int[] childArray;
     private int[] parentArray;
     private int counter;
