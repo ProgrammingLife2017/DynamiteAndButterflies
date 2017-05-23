@@ -1,6 +1,6 @@
 package gui.subControllers;
 
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import java.util.prefs.Preferences;
 
 /**

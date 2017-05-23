@@ -3,7 +3,6 @@ package gui;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.subControllers.*;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -14,6 +13,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.prefs.Preferences;
@@ -27,13 +27,13 @@ import java.util.prefs.Preferences;
 public class MenuController {
 
     @FXML
-    public Button saveBookmark;
+    private Button saveBookmark;
     @FXML
-    public MenuItem file1;
+    private MenuItem file1;
     @FXML
-    public MenuItem file2;
+    private MenuItem file2;
     @FXML
-    public MenuItem file3;
+    private MenuItem file3;
     @FXML
     private Button bookmark1;
     @FXML
@@ -97,9 +97,23 @@ public class MenuController {
      */
     @FXML
     public void openFileClicked() throws IOException {
-        String filePath = fileController.openFileClicked(anchorPane, gc);
+        Stage stage = App.getStage();
+        File file = fileController.chooseFile(stage);
+        String filePath = fileController.openFileClicked(gc, file.getAbsolutePath());
         String fileName = fileController.fileNameFromPath(filePath);
 
+        updateControllers(filePath, fileName);
+        recentController.update(filePath, prefs);
+    }
+
+    public void openFileClicked(String filePath) throws IOException {
+        fileController.openFileClicked(gc, filePath);
+        String fileName = fileController.fileNameFromPath(filePath);
+
+        updateControllers(filePath, fileName);
+    }
+
+    private void updateControllers(String filePath, String fileName) {
         Stage stage = App.getStage();
         String offTitle = stage.getTitle();
         stage.setTitle(offTitle + "---\t" + fileName);
@@ -108,7 +122,6 @@ public class MenuController {
         bookmarkController.loadBookmarks(fileName);
         zoomController = new ZoomController(fileController.getDrawer(),
                                 nodeTextField, radiusTextField);
-        recentController.update(filePath, prefs);
 
         displayInfo(fileController.getGraph());
     }
@@ -233,21 +246,34 @@ public class MenuController {
         return fileController.getSequenceHashMap();
     }
 
+    /**
+     * Button one of the File -> Recent menu.
+     */
     @FXML
-    public void file1Press(ActionEvent actionEvent) {
+    public void file1Press() {
         pressedRecent(file1);
     }
 
+    /**
+     * Button two of the File -> Recent menu.
+     */
     @FXML
-    public void file2Press(ActionEvent actionEvent) {
+    public void file2Press() {
         pressedRecent(file2);
     }
 
+    /**
+     * Button three of the File -> Recent menu.
+     */
     @FXML
-    public void file3Press(ActionEvent actionEvent) {
+    public void file3Press() {
         pressedRecent(file3);
     }
 
+    /**
+     * Method used to not duplicate recentFile presses.
+     * @param file the menuItem that has been pressed
+     */
     private void pressedRecent(MenuItem file) {
         String filePath = recentController.pressedRecent(file);
 
@@ -260,9 +286,9 @@ public class MenuController {
             }
         } else {
             try {
-                fileController.openFileClicked(anchorPane, gc, filePath);
+                openFileClicked(filePath);
             } catch (IOException e) {
-                System.out.println("Succesvol op recent gedrukt");
+                System.out.println("Semi-succesvol op recent gedrukt");
             }
         }
     }

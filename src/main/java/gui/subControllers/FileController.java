@@ -2,9 +2,7 @@ package gui.subControllers;
 
 import graph.SequenceGraph;
 import gui.GraphDrawer;
-import javafx.fxml.FXML;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
@@ -22,7 +20,7 @@ public class FileController {
     private SequenceGraph graph;
     private gui.GraphDrawer drawer;
     private HTreeMap<Long, String> sequenceHashMap;
-    HTreeMap<Long, int[]> adjacencyMap;
+    private HTreeMap<Long, int[]> adjacencyMap;
     private File parDirectory;
 
     private final int RENDER_RANGE = 5000;
@@ -42,7 +40,7 @@ public class FileController {
      * @param stage The stage on which the fileFinder is shown.
      * @return returns the file that can be loaded.
      */
-    private File chooseFile(Stage stage) {
+    public File chooseFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
 
@@ -62,22 +60,6 @@ public class FileController {
         File res = fileChooser.showOpenDialog(stage);
         parDirectory = res.getParentFile();
         return res;
-    }
-
-    /**
-     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa.
-     * can be selected and directly be visualised on the screen.
-     * @param anchorPane the pane where we will be drawing
-     * @param gc the graphicscontext we will use
-     * @return The strign of the file that has just been loaded.
-     * @throws IOException exception if no file is found
-     */
-    @FXML
-    public String openFileClicked(AnchorPane anchorPane, GraphicsContext gc) throws IOException {
-        Stage stage = (Stage) anchorPane.getScene().getWindow();
-        File file = chooseFile(stage);
-
-        return openFileClicked(anchorPane, gc, file.getAbsolutePath());
     }
 
     /**
@@ -104,9 +86,15 @@ public class FileController {
         return graph;
     }
 
-    public String openFileClicked(AnchorPane anchorPane, GraphicsContext gc, String filePath) throws IOException {
-        Stage stage = (Stage) anchorPane.getScene().getWindow();
-
+    /**
+     * When 'open gfa file' is clicked this method opens the file specified by openFile.
+     * It immediately visualises the graph.
+     * @param gc the graphicscontext we will use
+     * @param filePath the path of the file that needs to be opened
+     * @return The string of the file that has just been loaded.
+     * @throws IOException exception if no file is found
+     */
+    public String openFileClicked(GraphicsContext gc, String filePath) throws IOException {
         GfaParser parser = new GfaParser();
         System.out.println(filePath);
 
@@ -120,6 +108,11 @@ public class FileController {
         return filePath;
     }
 
+    /**
+     * Gets the fileName from the filePath.
+     * @param filePath The path to the file you want the name off
+     * @return The name of the file.
+     */
     public String fileNameFromPath(String filePath) {
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
