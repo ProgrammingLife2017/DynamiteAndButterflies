@@ -12,8 +12,6 @@ import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -79,23 +77,7 @@ public class FileController {
         Stage stage = (Stage) anchorPane.getScene().getWindow();
         File file = chooseFile(stage);
 
-        GfaParser parser = new GfaParser();
-        System.out.println("src/main/resources/" + file.getName());
-
-        adjacencyMap = parser.parseGraph(file.getAbsolutePath());
-        graph = new SequenceGraph();
-        graph.createSubGraph(NODE_ID,RENDER_RANGE, adjacencyMap);
-        sequenceHashMap = parser.getSequenceHashMap();
-        drawer = new GraphDrawer(graph, gc);
-        drawer.moveShapes(0.0);
-
-        String filePath = file.getAbsolutePath();
-        String pattern = Pattern.quote(System.getProperty("file.separator"));
-        String[] partPaths = filePath.split(pattern);
-        String fileName = partPaths[partPaths.length - 1];
-        System.out.println(fileName);
-
-        return fileName;
+        return openFileClicked(anchorPane, gc, file.getAbsolutePath());
     }
 
     /**
@@ -120,5 +102,29 @@ public class FileController {
      */
     public SequenceGraph getGraph() {
         return graph;
+    }
+
+    public String openFileClicked(AnchorPane anchorPane, GraphicsContext gc, String filePath) throws IOException {
+        Stage stage = (Stage) anchorPane.getScene().getWindow();
+
+        GfaParser parser = new GfaParser();
+        System.out.println(filePath);
+
+        adjacencyMap = parser.parseGraph(filePath);
+        graph = new SequenceGraph();
+        graph.createSubGraph(NODE_ID, RENDER_RANGE, adjacencyMap);
+        sequenceHashMap = parser.getSequenceHashMap();
+        drawer = new GraphDrawer(graph, gc);
+        drawer.moveShapes(0.0);
+
+        return filePath;
+    }
+
+    public String fileNameFromPath(String filePath) {
+        String pattern = Pattern.quote(System.getProperty("file.separator"));
+        String[] partPaths = filePath.split(pattern);
+        String fileName = partPaths[partPaths.length - 1];
+        System.out.println(fileName);
+        return fileName;
     }
 }

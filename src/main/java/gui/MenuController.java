@@ -2,17 +2,12 @@ package gui;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
-import gui.subControllers.BookmarkController;
-import gui.subControllers.FileController;
-import gui.subControllers.InfoController;
-import gui.subControllers.ZoomController;
+import gui.subControllers.*;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -33,6 +28,12 @@ public class MenuController {
 
     @FXML
     public Button saveBookmark;
+    @FXML
+    public MenuItem file1;
+    @FXML
+    public MenuItem file2;
+    @FXML
+    public MenuItem file3;
     @FXML
     private Button bookmark1;
     @FXML
@@ -65,6 +66,7 @@ public class MenuController {
     private FileController fileController;
     private ZoomController zoomController;
     private InfoController infoController;
+    private RecentController recentController;
 
     /**
      * Initializes the canvas.
@@ -75,9 +77,13 @@ public class MenuController {
         canvas.heightProperty().bind(canvasPanel.heightProperty());
         gc = canvas.getGraphicsContext2D();
         prefs = Preferences.userRoot();
+
         fileController = new FileController();
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2);
+        recentController = new RecentController(file1, file2, file3);
+
+        recentController.initialize(prefs);
         ps = new PrintStream(new Console(consoleArea));
         System.setErr(ps);
         System.setOut(ps);
@@ -91,14 +97,18 @@ public class MenuController {
      */
     @FXML
     public void openFileClicked() throws IOException {
-        String fileString = fileController.openFileClicked(anchorPane, gc);
+        String filePath = fileController.openFileClicked(anchorPane, gc);
+        String fileName = fileController.fileNameFromPath(filePath);
+
         Stage stage = App.getStage();
         String offTitle = stage.getTitle();
-        stage.setTitle(offTitle + "---\t" + fileString);
-        prefs.put("file", fileString);
-        bookmarkController.loadBookmarks(fileString);
+        stage.setTitle(offTitle + "---\t" + fileName);
+
+        prefs.put("file", fileName);
+        bookmarkController.loadBookmarks(fileName);
         zoomController = new ZoomController(fileController.getDrawer(),
                                 nodeTextField, radiusTextField);
+        recentController.update(filePath, prefs);
 
         displayInfo(fileController.getGraph());
     }
@@ -129,7 +139,7 @@ public class MenuController {
     @FXML
     public void scrollZoom(ScrollEvent scrollEvent) throws IOException {
         int column = fileController.getDrawer().mouseLocationColumn(scrollEvent.getX());
-        if (scrollEvent.getDeltaY() > 0){
+        if (scrollEvent.getDeltaY() > 0) {
             zoomController.zoomIn(column);
         } else {
             zoomController.zoomOut(column);
@@ -221,5 +231,39 @@ public class MenuController {
 
     HTreeMap<Long, String> getSequenceHashMap() {
         return fileController.getSequenceHashMap();
+    }
+
+    @FXML
+    public void file1Press(ActionEvent actionEvent) {
+        pressedRecent(file1);
+    }
+
+    @FXML
+    public void file2Press(ActionEvent actionEvent) {
+        pressedRecent(file2);
+    }
+
+    @FXML
+    public void file3Press(ActionEvent actionEvent) {
+        pressedRecent(file3);
+    }
+
+    private void pressedRecent(MenuItem file) {
+        String filePath = recentController.pressedRecent(file);
+
+        if (filePath == null) {
+            System.out.println("Don't do that");
+            try {
+                openFileClicked();
+            } catch (IOException e1) {
+                System.out.println("Drukken op lege recent");
+            }
+        } else {
+            try {
+                fileController.openFileClicked(anchorPane, gc, filePath);
+            } catch (IOException e) {
+                System.out.println("Succesvol op recent gedrukt");
+            }
+        }
     }
 }
