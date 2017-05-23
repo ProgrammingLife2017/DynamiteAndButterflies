@@ -23,7 +23,12 @@ public class GfaParser {
     private String header1;
     private String header2;
     private HTreeMap<Long, String> sequenceMap;
+
+    private int[] parentArray;
+    private int[] childArray;
+
     public DB db;
+
 
     /**
      * This method parses the file specified in filepath into a sequence graph.
@@ -32,7 +37,7 @@ public class GfaParser {
      * @throws IOException For instance when the file is not found
      */
     @SuppressWarnings("Since15")
-    public List<Tuple> parseGraph(String filePath) throws IOException {
+    public void parseGraph(String filePath) throws IOException {
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         String partPath = partPaths[partPaths.length-1];
@@ -42,10 +47,10 @@ public class GfaParser {
         db = DBMaker.fileDB(partPath +  ".sequence.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
         if (db.get(partPath+ ".sequence.db") != null) {
             sequenceMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
-            return parseSpecific(filePath, true);
+            parseSpecific(filePath, true);
         } else {
             sequenceMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
-            return parseSpecific(filePath, false);
+            parseSpecific(filePath, false);
         }
     }
 
@@ -65,14 +70,16 @@ public class GfaParser {
      * @throws IOException Reader.
      */
     @SuppressWarnings("Since15")
-    private List<Tuple> parseSpecific(String filePath, Boolean exists) throws IOException {
-        ArrayList<Tuple> edgeList = new ArrayList<Tuple>();
+    private void parseSpecific(String filePath, Boolean exists) throws IOException {
+        parentArray = new int[17367708];
+        childArray = new int[17367708];
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line = br.readLine();
         header1 = line.split("H")[1];
         line = br.readLine();
         header2 = line.split("H")[1];
+        int counter = 0;
         while ((line = br.readLine()) != null) {
             if (line.startsWith("S")) {
                 String[] data = line.split(("\t"));
@@ -84,14 +91,14 @@ public class GfaParser {
                 String[] edgeDataString = line.split("\t");
                 int parentId = (Integer.parseInt(edgeDataString[1]));
                 int childId = Integer.parseInt(edgeDataString[3]);
-                Tuple edge = new Tuple(parentId, childId);
-                edgeList.add(edge);
+                parentArray[counter] = parentId;
+                childArray[counter] = childId;
+                counter++;
             }
         }
         in.close();
         br.close();
         db.commit();
-        return edgeList;
     }
 
 
@@ -119,5 +126,13 @@ public class GfaParser {
             ret[i] = integers.get(i).intValue();
         }
         return ret;
+    }
+
+    public int[] getParentArray() {
+        return this.parentArray;
+    }
+
+    public int[] getChildArray() {
+        return this.parentArray;
     }
 }

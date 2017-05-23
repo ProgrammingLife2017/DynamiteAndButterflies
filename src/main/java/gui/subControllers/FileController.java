@@ -26,11 +26,12 @@ public class FileController {
     private SequenceGraph graph;
     private gui.GraphDrawer drawer;
     private HTreeMap<Long, String> sequenceHashMap;
-    private List<Tuple> edgeList;
     private File parDirectory;
 
     private final int RENDER_RANGE = 5000;
     private final int NODE_ID = 1;
+    private int[] childArray;
+    private int[] parentArray;
 
     /**
      * Constructor of the FileController object to control the Files.
@@ -84,9 +85,11 @@ public class FileController {
         GfaParser parser = new GfaParser();
         System.out.println("src/main/resources/" + file.getName());
 
-        edgeList = parser.parseGraph(file.getAbsolutePath());
+        parser.parseGraph(file.getAbsolutePath());
+        parentArray = parser.getParentArray();
+        childArray = parser.getChildArray();
         graph = new SequenceGraph();
-        graph.createSubGraph(NODE_ID,RENDER_RANGE, edgeList);
+        graph.createSubGraph(NODE_ID,RENDER_RANGE, parentArray, childArray);
         sequenceHashMap = parser.getSequenceHashMap();
         drawer = new GraphDrawer(graph, gc);
         drawer.moveShapes(0.0);

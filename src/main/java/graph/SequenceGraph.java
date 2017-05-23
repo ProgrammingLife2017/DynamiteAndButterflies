@@ -33,8 +33,9 @@ public class SequenceGraph {
     }
 
 
-    public void createSubGraph(int centerNodeID, int range, List<Tuple> edgeList) {
-        int upperBoundID = edgeList.get(edgeList.size()-1).childID;
+    public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray) {
+
+        int upperBoundID = childArray[childArray.length-1];
         int lowerBoundID = 1;
         if(centerNodeID + range <= upperBoundID) {
             upperBoundID = centerNodeID + range;
@@ -43,9 +44,9 @@ public class SequenceGraph {
             lowerBoundID = centerNodeID - range;
         }
 
-        for(int i = 0; i < edgeList.size(); i++) {
-            int parentID = edgeList.get(i).parentID;
-            int childID = edgeList.get(i).childID;
+        for(int i = 0; i < parentArray.length-1; i++) {
+            int parentID = parentArray[i];
+            int childID = childArray[i];
 
             if(parentID >= lowerBoundID && childID <= upperBoundID) {
                 SequenceNode parentNode = new SequenceNode(parentID);
