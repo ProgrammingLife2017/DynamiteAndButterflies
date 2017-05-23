@@ -1,11 +1,11 @@
 package gui;
 
 import graph.SequenceGraph;
+import graph.SequenceNode;
 import gui.subControllers.BookmarkController;
 import gui.subControllers.FileController;
 import gui.subControllers.InfoController;
 import gui.subControllers.ZoomController;
-import graph.SequenceNode;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -16,6 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
 
 import java.io.IOException;
@@ -91,6 +92,9 @@ public class MenuController {
     @FXML
     public void openFileClicked() throws IOException {
         String fileString = fileController.openFileClicked(anchorPane, gc);
+        Stage stage = App.getStage();
+        String offTitle = stage.getTitle();
+        stage.setTitle(offTitle + "---\t" + fileString);
         prefs.put("file", fileString);
         bookmarkController.loadBookmarks(fileString);
         zoomController = new ZoomController(fileController.getDrawer(),
