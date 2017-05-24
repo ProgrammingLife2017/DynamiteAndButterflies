@@ -42,15 +42,9 @@ public class PopUpController {
     }
 
     @FXML
-    public void loadPopUp(final String partPath) {
+    public void loadDbCorruptPopUp(final String partPath, String message) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/popUp.fxml"));
-            loader.setController(this);
-            Parent root = loader.load();
-            stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.setTitle(".db File corrupted");
-            stage.initModality(Modality.APPLICATION_MODAL);
+            popUp(".db File corrupted");
             popUpOK.addEventHandler(MouseEvent.MOUSE_CLICKED,
                     new EventHandler<MouseEvent>() {
                         public void handle(MouseEvent e) {
@@ -67,7 +61,7 @@ public class PopUpController {
                             stage.close();
                         }
             });
-            setMessage("Database File is corrupt, press 'Reload' to reload the file," + "\n" + "or press 'Resume' to recover the data still available.");
+            setMessage(message);
             stage.showAndWait();
         } catch (Exception e) {
             System.out
@@ -77,11 +71,14 @@ public class PopUpController {
         }
     }
 
-    @FXML
-    private void handleButtonAction(ActionEvent event) throws IOException {
-        if(event.getSource() == popUpOK) {
-            stage.close();
-        }
+    private void popUp(String title) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/popUp.fxml"));
+        loader.setController(this);
+        Parent root = loader.load();
+        stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.setTitle(title);
+        stage.initModality(Modality.APPLICATION_MODAL);
     }
 
     @FXML

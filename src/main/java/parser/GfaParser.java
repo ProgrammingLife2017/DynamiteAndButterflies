@@ -43,7 +43,8 @@ public class GfaParser {
 
         if(!prefs.getBoolean(partPath, true)) {
             PopUpController controller = new PopUpController();
-            controller.loadPopUp(partPath);
+            String message = "Database File is corrupt, press 'Reload' to reload the file," + "\n" + "or press 'Resume' to recover the data still available.";
+            controller.loadDbCorruptPopUp(partPath, message);
         }
 
         db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().closeOnJvmShutdown().checksumHeaderBypass().make();
