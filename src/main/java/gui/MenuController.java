@@ -115,8 +115,11 @@ public class MenuController {
 
     private void updateControllers(String filePath, String fileName) {
         Stage stage = App.getStage();
-        String offTitle = stage.getTitle();
-        stage.setTitle(offTitle + "---\t" + fileName);
+        String title = stage.getTitle();
+        String split = "---";
+        String[] parts = title.split(split);
+        String offTitle = parts[0];
+        stage.setTitle(offTitle + split + fileName);
 
         prefs.put("file", fileName);
         bookmarkController.loadBookmarks(fileName);
