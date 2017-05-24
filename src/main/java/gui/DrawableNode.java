@@ -18,7 +18,7 @@ public class DrawableNode {
     private double height;
     private boolean highlighted;
 
-    public DrawableNode (int id, GraphicsContext gc) {
+    public DrawableNode(int id, GraphicsContext gc) {
         this.gc = gc;
         this.id = id;
     }

@@ -39,6 +39,11 @@ public class ZoomController {
         updateRadius(drawer.getZoomLevel() + "");
     }
 
+    /**
+     * Zooms in.
+     * @param column the column to zoom in on.
+     * @throws IOException thrown if can't find
+     */
     public void zoomIn(int column) throws IOException {
         drawer.zoom(0.9, column);
         updateRadius(drawer.getZoomLevel() + "");
@@ -57,6 +62,11 @@ public class ZoomController {
         updateRadius(drawer.getZoomLevel() + "");
     }
 
+    /**
+     * Zooms out.
+     * @param column the column to zoom out on.
+     * @throws IOException thrown if can't find
+     */
     public void zoomOut(int column) throws IOException {
         drawer.zoom(1.1, column);
         updateRadius(drawer.getZoomLevel() + "");
@@ -73,6 +83,12 @@ public class ZoomController {
         drawer.changeZoom(endColumn - startColumn, drawer.getColumnId(centreNodeID));
     }
 
+    /**
+     * Traverses the graph loaded to a specified destination.
+     * @param graphSize The size of the graph
+     * @param centreNode The centre node to move to
+     * @param radius The radius to be viewed
+     */
     public void traverseGraphClicked(int graphSize, int centreNode, int radius) {
         int startColumn = getStartColumn(centreNode, radius);
         int endColumn = getEndColumn(graphSize, centreNode, radius);

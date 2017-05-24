@@ -7,7 +7,11 @@ import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -34,29 +38,42 @@ public class GfaParser {
      * @return Returns a sequenceGraph
      * @throws IOException For instance when the file is not found
      */
-    public HTreeMap<Long, int[]> parseGraph(String filePath) throws IOException{
+    public HTreeMap<Long, int[]> parseGraph(String filePath) throws IOException {
         prefs = Preferences.userRoot();
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         partPath = partPaths[partPaths.length - 1];
         System.out.println(partPath);
 
-        if(!prefs.getBoolean(partPath, true)) {
+        if (!prefs.getBoolean(partPath, true)) {
             PopUpController controller = new PopUpController();
-            String message = "Database File is corrupt, press 'Reload' to reload the file," + "\n" + "or press 'Resume' to recover the data still available.";
+            String message = "Database File is corrupt, press 'Reload' to reload the file," + "\n"
+                            + "or press 'Resume' to recover the data still available.";
             controller.loadDbCorruptPopUp(partPath, message);
         }
 
-        db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().closeOnJvmShutdown().checksumHeaderBypass().make();
-        db2 = DBMaker.fileDB(partPath + ".adjacency.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().closeOnJvmShutdown().checksumHeaderBypass().make();
+        db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().
+                                                fileMmapPreclearDisable().cleanerHackEnable().
+                                                closeOnJvmShutdown().checksumHeaderBypass().make();
+        db2 = DBMaker.fileDB(partPath + ".adjacency.db").fileMmapEnable().
+                                                fileMmapPreclearDisable().cleanerHackEnable().
+                                                closeOnJvmShutdown().checksumHeaderBypass().make();
         if (db.get(partPath + ".sequence.db") != null) {
-            sequenceMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
-            adjacencyHMap = db2.hashMap(partPath + ".adjacency.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.INT_ARRAY).createOrOpen();
+            sequenceMap = db.hashMap(partPath + ".sequence.db").
+                            keySerializer(Serializer.LONG).
+                            valueSerializer(Serializer.STRING).createOrOpen();
+            adjacencyHMap = db2.hashMap(partPath + ".adjacency.db").
+                            keySerializer(Serializer.LONG).
+                            valueSerializer(Serializer.INT_ARRAY).createOrOpen();
             return adjacencyHMap;
         } else {
             prefs.putBoolean(partPath, false);
-            sequenceMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
-            adjacencyHMap = db2.hashMap(partPath + ".adjacency.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.INT_ARRAY).createOrOpen();
+            sequenceMap = db.hashMap(partPath + ".sequence.db").
+                                    keySerializer(Serializer.LONG).
+                                    valueSerializer(Serializer.STRING).createOrOpen();
+            adjacencyHMap = db2.hashMap(partPath + ".adjacency.db").
+                                    keySerializer(Serializer.LONG).
+                                    valueSerializer(Serializer.INT_ARRAY).createOrOpen();
             return parseSpecific(filePath);
         }
     }
@@ -96,7 +113,7 @@ public class GfaParser {
         while ((line = br.readLine()) != null) {
             int childId;
             if (line.startsWith("S")) {
-                if(parentId > 0) {
+                if (parentId > 0) {
                     adjacencyHMap.put((long) parentId, convertIntegers(temp));
                     temp = new ArrayList<Integer>();
                 }
@@ -131,15 +148,13 @@ public class GfaParser {
     }
 
     /**
-     * Converts an List<Integer> to int[]
+     * Converts an List<Integer> to int[].
      * @param integers list with integers
      * @return int[]
      */
-    private static int[] convertIntegers(List<Integer> integers)
-    {
+    private static int[] convertIntegers(List<Integer> integers) {
         int[] ret = new int[integers.size()];
-        for (int i=0; i < ret.length; i++)
-        {
+        for (int i = 0; i < ret.length; i++) {
             ret[i] = integers.get(i);
         }
         return ret;

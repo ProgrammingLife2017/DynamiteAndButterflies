@@ -12,10 +12,18 @@ import java.io.OutputStream;
 public class Console extends OutputStream {
     private TextArea console;
 
+    /**
+     * Constructor of the console.
+     * @param console the textArea that is the console
+     */
     public Console(TextArea console) {
         this.console = console;
     }
 
+    /**
+     * Appends text to the Console.
+     * @param valueOf The string to be appended.
+     */
     public void appendText(final String valueOf) {
         Platform.runLater(new Runnable() {
             public void run() {
@@ -24,7 +32,12 @@ public class Console extends OutputStream {
         });
     }
 
+    /**
+     * Writes an int to the console.
+     * @param b the int to be written
+     * @throws IOException throws exception when console not found
+     */
     public void write(int b) throws IOException {
-        appendText(String.valueOf((char)b));
+        appendText(String.valueOf((char) b));
     }
 }
