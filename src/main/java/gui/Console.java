@@ -37,7 +37,7 @@ public class Console extends OutputStream {
      * @param b the int to be written
      * @throws IOException throws exception when console not found
      */
-    public void write(int b) throws IOException {
-        appendText(String.valueOf((char) b));
+    public void write(int text) throws IOException {
+        appendText(String.valueOf((char) text));
     }
 }

@@ -3,7 +3,7 @@ package gui;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import graph.SequenceGraph;
 import graph.SequenceNode;
-import gui.subControllers.*;
+import gui.sub_controllers.*;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;

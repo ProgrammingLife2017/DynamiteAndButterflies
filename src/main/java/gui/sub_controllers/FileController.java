@@ -1,4 +1,4 @@
-package gui.subControllers;
+package gui.sub_controllers;
 
 import graph.SequenceGraph;
 import gui.GraphDrawer;

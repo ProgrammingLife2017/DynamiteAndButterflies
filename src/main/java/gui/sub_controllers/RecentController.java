@@ -1,4 +1,4 @@
-package gui.subControllers;
+package gui.sub_controllers;
 
 import javafx.scene.control.MenuItem;
 
@@ -13,16 +13,20 @@ public class RecentController {
     private MenuItem file2;
     private MenuItem file3;
 
+    String filePref1 = "file1";
+    String filePref2 = "file2";
+    String filePref3 = "file3";
+
     /**
      * Constructor of the recentController that controls the File->Recent tab.
-     * @param f1 MenuItem one
-     * @param f2 MenuItem two
-     * @param f3 MenuItem three
+     * @param filebut1 MenuItem one
+     * @param filebut2 MenuItem two
+     * @param filebut3 MenuItem three
      */
-    public RecentController(MenuItem f1, MenuItem f2, MenuItem f3) {
-        file1 = f1;
-        file2 = f2;
-        file3 = f3;
+    public RecentController(MenuItem filebut1, MenuItem filebut2, MenuItem filebut3) {
+        file1 = filebut1;
+        file2 = filebut2;
+        file3 = filebut3;
     }
 
     /**
@@ -44,9 +48,9 @@ public class RecentController {
      * @param prefs The preferences of the user.
      */
     public void update(String filePath, Preferences prefs) {
-        prefs.put("file3", file2.getText());
-        prefs.put("file2", file1.getText());
-        prefs.put("file1", filePath);
+        prefs.put(filePref3, file2.getText());
+        prefs.put(filePref2, file1.getText());
+        prefs.put(filePref1, filePath);
 
         file3.setText(file2.getText());
         file2.setText(file1.getText());
@@ -59,12 +63,12 @@ public class RecentController {
      */
     public void initialize(Preferences prefs) {
         String empty = "<No recent file>";
-        prefs.put("file3", prefs.get("file3", empty));
-        prefs.put("file2", prefs.get("file2", empty));
-        prefs.put("file1", prefs.get("file1", empty));
+        prefs.put(filePref3, prefs.get(filePref3, empty));
+        prefs.put(filePref2, prefs.get(filePref2, empty));
+        prefs.put(filePref1, prefs.get(filePref1, empty));
 
-        file1.setText(prefs.get("file1", empty));
-        file2.setText(prefs.get("file2", empty));
-        file3.setText(prefs.get("file3", empty));
+        file1.setText(prefs.get(filePref1, empty));
+        file2.setText(prefs.get(filePref2, empty));
+        file3.setText(prefs.get(filePref3, empty));
     }
 }

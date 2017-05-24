@@ -1,6 +1,6 @@
 package parser;
 
-import gui.subControllers.PopUpController;
+import gui.sub_controllers.PopUpController;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;

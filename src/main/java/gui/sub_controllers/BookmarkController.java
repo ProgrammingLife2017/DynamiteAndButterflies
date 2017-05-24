@@ -1,4 +1,4 @@
-package gui.subControllers;
+package gui.sub_controllers;
 
 import javafx.scene.control.Button;
 import java.util.prefs.Preferences;
@@ -12,6 +12,7 @@ public class BookmarkController {
     private static Preferences prefs = Preferences.userRoot();
     private String stringFile;
     private Button bookmark1, bookmark2;
+    private String bookmarkSave = "bookmarkNum";
 
     /**
      * Constructor of the bookmark controller to handle the bookmarks.
@@ -32,24 +33,20 @@ public class BookmarkController {
     public void loadBookmarks(String stringOfFile) {
         stringFile = stringOfFile;
 
-        if (prefs.getInt("bookmarkNum" + stringFile, -1) == -1) {
-            prefs.putInt("bookmarkNum" + stringFile, 0);
+        if (prefs.getInt(bookmarkSave + stringFile, -1) == -1) {
+            prefs.putInt(bookmarkSave + stringFile, 0);
         }
 
-        int largestIndex = prefs.getInt("bookmarkNum" + stringFile, -1);
+        int largestIndex = prefs.getInt(bookmarkSave + stringFile, -1);
         //As a user,
         // When viewing a file with bookmarks,
         // And choosing a new file to view
         // And that file has no bookmarks
         // I want to not see the old bookmarks.
         // Initializing this number as -2 ensures the above user story.
-        int i = -2;
-
-        while (i <= largestIndex) {
-            int newIndex = i;
-            String realBM = prefs.get(stringFile + newIndex, "-");
+        for (int i = -2; i <= largestIndex; i++) {
+            String realBM = prefs.get(stringFile + i, "-");
             updateBookmarks(realBM);
-            i++;
         }
     }
 
@@ -61,10 +58,10 @@ public class BookmarkController {
     public void saving(int nodes, int radius) {
 
         String stringFile = prefs.get("file", "def");
-        int newIndex = prefs.getInt("bookmarkNum" + stringFile, -1);
+        int newIndex = prefs.getInt(bookmarkSave + stringFile, -1);
         newIndex++;
         prefs.put(stringFile + newIndex, nodes + "-" + radius);
-        prefs.putInt("bookmarkNum" + stringFile, newIndex);
+        prefs.putInt(bookmarkSave + stringFile, newIndex);
 
         updateBookmarks(nodes + "-" + radius);
     }
