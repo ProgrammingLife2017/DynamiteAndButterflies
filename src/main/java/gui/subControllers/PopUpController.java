@@ -64,8 +64,6 @@ public class PopUpController {
             setMessage(message);
             stage.showAndWait();
         } catch (Exception e) {
-            System.out
-                    .println("Something went wrong while loading the fxml file");
             e.getCause();
             e.printStackTrace();
         }
