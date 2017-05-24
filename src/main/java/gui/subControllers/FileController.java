@@ -29,7 +29,7 @@ public class FileController {
     private File parDirectory;
 
     private final int RENDER_RANGE = 5000;
-    private final int NODE_ID = 1;
+    private final int NODE_ID = 5000000;
     private int[] childArray;
     private int[] parentArray;
     private int counter;
@@ -85,10 +85,10 @@ public class FileController {
 
         GfaParser parser = new GfaParser();
         System.out.println("src/main/resources/" + file.getName());
-
-        parser.parseGraph(file.getAbsolutePath());
-        parentArray = parser.getParentArray();
-        childArray = parser.getChildArray();
+        String filePath = file.getAbsolutePath();
+        parser.parseGraph(filePath);
+        parentArray = parser.getParentArray(filePath);
+        childArray = parser.getChildArray(filePath);
         counter = parser.getCounter();
         graph = new SequenceGraph();
         graph.createSubGraph(NODE_ID,RENDER_RANGE, parentArray, childArray, counter);
@@ -96,7 +96,6 @@ public class FileController {
         drawer = new GraphDrawer(graph, gc);
         drawer.moveShapes(0.0);
 
-        String filePath = file.getAbsolutePath();
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         String fileName = partPaths[partPaths.length - 1];

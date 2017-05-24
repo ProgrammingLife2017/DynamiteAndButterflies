@@ -11,7 +11,9 @@ import org.mapdb.Serializer;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
 import static java.lang.Math.toIntExact;
@@ -30,6 +32,8 @@ public class GfaParser {
 
     public DB db;
 
+    private Preferences prefs = Preferences.userRoot();
+
 
     /**
      * This method parses the file specified in filepath into a sequence graph.
@@ -46,12 +50,11 @@ public class GfaParser {
 
 
         db = DBMaker.fileDB(partPath +  ".sequence.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
-        if (db.get(partPath+ ".sequence.db") != null) {
+        if (db.get(partPath+ ".sequence.db") == null) {
             sequenceMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
-            parseSpecific(filePath, true);
+            parseSpecific(filePath, partPath);
         } else {
             sequenceMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
-            parseSpecific(filePath, false);
         }
     }
 
@@ -66,40 +69,65 @@ public class GfaParser {
     /**
      * Parses the file with a boolean whether to create a db file or not. Creates the Graph
      * @param filePath The file to parse/
-     * @param exists Does the db file already exist?
+     * @param partPath The file base to write to
      * @return The sequenceGraph
      * @throws IOException Reader.
      */
     @SuppressWarnings("Since15")
-    private void parseSpecific(String filePath, Boolean exists) throws IOException {
-        parentArray = new int[17367708];
-        childArray = new int[17367708];
+    private void parseSpecific(String filePath, String partPath) throws IOException {
+        LinkedList<Integer> parentList = new LinkedList<Integer>();
+        LinkedList<Integer> childList = new LinkedList<Integer>();
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line = br.readLine();
         header1 = line.split("H")[1];
         line = br.readLine();
         header2 = line.split("H")[1];
-        counter = 0;
         while ((line = br.readLine()) != null) {
             if (line.startsWith("S")) {
                 String[] data = line.split(("\t"));
                 int id = Integer.parseInt(data[1]);
-                if (!exists) {
                     sequenceMap.put((long) (id), data[2]);
-                }
             } else if (line.startsWith("L")) {
                 String[] edgeDataString = line.split("\t");
                 int parentId = (Integer.parseInt(edgeDataString[1]));
                 int childId = Integer.parseInt(edgeDataString[3]);
-                parentArray[counter] = parentId;
-                childArray[counter] = childId;
-                counter++;
+                parentList.add(parentId);
+                childList.add(childId);
             }
         }
+        write(partPath+"parentArray.txt",parentList);
+        write(partPath+"childArray.txt",childList);
         in.close();
         br.close();
         db.commit();
+    }
+
+    private void write(String filePath, LinkedList<Integer> x) throws IOException {
+        BufferedWriter edgeWriter = null;
+        edgeWriter =  new BufferedWriter(new FileWriter(filePath));
+
+        for (int i: x) {
+            edgeWriter.write(i +",");
+        }
+        edgeWriter.flush();
+        edgeWriter.close();
+        prefs.putInt(filePath + "size", x.size());
+    }
+
+    private int[] read(String filePath) throws IOException {
+        InputStream in = new FileInputStream(filePath);
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+        String []StrNums = br.readLine().split(",");
+        int size = prefs.getInt(filePath+"size", -1);
+        if (size == -1) {
+            throw new java.lang.RuntimeException("Size not in preferences file");
+        }
+        int [] nodeArray = new int[size];
+        for (int i=0; i < StrNums.length; i++) {
+            nodeArray[i] = Integer.parseInt(StrNums[i]);
+        }
+        return nodeArray;
     }
 
 
@@ -129,12 +157,12 @@ public class GfaParser {
         return ret;
     }
 
-    public int[] getParentArray() {
-        return this.parentArray;
+    public int[] getParentArray(String filePath) throws IOException {
+        return read(filePath);
     }
 
-    public int[] getChildArray() {
-        return this.childArray;
+    public int[] getChildArray(String filePath) throws IOException {
+        return read(filePath);
     }
 
     public int getCounter() {

@@ -150,7 +150,7 @@ public class SequenceGraph {
     private void createColumns() {
         for (int i = 1; i <= nodes.size(); i++) {
             SequenceNode parent = nodes.get(i);     // Start at first node
-            ArrayList<Integer> children = parent.getChildren();    // Get all children
+                ArrayList<Integer> children = parent.getChildren();    // Get all children
             for (Integer child : children) {
                 this.getNode(child).incrementColumn(parent.getColumn());
             }

@@ -2,6 +2,7 @@ package gui;
 
 import graph.SequenceGraph;
 import gui.subControllers.BookmarkController;
+//import gui.subControllers.FileController;
 import gui.subControllers.FileController;
 import gui.subControllers.InfoController;
 import gui.subControllers.ZoomController;
@@ -78,8 +79,8 @@ public class MenuController {
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2);
         ps = new PrintStream(new Console(consoleArea));
-        System.setErr(ps);
-        System.setOut(ps);
+//        System.setErr(ps);
+//        System.setOut(ps);
 
     }
 
