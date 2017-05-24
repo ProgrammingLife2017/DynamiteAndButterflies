@@ -295,17 +295,16 @@ public class MenuController {
         String filePath = recentController.pressedRecent(file);
 
         if (filePath == null) {
-            System.out.println("Don't do that");
             try {
                 openFileClicked();
             } catch (IOException e1) {
-                System.out.println("Drukken op lege recent");
+                e1.printStackTrace();
             }
         } else {
             try {
                 openFileClicked(filePath);
             } catch (IOException e) {
-                System.out.println("Semi-succesvol op recent gedrukt");
+                e.printStackTrace();
             }
         }
     }
