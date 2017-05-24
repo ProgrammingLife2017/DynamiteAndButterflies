@@ -8,9 +8,9 @@ import javafx.scene.control.Label;
  */
 public class InfoController {
 
-    private Label nodeLabel;
-    private Label edgeLabel;
-    private Label seqLabel;
+    private final Label nodeLabel;
+    private final Label edgeLabel;
+    private final Label seqLabel;
 
     /**
      * Constructor of the Information controller  that controls the infoPane.

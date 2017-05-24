@@ -10,7 +10,7 @@ import java.io.OutputStream;
  * Created by TUDelft SID on 18-5-2017.
  */
 public class Console extends OutputStream {
-    private TextArea console;
+    private final TextArea console;
 
     /**
      * Constructor of the console.

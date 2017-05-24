@@ -7,12 +7,13 @@ import java.io.IOException;
 
 /**
  * Created by Jip on 17-5-2017.
- * The Zoom Controller controls all buttons in the GUI that aare the boss of zooming.
+ * The Zoom Controller controls all buttons
+ * in the GUI that are the boss of zooming.
  */
 public class ZoomController {
 
-    private gui.GraphDrawer drawer;
-    private TextField nodeTextField, radiusTextField;
+    private final GraphDrawer drawer;
+    private final TextField nodeTextField, radiusTextField;
 
     /**
      * Constructor of the Zoom Controller.
@@ -31,10 +32,10 @@ public class ZoomController {
      * @throws IOException exception.
      */
     public void zoomIn() throws IOException {
-        if (!nodeTextField.getText().equals("")) {
-            drawer.zoom(0.8, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
-        } else {
+        if (nodeTextField.getText().equals("")) {
             drawer.zoom(0.8, drawer.getRealCentreNode().getColumn());
+        } else {
+            drawer.zoom(0.8, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
         }
         updateRadius(drawer.getZoomLevel() + "");
     }
@@ -54,10 +55,10 @@ public class ZoomController {
      * @throws IOException exception.
      */
     public void zoomOut() throws IOException {
-        if (!nodeTextField.getText().equals("")) {
-            drawer.zoom(1.25, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
-        } else {
+        if (nodeTextField.getText().equals("")) {
             drawer.zoom(1.25, drawer.getRealCentreNode().getColumn());
+        } else {
+            drawer.zoom(1.25, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
         }
         updateRadius(drawer.getZoomLevel() + "");
     }

@@ -5,14 +5,15 @@ import java.util.prefs.Preferences;
 
 /**
  * Created by Jip on 17-5-2017.
- * A BookmarkController class moving some logic from the MenuController into a different class.
+ * A BookmarkController class moving some logic
+ * from the MenuController into a different class.
  */
 public class BookmarkController {
 
     private static Preferences prefs = Preferences.userRoot();
     private String stringFile;
-    private Button bookmark1, bookmark2;
-    private String bookmarkSave = "bookmarkNum";
+    private final Button bookmark1, bookmark2;
+    private final String bookmarkSave = "bookmarkNum";
 
     /**
      * Constructor of the bookmark controller to handle the bookmarks.
@@ -28,7 +29,8 @@ public class BookmarkController {
 
     /**
      * Loads the bookmarks of the specific file stringFile.
-     * @param stringOfFile The file that is being loaded whose bookmarks should be loaded.
+     * @param stringOfFile The file that is being
+     *                     loaded whose bookmarks should be loaded.
      */
     public void loadBookmarks(String stringOfFile) {
         stringFile = stringOfFile;

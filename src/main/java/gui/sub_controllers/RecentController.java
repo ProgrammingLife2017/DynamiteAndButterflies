@@ -9,13 +9,13 @@ import java.util.prefs.Preferences;
  */
 public class RecentController {
 
-    private MenuItem file1;
-    private MenuItem file2;
-    private MenuItem file3;
+    private final MenuItem file1;
+    private final MenuItem file2;
+    private final MenuItem file3;
 
-    String filePref1 = "file1";
-    String filePref2 = "file2";
-    String filePref3 = "file3";
+    private String filePref1 = "file1";
+    private String filePref2 = "file2";
+    private String filePref3 = "file3";
 
     /**
      * Constructor of the recentController that controls the File->Recent tab.
@@ -36,7 +36,7 @@ public class RecentController {
      */
     public String pressedRecent(MenuItem file) {
         String filePath = file.getText();
-        if (!filePath.equals("<No recent file>")) {
+        if (!"<No recent file>".equals(filePath)) {
             return filePath;
         }
         return null;
