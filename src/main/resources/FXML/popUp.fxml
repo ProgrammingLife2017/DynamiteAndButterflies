@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <Button fx:id="popUpOK" layoutX="290.0" layoutY="111.0" mnemonicParsing="false" text="Close Message" />
-      <Button fx:id="openLoc" layoutX="95.0" layoutY="111.0" mnemonicParsing="false" text="Open File Location" />
-      <Label fx:id="message" layoutX="15.0" layoutY="14.0" maxHeight="1.7976931348623157E308" text="DataBase File is Corrupt, remove them and try again" wrapText="true" />
-   </children>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="133.0"
+            prefWidth="325.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <Button fx:id="popUpOK" layoutX="212.0" layoutY="86.0" mnemonicParsing="false" text="Resume"/>
+    <Button fx:id="openLoc" layoutX="57.0" layoutY="86.0" mnemonicParsing="false" text="Reload"/>
+    <Label fx:id="message" layoutX="15.0" layoutY="14.0" maxHeight="1.7976931348623157E308"
+           text="Database File is corrupt, press 'Reload' to reload the file" wrapText="true"/>
 </AnchorPane>

@@ -21,8 +21,10 @@ import java.util.regex.Pattern;
 
 
 /**
- * Created by lex_b on 22/05/2017.
+ * Created by Lex Boleij on 22/05/2017.
+ * Class that creates a popUp (for now only necessary on db file corruption).
  */
+
 public class PopUpController {
 
     @FXML
@@ -58,19 +60,15 @@ public class PopUpController {
             openLoc.addEventHandler(MouseEvent.MOUSE_CLICKED,
                     new EventHandler<MouseEvent>() {
                         public void handle(MouseEvent e) {
-                            /*File seq = new File(partPath + ".sequence.db");
+                            File seq = new File(partPath + ".sequence.db");
                             File adj = new File(partPath + ".adjacency.db");
                             adj.delete();
-                            seq.delete();*/
-                            try {
-                                Runtime.getRuntime().exec("explorer.exe /select," + partPath + ".sequence.db");
-                                Runtime.getRuntime().exit(0);
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                            }
+                            seq.delete();
+                            stage.close();
                         }
             });
-            stage.show();
+            setMessage("Database File is corrupt, press 'Reload' to reload the file," + "\n" + "or press 'Resume' to recover the data still available.");
+            stage.showAndWait();
         } catch (Exception e) {
             System.out
                     .println("Something went wrong while loading the fxml file");
@@ -87,7 +85,7 @@ public class PopUpController {
     }
 
     @FXML
-    public void setMessage(String messageArg) {
+    private void setMessage(String messageArg) {
         message.setText(messageArg);
     }
 
