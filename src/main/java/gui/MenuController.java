@@ -92,9 +92,14 @@ public class MenuController {
     @FXML
     public void openFileClicked() throws IOException {
         String fileString = fileController.openFileClicked(anchorPane, gc);
+
         Stage stage = App.getStage();
-        String offTitle = stage.getTitle();
-        stage.setTitle(offTitle + "---\t" + fileString);
+        String title = stage.getTitle();
+        String split = "---";
+        String[] parts = title.split(split);
+        String offTitle = parts[0];
+        stage.setTitle(offTitle + split + fileString);
+
         prefs.put("file", fileString);
         bookmarkController.loadBookmarks(fileString);
         zoomController = new ZoomController(fileController.getDrawer(),
