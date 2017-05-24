@@ -65,7 +65,7 @@ public class GraphDrawer {
      * @param column The Column that has to be in the centre.
      */
     public void zoom(final double factor, final int column) {
-        if ((factor < 1 && zoomLevel < 2) || (factor > 1 && zoomLevel > columns.size())) {
+        if ((factor < 1 && zoomLevel < 2) || (factor > 1 && zoomLevel > columnWidths[columns.size()])) {
             return;
         }
         this.zoomLevel = zoomLevel * factor;
