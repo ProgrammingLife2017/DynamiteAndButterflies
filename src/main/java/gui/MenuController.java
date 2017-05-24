@@ -1,5 +1,6 @@
 package gui;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.subControllers.*;
@@ -75,6 +76,7 @@ public class MenuController {
     /**
      * Initializes the canvas.
      */
+    @SuppressFBWarnings("DM_DEFAULT_ENCODING")
     @FXML
     public void initialize() {
         canvas.widthProperty().bind(canvasPanel.widthProperty());
@@ -91,7 +93,6 @@ public class MenuController {
         ps = new PrintStream(new Console(consoleArea));
         System.setErr(ps);
         System.setOut(ps);
-
     }
 
     /**

@@ -56,15 +56,16 @@ public class PopUpController {
                         public void handle(MouseEvent e) {
                             File seq = new File(partPath + ".sequence.db");
                             File adj = new File(partPath + ".adjacency.db");
-                            adj.delete();
-                            seq.delete();
+                            boolean success = adj.delete();
+                            assert success;
+                            success = seq.delete();
+                            assert success;
                             stage.close();
                         }
             });
             setMessage(message);
             stage.showAndWait();
         } catch (Exception e) {
-            e.getCause();
             e.printStackTrace();
         }
     }

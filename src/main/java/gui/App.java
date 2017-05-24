@@ -33,16 +33,16 @@ public class App extends Application {
      * @throws UnsupportedEncodingException Needs a certain encoding
      * @throws FileNotFoundException Needs a certain file
      */
+    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     public void start(Stage stageIn) throws UnsupportedEncodingException, FileNotFoundException {
         stage = stageIn;
         stage.setTitle("Programming Life");
         loadScene("/FXML/Menu.fxml");
-        prefs = Preferences.userRoot();
     }
 
     private static Stage stage;
     private static AnchorPane pane;
-    private static Preferences prefs;
+    private static Preferences prefs = Preferences.userRoot();
     private static FXMLLoader loader;
 
     /**

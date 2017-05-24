@@ -9,7 +9,7 @@ import java.util.prefs.Preferences;
  */
 public class BookmarkController {
 
-    private static Preferences prefs;
+    private static Preferences prefs = Preferences.userRoot();
     private String stringFile;
     private Button bookmark1, bookmark2;
 
@@ -23,7 +23,6 @@ public class BookmarkController {
         bookmark2 = bm2;
 
         stringFile = "";
-        prefs = Preferences.userRoot();
     }
 
     /**

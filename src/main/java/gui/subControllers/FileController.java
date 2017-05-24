@@ -23,8 +23,8 @@ public class FileController {
     private HTreeMap<Long, int[]> adjacencyMap;
     private File parDirectory;
 
-    private final int RENDER_RANGE = 5000;
-    private final int NODE_ID = 1;
+    private static final int RENDER_RANGE = 5000;
+    private static final int NODE_ID = 1;
 
     /**
      * Constructor of the FileController object to control the Files.

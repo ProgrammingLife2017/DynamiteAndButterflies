@@ -18,6 +18,7 @@ public class DrawableNode {
     private double height;
     private boolean highlighted;
 
+    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     public DrawableNode(int id, GraphicsContext gc) {
         this.gc = gc;
         this.id = id;

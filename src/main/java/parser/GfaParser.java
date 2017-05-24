@@ -1,23 +1,16 @@
 package parser;
 
-import graph.SequenceNode;
 import gui.subControllers.PopUpController;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
-
-import static java.lang.Math.toIntExact;
 
 /**
  * This class contains a parser to parse a .gfa file into our data structure.
@@ -104,9 +97,23 @@ public class GfaParser {
     private HTreeMap<Long, int[]> parseSpecific(String filePath) throws IOException {
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+
         String line = br.readLine();
+        if (line == null) {
+            in.close();
+            br.close();
+            db.commit();
+            return null;
+        }
         header1 = line.split("H")[1];
         line = br.readLine();
+
+        if (line == null) {
+            in.close();
+            br.close();
+            db.commit();
+            return null;
+        }
         header2 = line.split("H")[1];
         ArrayList<Integer> temp = new ArrayList<Integer>();
         int parentId = 0;
@@ -119,7 +126,6 @@ public class GfaParser {
                 }
                 String[] data = line.split(("\t"));
                 int id = Integer.parseInt(data[1]);
-                SequenceNode node = new SequenceNode(toIntExact(id));
                 sequenceMap.put((long) (id), data[2]);
             } else if (line.startsWith("L")) {
                 String[] edgeDataString = line.split("\t");
