@@ -30,6 +30,7 @@ public class FileController {
 
     private final int RENDER_RANGE = 5000;
     private final int NODE_ID = 5000000;
+
     private int[] childArray;
     private int[] parentArray;
     private int counter;

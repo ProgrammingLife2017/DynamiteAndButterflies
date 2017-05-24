@@ -41,9 +41,7 @@ public class GraphDrawer {
         this.graph = graph;
         this.yBase = (int) (gc.getCanvas().getHeight() / 4);
         canvasNodes = new ArrayList<DrawableNode>();
-        initializeDrawableNodes();
-        graph.initialize();
-        graph.layerizeGraph();
+        initializeDrawableNodes();;
         columns = graph.getColumns();
         zoomLevel = columns.size();
     }
@@ -88,7 +86,7 @@ public class GraphDrawer {
     }
 
     private void drawNodes() {
-        for (int j = 0; j < columns.size(); j++) {
+        for (int j = 1; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
                 if (column.get(i).isDummy()) {
