@@ -2,23 +2,18 @@ package gui;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
-import gui.subControllers.BookmarkController;
-import gui.subControllers.FileController;
-import gui.subControllers.InfoController;
-import gui.subControllers.ZoomController;
+import gui.subControllers.*;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.prefs.Preferences;
@@ -32,7 +27,13 @@ import java.util.prefs.Preferences;
 public class MenuController {
 
     @FXML
-    public Button saveBookmark;
+    private Button saveBookmark;
+    @FXML
+    private MenuItem file1;
+    @FXML
+    private MenuItem file2;
+    @FXML
+    private MenuItem file3;
     @FXML
     private Button bookmark1;
     @FXML
@@ -65,6 +66,7 @@ public class MenuController {
     private FileController fileController;
     private ZoomController zoomController;
     private InfoController infoController;
+    private RecentController recentController;
 
     /**
      * Initializes the canvas.
@@ -75,9 +77,13 @@ public class MenuController {
         canvas.heightProperty().bind(canvasPanel.heightProperty());
         gc = canvas.getGraphicsContext2D();
         prefs = Preferences.userRoot();
+
         fileController = new FileController();
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2);
+        recentController = new RecentController(file1, file2, file3);
+
+        recentController.initialize(prefs);
         ps = new PrintStream(new Console(consoleArea));
         System.setErr(ps);
         System.setOut(ps);
@@ -91,17 +97,37 @@ public class MenuController {
      */
     @FXML
     public void openFileClicked() throws IOException {
-        String fileString = fileController.openFileClicked(anchorPane, gc);
+        Stage stage = App.getStage();
+        File file = fileController.chooseFile(stage);
+        String filePath = fileController.openFileClicked(gc, file.getAbsolutePath());
+        String fileName = fileController.fileNameFromPath(filePath);
 
+        updateControllers(fileName);
+        recentController.update(filePath, prefs);
+    }
+
+    /**
+     * Opens the file specified in the filepath.
+     * @param filePath the filePath with the file that needs to be opened.
+     * @throws IOException Throws exception when file can't be found.
+     */
+    public void openFileClicked(String filePath) throws IOException {
+        fileController.openFileClicked(gc, filePath);
+        String fileName = fileController.fileNameFromPath(filePath);
+
+        updateControllers(fileName);
+    }
+
+    private void updateControllers(String fileName) {
         Stage stage = App.getStage();
         String title = stage.getTitle();
         String split = "---";
         String[] parts = title.split(split);
         String offTitle = parts[0];
-        stage.setTitle(offTitle + split + fileString);
+        stage.setTitle(offTitle + split + fileName);
 
-        prefs.put("file", fileString);
-        bookmarkController.loadBookmarks(fileString);
+        prefs.put("file", fileName);
+        bookmarkController.loadBookmarks(fileName);
         zoomController = new ZoomController(fileController.getDrawer(),
                                 nodeTextField, radiusTextField);
 
@@ -131,10 +157,15 @@ public class MenuController {
         zoomController.zoomOut();
     }
 
+    /**
+     * Ensures the scroll bar zooms in and out.
+     * @param scrollEvent The scroll.
+     * @throws IOException throws exception if column doesn't exist.
+     */
     @FXML
     public void scrollZoom(ScrollEvent scrollEvent) throws IOException {
         int column = fileController.getDrawer().mouseLocationColumn(scrollEvent.getX());
-        if (scrollEvent.getDeltaY() > 0){
+        if (scrollEvent.getDeltaY() > 0) {
             zoomController.zoomIn(column);
         } else {
             zoomController.zoomOut(column);
@@ -224,7 +255,57 @@ public class MenuController {
         }
     }
 
+    /**
+     * Getter for the sequence hashMap.
+     * @return the sequence hashMap.
+     */
     HTreeMap<Long, String> getSequenceHashMap() {
         return fileController.getSequenceHashMap();
+    }
+
+    /**
+     * Button one of the File -> Recent menu.
+     */
+    @FXML
+    public void file1Press() {
+        pressedRecent(file1);
+    }
+
+    /**
+     * Button two of the File -> Recent menu.
+     */
+    @FXML
+    public void file2Press() {
+        pressedRecent(file2);
+    }
+
+    /**
+     * Button three of the File -> Recent menu.
+     */
+    @FXML
+    public void file3Press() {
+        pressedRecent(file3);
+    }
+
+    /**
+     * Method used to not duplicate recentFile presses.
+     * @param file the menuItem that has been pressed
+     */
+    private void pressedRecent(MenuItem file) {
+        String filePath = recentController.pressedRecent(file);
+
+        if (filePath == null) {
+            try {
+                openFileClicked();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        } else {
+            try {
+                openFileClicked(filePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

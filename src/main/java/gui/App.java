@@ -29,9 +29,9 @@ public class App extends Application {
 
     /**
      * Launches the application with Menu.fxml as default scene.
-     * @param stageIn
-     * @throws UnsupportedEncodingException
-     * @throws FileNotFoundException
+     * @param stageIn The stage to load the app.
+     * @throws UnsupportedEncodingException Needs a certain encoding
+     * @throws FileNotFoundException Needs a certain file
      */
     public void start(Stage stageIn) throws UnsupportedEncodingException, FileNotFoundException {
         stage = stageIn;
@@ -86,6 +86,10 @@ public class App extends Application {
         }
     }
 
+    /**
+     * Getter for the stage on which the application is loaded.
+     * @return The Stage on which the application is loaded.
+     */
     public static Stage getStage() {
         return stage;
     }
