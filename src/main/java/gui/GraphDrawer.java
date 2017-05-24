@@ -42,7 +42,7 @@ public class GraphDrawer {
     public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
         this.graph = graph;
-        this.yBase = (int) (gc.getCanvas().getHeight() / 4);
+        this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
         canvasNodes = new ArrayList<DrawableNode>();
         initializeDrawableNodes();
         graph.initialize();
@@ -65,6 +65,9 @@ public class GraphDrawer {
      * @param column The Column that has to be in the centre.
      */
     public void zoom(final double factor, final int column) {
+        if ((factor < 1 && zoomLevel < 2) || (factor > 1 && zoomLevel > columns.size())) {
+            return;
+        }
         this.zoomLevel = zoomLevel * factor;
         moveShapes(column - ((column - xDifference) * factor));
     }

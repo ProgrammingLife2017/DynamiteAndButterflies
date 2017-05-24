@@ -165,7 +165,6 @@ public class SequenceGraph {
             ArrayList<Integer> children = parent.getChildren();    // Get all children
             for (Integer child : children) {
                 this.getNode(child).incrementColumn(parent.getColumn());
-                System.out.println(this.getNode(child).getId());
             }
         }
     }

@@ -1,7 +1,5 @@
 package parser;
 
-import graph.Edge;
-import graph.SequenceGraph;
 import graph.SequenceNode;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -10,7 +8,6 @@ import org.mapdb.Serializer;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -99,9 +96,6 @@ public class GfaParser {
                 }
                 String[] data = line.split(("\t"));
                 int id = Integer.parseInt(data[1]);
-                if(id % 10000 == 0) {
-                    System.out.println(id);
-                }
                 SequenceNode node = new SequenceNode(toIntExact(id));
                 if (!exists) {
                     sequenceMap.put((long) (id), data[2]);
