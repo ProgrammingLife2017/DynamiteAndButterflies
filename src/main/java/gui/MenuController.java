@@ -102,18 +102,23 @@ public class MenuController {
         String filePath = fileController.openFileClicked(gc, file.getAbsolutePath());
         String fileName = fileController.fileNameFromPath(filePath);
 
-        updateControllers(filePath, fileName);
+        updateControllers(fileName);
         recentController.update(filePath, prefs);
     }
 
+    /**
+     * Opens the file specified in the filepath.
+     * @param filePath the filePath with the file that needs to be opened.
+     * @throws IOException Throws exception when file can't be found.
+     */
     public void openFileClicked(String filePath) throws IOException {
         fileController.openFileClicked(gc, filePath);
         String fileName = fileController.fileNameFromPath(filePath);
 
-        updateControllers(filePath, fileName);
+        updateControllers(fileName);
     }
 
-    private void updateControllers(String filePath, String fileName) {
+    private void updateControllers(String fileName) {
         Stage stage = App.getStage();
         String title = stage.getTitle();
         String split = "---";
@@ -152,6 +157,11 @@ public class MenuController {
         zoomController.zoomOut();
     }
 
+    /**
+     * Ensures the scroll bar zooms in and out.
+     * @param scrollEvent The scroll.
+     * @throws IOException throws exception if column doesn't exist.
+     */
     @FXML
     public void scrollZoom(ScrollEvent scrollEvent) throws IOException {
         int column = fileController.getDrawer().mouseLocationColumn(scrollEvent.getX());
@@ -245,6 +255,10 @@ public class MenuController {
         }
     }
 
+    /**
+     * Getter for the sequence hashMap.
+     * @return the sequence hashMap.
+     */
     HTreeMap<Long, String> getSequenceHashMap() {
         return fileController.getSequenceHashMap();
     }
