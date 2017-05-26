@@ -66,11 +66,6 @@
             <artifactId>pmd-core</artifactId>
             <version>5.7.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.92</groupId>
-            <artifactId>Sem</artifactId>
-            <version>1.0</version>
-        </dependency>
 
 
     </dependencies>
