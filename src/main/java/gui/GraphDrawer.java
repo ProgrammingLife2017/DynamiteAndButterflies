@@ -221,6 +221,11 @@ public class GraphDrawer {
         return zoomLevel;
     }
 
+    /**
+     * Gets the column based on the mouse location.
+     * @param x x coordinate of the mouse
+     * @return The int representing the column where the mouse is.
+     */
     public int mouseLocationColumn(double x) {
         return (int) ((x / stepSize) + xDifference);
     }

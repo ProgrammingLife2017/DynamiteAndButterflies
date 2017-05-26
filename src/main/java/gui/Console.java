@@ -10,6 +10,8 @@ import java.io.OutputStream;
  * Created by TUDelft SID on 18-5-2017.
  */
 public class Console extends OutputStream {
+
+    //We call this variable console because it functions as the console in our application.
     private final TextArea console;
 
     /**
@@ -34,7 +36,7 @@ public class Console extends OutputStream {
 
     /**
      * Writes an int to the console.
-     * @param b the int to be written
+     * @param text the int to be written
      * @throws IOException throws exception when console not found
      */
     public void write(int text) throws IOException {

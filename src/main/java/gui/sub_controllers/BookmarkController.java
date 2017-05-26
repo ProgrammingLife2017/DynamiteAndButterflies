@@ -13,7 +13,7 @@ public class BookmarkController {
     private static Preferences prefs = Preferences.userRoot();
     private String stringFile;
     private final Button bookmark1, bookmark2;
-    private final String bookmarkSave = "bookmarkNum";
+    private static final String BOOKMARK_SAVE = "bookmarkNum";
 
     /**
      * Constructor of the bookmark controller to handle the bookmarks.
@@ -35,11 +35,11 @@ public class BookmarkController {
     public void loadBookmarks(String stringOfFile) {
         stringFile = stringOfFile;
 
-        if (prefs.getInt(bookmarkSave + stringFile, -1) == -1) {
-            prefs.putInt(bookmarkSave + stringFile, 0);
+        if (prefs.getInt(BOOKMARK_SAVE + stringFile, -1) == -1) {
+            prefs.putInt(BOOKMARK_SAVE + stringFile, 0);
         }
 
-        int largestIndex = prefs.getInt(bookmarkSave + stringFile, -1);
+        int largestIndex = prefs.getInt(BOOKMARK_SAVE + stringFile, -1);
         //As a user,
         // When viewing a file with bookmarks,
         // And choosing a new file to view
@@ -60,10 +60,10 @@ public class BookmarkController {
     public void saving(int nodes, int radius) {
 
         String stringFile = prefs.get("file", "def");
-        int newIndex = prefs.getInt(bookmarkSave + stringFile, -1);
+        int newIndex = prefs.getInt(BOOKMARK_SAVE + stringFile, -1);
         newIndex++;
         prefs.put(stringFile + newIndex, nodes + "-" + radius);
-        prefs.putInt(bookmarkSave + stringFile, newIndex);
+        prefs.putInt(BOOKMARK_SAVE + stringFile, newIndex);
 
         updateBookmarks(nodes + "-" + radius);
     }
