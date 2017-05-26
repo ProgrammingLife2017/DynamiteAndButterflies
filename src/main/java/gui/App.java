@@ -33,7 +33,6 @@ public class App extends Application {
      * @throws UnsupportedEncodingException Needs a certain encoding
      * @throws FileNotFoundException Needs a certain file
      */
-    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     public void start(Stage stageIn) throws UnsupportedEncodingException, FileNotFoundException {
         stage = stageIn;
         stage.setTitle("Programming Life");
