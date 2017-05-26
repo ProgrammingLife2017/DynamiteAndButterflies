@@ -26,6 +26,7 @@ public class GraphDrawer {
 
     private int yBase;
     private double zoomLevel;
+    private double radius;
     private double xDifference;
     private double stepSize;
     private int[] columnWidths;
@@ -51,6 +52,7 @@ public class GraphDrawer {
         columnWidths = new int[columns.size() + 1];
         initializeColumnWidths();
         zoomLevel = columnWidths[columns.size()];
+        radius = columns.size();
     }
 
     private void initializeDrawableNodes() {
@@ -65,10 +67,11 @@ public class GraphDrawer {
      * @param column The Column that has to be in the centre.
      */
     public void zoom(final double factor, final int column) {
-        if ((factor < 1 && zoomLevel < 10) || (factor > 1 && zoomLevel > columnWidths[columns.size()])) {
+        if ((factor < 1 && radius < 1) || (factor > 1 && radius >= columns.size())) {
             return;
         }
         this.zoomLevel = zoomLevel * factor;
+        this.radius = radius * factor;
         moveShapes(column - ((column - xDifference) * factor));
     }
 
@@ -78,8 +81,9 @@ public class GraphDrawer {
      * @param column The new Column to be in the centre.
      */
     public void changeZoom(final int newZoom, final int column) {
-        zoomLevel = newZoom;
-        moveShapes(column - zoomLevel / 2);
+        radius = newZoom;
+        zoomLevel = columnWidths[column + newZoom / 2] - columnWidths[column - newZoom / 2];
+        moveShapes(columnWidths[column + 2] - zoomLevel / 2);
     }
 
     /**
@@ -212,6 +216,13 @@ public class GraphDrawer {
         return null;
     }
 
+    public void highlight(int node) {
+        for (DrawableNode canvasNode : canvasNodes) {
+            canvasNode.lowlight();
+        }
+        canvasNodes.get(node - 1).highlight();
+    }
+
     //TODO: Loop over the  nodes in the graph (O(n*m) > O(k))
     /**
      * Returns the ColumnId of a Node at the users Choice.
@@ -235,6 +246,10 @@ public class GraphDrawer {
      */
     public double getZoomLevel() {
         return zoomLevel;
+    }
+
+    public double getRadius() {
+        return radius;
     }
 
     public int mouseLocationColumn(double x) {
