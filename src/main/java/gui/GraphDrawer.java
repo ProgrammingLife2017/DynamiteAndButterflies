@@ -119,7 +119,8 @@ public class GraphDrawer {
             SequenceNode parent = nodes.get(i);
             for (int j = 0; j < parent.getChildren().size(); j++) {
                 SequenceNode child = graph.getNode(parent.getChild(j));
-                double startx = stepSize * ((parent.getColumn() - xDifference) + RELATIVE_X_DISTANCE);
+                double startx = stepSize * ((parent.getColumn() - xDifference)
+                                            + RELATIVE_X_DISTANCE);
                 double starty = yBase + (parent.getIndex() * RELATIVE_Y_DISTANCE) + getYSize() / 2;
                 double endx = (child.getColumn() - xDifference) * stepSize;
                 double endy = yBase + (child.getIndex() * RELATIVE_Y_DISTANCE) + getYSize() / 2;
@@ -128,6 +129,12 @@ public class GraphDrawer {
         }
     }
 
+    /**
+     * Searches for the node that was pressed.
+     * @param xEvent xCor of mouse press
+     * @param yEvent yCor of mouse press
+     * @return The Node that was clicked
+     */
     public SequenceNode clickNode(double xEvent, double yEvent) {
         SequenceNode click = null;
         for (int i = 0; i < canvasNodes.size(); i++) {
@@ -214,8 +221,13 @@ public class GraphDrawer {
         return zoomLevel;
     }
 
+    /**
+     * Gets the column based on the mouse location.
+     * @param x x coordinate of the mouse
+     * @return The int representing the column where the mouse is.
+     */
     public int mouseLocationColumn(double x) {
-        return (int) ((x/stepSize) + xDifference);
+        return (int) ((x / stepSize) + xDifference);
     }
 }
 

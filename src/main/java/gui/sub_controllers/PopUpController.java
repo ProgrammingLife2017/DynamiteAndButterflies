@@ -1,7 +1,5 @@
-package gui.subControllers;
+package gui.sub_controllers;
 
-import gui.App;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,9 +13,6 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.regex.Pattern;
 
 
 /**
@@ -41,6 +36,11 @@ public class PopUpController {
     public PopUpController() {
     }
 
+    /**
+     * The popup for a corrupt database file.
+     * @param partPath The path to the file
+     * @param message The message to display.
+     */
     @FXML
     public void loadDbCorruptPopUp(final String partPath, String message) {
         try {
@@ -56,15 +56,16 @@ public class PopUpController {
                         public void handle(MouseEvent e) {
                             File seq = new File(partPath + ".sequence.db");
                             File adj = new File(partPath + ".adjacency.db");
-                            adj.delete();
-                            seq.delete();
+                            boolean success = adj.delete();
+                            assert success;
+                            success = seq.delete();
+                            assert success;
                             stage.close();
                         }
             });
             setMessage(message);
             stage.showAndWait();
         } catch (Exception e) {
-            e.getCause();
             e.printStackTrace();
         }
     }

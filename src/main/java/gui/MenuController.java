@@ -2,11 +2,15 @@ package gui;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
-import gui.subControllers.*;
+import gui.sub_controllers.*;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -87,7 +91,6 @@ public class MenuController {
         ps = new PrintStream(new Console(consoleArea));
         System.setErr(ps);
         System.setOut(ps);
-
     }
 
     /**
