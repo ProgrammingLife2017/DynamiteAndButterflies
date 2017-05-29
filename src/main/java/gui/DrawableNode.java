@@ -17,6 +17,7 @@ public class DrawableNode {
     private double width;
     private double height;
     private boolean highlighted;
+    private boolean isDummy;
 
     public DrawableNode (int id, GraphicsContext gc) {
         this.gc = gc;
@@ -32,6 +33,14 @@ public class DrawableNode {
 
     public int getId() {
         return this.id;
+    }
+
+    public boolean isDummy() {
+        return isDummy;
+    }
+
+    public void setDummy(boolean dummy) {
+        isDummy = dummy;
     }
 
     public void highlight() {
