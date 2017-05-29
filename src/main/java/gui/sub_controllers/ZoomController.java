@@ -24,10 +24,12 @@ public class ZoomController {
     /**
      * Constructor of the Zoom Controller.
      * @param drwr A GraphDrawer that can draw the graph for us.
+     * @param panningController The panningcontroller.
      * @param nodeField The textField that contains the centre node.
      * @param radField The textField that contains the radius.
      */
-    public ZoomController(GraphDrawer drwr, PanningController panningController, TextField nodeField, TextField radField) {
+    public ZoomController(GraphDrawer drwr, PanningController panningController,
+                          TextField nodeField, TextField radField) {
         drawer = drwr;
         nodeTextField = nodeField;
         radiusTextField = radField;
@@ -38,12 +40,14 @@ public class ZoomController {
      * ZoomIn.
      * @throws IOException exception.
      */
-    public void zoomIn() throws IOException {
+    public void zoomIn() {
         if (nodeTextField.getText().equals("")) {
-            drawer.zoom(BUTTON_ZOOM_IN_FACTOR, drawer.getRealCentreNode().getColumn());
+            drawer.zoom(BUTTON_ZOOM_IN_FACTOR,
+                    drawer.getRealCentreNode().getColumn());
             panningController.setScrollbarSize(BUTTON_ZOOM_IN_FACTOR);
         } else {
-            drawer.zoom(BUTTON_ZOOM_IN_FACTOR, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
+            drawer.zoom(BUTTON_ZOOM_IN_FACTOR,
+                    drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
             panningController.setScrollbarSize(BUTTON_ZOOM_IN_FACTOR);
         }
         updateRadius((int) Math.ceil(drawer.getRadius()) + "");
@@ -66,10 +70,12 @@ public class ZoomController {
      */
     public void zoomOut() throws IOException {
         if (nodeTextField.getText().equals("")) {
-            drawer.zoom(BUTTON_ZOOM_OUT_FACTOR, drawer.getRealCentreNode().getColumn());
+            drawer.zoom(BUTTON_ZOOM_OUT_FACTOR,
+                    drawer.getRealCentreNode().getColumn());
             panningController.setScrollbarSize(BUTTON_ZOOM_OUT_FACTOR);
         } else {
-            drawer.zoom(BUTTON_ZOOM_OUT_FACTOR, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
+            drawer.zoom(BUTTON_ZOOM_OUT_FACTOR,
+                    drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
             panningController.setScrollbarSize(BUTTON_ZOOM_OUT_FACTOR);
         }
         updateRadius((int) Math.ceil(drawer.getRadius()) + "");

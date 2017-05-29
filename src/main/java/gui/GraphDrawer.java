@@ -19,6 +19,7 @@ public class GraphDrawer {
     private static final double RELATIVE_Y_DISTANCE = 50;
     private static final double LINE_WIDTH_FACTOR = 0.2;
     private static final double Y_SIZE_FACTOR = 4;
+    private static final double Y_BASE_FACTOR = 0.25;
     private static final double MIN_LINE_WIDTH = 0.01;
     private static final double MAX_LINE_WIDTH = 1;
     private static final double MAX_Y_SIZE = 20;
@@ -43,7 +44,7 @@ public class GraphDrawer {
     public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
         this.graph = graph;
-        this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
+        this.yBase = (int) (gc.getCanvas().getHeight() * Y_BASE_FACTOR); //TODO explain magic number
         canvasNodes = new ArrayList<DrawableNode>();
         initializeDrawableNodes();
         graph.initialize();
@@ -271,6 +272,10 @@ public class GraphDrawer {
         return radius;
     }
 
+    /**
+     * Get function for x difference.
+     * @return The x difference.
+     */
     public double getxDifference() {
         return xDifference;
     }
