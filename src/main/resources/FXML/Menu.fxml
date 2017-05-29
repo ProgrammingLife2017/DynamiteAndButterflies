@@ -13,6 +13,8 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.shape.Line?>
 
 <AnchorPane fx:id="anchorPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1030.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MenuController">
@@ -61,10 +63,20 @@
                         </AnchorPane>
                       <AnchorPane fx:id="canvasPanel">
                            <children>
-                              <ScrollBar fx:id="scrollbar" layoutY="763.0" max="0.0" visibleAmount="0.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-                              <Canvas fx:id="canvas" onMouseClicked="#clickMouse" onScroll="#scrollZoom" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                              <Button layoutX="-2.0" layoutY="291.0" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0" />
-                              <Button layoutX="1692.0" layoutY="80.0" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="63.0" />
+                              <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <center>
+                                    <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                       <children>
+                                          <Canvas fx:id="canvas" onMouseClicked="#clickMouse" onScroll="#scrollZoom" />
+                                          <Button layoutX="1721.0" layoutY="4.0" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" />
+                                          <Button layoutX="1721.0" layoutY="42.0" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" />
+                                       </children>
+                                    </Pane>
+                                 </center>
+                                  <bottom>
+                                      <ScrollBar fx:id="scrollbar" visibleAmount="100.0" BorderPane.alignment="CENTER" />
+                                  </bottom>
+                              </BorderPane>
                            </children>
                         </AnchorPane>
                     </items>
