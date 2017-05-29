@@ -73,7 +73,7 @@ public class SequenceGraphTest {
     public void initialize() throws Exception {
         startLargeGraph();
 
-        graph.initialize();
+        //graph.initialize();
 
         assertTrue(graph.getNode(1).hasChildren());
         assertTrue(graph.getNode(2).hasChildren());

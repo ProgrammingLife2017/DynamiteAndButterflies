@@ -84,4 +84,12 @@ public class App extends Application {
         if (controller.getSequenceHashMap() != null)
             controller.getSequenceHashMap().close();
     }
+
+    /**
+     * Getter for the stage on which the application is loaded.
+     * @return The Stage on which the application is loaded.
+     */
+    public static Stage getStage() {
+        return stage;
+    }
 }

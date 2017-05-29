@@ -2,26 +2,18 @@ package gui.subControllers;
 
 import graph.SequenceGraph;
 import gui.GraphDrawer;
-import javafx.fxml.FXML;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
 import parser.GfaParser;
-import parser.Tuple;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.regex.Pattern;
 
-/**
- * Created by Jip on 17-5-2017.
- */
 public class FileController {
+
 
     private SequenceGraph graph;
     private gui.GraphDrawer drawer;
@@ -48,7 +40,7 @@ public class FileController {
      * @param stage The stage on which the fileFinder is shown.
      * @return returns the file that can be loaded.
      */
-    private File chooseFile(Stage stage) {
+    public File chooseFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
 
@@ -68,42 +60,6 @@ public class FileController {
         File res = fileChooser.showOpenDialog(stage);
         parDirectory = res.getParentFile();
         return res;
-    }
-
-    /**
-     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa.
-     * can be selected and directly be visualised on the screen.
-     * @param anchorPane the pane where we will be drawing
-     * @param gc the graphicscontext we will use
-     * @return The strign of the file that has just been loaded.
-     * @throws IOException exception if no file is found
-     */
-    @FXML
-    public String openFileClicked(AnchorPane anchorPane, GraphicsContext gc) throws IOException {
-        Stage stage = (Stage) anchorPane.getScene().getWindow();
-        File file = chooseFile(stage);
-
-        GfaParser parser = new GfaParser();
-        System.out.println("src/main/resources/" + file.getName());
-        String filePath = file.getAbsolutePath();
-        parser.parseGraph(filePath);
-
-        parentArray = parser.getParentArray(parser.getPartPath());
-        childArray = parser.getChildArray(parser.getPartPath());
-
-
-        graph = new SequenceGraph();
-        graph.createSubGraph(NODE_ID,RENDER_RANGE, parentArray, childArray);
-        sequenceHashMap = parser.getSequenceHashMap();
-        drawer = new GraphDrawer(graph, gc);
-        drawer.moveShapes(0.0);
-
-        String pattern = Pattern.quote(System.getProperty("file.separator"));
-        String[] partPaths = filePath.split(pattern);
-        String fileName = partPaths[partPaths.length - 1];
-        System.out.println(fileName);
-
-        return fileName;
     }
 
     /**
@@ -128,5 +84,48 @@ public class FileController {
      */
     public SequenceGraph getGraph() {
         return graph;
+    }
+
+    /**
+     * When 'open gfa file' is clicked this method opens the file specified by openFile.
+     * It immediately visualises the graph.
+     * @param gc the graphicscontext we will use
+     * @param filePath the path of the file that needs to be opened
+     * @return The string of the file that has just been loaded.
+     * @throws IOException exception if no file is found
+     */
+    public String openFileClicked(GraphicsContext gc, String filePath) throws IOException {
+        GfaParser parser = new GfaParser();
+        parser.parseGraph(filePath);
+
+        parentArray = parser.getParentArray(parser.getPartPath());
+        childArray = parser.getChildArray(parser.getPartPath());
+
+
+        graph = new SequenceGraph();
+        graph.createSubGraph(NODE_ID,RENDER_RANGE, parentArray, childArray);
+        sequenceHashMap = parser.getSequenceHashMap();
+        drawer = new GraphDrawer(graph, gc);
+        drawer.moveShapes(0.0);
+
+        String pattern = Pattern.quote(System.getProperty("file.separator"));
+        String[] partPaths = filePath.split(pattern);
+        String fileName = partPaths[partPaths.length - 1];
+        System.out.println(fileName);
+
+        return fileName;
+    }
+
+    /**
+     * Gets the fileName from the filePath.
+     * @param filePath The path to the file you want the name off
+     * @return The name of the file.
+     */
+    public String fileNameFromPath(String filePath) {
+        String pattern = Pattern.quote(System.getProperty("file.separator"));
+        String[] partPaths = filePath.split(pattern);
+        String fileName = partPaths[partPaths.length - 1];
+        System.out.println(fileName);
+        return fileName;
     }
 }

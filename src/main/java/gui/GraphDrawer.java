@@ -5,6 +5,7 @@ import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -26,6 +27,7 @@ public class GraphDrawer {
     private double zoomLevel;
     private double xDifference;
     private double stepSize;
+    private boolean showDummyNodes;
     private GraphicsContext gc;
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
@@ -39,16 +41,31 @@ public class GraphDrawer {
     public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
         this.graph = graph;
-        this.yBase = (int) (gc.getCanvas().getHeight() / 4);
+        this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
         canvasNodes = new ArrayList<DrawableNode>();
-        initializeDrawableNodes();;
+        graph.layerizeGraph(1);
         columns = graph.getColumns();
         zoomLevel = columns.size();
+        initializeDrawableNodes();
     }
 
+//    private void initializeDrawableNodes() {
+//        for (int i = 1; i <= graph.size(); i++) {
+//            canvasNodes.add(new DrawableNode(i, gc));
+//        }
+//    }
+
     private void initializeDrawableNodes() {
-        for (int i = 1; i <= graph.size(); i++) {
-            canvasNodes.add(new DrawableNode(i, gc));
+        for (int i = 0; i < columns.size(); i++) {
+            ArrayList<SequenceNode> column = columns.get(i);
+            for (int j = 0; j < column.size(); j++) {
+                SequenceNode sNode = column.get(j);
+                DrawableNode dNode = new DrawableNode(sNode.getId(), gc);
+                if (sNode.isDummy()) {
+                    dNode.setDummy(true);
+                }
+                canvasNodes.add(dNode);
+            }
         }
     }
 
@@ -58,6 +75,9 @@ public class GraphDrawer {
      * @param column The Column that has to be in the centre.
      */
     public void zoom(final double factor, final int column) {
+        if ((factor < 1 && zoomLevel < 2) || (factor > 1 && zoomLevel > columns.size())) {
+            return;
+        }
         this.zoomLevel = zoomLevel * factor;
         moveShapes(column - ((column - xDifference) * factor));
     }
@@ -73,6 +93,13 @@ public class GraphDrawer {
     }
 
     /**
+     * Redraw all nodes with the same coordinates.
+     */
+    public void redraw() {
+        moveShapes(xDifference);
+    }
+
+    /**
      * Draws the Graph.
      * @param xDifference Variable to determine which column should be in the centre.
      */
@@ -85,21 +112,27 @@ public class GraphDrawer {
         drawEdges();
     }
 
+    /**
+     * Gives all nodes the right coordinates on the canvas and draw them. Depending on whether the dummy nodes checkbox
+     * is checked dummy nodes are either drawn or skipped.
+     */
     private void drawNodes() {
-        for (int j = 1; j < columns.size(); j++) {
+        int counter = 0;
+        for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
-                if (column.get(i).isDummy()) {
+                if (column.get(i).isDummy() && !showDummyNodes) {
+                    counter++;
                     continue;
-                    //gc.setFill(Color.BLACK);
                 }
                 double x = (j - xDifference) * stepSize;
                 double y = yBase + (i * RELATIVE_Y_DISTANCE);
                 double width = RELATIVE_X_DISTANCE * stepSize;
                 double height = getYSize();
-                DrawableNode node = canvasNodes.get(column.get(i).getId() - 1);
+                DrawableNode node = canvasNodes.get(counter);
                 node.setCoordinates(x, y, width, height);
                 node.draw();
+                counter++;
             }
         }
     }
@@ -123,6 +156,13 @@ public class GraphDrawer {
         }
     }
 
+    /**
+     * Check for each node if the click event is within its borders. If so highlight the node and return it. Also all
+     * other nodes are lowlighted.
+     * @param xEvent The x coordinate of the click event.
+     * @param yEvent The y coordinate of the click event.
+     * @return The sequencenode that has been clicked or null if nothing was clicked.
+     */
     public SequenceNode clickNode(double xEvent, double yEvent) {
         SequenceNode click = null;
         for (int i = 0; i < canvasNodes.size(); i++) {
@@ -158,7 +198,7 @@ public class GraphDrawer {
         if (width == 0) {
             width = MIN_LINE_WIDTH;
         }
-        if (width > 1) { 
+        if (width > 1) {
             width = MAX_LINE_WIDTH;
         }
         gc.setLineWidth(width);
@@ -201,14 +241,19 @@ public class GraphDrawer {
         return -1;
     }
 
-    /**
-     * Get function for zoom level.
-     * @return the Zoom level.
-     */
     public double getZoomLevel() {
         return zoomLevel;
     }
 
+    public void setShowDummyNodes(boolean showDummyNodes) {
+        this.showDummyNodes = showDummyNodes;
+    }
+
+    /**
+     * Return the column the mouse click is in.
+     * @param x The x coordinate of the mouse click event
+     * @return The id of the column that the mouse click is in.
+     */
     public int mouseLocationColumn(double x) {
         return (int) ((x/stepSize) + xDifference);
     }

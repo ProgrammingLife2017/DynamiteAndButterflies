@@ -70,7 +70,7 @@ public class SequenceGraph {
         SequenceNode lastNode = new SequenceNode(upperBoundID);
         this.nodes.put(upperBoundID, lastNode);
 
-        initialize();
+
         layerizeGraph(lowerBoundID);
     }
 
@@ -124,15 +124,6 @@ public class SequenceGraph {
         this.nodes = hash;
     }
 
-    /**
-     * Add a child to each Node.
-     */
-    public void initialize() {
-        for (Edge edge : getEdges()) {
-            // aan elke parent de child toevoegen
-            this.getNode(edge.getParent()).addChild(edge.getChild());
-        }
-    }
 
     /**
      * Will add columns to all the nodes and to all the edges.
