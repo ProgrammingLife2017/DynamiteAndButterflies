@@ -93,6 +93,9 @@ public class GraphDrawer {
         moveShapes(column - zoomLevel / 2);
     }
 
+    /**
+     * Redraw all nodes with the same coordinates.
+     */
     public void redraw() {
         moveShapes(xDifference);
     }
@@ -110,6 +113,10 @@ public class GraphDrawer {
         drawEdges();
     }
 
+    /**
+     * Gives all nodes the right coordinates on the canvas and draw them. Depending on whether the dummy nodes checkbox
+     * is checked dummy nodes are either drawn or skipped.
+     */
     private void drawNodes() {
         int counter = 0;
         for (int j = 0; j < columns.size(); j++) {
@@ -150,6 +157,13 @@ public class GraphDrawer {
         }
     }
 
+    /**
+     * Check for each node if the click event is within its borders. If so highlight the node and return it. Also all
+     * other nodes are lowlighted.
+     * @param xEvent The x coordinate of the click event.
+     * @param yEvent The y coordinate of the click event.
+     * @return The sequencenode that has been clicked or null if nothing was clicked.
+     */
     public SequenceNode clickNode(double xEvent, double yEvent) {
         SequenceNode click = null;
         for (int i = 0; i < canvasNodes.size(); i++) {
@@ -228,10 +242,6 @@ public class GraphDrawer {
         return -1;
     }
 
-    /**
-     * Get function for zoom level.
-     * @return the Zoom level.
-     */
     public double getZoomLevel() {
         return zoomLevel;
     }
@@ -240,6 +250,11 @@ public class GraphDrawer {
         this.showDummyNodes = showDummyNodes;
     }
 
+    /**
+     * Return the column the mouse click is in.
+     * @param x The x coordinate of the mouse click event
+     * @return The id of the column that the mouse click is in.
+     */
     public int mouseLocationColumn(double x) {
         return (int) ((x/stepSize) + xDifference);
     }

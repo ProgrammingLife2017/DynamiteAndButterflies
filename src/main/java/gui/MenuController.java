@@ -218,6 +218,9 @@ public class MenuController {
         infoController.updateSeqLabel(newString);
     }
 
+    /**
+     * Display dummy nodes on checkbox checked and hide them on checkbox unchecked.
+     */
     @FXML
     public void toggleDummyNodes() {
         if (dummyNodeCheckbox.isSelected()) {
