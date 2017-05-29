@@ -27,6 +27,7 @@ public class GraphDrawer {
     private double zoomLevel;
     private double xDifference;
     private double stepSize;
+    private boolean showDummyNodes;
     private GraphicsContext gc;
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
@@ -92,6 +93,10 @@ public class GraphDrawer {
         moveShapes(column - zoomLevel / 2);
     }
 
+    public void redraw() {
+        moveShapes(xDifference);
+    }
+
     /**
      * Draws the Graph.
      * @param xDifference Variable to determine which column should be in the centre.
@@ -110,9 +115,9 @@ public class GraphDrawer {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
-                if (column.get(i).isDummy()) {
-                    //continue;
-                    //gc.setFill(Color.BLACK);
+                if (column.get(i).isDummy() && !showDummyNodes) {
+                    counter++;
+                    continue;
                 }
                 double x = (j - xDifference) * stepSize;
                 double y = yBase + (i * RELATIVE_Y_DISTANCE);
@@ -229,6 +234,10 @@ public class GraphDrawer {
      */
     public double getZoomLevel() {
         return zoomLevel;
+    }
+
+    public void setShowDummyNodes(boolean showDummyNodes) {
+        this.showDummyNodes = showDummyNodes;
     }
 
     public int mouseLocationColumn(double x) {

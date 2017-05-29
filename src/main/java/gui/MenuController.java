@@ -56,6 +56,9 @@ public class MenuController {
     private Label numEdgesLabel;
     @FXML
     private TextArea consoleArea;
+    @FXML
+    private CheckBox dummyNodeCheckbox;
+
     private PrintStream ps;
 
     private GraphicsContext gc;
@@ -213,6 +216,16 @@ public class MenuController {
         String newString = "Sequence: "
                 + fileController.getSequenceHashMap().get((long) centreNodeID);
         infoController.updateSeqLabel(newString);
+    }
+
+    @FXML
+    public void toggleDummyNodes() {
+        if (dummyNodeCheckbox.isSelected()) {
+            fileController.getDrawer().setShowDummyNodes(true);
+        } else {
+            fileController.getDrawer().setShowDummyNodes(false);
+        }
+        fileController.getDrawer().redraw();
     }
 
     /**
