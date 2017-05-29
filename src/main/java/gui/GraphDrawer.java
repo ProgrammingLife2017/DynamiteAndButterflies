@@ -41,19 +41,13 @@ public class GraphDrawer {
     public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
         this.graph = graph;
-        this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
+        this.yBase = (int) (gc.getCanvas().getHeight() / 4);
         canvasNodes = new ArrayList<DrawableNode>();
         graph.layerizeGraph(1);
         columns = graph.getColumns();
         zoomLevel = columns.size();
         initializeDrawableNodes();
     }
-
-//    private void initializeDrawableNodes() {
-//        for (int i = 1; i <= graph.size(); i++) {
-//            canvasNodes.add(new DrawableNode(i, gc));
-//        }
-//    }
 
     private void initializeDrawableNodes() {
         for (int i = 0; i < columns.size(); i++) {
@@ -241,6 +235,10 @@ public class GraphDrawer {
         return -1;
     }
 
+    /**
+     * Get function for zoom level.
+     * @return the Zoom level.
+     */
     public double getZoomLevel() {
         return zoomLevel;
     }

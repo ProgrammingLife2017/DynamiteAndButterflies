@@ -29,9 +29,9 @@ public class App extends Application {
 
     /**
      * Launches the application with Menu.fxml as default scene.
-     * @param stageIn
-     * @throws UnsupportedEncodingException
-     * @throws FileNotFoundException
+     * @param stageIn The stage to load the app.
+     * @throws UnsupportedEncodingException Needs a certain encoding
+     * @throws FileNotFoundException Needs a certain file
      */
     public void start(Stage stageIn) throws UnsupportedEncodingException, FileNotFoundException {
         stage = stageIn;
@@ -60,7 +60,7 @@ public class App extends Application {
 
             // Set the pane onto the scene
             Scene scene = new Scene(pane);
-            stage.setTitle("Wow!! DynamiteAndButterflies genome visualiser.");
+            stage.setTitle("Wow!! DynamiteAndButterflies genome visualiser\t");
             stage.setScene(scene);
             stage.setResizable(true);
             stage.setMaximized(true);
@@ -81,8 +81,17 @@ public class App extends Application {
         int numOfBookmarks = prefs.getInt("bookmarkNum" + stringOfFile, -1);
         prefs.putInt("bookmarkNum" + stringOfFile, numOfBookmarks);
         MenuController controller = loader.getController();
-        if (controller.getSequenceHashMap() != null)
+        if (controller.getSequenceHashMap() != null) {
             controller.getSequenceHashMap().close();
+        }
+    }
+
+    /**
+     * Getter for the stage on which the application is loaded.
+     * @return The Stage on which the application is loaded.
+     */
+    public static Stage getStage() {
+        return stage;
     }
 
     /**

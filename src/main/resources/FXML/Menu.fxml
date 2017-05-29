@@ -16,94 +16,94 @@
 <?import javafx.scene.shape.Line?>
 
 <AnchorPane fx:id="anchorPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1030.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MenuController">
-    <children>
-        <SplitPane dividerPositions="1.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <items>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                    <children>
-                        <MenuBar prefHeight="32.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                            <menus>
-                                <Menu mnemonicParsing="false" text="File">
-                                    <items>
-                                        <MenuItem mnemonicParsing="false" onAction="#openFileClicked" text="Open gfa file" />
-                                        <Menu mnemonicParsing="false" text="Recent">
-                                            <items>
-                                                <MenuItem fx:id="file1" mnemonicParsing="false" onAction="#file1Press" text="&lt;No recent file&gt;" />
-                                                <MenuItem fx:id="file2" mnemonicParsing="false" onAction="#file2Press" text="&lt;No recent file&gt;" />
-                                                <MenuItem fx:id="file3" mnemonicParsing="false" onAction="#file3Press" text="&lt;No recent file&gt;" />
-                                            </items>
-                                        </Menu>
-                                    </items>
-                                </Menu>
-                                <Menu mnemonicParsing="false" text="Edit">
-                                    <items>
-                                        <MenuItem mnemonicParsing="false" text="Delete" />
-                                    </items>
-                                </Menu>
-                                <Menu mnemonicParsing="false" text="Help">
-                                    <items>
-                                        <MenuItem mnemonicParsing="false" text="About" />
-                                    </items>
-                                </Menu>
-                            </menus>
-                        </MenuBar>
-                        <SplitPane dividerPositions="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="32.0">
-                            <items>
-                                <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0">
-                                    <children>
-                                        <TextField fx:id="nodeTextField" alignment="CENTER" layoutX="27.0" layoutY="30.0" prefHeight="29.0" prefWidth="97.0" promptText="Centre node" />
-                                        <Button layoutX="14.0" layoutY="71.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
-                                        <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="27.0" layoutY="111.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
-                                        <Button fx:id="saveBookmark" layoutX="15.0" layoutY="224.0" mnemonicParsing="false" onAction="#saveTheBookmarks" text="Save Bookmark" />
-                                        <Button fx:id="bookmark1" layoutX="27.0" layoutY="268.0" mnemonicParsing="false" onAction="#pressBookmark1" prefHeight="24.0" prefWidth="98.0" text="-" textAlignment="CENTER" />
-                                        <Button fx:id="bookmark2" layoutX="27.0" layoutY="311.0" mnemonicParsing="false" onAction="#pressBookmark2" prefHeight="24.0" prefWidth="97.0" text="-" textAlignment="CENTER" />
-                                        <CheckBox fx:id="dummyNodeCheckbox" layoutX="62.0" layoutY="405.0" mnemonicParsing="false" onAction="#toggleDummyNodes" />
-                                        <Label layoutX="3.0" layoutY="372.0" text="Display dummy nodes" />
-                                    </children>
-                                </AnchorPane>
-                                <AnchorPane fx:id="canvasPanel">
-                                    <children>
-                                        <Canvas fx:id="canvas" onMouseClicked="#clickMouse" onScroll="#scrollZoom" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                        <Button layoutX="-2.0" layoutY="291.0" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0" />
-                                        <Button layoutX="1692.0" layoutY="80.0" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="63.0" />
-                                    </children>
-                                </AnchorPane>
-                            </items>
-                        </SplitPane>
-                    </children>
-                </AnchorPane>
-                <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="400.0">
-                    <children>
-                        <TabPane tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                            <tabs>
-                                <Tab text="Information">
-                                    <content>
-                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                            <children>
-                                                <Label layoutX="24.0" layoutY="11.0" text="Nodes:" />
-                                                <Label layoutX="24.0" layoutY="43.0" text="Edges:" />
-                                                <Label fx:id="numNodesLabel" layoutX="85.0" layoutY="11.0" text="0" />
-                                                <Label fx:id="numEdgesLabel" layoutX="85.0" layoutY="43.0" text="0" />
-                                                <Label fx:id="sequenceInfo" layoutX="168.0" layoutY="21.0" text="Select a Node" />
-                                                <Line endX="150.0" endY="140.0" startX="150.0" startY="10.0" stroke="#c9c4c4" strokeLineCap="ROUND" strokeLineJoin="ROUND" />
-                                            </children>
-                                        </AnchorPane>
-                                    </content>
-                                </Tab>
-                                <Tab text="Console">
-                                    <content>
-                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                            <children>
-                                                <TextArea fx:id="consoleArea" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                            </children>
-                                        </AnchorPane>
-                                    </content>
-                                </Tab>
-                            </tabs>
-                        </TabPane>
-                    </children>
-                </AnchorPane>
-            </items>
-        </SplitPane>
-    </children>
+   <children>
+      <SplitPane dividerPositions="1.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+               <children>
+                  <MenuBar prefHeight="32.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <menus>
+                      <Menu mnemonicParsing="false" text="File">
+                        <items>
+                          <MenuItem mnemonicParsing="false" onAction="#openFileClicked" text="Open gfa file" />
+                            <Menu mnemonicParsing="false" text="Recent">
+                                <items>
+                                    <MenuItem fx:id="file1" mnemonicParsing="false" onAction="#file1Press" text="&lt;No recent file&gt;" />
+                                    <MenuItem fx:id="file2" mnemonicParsing="false" onAction="#file2Press" text="&lt;No recent file&gt;" />
+                                    <MenuItem fx:id="file3" mnemonicParsing="false" onAction="#file3Press" text="&lt;No recent file&gt;" />
+                                </items>
+                            </Menu>
+                        </items>
+                      </Menu>
+                      <Menu mnemonicParsing="false" text="Edit">
+                        <items>
+                          <MenuItem mnemonicParsing="false" text="Delete" />
+                        </items>
+                      </Menu>
+                      <Menu mnemonicParsing="false" text="Help">
+                        <items>
+                          <MenuItem mnemonicParsing="false" text="About" />
+                        </items>
+                      </Menu>
+                    </menus>
+                  </MenuBar>
+                  <SplitPane dividerPositions="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="32.0">
+                    <items>
+                      <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0">
+                           <children>
+                              <TextField fx:id="nodeTextField" alignment="CENTER" layoutX="27.0" layoutY="30.0" prefHeight="29.0" prefWidth="97.0" promptText="Centre node" />
+                              <Button layoutX="14.0" layoutY="71.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
+                              <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="27.0" layoutY="111.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
+                              <Button fx:id="saveBookmark" layoutX="15.0" layoutY="224.0" mnemonicParsing="false" onAction="#saveTheBookmarks" text="Save Bookmark" />
+                              <Button fx:id="bookmark1" layoutX="27.0" layoutY="268.0" mnemonicParsing="false" onAction="#pressBookmark1" prefHeight="24.0" prefWidth="98.0" text="-" textAlignment="CENTER" />
+                              <Button fx:id="bookmark2" layoutX="27.0" layoutY="311.0" mnemonicParsing="false" onAction="#pressBookmark2" prefHeight="24.0" prefWidth="97.0" text="-" textAlignment="CENTER" />
+                              <CheckBox fx:id="dummyNodeCheckbox" layoutX="62.0" layoutY="405.0" mnemonicParsing="false" onAction="#toggleDummyNodes" />
+                              <Label layoutX="3.0" layoutY="372.0" text="Display dummy nodes" />
+                           </children>
+                        </AnchorPane>
+                      <AnchorPane fx:id="canvasPanel">
+                           <children>
+                              <Canvas fx:id="canvas" onMouseClicked="#clickMouse" onScroll="#scrollZoom" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <Button layoutX="-2.0" layoutY="291.0" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0" />
+                              <Button layoutX="1692.0" layoutY="80.0" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="63.0" />
+                           </children>
+                        </AnchorPane>
+                    </items>
+                  </SplitPane>
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="400.0">
+               <children>
+                  <TabPane tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <tabs>
+                      <Tab text="Information">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <Label layoutX="24.0" layoutY="11.0" text="Nodes:" />
+                                    <Label layoutX="24.0" layoutY="43.0" text="Edges:" />
+                                    <Label fx:id="numNodesLabel" layoutX="85.0" layoutY="11.0" text="0" />
+                                    <Label fx:id="numEdgesLabel" layoutX="85.0" layoutY="43.0" text="0" />
+                                    <Label fx:id="sequenceInfo" layoutX="168.0" layoutY="21.0" text="Select a Node" />
+                                    <Line endX="150.0" endY="140.0" startX="150.0" startY="10.0" stroke="#c9c4c4" strokeLineCap="ROUND" strokeLineJoin="ROUND" />
+                                 </children>
+                              </AnchorPane>
+                        </content>
+                      </Tab>
+                      <Tab text="Console">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <TextArea fx:id="consoleArea" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                 </children>
+                              </AnchorPane>
+                        </content>
+                      </Tab>
+                    </tabs>
+                  </TabPane>
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </children>
 </AnchorPane>

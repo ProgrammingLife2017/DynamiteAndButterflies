@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 
 public class FileController {
 
-
     private SequenceGraph graph;
     private gui.GraphDrawer drawer;
     private HTreeMap<Long, String> sequenceHashMap;

@@ -1,8 +1,7 @@
 package parser;
 
-import graph.Edge;
-import graph.SequenceGraph;
 import graph.SequenceNode;
+import gui.subControllers.PopUpController;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
@@ -25,6 +24,10 @@ public class GfaParser {
     private String header1;
     private String header2;
     private HTreeMap<Long, String> sequenceMap;
+    private HTreeMap<Long, int[]> adjacencyHMap;
+    private DB db;
+    private DB db2;
+    private Preferences prefs;
 
 
     private int[] parentArray;
@@ -32,25 +35,27 @@ public class GfaParser {
     private int counter;
     private String partPath;
 
-    public DB db;
-
-    private Preferences prefs = Preferences.userRoot();
-
-
     /**
      * This method parses the file specified in filepath into a sequence graph.
      * @param filePath A string specifying where the file is stored.
      * @return Returns a sequenceGraph
      * @throws IOException For instance when the file is not found
      */
-    @SuppressWarnings("Since15")
     public void parseGraph(String filePath) throws IOException {
+    public HTreeMap<Long, int[]> parseGraph(String filePath) throws IOException{
+        prefs = Preferences.userRoot();
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         partPath = partPaths[partPaths.length-1];
         System.out.println(partPath);
 
+        if(!prefs.getBoolean(partPath, true)) {
+            PopUpController controller = new PopUpController();
+            String message = "Database File is corrupt, press 'Reload' to reload the file," + "\n" + "or press 'Resume' to recover the data still available.";
+            controller.loadDbCorruptPopUp(partPath, message);
+        }
 
+        db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().closeOnJvmShutdown().checksumHeaderBypass().make();
         db = DBMaker.fileDB(partPath +  ".sequence.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
         if (db.get(partPath+ ".sequence.db") == null) {
             sequenceMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
