@@ -10,12 +10,22 @@ import java.io.OutputStream;
  * Created by TUDelft SID on 18-5-2017.
  */
 public class Console extends OutputStream {
-    private TextArea console;
 
+    //We call this variable console because it functions as the console in our application.
+    private final TextArea console;
+
+    /**
+     * Constructor of the console.
+     * @param console the textArea that is the console
+     */
     public Console(TextArea console) {
         this.console = console;
     }
 
+    /**
+     * Appends text to the Console.
+     * @param valueOf The string to be appended.
+     */
     public void appendText(final String valueOf) {
         Platform.runLater(new Runnable() {
             public void run() {
@@ -24,7 +34,12 @@ public class Console extends OutputStream {
         });
     }
 
-    public void write(int b) throws IOException {
-        appendText(String.valueOf((char)b));
+    /**
+     * Writes an int to the console.
+     * @param text the int to be written
+     * @throws IOException throws exception when console not found
+     */
+    public void write(int text) throws IOException {
+        appendText(String.valueOf((char) text));
     }
 }

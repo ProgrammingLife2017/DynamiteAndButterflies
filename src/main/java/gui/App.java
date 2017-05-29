@@ -37,12 +37,11 @@ public class App extends Application {
         stage = stageIn;
         stage.setTitle("Programming Life");
         loadScene("/FXML/Menu.fxml");
-        prefs = Preferences.userRoot();
     }
 
     private static Stage stage;
     private static AnchorPane pane;
-    private static Preferences prefs;
+    private static Preferences prefs = Preferences.userRoot();
     private static FXMLLoader loader;
 
     /**

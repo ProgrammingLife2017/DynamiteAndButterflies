@@ -99,6 +99,10 @@ public class GraphDrawer {
         drawEdges();
     }
 
+    /**
+     * Initializes the widths of each column.
+     * Using the widest node of each column.
+     */
     public void initializeColumnWidths() {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
@@ -122,7 +126,8 @@ public class GraphDrawer {
             ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
                 if (!column.get(i).isDummy()) {
-                    double width = (columnWidths[j + 1] - columnWidths[j]) * stepSize * RELATIVE_X_DISTANCE;
+                    double width = (columnWidths[j + 1] - columnWidths[j])
+                                    * stepSize * RELATIVE_X_DISTANCE;
                     double height = getYSize();
                     double x = (columnWidths[j] - xDifference) * stepSize;
                     double y = yBase + (i * RELATIVE_Y_DISTANCE);
@@ -155,6 +160,12 @@ public class GraphDrawer {
         }
     }
 
+    /**
+     * Searches for the node that was pressed.
+     * @param xEvent xCor of mouse press
+     * @param yEvent yCor of mouse press
+     * @return The Node that was clicked
+     */
     public SequenceNode clickNode(double xEvent, double yEvent) {
         SequenceNode click = null;
         for (int i = 0; i < canvasNodes.size(); i++) {
@@ -216,6 +227,10 @@ public class GraphDrawer {
         return null;
     }
 
+    /**
+     * Highlights the centre node.
+     * @param node The node that should be highlighted
+     */
     public void highlight(int node) {
         for (DrawableNode canvasNode : canvasNodes) {
             canvasNode.lowlight();
@@ -248,12 +263,21 @@ public class GraphDrawer {
         return zoomLevel;
     }
 
+    /**
+     * Get function for the radius.
+     * @return the double representing the radius.
+     */
     public double getRadius() {
         return radius;
     }
 
+    /**
+     * Gets the column based on the mouse location.
+     * @param x x coordinate of the mouse
+     * @return The int representing the column where the mouse is.
+     */
     public int mouseLocationColumn(double x) {
-        return (int) ((x/stepSize) + xDifference);
+        return (int) ((x / stepSize) + xDifference);
     }
 }
 

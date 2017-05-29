@@ -1,17 +1,19 @@
-package gui.subControllers;
+package gui.sub_controllers;
 
 import javafx.scene.control.Button;
 import java.util.prefs.Preferences;
 
 /**
  * Created by Jip on 17-5-2017.
- * A BookmarkController class moving some logic from the MenuController into a different class.
+ * A BookmarkController class moving some logic
+ * from the MenuController into a different class.
  */
 public class BookmarkController {
 
-    private static Preferences prefs;
+    private static Preferences prefs = Preferences.userRoot();
     private String stringFile;
-    private Button bookmark1, bookmark2;
+    private final Button bookmark1, bookmark2;
+    private static final String BOOKMARK_SAVE = "bookmarkNum";
 
     /**
      * Constructor of the bookmark controller to handle the bookmarks.
@@ -23,34 +25,30 @@ public class BookmarkController {
         bookmark2 = bm2;
 
         stringFile = "";
-        prefs = Preferences.userRoot();
     }
 
     /**
      * Loads the bookmarks of the specific file stringFile.
-     * @param stringOfFile The file that is being loaded whose bookmarks should be loaded.
+     * @param stringOfFile The file that is being
+     *                     loaded whose bookmarks should be loaded.
      */
     public void loadBookmarks(String stringOfFile) {
         stringFile = stringOfFile;
 
-        if (prefs.getInt("bookmarkNum" + stringFile, -1) == -1) {
-            prefs.putInt("bookmarkNum" + stringFile, 0);
+        if (prefs.getInt(BOOKMARK_SAVE + stringFile, -1) == -1) {
+            prefs.putInt(BOOKMARK_SAVE + stringFile, 0);
         }
 
-        int largestIndex = prefs.getInt("bookmarkNum" + stringFile, -1);
+        int largestIndex = prefs.getInt(BOOKMARK_SAVE + stringFile, -1);
         //As a user,
         // When viewing a file with bookmarks,
         // And choosing a new file to view
         // And that file has no bookmarks
         // I want to not see the old bookmarks.
         // Initializing this number as -2 ensures the above user story.
-        int i = -2;
-
-        while (i <= largestIndex) {
-            int newIndex = i;
-            String realBM = prefs.get(stringFile + newIndex, "-");
+        for (int i = -2; i <= largestIndex; i++) {
+            String realBM = prefs.get(stringFile + i, "-");
             updateBookmarks(realBM);
-            i++;
         }
     }
 
@@ -62,10 +60,10 @@ public class BookmarkController {
     public void saving(int nodes, int radius) {
 
         String stringFile = prefs.get("file", "def");
-        int newIndex = prefs.getInt("bookmarkNum" + stringFile, -1);
+        int newIndex = prefs.getInt(BOOKMARK_SAVE + stringFile, -1);
         newIndex++;
         prefs.put(stringFile + newIndex, nodes + "-" + radius);
-        prefs.putInt("bookmarkNum" + stringFile, newIndex);
+        prefs.putInt(BOOKMARK_SAVE + stringFile, newIndex);
 
         updateBookmarks(nodes + "-" + radius);
     }
