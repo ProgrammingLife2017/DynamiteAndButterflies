@@ -78,7 +78,7 @@
                               <Label fx:id="numEdgesLabel" layoutX="85.0" layoutY="43.0" text="0" />
                               <Label fx:id="sequenceInfo" layoutX="168.0" layoutY="21.0" text="Select a Node" />
                               <Line endX="150.0" endY="140.0" startX="150.0" startY="10.0" stroke="#c9c4c4" strokeLineCap="ROUND" strokeLineJoin="ROUND" />
-                              <ProgressBar fx:id="progressBar" layoutX="177.0" layoutY="95.0" prefHeight="18.0" prefWidth="785.0" progress="0.0" />
+                              <ProgressBar fx:id="progressBar" layoutX="177.0" layoutY="95.0" prefHeight="18.0" prefWidth="785.0" progress="0.0" visible="false" />
                            </children>
                         </AnchorPane>
                   </content>

@@ -6,24 +6,39 @@ import javafx.scene.control.ProgressBar;
 /**
  * Created by Jip on 22-5-2017.
  */
-public class ProgressBarController extends Thread {
+public class ProgressBarController {
 
     private ProgressBar pb;
 
+    /**
+     * Constructor.
+     * @param bar The progressbar.
+     */
     public ProgressBarController(ProgressBar bar) {
         pb = bar;
     }
 
-    @Override
-    public void run() {
+    /**
+     * The run method on open File.
+     */
+    void run() {
         Platform.runLater(new Runnable() {
             public void run() {
                 pb.setProgress(-1.0);
             }
         });
+        pb.setVisible(true);
     }
 
-    public void done() {
-        pb.setProgress(1.0);
+    /**
+     * The method to disable the progressbar after load.
+     */
+    void done() {
+        Platform.runLater(new Runnable() {
+            public void run() {
+                pb.setProgress(1.0);
+            }
+        });
+        pb.setVisible(false);
     }
 }

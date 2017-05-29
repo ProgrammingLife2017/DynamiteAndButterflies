@@ -2,6 +2,7 @@ package gui.subControllers;
 
 import graph.SequenceGraph;
 import gui.GraphDrawer;
+import gui.MenuController;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
@@ -11,25 +12,32 @@ import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.regex.Pattern;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by Jip on 17-5-2017.
  */
-public class FileController {
+public class FileController implements Observer {
 
     private SequenceGraph graph;
     private gui.GraphDrawer drawer;
     private HTreeMap<Long, String> sequenceHashMap;
-    HTreeMap<Long, int[]> adjacencyMap;
     private File parDirectory;
     private ProgressBarController progressBarController;
 
-    private final int RENDER_RANGE = 5000;
-    private final int NODE_ID = 1;
+    private final int renderRange = 5000;
+    private final int nodeId = 1;
+
+    private Thread parseThread;
+
+    private GraphicsContext gc;
+
+    private GfaParser parser;
 
     /**
      * Constructor of the FileController object to control the Files.
+     * @param pbc The progressbar.
      */
     public FileController(ProgressBarController pbc) {
         graph = new SequenceGraph();
@@ -69,32 +77,26 @@ public class FileController {
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa.
      * can be selected and directly be visualised on the screen.
      * @param anchorPane the pane where we will be drawing
-     * @param gc the graphicscontext we will use
-     * @return The strign of the file that has just been loaded.
+     * @param gc the graphicscontext we will use.
+     * @param mC the MenuController so it can Observe.
      * @throws IOException exception if no file is found
+     * @throws InterruptedException Exception if the Thread is interrupted.
      */
-    public String openFileClicked(AnchorPane anchorPane, GraphicsContext gc) throws IOException {
+    public void openFileClicked(AnchorPane anchorPane, GraphicsContext gc, MenuController mC)
+            throws IOException, InterruptedException {
+        this.gc = gc;
         Stage stage = (Stage) anchorPane.getScene().getWindow();
-        progressBarController.run();
         File file = chooseFile(stage);
-        GfaParser parser = new GfaParser(file.getAbsolutePath());
-        System.out.println("src/main/resources/" + file.getName());
-        parser.start();
+        parser = new GfaParser(file.getAbsolutePath());
+        parser.addObserver(this);
+        parser.addObserver(mC);
+        if (this.parseThread != null) {
+            this.parseThread.interrupt();
+        }
+        this.parseThread = new Thread(parser);
+        this.parseThread.start();
 
-        adjacencyMap = parser.getAdjacencyHMap();
-        graph = new SequenceGraph();
-        graph.createSubGraph(NODE_ID, RENDER_RANGE, adjacencyMap);
-        sequenceHashMap = parser.getSequenceHashMap();
-        drawer = new GraphDrawer(graph, gc);
-        drawer.moveShapes(0.0);
-
-        String filePath = file.getAbsolutePath();
-        String pattern = Pattern.quote(System.getProperty("file.separator"));
-        String[] partPaths = filePath.split(pattern);
-        String fileName = partPaths[partPaths.length - 1];
-        System.out.println(fileName);
-
-        return fileName;
+        progressBarController.run();
     }
 
     /**
@@ -121,20 +123,19 @@ public class FileController {
         return graph;
     }
 
-//    public Task fileReadTask() {
-//        return new Task() {
-//            @Override
-//            protected Object call() throws Exception {
-//
-//                GfaParser parser = new GfaParser();
-//                System.out.println("src/main/resources/" + file.getName());
-//
-//                adjacencyMap = parser.parseGraph(file.getAbsolutePath());
-//                progressBarController.done();
-//                sequenceHashMap = parser.getSequenceHashMap();
-//
-//                return file.getName();
-//            }
-//        };
-//    };
+    @Override
+    public void update(Observable o, Object arg) {
+        if (o instanceof GfaParser) {
+            if (arg instanceof HTreeMap) {
+                HTreeMap<Long, int[]> adjacencyMap = (HTreeMap) arg;
+                progressBarController.done();
+                //adjacencyMap = parser.getAdjacencyHMap();
+                graph = new SequenceGraph();
+                graph.createSubGraph(nodeId, renderRange, adjacencyMap);
+                sequenceHashMap = parser.getSequenceHashMap();
+                drawer = new GraphDrawer(graph, gc);
+                drawer.moveShapes(0.0);
+            }
+        }
+    }
 }

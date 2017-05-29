@@ -3,6 +3,7 @@ package gui;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.subControllers.*;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -11,9 +12,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import org.mapdb.HTreeMap;
+import parser.GfaParser;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.prefs.Preferences;
 
 /**
@@ -22,7 +26,7 @@ import java.util.prefs.Preferences;
  * Controller for the Menu scene. Used to run all functionality
  * in the main screen of the application.
  */
-public class MenuController {
+public class MenuController implements Observer {
 
     @FXML
     public Button saveBookmark;
@@ -61,6 +65,8 @@ public class MenuController {
     private ZoomController zoomController;
     private InfoController infoController;
 
+    private String fileString;
+
     /**
      * Initializes the canvas.
      */
@@ -85,17 +91,13 @@ public class MenuController {
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
      * can be selected and directly be visualised on the screen.
      * @throws IOException if there is no file specified.
+     * @throws InterruptedException Exception when the Thread is interrupted.
      */
     @FXML
-    public void openFileClicked() throws IOException {
-        String fileString = fileController.openFileClicked(anchorPane, gc);
+    public void openFileClicked() throws IOException, InterruptedException {
+        fileController.openFileClicked(anchorPane, gc, this);
 
-        prefs.put("file", fileString);
-        bookmarkController.loadBookmarks(fileString);
-        zoomController = new ZoomController(fileController.getDrawer(),
-                                nodeTextField, radiusTextField);
 
-        displayInfo(fileController.getGraph());
     }
 
     private void displayInfo(SequenceGraph graph) {
@@ -124,7 +126,7 @@ public class MenuController {
     @FXML
     public void scrollZoom(ScrollEvent scrollEvent) throws IOException {
         int column = fileController.getDrawer().mouseLocationColumn(scrollEvent.getX());
-        if (scrollEvent.getDeltaY() > 0){
+        if (scrollEvent.getDeltaY() > 0) {
             zoomController.zoomIn(column);
         } else {
             zoomController.zoomOut(column);
@@ -214,7 +216,30 @@ public class MenuController {
         }
     }
 
+    /**
+     * getter for the SequenceMap.
+     * @return The sequenceMap.
+     */
     HTreeMap<Long, String> getSequenceHashMap() {
         return fileController.getSequenceHashMap();
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        if (o instanceof GfaParser) {
+            if (arg instanceof String) {
+                fileString = (String) arg;
+                prefs.put("file", fileString);
+                Platform.runLater(new Runnable() {
+                    public void run() {
+                        bookmarkController.loadBookmarks(fileString);
+                        zoomController = new ZoomController(fileController.getDrawer(),
+                                nodeTextField, radiusTextField);
+                        displayInfo(fileController.getGraph());
+                    }
+                });
+            }
+        }
+
     }
 }
