@@ -2,6 +2,7 @@
 
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -41,7 +42,8 @@
                       </Menu>
                       <Menu mnemonicParsing="false" text="Help">
                         <items>
-                          <MenuItem mnemonicParsing="false" text="About" />
+                            <MenuItem mnemonicParsing="false" text="About" />
+                            <MenuItem mnemonicParsing="false" text="Help" onAction="#helpWanted" />
                         </items>
                       </Menu>
                     </menus>
