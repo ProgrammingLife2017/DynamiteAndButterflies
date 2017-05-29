@@ -20,8 +20,8 @@ public class PanningController {
     }
 
     public void initialize() {
-        scrollbar.setMax(drawer.getRadius());
-        scrollbar.setVisibleAmount(drawer.getRadius());
+        scrollbar.setMax(drawer.getZoomLevel());
+        scrollbar.setVisibleAmount(drawer.getZoomLevel());
         scrollbar.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> ov,
                                 Number old_val, Number new_val) {
