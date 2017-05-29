@@ -12,6 +12,7 @@ public class PanningController {
 
     private ScrollBar scrollbar;
     private GraphDrawer drawer;
+    private boolean active;
 
     public PanningController(ScrollBar scrollBar, GraphDrawer drawer) {
         this.scrollbar = scrollBar;
@@ -25,7 +26,9 @@ public class PanningController {
         scrollbar.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> ov,
                                 Number old_val, Number new_val) {
-                System.out.println("delta: " + (new_val.doubleValue() - old_val.doubleValue()));
+                if (active) {
+                    drawer.moveShapes(drawer.getxDifference() + (new_val.doubleValue() - old_val.doubleValue()));
+                }
             }
         });
     }
@@ -35,6 +38,7 @@ public class PanningController {
     }
 
     public void setScrollbarSize(double factor, int column) {
+        active = false;
         double max = scrollbar.getMax();
         double amount = scrollbar.getVisibleAmount();
         if ((factor < 1 && amount < 1) || (factor > 1 && amount >= max)) {
@@ -43,7 +47,7 @@ public class PanningController {
         amount = scrollbar.getVisibleAmount() * factor;
         scrollbar.setValue(column);
         scrollbar.setVisibleAmount(amount);
-        System.out.println(amount);
+        active = true;
     }
 
 }

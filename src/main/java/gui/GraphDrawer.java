@@ -271,6 +271,10 @@ public class GraphDrawer {
         return radius;
     }
 
+    public double getxDifference() {
+        return xDifference;
+    }
+
     /**
      * Gets the column based on the mouse location.
      * @param x x coordinate of the mouse
