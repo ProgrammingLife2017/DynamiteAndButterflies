@@ -21,6 +21,7 @@ public class SequenceGraph {
     private HashMap<Integer, SequenceNode> nodes;
     private ArrayList<Edge> edges;
     private ArrayList<ArrayList<SequenceNode>> columns;
+    private HashMap<Integer, ArrayList<Integer>> adjacencyMap;
 
     /**
      * The constructor initializes the SequenceGraph with it's basic values.
@@ -35,12 +36,11 @@ public class SequenceGraph {
 
 
     public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray) {
+        int upperBoundID = childArray[childArray.length -1];
+        int lowerBoundID = parentArray[0];
+        range = range + 5;
 
 
-
-        /*
-        int upperBoundID = childArray[counter-1];
-        int lowerBoundID = 1;
         if(centerNodeID + range <= upperBoundID) {
             upperBoundID = centerNodeID + range;
         }
@@ -48,23 +48,30 @@ public class SequenceGraph {
             lowerBoundID = centerNodeID - range;
         }
 
-        for(int i = lowerBoundID-1; i < counter; i++) {
+        for(int i = 0; i < parentArray.length; i++) {
             int parentID = parentArray[i];
             int childID = childArray[i];
 
-            if(parentID >= lowerBoundID && childID <= upperBoundID) {
-                SequenceNode parentNode = new SequenceNode(parentID);
-                parentNode.addChild(childID);
-                SequenceNode childNode = new SequenceNode(childID);
-                this.addNode(parentNode);
-                this.addNode(childNode);
-                Edge edge = new Edge(parentID, childID);
-                this.getEdges().add(edge);
+            if(parentID >= lowerBoundID) {
+                if (nodes.get(parentID) == null) {
+                    SequenceNode node = new SequenceNode(parentID);
+                    node.addChild(childID);
+                    nodes.put(parentID, node);
+                } else {
+                    nodes.get(parentID).addChild(childID);
+                }
+//                SequenceNode node = new SequenceNode(parentID);
+//                node.addChild(childID);
+//                this.nodes.put(parentID, node);
+//                addToList(parentID, childID);
+
             }
         }
+        SequenceNode lastNode = new SequenceNode(upperBoundID);
+        this.nodes.put(upperBoundID, lastNode);
+
         initialize();
         layerizeGraph(lowerBoundID);
-        */
     }
 
     /**
@@ -203,6 +210,33 @@ public class SequenceGraph {
             }
         }
         return columns;
+    }
+
+    /**
+     * Adder for Hashmap<Integer, List<Integer>)
+     *
+     * @param mapKey - the key in which to add a nodeID
+     * @param nodeID - the nodeID to be added
+     */
+    private synchronized void addToList(Integer mapKey, Integer nodeID) {
+        if (adjacencyMap.get(mapKey) == null) {
+            ArrayList<Integer> idList = new ArrayList<Integer>();
+            idList.add(nodeID);
+            adjacencyMap.put(mapKey, idList);
+
+        }
+        else if(adjacencyMap.get(mapKey) != null) {
+            ArrayList<Integer> idList = adjacencyMap.get(mapKey);
+            // if list does not exist create it
+            if (idList == null) {
+                idList = new ArrayList<Integer>();
+                idList.add(nodeID);
+                adjacencyMap.put(mapKey, idList);
+            } else {
+                // add if item is not already in list
+                if (!idList.contains(nodeID)) idList.add(nodeID);
+            }
+        }
     }
 
 }

@@ -26,6 +26,7 @@ public class GfaParser {
     private String header2;
     private HTreeMap<Long, String> sequenceMap;
 
+
     private int[] parentArray;
     private int[] childArray;
     private int counter;
@@ -117,9 +118,14 @@ public class GfaParser {
         prefs.putInt(filePath + "size", x.size());
     }
 
-    private int[] read(String partPath) throws IOException {
-        InputStream in = new FileInputStream(System.getProperty("user.dir")+ System.getProperty("file.separator") + partPath + "childArray.txt");
-
+    private int[] read(String partPath, boolean isParent) throws IOException {
+        String additionToPath;
+        if (isParent) {
+            additionToPath = "parentArray.txt";
+        } else {
+            additionToPath = "childArray.txt";
+        }
+        InputStream in = new FileInputStream(System.getProperty("user.dir")+ System.getProperty("file.separator") + partPath + additionToPath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String []StrNums = br.readLine().split(",");
         int size = prefs.getInt(partPath+"childArray.txtsize", -1);
@@ -161,11 +167,11 @@ public class GfaParser {
     }
 
     public int[] getParentArray(String partPath) throws IOException {
-        return read(partPath);
+        return read(partPath, true);
     }
 
     public int[] getChildArray( String partPath) throws IOException {
-        return read(partPath);
+        return read(partPath, false);
     }
 
     public int getCounter() {
@@ -175,4 +181,6 @@ public class GfaParser {
     public String getPartPath() {
         return partPath;
     }
+
+
 }
