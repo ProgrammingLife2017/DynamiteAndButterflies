@@ -56,6 +56,8 @@ public class DrawableNode {
     public void draw() {
         if (highlighted) {
             gc.setFill(Color.ORANGE);
+        } else if (isDummy){
+            gc.setFill(Color.BLACK);
         } else {
             gc.setFill(Color.BLUE);
         }

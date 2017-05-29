@@ -5,6 +5,7 @@ import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -41,16 +42,30 @@ public class GraphDrawer {
         this.graph = graph;
         this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
         canvasNodes = new ArrayList<DrawableNode>();
-        initializeDrawableNodes();
         graph.initialize();
         graph.layerizeGraph();
         columns = graph.getColumns();
         zoomLevel = columns.size();
+        initializeDrawableNodes();
     }
 
+//    private void initializeDrawableNodes() {
+//        for (int i = 1; i <= graph.size(); i++) {
+//            canvasNodes.add(new DrawableNode(i, gc));
+//        }
+//    }
+
     private void initializeDrawableNodes() {
-        for (int i = 1; i <= graph.size(); i++) {
-            canvasNodes.add(new DrawableNode(i, gc));
+        for (int i = 0; i < columns.size(); i++) {
+            ArrayList<SequenceNode> column = columns.get(i);
+            for (int j = 0; j < column.size(); j++) {
+                SequenceNode sNode = column.get(j);
+                DrawableNode dNode = new DrawableNode(sNode.getId(), gc);
+                if (sNode.isDummy()) {
+                    dNode.setDummy(true);
+                }
+                canvasNodes.add(dNode);
+            }
         }
     }
 
@@ -91,20 +106,22 @@ public class GraphDrawer {
     }
 
     private void drawNodes() {
+        int counter = 0;
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
                 if (column.get(i).isDummy()) {
-                    continue;
+                    //continue;
                     //gc.setFill(Color.BLACK);
                 }
                 double x = (j - xDifference) * stepSize;
                 double y = yBase + (i * RELATIVE_Y_DISTANCE);
                 double width = RELATIVE_X_DISTANCE * stepSize;
                 double height = getYSize();
-                DrawableNode node = canvasNodes.get(column.get(i).getId() - 1);
+                DrawableNode node = canvasNodes.get(counter);
                 node.setCoordinates(x, y, width, height);
                 node.draw();
+                counter++;
             }
         }
     }
