@@ -8,10 +8,12 @@ import javafx.scene.paint.Color;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
- *
+ * <p>
  * Class used to draw shapes on the canvas.
  */
 public class GraphDrawer {
@@ -39,8 +41,9 @@ public class GraphDrawer {
 
     /**
      * Constructor.
+     *
      * @param graph The sequencegraph to be drawn to the canvas.
-     * @param gc The graphics context used to actually draw shapes.
+     * @param gc    The graphics context used to actually draw shapes.
      */
     public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
@@ -51,18 +54,28 @@ public class GraphDrawer {
         graph.layerizeGraph();
         columns = graph.getColumns();
         columnWidths = new int[columns.size() + 1];
+        initializeDrawableNodes();
         initializeColumnWidths();
         zoomLevel = columnWidths[columns.size()];
         radius = columns.size();
-        initializeDrawableNodes();
     }
 
     private void initializeDrawableNodes() {
-
+        for (Object o : graph.getNodes().entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
+            SequenceNode node = (SequenceNode) pair.getValue();
+            canvasNodes.add(new DrawableNode(node.getId(), gc, false));
+        }
+        for (Object o : graph.getDummyNodes().entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
+            SequenceNode node = (SequenceNode) pair.getValue();
+            canvasNodes.add(new DrawableNode(node.getId(), gc, true));
+        }
     }
 
     /**
      * Function what to do on Zoom.
+     *
      * @param factor Zooming factor.
      * @param column The Column that has to be in the centre.
      */
@@ -77,8 +90,9 @@ public class GraphDrawer {
 
     /**
      * Change the zoom (invoked by user by clicking on "Go to this Node".
+     *
      * @param newZoom The new radius.
-     * @param column The new Column to be in the centre.
+     * @param column  The new Column to be in the centre.
      */
     public void changeZoom(final int newZoom, final int column) {
         radius = newZoom;
@@ -95,6 +109,7 @@ public class GraphDrawer {
 
     /**
      * Draws the Graph.
+     *
      * @param xDifference Variable to determine which column should be in the centre.
      */
     public void moveShapes(double xDifference) {
@@ -133,13 +148,10 @@ public class GraphDrawer {
      * is checked dummy nodes are either drawn or skipped.
      */
     private void drawNodes() {
-        int counter = 0;
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
-
                 if (column.get(i).isDummy() && !showDummyNodes) {
-                    counter++;
                     continue;
                 }
                 double width = (columnWidths[j + 1] - columnWidths[j])
@@ -151,10 +163,9 @@ public class GraphDrawer {
                     y += (height - width) / 2;
                     height = width;
                 }
-                DrawableNode node = canvasNodes.get(counter);
+                DrawableNode node = canvasNodes.get(column.get(i).getId() - 1);
                 node.setCoordinates(x, y, width, height);
                 node.draw();
-                counter++;
             }
         }
     }
@@ -179,6 +190,7 @@ public class GraphDrawer {
     /**
 <<<<<<< HEAD
      * Searches for the node that was pressed.
+     *
      * @param xEvent xCor of mouse press
      * @param yEvent yCor of mouse press
      * @return The Node that was clicked
@@ -225,7 +237,7 @@ public class GraphDrawer {
         if (width == 0) {
             width = MIN_LINE_WIDTH;
         }
-        if (width > 1) { 
+        if (width > 1) {
             width = MAX_LINE_WIDTH;
         }
         gc.setLineWidth(width);
@@ -233,6 +245,7 @@ public class GraphDrawer {
 
     /**
      * Gets the real Centre Column.
+     *
      * @return the Centre Column.
      */
     private ArrayList<SequenceNode> getCentreColumn() {
@@ -241,6 +254,7 @@ public class GraphDrawer {
 
     /**
      * Returns the First SequenceNode (not Dummy) Object from the centre Column.
+     *
      * @return The Centre Node.
      */
     public SequenceNode getRealCentreNode() {
@@ -253,6 +267,7 @@ public class GraphDrawer {
 
     /**
      * Highlights the centre node.
+     *
      * @param node The node that should be highlighted
      */
     public void highlight(int node) {
@@ -263,8 +278,10 @@ public class GraphDrawer {
     }
 
     //TODO: Loop over the  nodes in the graph (O(n*m) > O(k))
+
     /**
      * Returns the ColumnId of a Node at the users Choice.
+     *
      * @param nodeId The Id of the Node you want to find the Column of.
      * @return The ColumnId
      */
@@ -279,12 +296,18 @@ public class GraphDrawer {
         return -1;
     }
 
+    /**
+     * Get function for zoom level.
+     *
+     * @return the Zoom level.
+     */
     public double getZoomLevel() {
         return zoomLevel;
     }
 
     /**
      * Get function for the radius.
+     *
      * @return the double representing the radius.
      */
     public double getRadius() {

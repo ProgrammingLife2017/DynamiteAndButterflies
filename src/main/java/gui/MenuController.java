@@ -190,6 +190,13 @@ public class MenuController {
         }
     }
 
+    @FXML
+    public void checkDummynodes() {
+        if (dummyNodeCheckbox.isSelected()) {
+
+        }
+    }
+
     /**
      * Adds a button to traverse the graph with.
      */
