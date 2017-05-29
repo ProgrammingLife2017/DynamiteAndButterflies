@@ -82,8 +82,8 @@ public class MenuController implements Observer {
         bookmarkController = new BookmarkController(bookmark1, bookmark2);
 
         ps = new PrintStream(new Console(consoleArea));
-        System.setErr(ps);
-        System.setOut(ps);
+        //System.setErr(ps);
+        //System.setOut(ps);
 
     }
 

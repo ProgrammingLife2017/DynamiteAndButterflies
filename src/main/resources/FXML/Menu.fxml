@@ -18,83 +18,83 @@
 <?import javafx.scene.shape.Line?>
 
 <AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MenuController">
-   <children>
-      <BorderPane prefHeight="600.0" prefWidth="1000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <top>
+<children>
+    <BorderPane prefHeight="600.0" prefWidth="1000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <top>
             <MenuBar prefHeight="32.0" prefWidth="1095.0" BorderPane.alignment="CENTER">
-              <menus>
-                <Menu mnemonicParsing="false" text="File">
-                  <items>
-                    <MenuItem mnemonicParsing="false" onAction="#openFileClicked" text="Open gfa file" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Edit">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="Delete" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Help">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
-                  </items>
-                </Menu>
-              </menus>
+                <menus>
+                    <Menu mnemonicParsing="false" text="File">
+                        <items>
+                            <MenuItem mnemonicParsing="false" onAction="#openFileClicked" text="Open gfa file" />
+                        </items>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="Edit">
+                        <items>
+                            <MenuItem mnemonicParsing="false" text="Delete" />
+                        </items>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="Help">
+                        <items>
+                            <MenuItem mnemonicParsing="false" text="About" />
+                        </items>
+                    </Menu>
+                </menus>
             </MenuBar>
-         </top>
-         <left>
+        </top>
+        <left>
             <Pane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
-               <children>
-                  <TextField fx:id="nodeTextField" alignment="CENTER" layoutX="22.0" layoutY="126.0" prefHeight="29.0" prefWidth="97.0" promptText="Centre node" />
-                  <Button layoutX="9.0" layoutY="167.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
-                  <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="22.0" layoutY="209.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
-                  <Button fx:id="saveBookmark" layoutX="14.0" layoutY="293.0" mnemonicParsing="false" onAction="#saveTheBookmarks" text="Save Bookmark" />
-                  <Button fx:id="bookmark1" layoutX="27.0" layoutY="332.0" mnemonicParsing="false" onAction="#pressBookmark1" prefHeight="24.0" prefWidth="98.0" text="-" textAlignment="CENTER" />
-                  <Button fx:id="bookmark2" layoutX="27.0" layoutY="368.0" mnemonicParsing="false" onAction="#pressBookmark2" prefHeight="24.0" prefWidth="97.0" text="-" textAlignment="CENTER" />
-               </children>
-               <padding>
-                  <Insets right="15.0" />
-               </padding>
+                <children>
+                    <TextField fx:id="nodeTextField" alignment="CENTER" layoutX="22.0" layoutY="126.0" prefHeight="29.0" prefWidth="97.0" promptText="Centre node" />
+                    <Button layoutX="9.0" layoutY="167.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
+                    <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="22.0" layoutY="209.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
+                    <Button fx:id="saveBookmark" layoutX="14.0" layoutY="293.0" mnemonicParsing="false" onAction="#saveTheBookmarks" text="Save Bookmark" />
+                    <Button fx:id="bookmark1" layoutX="27.0" layoutY="332.0" mnemonicParsing="false" onAction="#pressBookmark1" prefHeight="24.0" prefWidth="98.0" text="-" textAlignment="CENTER" />
+                    <Button fx:id="bookmark2" layoutX="27.0" layoutY="368.0" mnemonicParsing="false" onAction="#pressBookmark2" prefHeight="24.0" prefWidth="97.0" text="-" textAlignment="CENTER" />
+                </children>
+                <padding>
+                    <Insets right="15.0" />
+                </padding>
             </Pane>
-         </left>
-         <center>
+        </left>
+        <center>
             <AnchorPane fx:id="canvasPanel" onMouseClicked="#clickMouse" onScroll="#scrollZoom" style="-fx-border-color: BLACK;" BorderPane.alignment="CENTER">
-               <children>
-                  <Canvas fx:id="canvas" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                  <Button layoutX="-1.0" layoutY="359.0" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.bottomAnchor="33.0" AnchorPane.leftAnchor="0.0" />
-                  <Button layoutX="1.0" layoutY="390.0" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
-               </children>
+                <children>
+                    <Canvas fx:id="canvas" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                    <Button layoutX="-1.0" layoutY="359.0" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.bottomAnchor="33.0" AnchorPane.leftAnchor="0.0" />
+                    <Button layoutX="1.0" layoutY="390.0" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+                </children>
             </AnchorPane>
-         </center>
-         <bottom>
+        </center>
+        <bottom>
             <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-              <tabs>
-                <Tab text="Information">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <Label layoutX="24.0" layoutY="11.0" text="Nodes:" />
-                              <Label layoutX="24.0" layoutY="43.0" text="Edges:" />
-                              <Label fx:id="numNodesLabel" layoutX="85.0" layoutY="11.0" text="0" />
-                              <Label fx:id="numEdgesLabel" layoutX="85.0" layoutY="43.0" text="0" />
-                              <Label fx:id="sequenceInfo" layoutX="168.0" layoutY="21.0" text="Select a Node" />
-                              <Line endX="150.0" endY="140.0" startX="150.0" startY="10.0" stroke="#c9c4c4" strokeLineCap="ROUND" strokeLineJoin="ROUND" />
-                              <ProgressBar fx:id="progressBar" layoutX="177.0" layoutY="95.0" prefHeight="18.0" prefWidth="785.0" progress="0.0" visible="false" />
-                           </children>
-                        </AnchorPane>
-                  </content>
-                </Tab>
-                <Tab text="Console">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <TextArea fx:id="consoleArea" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                           </children>
-                        </AnchorPane>
-                  </content>
-                </Tab>
-              </tabs>
+                <tabs>
+                    <Tab text="Information">
+                        <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                <children>
+                                    <Label layoutX="24.0" layoutY="11.0" text="Nodes:" />
+                                    <Label layoutX="24.0" layoutY="43.0" text="Edges:" />
+                                    <Label fx:id="numNodesLabel" layoutX="85.0" layoutY="11.0" text="0" />
+                                    <Label fx:id="numEdgesLabel" layoutX="85.0" layoutY="43.0" text="0" />
+                                    <Label fx:id="sequenceInfo" layoutX="168.0" layoutY="21.0" text="Select a Node" />
+                                    <Line endX="150.0" endY="140.0" startX="150.0" startY="10.0" stroke="#c9c4c4" strokeLineCap="ROUND" strokeLineJoin="ROUND" />
+                                    <ProgressBar fx:id="progressBar" layoutX="-8.0" layoutY="146.0" prefHeight="32.0" prefWidth="1934.0" progress="0.0" visible="false" />
+                                </children>
+                            </AnchorPane>
+                        </content>
+                    </Tab>
+                    <Tab text="Console">
+                        <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                <children>
+                                    <TextArea fx:id="consoleArea" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                </children>
+                            </AnchorPane>
+                        </content>
+                    </Tab>
+                </tabs>
             </TabPane>
-         </bottom>
-      </BorderPane>
-   </children>
+        </bottom>
+    </BorderPane>
+</children>
 </AnchorPane>

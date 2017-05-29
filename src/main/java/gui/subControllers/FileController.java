@@ -128,13 +128,12 @@ public class FileController implements Observer {
         if (o instanceof GfaParser) {
             if (arg instanceof HTreeMap) {
                 HTreeMap<Long, int[]> adjacencyMap = (HTreeMap) arg;
-                progressBarController.done();
-                //adjacencyMap = parser.getAdjacencyHMap();
                 graph = new SequenceGraph();
                 graph.createSubGraph(nodeId, renderRange, adjacencyMap);
                 sequenceHashMap = parser.getSequenceHashMap();
                 drawer = new GraphDrawer(graph, gc);
                 drawer.moveShapes(0.0);
+                progressBarController.done();
             }
         }
     }
