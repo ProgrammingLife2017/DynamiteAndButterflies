@@ -5,6 +5,7 @@ import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -30,6 +31,7 @@ public class GraphDrawer {
     private double xDifference;
     private double stepSize;
     private int[] columnWidths;
+    private boolean showDummyNodes;
     private GraphicsContext gc;
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
@@ -45,7 +47,6 @@ public class GraphDrawer {
         this.graph = graph;
         this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
         canvasNodes = new ArrayList<DrawableNode>();
-        initializeDrawableNodes();
         graph.initialize();
         graph.layerizeGraph();
         columns = graph.getColumns();
@@ -53,12 +54,11 @@ public class GraphDrawer {
         initializeColumnWidths();
         zoomLevel = columnWidths[columns.size()];
         radius = columns.size();
+        initializeDrawableNodes();
     }
 
     private void initializeDrawableNodes() {
-        for (int i = 1; i <= graph.size(); i++) {
-            canvasNodes.add(new DrawableNode(i, gc));
-        }
+
     }
 
     /**
@@ -84,6 +84,13 @@ public class GraphDrawer {
         radius = newZoom;
         zoomLevel = columnWidths[column + newZoom / 2] - columnWidths[column - newZoom / 2];
         moveShapes(columnWidths[column + 2] - zoomLevel / 2);
+    }
+
+    /**
+     * Redraw all nodes with the same coordinates.
+     */
+    public void redraw() {
+        moveShapes(xDifference);
     }
 
     /**
@@ -121,24 +128,33 @@ public class GraphDrawer {
         }
     }
 
+    /**
+     * Gives all nodes the right coordinates on the canvas and draw them. Depending on whether the dummy nodes checkbox
+     * is checked dummy nodes are either drawn or skipped.
+     */
     private void drawNodes() {
+        int counter = 0;
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
-                if (!column.get(i).isDummy()) {
-                    double width = (columnWidths[j + 1] - columnWidths[j])
-                                    * stepSize * RELATIVE_X_DISTANCE;
-                    double height = getYSize();
-                    double x = (columnWidths[j] - xDifference) * stepSize;
-                    double y = yBase + (i * RELATIVE_Y_DISTANCE);
-                    if (height > width) {
-                        y += (height - width) / 2;
-                        height = width;
-                    }
-                    DrawableNode node = canvasNodes.get(column.get(i).getId() - 1);
-                    node.setCoordinates(x, y, width, height);
-                    node.draw();
+
+                if (column.get(i).isDummy() && !showDummyNodes) {
+                    counter++;
+                    continue;
                 }
+                double width = (columnWidths[j + 1] - columnWidths[j])
+                        * stepSize * RELATIVE_X_DISTANCE;
+                double height = getYSize();
+                double x = (columnWidths[j] - xDifference) * stepSize;
+                double y = yBase + (i * RELATIVE_Y_DISTANCE);
+                if (height > width) {
+                    y += (height - width) / 2;
+                    height = width;
+                }
+                DrawableNode node = canvasNodes.get(counter);
+                node.setCoordinates(x, y, width, height);
+                node.draw();
+                counter++;
             }
         }
     }
@@ -161,10 +177,18 @@ public class GraphDrawer {
     }
 
     /**
+<<<<<<< HEAD
      * Searches for the node that was pressed.
      * @param xEvent xCor of mouse press
      * @param yEvent yCor of mouse press
      * @return The Node that was clicked
+=======
+     * Check for each node if the click event is within its borders. If so highlight the node and return it. Also all
+     * other nodes are lowlighted.
+     * @param xEvent The x coordinate of the click event.
+     * @param yEvent The y coordinate of the click event.
+     * @return The sequencenode that has been clicked or null if nothing was clicked.
+>>>>>>> origin/Issue_#99
      */
     public SequenceNode clickNode(double xEvent, double yEvent) {
         SequenceNode click = null;
@@ -255,10 +279,6 @@ public class GraphDrawer {
         return -1;
     }
 
-    /**
-     * Get function for zoom level.
-     * @return the Zoom level.
-     */
     public double getZoomLevel() {
         return zoomLevel;
     }
@@ -271,10 +291,14 @@ public class GraphDrawer {
         return radius;
     }
 
+    public void setShowDummyNodes(boolean showDummyNodes) {
+        this.showDummyNodes = showDummyNodes;
+    }
+
     /**
-     * Gets the column based on the mouse location.
-     * @param x x coordinate of the mouse
-     * @return The int representing the column where the mouse is.
+     * Return the column the mouse click is in.
+     * @param x The x coordinate of the mouse click event
+     * @return The id of the column that the mouse click is in.
      */
     public int mouseLocationColumn(double x) {
         return (int) ((x / stepSize) + xDifference);

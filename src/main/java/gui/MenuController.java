@@ -6,11 +6,7 @@ import gui.sub_controllers.*;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -60,6 +56,9 @@ public class MenuController {
     private Label numEdgesLabel;
     @FXML
     private TextArea consoleArea;
+    @FXML
+    private CheckBox dummyNodeCheckbox;
+
     private PrintStream ps;
 
     private GraphicsContext gc;
@@ -216,6 +215,19 @@ public class MenuController {
         String newString = "Sequence: "
                 + fileController.getSequenceHashMap().get((long) centreNodeID);
         infoController.updateSeqLabel(newString);
+    }
+
+    /**
+     * Display dummy nodes on checkbox checked and hide them on checkbox unchecked.
+     */
+    @FXML
+    public void toggleDummyNodes() {
+        if (dummyNodeCheckbox.isSelected()) {
+            fileController.getDrawer().setShowDummyNodes(true);
+        } else {
+            fileController.getDrawer().setShowDummyNodes(false);
+        }
+        fileController.getDrawer().redraw();
     }
 
     /**

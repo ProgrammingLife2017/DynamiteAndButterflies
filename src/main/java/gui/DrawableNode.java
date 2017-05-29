@@ -4,7 +4,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 /**
- * Created by TUDelft SID on 17-5-2017.
+ * Created by Jasper van Tilburg on 17-5-2017.
+ *
+ * A drawable version of SequenceNode. This class includes all attributes needed for displaying a node including
+ * coordinates, height, width, whether it is a dummy node and whether it is a highlighted node.
  */
 public class DrawableNode {
 
@@ -17,12 +20,20 @@ public class DrawableNode {
     private double width;
     private double height;
     private boolean highlighted;
-    
-    public DrawableNode(int id, GraphicsContext gc) {
+    private boolean isDummy;
+
+    public DrawableNode (int id, GraphicsContext gc) {
         this.gc = gc;
         this.id = id;
     }
 
+    /**
+     * Set the coordinates, width and height of the node.
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param width Width
+     * @param height Height
+     */
     public void setCoordinates(double x, double y, double width, double height) {
         this.xCoordinate = x;
         this.yCoordinate = y;
@@ -50,25 +61,51 @@ public class DrawableNode {
         return height;
     }
 
+    public boolean isDummy() {
+        return isDummy;
+    }
+
+    public void setDummy(boolean dummy) {
+        isDummy = dummy;
+    }
+
+    /**
+     * Draw the node highlighted.
+     */
     public void highlight() {
         this.highlighted = true;
         draw();
     }
 
+    /**
+     * Draw the node lowlighted.
+     */
     public void lowlight() {
         this.highlighted = false;
         draw();
     }
 
+    /**
+     * Draw the node with the color depending on it's status. Orange for highlighted nodes, black for dummy nodes and
+     * blue for sequence nodes.
+     */
     public void draw() {
         if (highlighted) {
             gc.setFill(Color.ORANGE);
+        } else if (isDummy){
+            gc.setFill(Color.BLACK);
         } else {
             gc.setFill(Color.BLUE);
         }
         gc.fillRoundRect(xCoordinate, yCoordinate, width, height, ARC_SIZE, ARC_SIZE);
     }
 
+    /**
+     * Check if a click event is within the borders of this node.
+     * @param xEvent x coordinate of the click event
+     * @param yEvent y coordinate of the click event
+     * @return True if the coordinates of the click event are within borders, false otherwise.
+     */
     public boolean checkClick(double xEvent, double yEvent) {
         return (xEvent > xCoordinate && xEvent < xCoordinate + width && yEvent > yCoordinate && yEvent < yCoordinate + height);
     }
