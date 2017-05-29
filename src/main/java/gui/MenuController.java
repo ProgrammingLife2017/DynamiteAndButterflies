@@ -97,8 +97,8 @@ public class MenuController implements Observer {
 
         recentController.initialize(prefs);
         ps = new PrintStream(new Console(consoleArea));
-        //System.setErr(ps);
-        //System.setOut(ps);
+        System.setErr(ps);
+        System.setOut(ps);
     }
 
     /**
