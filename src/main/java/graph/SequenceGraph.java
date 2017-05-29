@@ -34,8 +34,11 @@ public class SequenceGraph {
     }
 
 
-    public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray, int counter) {
+    public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray) {
 
+
+
+        /*
         int upperBoundID = childArray[counter-1];
         int lowerBoundID = 1;
         if(centerNodeID + range <= upperBoundID) {
@@ -61,6 +64,7 @@ public class SequenceGraph {
         }
         initialize();
         layerizeGraph(lowerBoundID);
+        */
     }
 
     /**

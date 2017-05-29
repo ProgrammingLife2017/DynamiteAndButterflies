@@ -29,6 +29,7 @@ public class GfaParser {
     private int[] parentArray;
     private int[] childArray;
     private int counter;
+    private String partPath;
 
     public DB db;
 
@@ -45,7 +46,7 @@ public class GfaParser {
     public void parseGraph(String filePath) throws IOException {
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
-        String partPath = partPaths[partPaths.length-1];
+        partPath = partPaths[partPaths.length-1];
         System.out.println(partPath);
 
 
@@ -55,6 +56,7 @@ public class GfaParser {
             parseSpecific(filePath, partPath);
         } else {
             sequenceMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
+            parseSpecific(filePath, partPath);
         }
     }
 
@@ -115,11 +117,12 @@ public class GfaParser {
         prefs.putInt(filePath + "size", x.size());
     }
 
-    private int[] read(String filePath) throws IOException {
-        InputStream in = new FileInputStream(filePath);
+    private int[] read(String partPath) throws IOException {
+        InputStream in = new FileInputStream(System.getProperty("user.dir")+ System.getProperty("file.separator") + partPath + "childArray.txt");
+
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String []StrNums = br.readLine().split(",");
-        int size = prefs.getInt(filePath+"size", -1);
+        int size = prefs.getInt(partPath+"childArray.txtsize", -1);
         if (size == -1) {
             throw new java.lang.RuntimeException("Size not in preferences file");
         }
@@ -157,15 +160,19 @@ public class GfaParser {
         return ret;
     }
 
-    public int[] getParentArray(String filePath) throws IOException {
-        return read(filePath);
+    public int[] getParentArray(String partPath) throws IOException {
+        return read(partPath);
     }
 
-    public int[] getChildArray(String filePath) throws IOException {
-        return read(filePath);
+    public int[] getChildArray( String partPath) throws IOException {
+        return read(partPath);
     }
 
     public int getCounter() {
         return counter;
+    }
+
+    public String getPartPath() {
+        return partPath;
     }
 }

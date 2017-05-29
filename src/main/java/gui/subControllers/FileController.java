@@ -29,11 +29,10 @@ public class FileController {
     private File parDirectory;
 
     private final int RENDER_RANGE = 5000;
-    private final int NODE_ID = 5000000;
+    private final int NODE_ID = 1;
 
     private int[] childArray;
     private int[] parentArray;
-    private int counter;
 
     /**
      * Constructor of the FileController object to control the Files.
@@ -88,11 +87,13 @@ public class FileController {
         System.out.println("src/main/resources/" + file.getName());
         String filePath = file.getAbsolutePath();
         parser.parseGraph(filePath);
-        parentArray = parser.getParentArray(filePath);
-        childArray = parser.getChildArray(filePath);
-        counter = parser.getCounter();
+
+        parentArray = parser.getParentArray(parser.getPartPath());
+        childArray = parser.getChildArray(parser.getPartPath());
+
+
         graph = new SequenceGraph();
-        graph.createSubGraph(NODE_ID,RENDER_RANGE, parentArray, childArray, counter);
+        graph.createSubGraph(NODE_ID,RENDER_RANGE, parentArray, childArray);
         sequenceHashMap = parser.getSequenceHashMap();
         drawer = new GraphDrawer(graph, gc);
         drawer.moveShapes(0.0);
