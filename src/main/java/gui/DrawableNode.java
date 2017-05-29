@@ -34,6 +34,22 @@ public class DrawableNode {
         return this.id;
     }
 
+    public double getxCoordinate() {
+        return xCoordinate;
+    }
+
+    public double getyCoordinate() {
+        return yCoordinate;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
     public void highlight() {
         this.highlighted = true;
         draw();

@@ -1,6 +1,7 @@
 package gui.sub_controllers;
 
 import graph.SequenceGraph;
+import graph.SequenceNode;
 import gui.GraphDrawer;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.FileChooser;
@@ -62,6 +63,13 @@ public class FileController {
         return res;
     }
 
+    private void assignSequenceLenghts() {
+        for (int i = 1; i <= graph.size(); i++) {
+            SequenceNode node = graph.getNode(i);
+            node.setSequenceLength(sequenceHashMap.get((long) i).length());
+        }
+    }
+
     /**
      * Gets the sequenceHashMap.
      * @return the sequenceHashMap with all the sequences
@@ -102,6 +110,7 @@ public class FileController {
         graph = new SequenceGraph();
         graph.createSubGraph(NODE_ID, RENDER_RANGE, adjacencyMap);
         sequenceHashMap = parser.getSequenceHashMap();
+        assignSequenceLenghts();
         drawer = new GraphDrawer(graph, gc);
         drawer.moveShapes(0.0);
 

@@ -37,7 +37,7 @@ public class ZoomController {
         } else {
             drawer.zoom(0.8, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
         }
-        updateRadius(drawer.getZoomLevel() + "");
+        updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
 
     /**
@@ -47,7 +47,7 @@ public class ZoomController {
      */
     public void zoomIn(int column) throws IOException {
         drawer.zoom(0.9, column);
-        updateRadius(drawer.getZoomLevel() + "");
+        updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
 
     /**
@@ -60,7 +60,7 @@ public class ZoomController {
         } else {
             drawer.zoom(1.25, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
         }
-        updateRadius(drawer.getZoomLevel() + "");
+        updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
 
     /**
@@ -70,7 +70,7 @@ public class ZoomController {
      */
     public void zoomOut(int column) throws IOException {
         drawer.zoom(1.1, column);
-        updateRadius(drawer.getZoomLevel() + "");
+        updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
 
     /**
@@ -82,6 +82,7 @@ public class ZoomController {
         int endColumn = getEndColumn(graphSize);
         int centreNodeID = Integer.parseInt(nodeTextField.getText());
         drawer.changeZoom(endColumn - startColumn, drawer.getColumnId(centreNodeID));
+        drawer.highlight(centreNodeID);
     }
 
     /**
@@ -94,6 +95,7 @@ public class ZoomController {
         int startColumn = getStartColumn(centreNode, radius);
         int endColumn = getEndColumn(graphSize, centreNode, radius);
         drawer.changeZoom(endColumn - startColumn, drawer.getColumnId(centreNode));
+        drawer.highlight(centreNode);
     }
 
     /**
@@ -101,7 +103,7 @@ public class ZoomController {
      */
     public void displayInfo() {
         nodeTextField.setText(drawer.getRealCentreNode().getId() + "");
-        radiusTextField.setText(drawer.getZoomLevel() + "");
+        radiusTextField.setText((int) Math.ceil(drawer.getRadius()) + "");
     }
 
     /**

@@ -185,7 +185,7 @@ public class MenuController {
         double pressedY = mouseEvent.getY();
         SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, pressedY);
         if (clicked != null) {
-            String newString = "Sequence: "
+            String newString = "ID: " + clicked.getId() + "\nSequence: "
                     + fileController.getSequenceHashMap().get((long) clicked.getId());
             infoController.updateSeqLabel(newString);
         }
@@ -197,8 +197,8 @@ public class MenuController {
     public void traverseGraphClicked() {
         zoomController.traverseGraphClicked(fileController.getGraph().getNodes().size());
         int centreNodeID = zoomController.getCentreNodeID();
-        String newString = "Sequence: "
-                            + fileController.getSequenceHashMap().get((long) centreNodeID);
+        String newString = "ID: " + centreNodeID + "\nSequence: "
+                + fileController.getSequenceHashMap().get((long) centreNodeID);
         infoController.updateSeqLabel(newString);
     }
 
