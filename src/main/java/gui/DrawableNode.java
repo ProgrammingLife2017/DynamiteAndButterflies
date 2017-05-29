@@ -17,8 +17,8 @@ public class DrawableNode {
     private double width;
     private double height;
     private boolean highlighted;
-
-    public DrawableNode (int id, GraphicsContext gc) {
+    
+    public DrawableNode(int id, GraphicsContext gc) {
         this.gc = gc;
         this.id = id;
     }
@@ -32,6 +32,22 @@ public class DrawableNode {
 
     public int getId() {
         return this.id;
+    }
+
+    public double getxCoordinate() {
+        return xCoordinate;
+    }
+
+    public double getyCoordinate() {
+        return yCoordinate;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
     }
 
     public void highlight() {

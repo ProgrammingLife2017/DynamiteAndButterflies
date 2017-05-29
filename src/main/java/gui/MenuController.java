@@ -2,23 +2,26 @@ package gui;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
-import gui.subControllers.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import gui.sub_controllers.*;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
 import parser.GfaParser;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -29,7 +32,13 @@ import java.util.prefs.Preferences;
 public class MenuController implements Observer {
 
     @FXML
-    public Button saveBookmark;
+    private Button saveBookmark;
+    @FXML
+    private MenuItem file1;
+    @FXML
+    private MenuItem file2;
+    @FXML
+    private MenuItem file3;
     @FXML
     private ProgressBar progressBar;
     @FXML
@@ -64,8 +73,9 @@ public class MenuController implements Observer {
     private FileController fileController;
     private ZoomController zoomController;
     private InfoController infoController;
+    private RecentController recentController;
 
-    private String fileString;
+    private String filePath;
 
     /**
      * Initializes the canvas.
@@ -80,11 +90,12 @@ public class MenuController implements Observer {
         fileController = new FileController(new ProgressBarController(progressBar));
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2);
+        recentController = new RecentController(file1, file2, file3);
 
+        recentController.initialize(prefs);
         ps = new PrintStream(new Console(consoleArea));
         //System.setErr(ps);
         //System.setOut(ps);
-
     }
 
     /**
@@ -95,10 +106,22 @@ public class MenuController implements Observer {
      */
     @FXML
     public void openFileClicked() throws IOException, InterruptedException {
-        fileController.openFileClicked(anchorPane, gc, this);
-
-
+        Stage stage = App.getStage();
+        File file = fileController.chooseFile(stage);
+        fileController.openFileClicked(gc, file.getAbsolutePath(), this);
     }
+
+    /**
+     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
+     * can be selected and directly be visualised on the screen.
+     * @throws IOException if there is no file specified.
+     * @throws InterruptedException Exception when the Thread is interrupted.
+     */
+    @FXML
+    public void openFileClicked(String filePath) throws IOException, InterruptedException {
+        fileController.openFileClicked(gc, filePath, this);
+    }
+
 
     private void displayInfo(SequenceGraph graph) {
         infoController.displayInfo(graph);
@@ -123,6 +146,11 @@ public class MenuController implements Observer {
         zoomController.zoomOut();
     }
 
+    /**
+     * Ensures the scroll bar zooms in and out.
+     * @param scrollEvent The scroll.
+     * @throws IOException throws exception if column doesn't exist.
+     */
     @FXML
     public void scrollZoom(ScrollEvent scrollEvent) throws IOException {
         int column = fileController.getDrawer().mouseLocationColumn(scrollEvent.getX());
@@ -143,7 +171,7 @@ public class MenuController implements Observer {
         double pressedY = mouseEvent.getY();
         SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, pressedY);
         if (clicked != null) {
-            String newString = "Sequence: "
+            String newString = "ID: " + clicked.getId() + "\nSequence: "
                     + fileController.getSequenceHashMap().get((long) clicked.getId());
             infoController.updateSeqLabel(newString);
         }
@@ -155,8 +183,8 @@ public class MenuController implements Observer {
     public void traverseGraphClicked() {
         zoomController.traverseGraphClicked(fileController.getGraph().getNodes().size());
         int centreNodeID = zoomController.getCentreNodeID();
-        String newString = "Sequence: "
-                            + fileController.getSequenceHashMap().get((long) centreNodeID);
+        String newString = "ID: " + centreNodeID + "\nSequence: "
+                + fileController.getSequenceHashMap().get((long) centreNodeID);
         infoController.updateSeqLabel(newString);
     }
 
@@ -228,18 +256,79 @@ public class MenuController implements Observer {
     public void update(Observable o, Object arg) {
         if (o instanceof GfaParser) {
             if (arg instanceof String) {
-                fileString = (String) arg;
-                prefs.put("file", fileString);
+                filePath = (String) arg;
+                recentController.update(filePath, prefs);
+
+                String pattern = Pattern.quote(System.getProperty("file.separator"));
+                String[] partPaths = filePath.split(pattern);
+                final String partPath = partPaths[partPaths.length - 1];
+                prefs.put("file", partPath);
                 Platform.runLater(new Runnable() {
                     public void run() {
-                        bookmarkController.loadBookmarks(fileString);
+                        Stage stage = App.getStage();
+                        String title = stage.getTitle();
+                        String split = "---";
+                        String[] parts = title.split(split);
+                        String offTitle = parts[0];
+                        stage.setTitle(offTitle + split + filePath);
+                        bookmarkController.loadBookmarks(partPath);
                         zoomController = new ZoomController(fileController.getDrawer(),
                                 nodeTextField, radiusTextField);
                         displayInfo(fileController.getGraph());
+                        recentController.update(filePath, prefs);
                     }
                 });
             }
         }
+    }
 
+    /**
+     * Button one of the File -> Recent menu.
+     */
+    @FXML
+    public void file1Press() {
+        pressedRecent(file1);
+    }
+
+    /**
+     * Button two of the File -> Recent menu.
+     */
+    @FXML
+    public void file2Press() {
+        pressedRecent(file2);
+    }
+
+    /**
+     * Button three of the File -> Recent menu.
+     */
+    @FXML
+    public void file3Press() {
+        pressedRecent(file3);
+    }
+
+    /**
+     * Method used to not duplicate recentFile presses.
+     * @param file the menuItem that has been pressed
+     */
+    private void pressedRecent(MenuItem file) {
+        String filePath = recentController.pressedRecent(file);
+
+        if (filePath == null) {
+            try {
+                openFileClicked();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                openFileClicked(filePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

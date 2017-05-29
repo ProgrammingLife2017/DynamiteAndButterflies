@@ -29,26 +29,40 @@ public class SequenceGraph {
         this.nodes = new HashMap<Integer, SequenceNode>();
         this.edges = new ArrayList<Edge>();
     }
+
+    /**
+     * Gets the size of the graph.
+     * @return integer with size of the graph
+     */
     public int size() {
         return nodes.size();
     }
 
+    /**
+     * Reset initializes the graph.
+     */
     public void resetGraph() {
         this.size = 0;
         this.nodes = new HashMap<Integer, SequenceNode>();
         this.edges = new ArrayList<Edge>();
     }
 
+    /**
+     * Creates a subgraph to visualize.
+     * @param centerNodeID The centre node of the view.
+     * @param range The range to show
+     * @param adjacencyList A list of ints and longs for amount children etc.
+     */
     public void createSubGraph(int centerNodeID, int range, HTreeMap<Long, int[]> adjacencyList) {
         resetGraph();
         Pair upperAndLowerBound = getBounds(centerNodeID, range, adjacencyList);
         int upperBound = (Integer) upperAndLowerBound.getKey();
         int lowerBound = (Integer) upperAndLowerBound.getValue();
 
-        for(int id = lowerBound; id <= upperBound; id++) {
+        for (int id = lowerBound; id <= upperBound; id++) {
             SequenceNode node = new SequenceNode(id);
             this.addNode(node);
-            int[] children = adjacencyList.get((long)id);
+            int[] children = adjacencyList.get((long) id);
             for (int aChildren : children) {
                 Edge edge = new Edge(id, aChildren);
                 if (aChildren < upperBound) {
@@ -61,10 +75,10 @@ public class SequenceGraph {
     private Pair getBounds(int centerNodeID, int range, HTreeMap<Long, int[]> adjacencyList) {
         int upperBound = adjacencyList.size();
         int lowerBound = 1;
-        if(centerNodeID - range > 1) {
+        if (centerNodeID - range > 1) {
             lowerBound = centerNodeID - range;
         }
-        if(centerNodeID + range < upperBound ) {
+        if (centerNodeID + range < upperBound) {
             upperBound = centerNodeID + range;
         }
 
@@ -72,7 +86,7 @@ public class SequenceGraph {
     }
 
     /**
-     * Getter for the column list
+     * Getter for the column list.
      * @return the column arraylist with an arraylist with nodes.
      */
     public ArrayList<ArrayList<SequenceNode>> getColumns() {
@@ -88,6 +102,10 @@ public class SequenceGraph {
         return this.edges;
     }
 
+    /**
+     * Sets the edges.
+     * @param allEdges set of edges
+     */
     public void setEdges(ArrayList<Edge> allEdges) {
         this.edges = allEdges;
     }
@@ -118,6 +136,10 @@ public class SequenceGraph {
         return this.nodes;
     }
 
+    /**
+     * Sets the node.
+     * @param hash with nodes
+     */
     public void setNodes(HashMap<Integer, SequenceNode> hash) {
         this.nodes = hash;
     }
@@ -199,7 +221,7 @@ public class SequenceGraph {
             //it.remove();
         }
 
-        int counter = nodes.size()+1;
+        int counter = nodes.size() + 1;
         for (Edge edge : edges) {
             for (int i : edge.getColumnSpan()) {
                 SequenceNode dummyNode = new SequenceNode(counter);

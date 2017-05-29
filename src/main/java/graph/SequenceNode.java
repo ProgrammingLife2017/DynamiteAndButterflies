@@ -11,6 +11,7 @@ public class SequenceNode {
     private int id;
     private int index;
     private int column;
+    private int sequenceLength;
     private ArrayList<Integer> children;
     private boolean isDummy;
 
@@ -57,10 +58,6 @@ public class SequenceNode {
         this.index = index;
     }
 
-    /**
-     * Gets the column of the node.
-     * @return the column of the node.
-     */
     public int getColumn() {
         return column;
     }
@@ -75,4 +72,11 @@ public class SequenceNode {
         }
     }
 
+    public int getSequenceLength() {
+        return sequenceLength;
+    }
+
+    public void setSequenceLength(int sequenceLength) {
+        this.sequenceLength = sequenceLength;
+    }
 }

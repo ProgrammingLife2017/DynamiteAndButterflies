@@ -1,6 +1,6 @@
 package parser;
 
-import graph.SequenceNode;
+import gui.sub_controllers.PopUpController;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
@@ -10,9 +10,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
+import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
-
-import static java.lang.Math.toIntExact;
 
 /**
  * This class contains a parser to parse a .gfa file into our data structure.
@@ -23,6 +22,8 @@ public class GfaParser extends Observable implements Runnable {
     private HTreeMap<Long, String> sequenceMap;
     private HTreeMap<Long, int[]> adjacencyHMap;
     private String filePath;
+    private String partPath;
+    private Preferences prefs;
 
     /**
      * Constructor.
@@ -46,33 +47,48 @@ public class GfaParser extends Observable implements Runnable {
      * @param filePath A string specifying where the file is stored.
      * @throws IOException For instance when the file is not found
      */
+
     @SuppressWarnings("Since15")
     public synchronized void parseGraph(String filePath) throws IOException {
+        prefs = Preferences.userRoot();
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
-        String partPath = partPaths[partPaths.length - 1];
+        partPath = partPaths[partPaths.length - 1];
         System.out.println(partPath);
 
+        if (!prefs.getBoolean(partPath, true)) {
+            PopUpController controller = new PopUpController();
+            String message = "Database File is corrupt, press 'Reload' to reload the file," + "\n"
+                    + "or press 'Resume' to recover the data still available.";
+            controller.loadDbCorruptPopUp(partPath, message);
+        }
         DB db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().
-                fileMmapPreclearDisable().cleanerHackEnable().make();
+                                                fileMmapPreclearDisable().cleanerHackEnable().
+                                                closeOnJvmShutdown().checksumHeaderBypass().make();
         DB db2 = DBMaker.fileDB(partPath + ".adjacency.db").fileMmapEnable().
-                fileMmapPreclearDisable().cleanerHackEnable().make();
+                                                fileMmapPreclearDisable().cleanerHackEnable().
+                                                closeOnJvmShutdown().checksumHeaderBypass().make();
         if (db.get(partPath + ".sequence.db") != null) {
-            adjacencyHMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).
-                    valueSerializer(Serializer.INT_ARRAY).createOrOpen();
-            sequenceMap = db2.hashMap(partPath + ".adjacency.db").keySerializer(Serializer.LONG).
-                    valueSerializer(Serializer.STRING).createOrOpen();
+            sequenceMap = db.hashMap(partPath + ".sequence.db").
+                            keySerializer(Serializer.LONG).
+                            valueSerializer(Serializer.STRING).createOrOpen();
+            adjacencyHMap = db2.hashMap(partPath + ".adjacency.db").
+                            keySerializer(Serializer.LONG).
+                            valueSerializer(Serializer.INT_ARRAY).createOrOpen();
         } else {
-            adjacencyHMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).
-                    valueSerializer(Serializer.INT_ARRAY).createOrOpen();
-            sequenceMap = db2.hashMap(partPath + ".adjacency.db").keySerializer(Serializer.LONG).
-                    valueSerializer(Serializer.STRING).createOrOpen();
+            prefs.putBoolean(partPath, false);
+            sequenceMap = db.hashMap(partPath + ".sequence.db").
+                                    keySerializer(Serializer.LONG).
+                                    valueSerializer(Serializer.STRING).createOrOpen();
+            adjacencyHMap = db2.hashMap(partPath + ".adjacency.db").
+                                    keySerializer(Serializer.LONG).
+                                    valueSerializer(Serializer.INT_ARRAY).createOrOpen();
             parseSpecific(filePath);
         }
         this.setChanged();
         this.notifyObservers(adjacencyHMap);
         this.setChanged();
-        this.notifyObservers(partPath);
+        this.notifyObservers(filePath);
     }
 
     /**
@@ -100,9 +116,19 @@ public class GfaParser extends Observable implements Runnable {
     private synchronized void parseSpecific(String filePath) throws IOException {
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+
         String line = br.readLine();
+        if (line == null) {
+            in.close();
+            br.close();
+        }
         header1 = line.split("H")[1];
         line = br.readLine();
+
+        if (line == null) {
+            in.close();
+            br.close();
+        }
         header2 = line.split("H")[1];
         ArrayList<Integer> temp = new ArrayList<Integer>();
         int parentId = 0;
@@ -115,7 +141,6 @@ public class GfaParser extends Observable implements Runnable {
                 }
                 String[] data = line.split(("\t"));
                 int id = Integer.parseInt(data[1]);
-                SequenceNode node = new SequenceNode(toIntExact(id));
                 sequenceMap.put((long) (id), data[2]);
             } else if (line.startsWith("L")) {
                 String[] edgeDataString = line.split("\t");
@@ -124,6 +149,7 @@ public class GfaParser extends Observable implements Runnable {
                 temp.add(childId);
             }
         }
+        prefs.putBoolean(partPath, true);
         in.close();
         br.close();
     }
@@ -148,7 +174,7 @@ public class GfaParser extends Observable implements Runnable {
     private static int[] convertIntegers(List<Integer> integers) {
         int[] ret = new int[integers.size()];
         for (int i = 0; i < ret.length; i++) {
-            ret[i] = integers.get(i).intValue();
+            ret[i] = integers.get(i);
         }
         return ret;
     }

@@ -1,4 +1,4 @@
-package gui.subControllers;
+package gui.sub_controllers;
 
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;

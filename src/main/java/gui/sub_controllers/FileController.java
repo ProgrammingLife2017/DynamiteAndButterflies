@@ -1,10 +1,10 @@
-package gui.subControllers;
+package gui.sub_controllers;
 
 import graph.SequenceGraph;
+import graph.SequenceNode;
 import gui.GraphDrawer;
 import gui.MenuController;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.regex.Pattern;
 
 /**
  * Created by Jip on 17-5-2017.
@@ -51,7 +52,7 @@ public class FileController implements Observer {
      * @param stage The stage on which the fileFinder is shown.
      * @return returns the file that can be loaded.
      */
-    private File chooseFile(Stage stage) {
+    public File chooseFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
 
@@ -73,21 +74,20 @@ public class FileController implements Observer {
         return res;
     }
 
+
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa.
      * can be selected and directly be visualised on the screen.
-     * @param anchorPane the pane where we will be drawing
      * @param gc the graphicscontext we will use.
      * @param mC the MenuController so it can Observe.
+     * @param filePath the filePath of the file.
      * @throws IOException exception if no file is found
      * @throws InterruptedException Exception if the Thread is interrupted.
      */
-    public void openFileClicked(AnchorPane anchorPane, GraphicsContext gc, MenuController mC)
+    public void openFileClicked(GraphicsContext gc, String filePath, MenuController mC)
             throws IOException, InterruptedException {
         this.gc = gc;
-        Stage stage = (Stage) anchorPane.getScene().getWindow();
-        File file = chooseFile(stage);
-        parser = new GfaParser(file.getAbsolutePath());
+        parser = new GfaParser(filePath);
         parser.addObserver(this);
         parser.addObserver(mC);
         if (this.parseThread != null) {
@@ -97,6 +97,13 @@ public class FileController implements Observer {
         this.parseThread.start();
 
         progressBarController.run();
+    }
+
+    private void assignSequenceLenghts() {
+        for (int i = 1; i <= graph.size(); i++) {
+            SequenceNode node = graph.getNode(i);
+            node.setSequenceLength(sequenceHashMap.get((long) i).length());
+        }
     }
 
     /**
@@ -136,5 +143,18 @@ public class FileController implements Observer {
                 progressBarController.done();
             }
         }
+    }
+
+    /**
+     * Gets the fileName from the filePath.
+     * @param filePath The path to the file you want the name off
+     * @return The name of the file.
+     */
+    public String fileNameFromPath(String filePath) {
+        String pattern = Pattern.quote(System.getProperty("file.separator"));
+        String[] partPaths = filePath.split(pattern);
+        String fileName = partPaths[partPaths.length - 1];
+        System.out.println(fileName);
+        return fileName;
     }
 }
