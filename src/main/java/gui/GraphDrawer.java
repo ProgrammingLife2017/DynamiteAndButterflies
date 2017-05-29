@@ -131,16 +131,25 @@ public class GraphDrawer {
             int max = 1;
             for (int i = 0; i < column.size(); i++) {
                 if (!column.get(i).isDummy()) {
-                    int length = column.get(i).getSequenceLength();
-                    if (length > MAX_X_SIZE) {
-                        max = (int) MAX_X_SIZE;
-                    } else if (length > max) {
+                    int length = visualLength(column.get(i), 0);
+                    if (length > max) {
                         max = length;
                     }
                 }
             }
             columnWidths[j + 1] = columnWidths[j] + max;
         }
+    }
+
+    private int visualLength(SequenceNode node, int j) {
+        int length = node.getSequenceLength();
+        if (length == 0) {
+            return columnWidths[j+1] - columnWidths[j];
+        }
+        if (length > MAX_X_SIZE) {
+            return (int) MAX_X_SIZE;
+        }
+        return length;
     }
 
     /**
@@ -151,10 +160,11 @@ public class GraphDrawer {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
-                if (column.get(i).isDummy() && !showDummyNodes) {
+                SequenceNode node = column.get(i);
+                if (node.isDummy() && !showDummyNodes) {
                     continue;
                 }
-                double width = (columnWidths[j + 1] - columnWidths[j])
+                double width = visualLength(node, j)
                         * stepSize * RELATIVE_X_DISTANCE;
                 double height = getYSize();
                 double x = (columnWidths[j] - xDifference) * stepSize;
@@ -163,9 +173,9 @@ public class GraphDrawer {
                     y += (height - width) / 2;
                     height = width;
                 }
-                DrawableNode node = canvasNodes.get(column.get(i).getId() - 1);
-                node.setCoordinates(x, y, width, height);
-                node.draw();
+                DrawableNode dNode = canvasNodes.get(node.getId() - 1);
+                dNode.setCoordinates(x, y, width, height);
+                dNode.draw();
             }
         }
     }
@@ -188,19 +198,11 @@ public class GraphDrawer {
     }
 
     /**
-<<<<<<< HEAD
-     * Searches for the node that was pressed.
-     *
-     * @param xEvent xCor of mouse press
-     * @param yEvent yCor of mouse press
-     * @return The Node that was clicked
-=======
      * Check for each node if the click event is within its borders. If so highlight the node and return it. Also all
      * other nodes are lowlighted.
      * @param xEvent The x coordinate of the click event.
      * @param yEvent The y coordinate of the click event.
      * @return The sequencenode that has been clicked or null if nothing was clicked.
->>>>>>> origin/Issue_#99
      */
     public SequenceNode clickNode(double xEvent, double yEvent) {
         SequenceNode click = null;
