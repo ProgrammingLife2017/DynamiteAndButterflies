@@ -3,14 +3,12 @@ package gui;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -60,12 +58,12 @@ public class MenuController {
     private Label numEdgesLabel;
     @FXML
     private TextArea consoleArea;
+    @FXML
+    private ScrollBar scrollbar;
+
     private PrintStream ps;
-
     private GraphicsContext gc;
-
     private Preferences prefs;
-
     private BookmarkController bookmarkController;
     private FileController fileController;
     private ZoomController zoomController;
@@ -88,9 +86,19 @@ public class MenuController {
         recentController = new RecentController(file1, file2, file3);
 
         recentController.initialize(prefs);
+        initializeScrollbar();
         ps = new PrintStream(new Console(consoleArea));
         System.setErr(ps);
         System.setOut(ps);
+    }
+
+    private void initializeScrollbar() {
+        scrollbar.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> ov,
+                                Number old_val, Number new_val) {
+                System.out.println("delta: " + (new_val.doubleValue() - old_val.doubleValue()));
+            }
+        });
     }
 
     /**
