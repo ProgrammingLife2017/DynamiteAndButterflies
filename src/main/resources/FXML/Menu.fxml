@@ -61,10 +61,10 @@
                         </AnchorPane>
                       <AnchorPane fx:id="canvasPanel">
                            <children>
+                              <ScrollBar fx:id="scrollbar" layoutY="763.0" max="0.0" visibleAmount="0.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
                               <Canvas fx:id="canvas" onMouseClicked="#clickMouse" onScroll="#scrollZoom" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                               <Button layoutX="-2.0" layoutY="291.0" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0" />
                               <Button layoutX="1692.0" layoutY="80.0" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="63.0" />
-                              <ScrollBar fx:id="scrollbar" layoutX="14.0" layoutY="763.0" visibleAmount="100.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
                            </children>
                         </AnchorPane>
                     </items>

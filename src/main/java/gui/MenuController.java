@@ -69,6 +69,7 @@ public class MenuController {
     private ZoomController zoomController;
     private InfoController infoController;
     private RecentController recentController;
+    private PanningController panningController;
 
     /**
      * Initializes the canvas.
@@ -86,19 +87,9 @@ public class MenuController {
         recentController = new RecentController(file1, file2, file3);
 
         recentController.initialize(prefs);
-        initializeScrollbar();
         ps = new PrintStream(new Console(consoleArea));
-        System.setErr(ps);
-        System.setOut(ps);
-    }
-
-    private void initializeScrollbar() {
-        scrollbar.valueProperty().addListener(new ChangeListener<Number>() {
-            public void changed(ObservableValue<? extends Number> ov,
-                                Number old_val, Number new_val) {
-                System.out.println("delta: " + (new_val.doubleValue() - old_val.doubleValue()));
-            }
-        });
+        //System.setErr(ps);
+        //System.setOut(ps);
     }
 
     /**
@@ -139,7 +130,8 @@ public class MenuController {
 
         prefs.put("file", fileName);
         bookmarkController.loadBookmarks(fileName);
-        zoomController = new ZoomController(fileController.getDrawer(),
+        panningController = new PanningController(scrollbar, fileController.getDrawer());
+        zoomController = new ZoomController(fileController.getDrawer(), panningController,
                                 nodeTextField, radiusTextField);
 
         displayInfo(fileController.getGraph());
