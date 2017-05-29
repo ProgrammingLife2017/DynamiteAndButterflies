@@ -2,16 +2,20 @@
 
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollBar?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.shape.Line?>
 
 <AnchorPane fx:id="anchorPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1030.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MenuController">
@@ -56,13 +60,26 @@
                               <Button fx:id="saveBookmark" layoutX="15.0" layoutY="224.0" mnemonicParsing="false" onAction="#saveTheBookmarks" text="Save Bookmark" />
                               <Button fx:id="bookmark1" layoutX="27.0" layoutY="268.0" mnemonicParsing="false" onAction="#pressBookmark1" prefHeight="24.0" prefWidth="98.0" text="-" textAlignment="CENTER" />
                               <Button fx:id="bookmark2" layoutX="27.0" layoutY="311.0" mnemonicParsing="false" onAction="#pressBookmark2" prefHeight="24.0" prefWidth="97.0" text="-" textAlignment="CENTER" />
+                              <CheckBox fx:id="dummyNodeCheckbox" layoutX="62.0" layoutY="405.0" mnemonicParsing="false" onAction="#toggleDummyNodes" />
+                              <Label layoutX="3.0" layoutY="372.0" text="Display dummy nodes" />
                            </children>
                         </AnchorPane>
                       <AnchorPane fx:id="canvasPanel">
                            <children>
-                              <Canvas fx:id="canvas" onMouseClicked="#clickMouse" onScroll="#scrollZoom" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                              <Button layoutX="-2.0" layoutY="291.0" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0" />
-                              <Button layoutX="1692.0" layoutY="80.0" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="63.0" />
+                              <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <center>
+                                    <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                       <children>
+                                          <Canvas fx:id="canvas" onMouseClicked="#clickMouse" onScroll="#scrollZoom" />
+                                          <Button layoutX="1721.0" layoutY="4.0" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" />
+                                          <Button layoutX="1721.0" layoutY="42.0" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" />
+                                       </children>
+                                    </Pane>
+                                 </center>
+                                  <bottom>
+                                      <ScrollBar fx:id="scrollbar" visibleAmount="100.0" BorderPane.alignment="CENTER" />
+                                  </bottom>
+                              </BorderPane>
                            </children>
                         </AnchorPane>
                     </items>

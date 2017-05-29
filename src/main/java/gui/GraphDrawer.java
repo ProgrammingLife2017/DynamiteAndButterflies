@@ -5,12 +5,15 @@ import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
- *
+ * <p>
  * Class used to draw shapes on the canvas.
  */
 public class GraphDrawer {
@@ -30,6 +33,7 @@ public class GraphDrawer {
     private double xDifference;
     private double stepSize;
     private int[] columnWidths;
+    private boolean showDummyNodes;
     private GraphicsContext gc;
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
@@ -37,32 +41,41 @@ public class GraphDrawer {
 
     /**
      * Constructor.
+     *
      * @param graph The sequencegraph to be drawn to the canvas.
-     * @param gc The graphics context used to actually draw shapes.
+     * @param gc    The graphics context used to actually draw shapes.
      */
     public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
         this.graph = graph;
         this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
         canvasNodes = new ArrayList<DrawableNode>();
-        initializeDrawableNodes();
         graph.initialize();
         graph.layerizeGraph();
         columns = graph.getColumns();
         columnWidths = new int[columns.size() + 1];
+        initializeDrawableNodes();
         initializeColumnWidths();
         zoomLevel = columnWidths[columns.size()];
         radius = columns.size();
     }
 
     private void initializeDrawableNodes() {
-        for (int i = 1; i <= graph.size(); i++) {
-            canvasNodes.add(new DrawableNode(i, gc));
+        for (Object o : graph.getNodes().entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
+            SequenceNode node = (SequenceNode) pair.getValue();
+            canvasNodes.add(new DrawableNode(node.getId(), gc, false));
+        }
+        for (Object o : graph.getDummyNodes().entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
+            SequenceNode node = (SequenceNode) pair.getValue();
+            canvasNodes.add(new DrawableNode(node.getId(), gc, true));
         }
     }
 
     /**
      * Function what to do on Zoom.
+     *
      * @param factor Zooming factor.
      * @param column The Column that has to be in the centre.
      */
@@ -77,8 +90,9 @@ public class GraphDrawer {
 
     /**
      * Change the zoom (invoked by user by clicking on "Go to this Node".
+     *
      * @param newZoom The new radius.
-     * @param column The new Column to be in the centre.
+     * @param column  The new Column to be in the centre.
      */
     public void changeZoom(final int newZoom, final int column) {
         radius = newZoom;
@@ -87,7 +101,15 @@ public class GraphDrawer {
     }
 
     /**
+     * Redraw all nodes with the same coordinates.
+     */
+    public void redraw() {
+        moveShapes(xDifference);
+    }
+
+    /**
      * Draws the Graph.
+     *
      * @param xDifference Variable to determine which column should be in the centre.
      */
     public void moveShapes(double xDifference) {
@@ -121,24 +143,29 @@ public class GraphDrawer {
         }
     }
 
+    /**
+     * Gives all nodes the right coordinates on the canvas and draw them. Depending on whether the dummy nodes checkbox
+     * is checked dummy nodes are either drawn or skipped.
+     */
     private void drawNodes() {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
-                if (!column.get(i).isDummy()) {
-                    double width = (columnWidths[j + 1] - columnWidths[j])
-                                    * stepSize * RELATIVE_X_DISTANCE;
-                    double height = getYSize();
-                    double x = (columnWidths[j] - xDifference) * stepSize;
-                    double y = yBase + (i * RELATIVE_Y_DISTANCE);
-                    if (height > width) {
-                        y += (height - width) / 2;
-                        height = width;
-                    }
-                    DrawableNode node = canvasNodes.get(column.get(i).getId() - 1);
-                    node.setCoordinates(x, y, width, height);
-                    node.draw();
+                if (column.get(i).isDummy() && !showDummyNodes) {
+                    continue;
                 }
+                double width = (columnWidths[j + 1] - columnWidths[j])
+                        * stepSize * RELATIVE_X_DISTANCE;
+                double height = getYSize();
+                double x = (columnWidths[j] - xDifference) * stepSize;
+                double y = yBase + (i * RELATIVE_Y_DISTANCE);
+                if (height > width) {
+                    y += (height - width) / 2;
+                    height = width;
+                }
+                DrawableNode node = canvasNodes.get(column.get(i).getId() - 1);
+                node.setCoordinates(x, y, width, height);
+                node.draw();
             }
         }
     }
@@ -161,10 +188,19 @@ public class GraphDrawer {
     }
 
     /**
+<<<<<<< HEAD
      * Searches for the node that was pressed.
+     *
      * @param xEvent xCor of mouse press
      * @param yEvent yCor of mouse press
      * @return The Node that was clicked
+=======
+     * Check for each node if the click event is within its borders. If so highlight the node and return it. Also all
+     * other nodes are lowlighted.
+     * @param xEvent The x coordinate of the click event.
+     * @param yEvent The y coordinate of the click event.
+     * @return The sequencenode that has been clicked or null if nothing was clicked.
+>>>>>>> origin/Issue_#99
      */
     public SequenceNode clickNode(double xEvent, double yEvent) {
         SequenceNode click = null;
@@ -201,7 +237,7 @@ public class GraphDrawer {
         if (width == 0) {
             width = MIN_LINE_WIDTH;
         }
-        if (width > 1) { 
+        if (width > 1) {
             width = MAX_LINE_WIDTH;
         }
         gc.setLineWidth(width);
@@ -209,6 +245,7 @@ public class GraphDrawer {
 
     /**
      * Gets the real Centre Column.
+     *
      * @return the Centre Column.
      */
     private ArrayList<SequenceNode> getCentreColumn() {
@@ -217,6 +254,7 @@ public class GraphDrawer {
 
     /**
      * Returns the First SequenceNode (not Dummy) Object from the centre Column.
+     *
      * @return The Centre Node.
      */
     public SequenceNode getRealCentreNode() {
@@ -229,6 +267,7 @@ public class GraphDrawer {
 
     /**
      * Highlights the centre node.
+     *
      * @param node The node that should be highlighted
      */
     public void highlight(int node) {
@@ -239,8 +278,10 @@ public class GraphDrawer {
     }
 
     //TODO: Loop over the  nodes in the graph (O(n*m) > O(k))
+
     /**
      * Returns the ColumnId of a Node at the users Choice.
+     *
      * @param nodeId The Id of the Node you want to find the Column of.
      * @return The ColumnId
      */
@@ -257,6 +298,7 @@ public class GraphDrawer {
 
     /**
      * Get function for zoom level.
+     *
      * @return the Zoom level.
      */
     public double getZoomLevel() {
@@ -265,16 +307,21 @@ public class GraphDrawer {
 
     /**
      * Get function for the radius.
+     *
      * @return the double representing the radius.
      */
     public double getRadius() {
         return radius;
     }
 
+    public void setShowDummyNodes(boolean showDummyNodes) {
+        this.showDummyNodes = showDummyNodes;
+    }
+
     /**
-     * Gets the column based on the mouse location.
-     * @param x x coordinate of the mouse
-     * @return The int representing the column where the mouse is.
+     * Return the column the mouse click is in.
+     * @param x The x coordinate of the mouse click event
+     * @return The id of the column that the mouse click is in.
      */
     public int mouseLocationColumn(double x) {
         return (int) ((x / stepSize) + xDifference);
