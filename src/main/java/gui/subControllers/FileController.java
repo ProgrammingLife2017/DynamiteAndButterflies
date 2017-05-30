@@ -6,6 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
+import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
