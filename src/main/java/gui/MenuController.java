@@ -4,12 +4,16 @@ import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.*;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
 
@@ -85,8 +89,8 @@ public class MenuController {
 
         recentController.initialize(prefs);
         ps = new PrintStream(new Console(consoleArea));
-        System.setErr(ps);
-        System.setOut(ps);
+        //System.setErr(ps);
+        //System.setOut(ps);
     }
 
     /**
@@ -308,7 +312,16 @@ public class MenuController {
         }
     }
 
-    public void helpWanted() {
+    public void helpWanted() throws IOException {
         //TODO add functionality.
+        System.out.println("We zijn nu hiero Jip");
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/tutorial.fxml"));
+        Stage stage;
+        Parent root = loader.load();
+        stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Tutorial");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
     }
 }
