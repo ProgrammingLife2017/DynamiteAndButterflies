@@ -13,7 +13,6 @@ Genome parser and visualisation
 ![zooming](http://i.imgur.com/qE3CEvL.png)
 
 ## List of Known issues
-- insession switching from and back to the same gfa file, results in an "overlapping file exception".
 - When opening a gfa file from "Open File", files can become duplicate in "Recent Files".
 - Node length are now the length of the largest node in the column instead of its own length.
 - Sequence in the bottom of the screen goes off the screen istead of wrapping.
