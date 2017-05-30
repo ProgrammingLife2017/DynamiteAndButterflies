@@ -28,6 +28,8 @@ public class GfaParser {
     private DB db;
     private DB db2;
     private Preferences prefs;
+    private int startNode = Integer.MAX_VALUE;
+    private int endNode = Integer.MIN_VALUE;
 
     private String partPath;
     private int[] parentArray;

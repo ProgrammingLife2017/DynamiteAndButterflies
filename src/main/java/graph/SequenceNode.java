@@ -14,7 +14,6 @@ public class SequenceNode {
     private ArrayList<Integer> children;
     private ArrayList<Integer> parents;
     private boolean isDummy;
-    private boolean visited;
 
     public SequenceNode(int id) {
         this.id = id;
@@ -23,7 +22,6 @@ public class SequenceNode {
         this.parents = new ArrayList<Integer>();
         this.children = new ArrayList<Integer>();
         this.isDummy = false;
-        this.visited = false;
     }
 
     public Integer getId() {
@@ -37,6 +35,10 @@ public class SequenceNode {
     public void addChild(Integer id) {
         if(!this.children.contains(id))
             this.children.add(id);
+    }
+
+    public void removeChild(Integer id) {
+        this.children.remove(id);
     }
 
     public void addParent(Integer id) {
@@ -84,13 +86,5 @@ public class SequenceNode {
         if (this.column < i + 1) {
             column = i + 1;
         }
-    }
-
-    public boolean isVisited() {
-        return visited;
-    }
-
-    public void setVisited(boolean visited) {
-        this.visited = visited;
     }
 }
