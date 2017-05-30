@@ -87,9 +87,9 @@ public class MenuController {
         recentController = new RecentController(file1, file2, file3);
 
         recentController.initialize(prefs);
-        ps = new PrintStream(new Console(consoleArea));
-        System.setErr(ps);
-        System.setOut(ps);
+        //ps = new PrintStream(new Console(consoleArea));
+        //System.setErr(ps);
+        //System.setOut(ps);
 
     }
 

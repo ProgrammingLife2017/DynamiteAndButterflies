@@ -60,22 +60,39 @@ public class SequenceGraph {
 
 
        // layerizeGraph(lowerBoundID);
-        LinkedList<Integer> test = Dfs(lowerBoundID);
+        initLayout(lowerBoundID, upperBoundID);
+    }
+
+    private void initLayout(int lowerBoundID, int upperBoundID) {
+        LinkedList<Integer> longestPath = Dfs(lowerBoundID, upperBoundID);
+        int count = 0;
+        for(int id: longestPath) {
+            this.getNode(id).setColumn(count);
+            count++;
+        }
     }
 
 
-    private LinkedList<Integer> Dfs(int startNode) {
+
+
+
+    private LinkedList<Integer> Dfs(int startNode, int endNode) {
         HashMap<Integer, Boolean> visited = new HashMap<Integer, Boolean>(nodes.size());
         LinkedList<Integer> longestPath = new LinkedList<Integer>();
-        return DFShelper(startNode, visited, longestPath);
+        return DFShelper(startNode, endNode, visited, longestPath);
 
     }
-    private LinkedList<Integer> DFShelper(int currentNode, HashMap<Integer, Boolean> visited, LinkedList<Integer> longestPath) {
+    private LinkedList<Integer> DFShelper(int currentNode,int endNode, HashMap<Integer, Boolean> visited, LinkedList<Integer> longestPath) {
         visited.put(currentNode, true);
         longestPath.add(currentNode);
-        for(int children: this.getNode(currentNode).getChildren()) {
-            if(!visited.get(children)) {
-                DFShelper(children, visited, longestPath);
+        for(int child: this.getNode(currentNode).getChildren()) {
+            if(visited.get(child) == null) {
+                if(child == endNode) {
+                    longestPath.add(child);
+                    return longestPath;
+                } else {
+                    return DFShelper(child,endNode, visited, longestPath);
+                }
             }
         }
         return longestPath;

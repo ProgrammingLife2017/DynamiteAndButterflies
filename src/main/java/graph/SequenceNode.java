@@ -14,6 +14,7 @@ public class SequenceNode {
     private ArrayList<Integer> children;
     private ArrayList<Integer> parents;
     private boolean isDummy;
+    private boolean visited;
 
     public SequenceNode(int id) {
         this.id = id;
@@ -22,6 +23,7 @@ public class SequenceNode {
         this.parents = new ArrayList<Integer>();
         this.children = new ArrayList<Integer>();
         this.isDummy = false;
+        this.visited = false;
     }
 
     public Integer getId() {
@@ -84,4 +86,11 @@ public class SequenceNode {
         }
     }
 
+    public boolean isVisited() {
+        return visited;
+    }
+
+    public void setVisited(boolean visited) {
+        this.visited = visited;
+    }
 }
