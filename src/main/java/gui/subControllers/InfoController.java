@@ -30,7 +30,7 @@ public class InfoController {
      */
     public void displayInfo(SequenceGraph graph) {
         nodeLabel.setText(graph.getNodes().size() + "");
-//        Fix this by implementing counter when adding children to nodes. 
+//        Fix this by implementing counter when adding children to nodes.
 //        edgeLabel.setText(graph.getEdges().size() + "");
     }
 

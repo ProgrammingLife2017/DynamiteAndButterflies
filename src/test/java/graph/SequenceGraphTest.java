@@ -51,14 +51,14 @@ public class SequenceGraphTest {
         hash.put(3, node3);
         hash.put(4, node4);
 
-        graph.setEdges(edges);
+//        graph.setEdges(edges);
         graph.setNodes(hash);
     }
 
     @Test
     public void constructorTest() {
         assertEquals(graph.getNodes(), new HashMap<Integer, SequenceNode>());
-        assertEquals(graph.getEdges(), new ArrayList<Edge>());
+//        assertEquals(graph.getEdges(), new ArrayList<Edge>());
     }
 
     @Test
