@@ -17,7 +17,7 @@ import java.util.Observer;
 import java.util.regex.Pattern;
 
 /**
- * Created by Jip on 17-5-2017.
+ * Controller for opening a file.
  */
 public class FileController implements Observer {
 
@@ -87,6 +87,10 @@ public class FileController implements Observer {
     public void openFileClicked(GraphicsContext gc, String filePath, MenuController mC)
             throws IOException, InterruptedException {
         this.gc = gc;
+        if (parser != null) {
+            parser.getDb().close();
+            parser.getDb2().close();
+        }
         parser = new GfaParser(filePath);
         parser.addObserver(this);
         parser.addObserver(mC);

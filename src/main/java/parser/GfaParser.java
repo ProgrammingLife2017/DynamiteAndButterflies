@@ -25,6 +25,9 @@ public class GfaParser extends Observable implements Runnable {
     private String partPath;
     private Preferences prefs;
 
+    private DB db;
+    private DB db2;
+
     /**
      * Constructor.
      * @param absolutePath The path location of the file.
@@ -43,29 +46,42 @@ public class GfaParser extends Observable implements Runnable {
     }
 
     /**
+     * getter for db of the sequencemap.
+     * @return db.
+     */
+    public DB getDb() {
+        return db;
+    }
+
+    /**
+     * Getter for db of the adjacencymap.
+     * @return db.
+     */
+    public DB getDb2() {
+        return db2;
+    }
+
+    /**
      * This method parses the file specified in filepath into a sequence graph.
      * @param filePath A string specifying where the file is stored.
      * @throws IOException For instance when the file is not found
      */
-
     @SuppressWarnings("Since15")
-    public synchronized void parseGraph(String filePath) throws IOException {
+    private synchronized void parseGraph(String filePath) throws IOException {
         prefs = Preferences.userRoot();
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         partPath = partPaths[partPaths.length - 1];
-        System.out.println(partPath);
-
         if (!prefs.getBoolean(partPath, true)) {
             PopUpController controller = new PopUpController();
             String message = "Database File is corrupt, press 'Reload' to reload the file," + "\n"
                     + "or press 'Resume' to recover the data still available.";
             controller.loadDbCorruptPopUp(partPath, message);
         }
-        DB db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().
+        db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().
                                                 fileMmapPreclearDisable().cleanerHackEnable().
                                                 closeOnJvmShutdown().checksumHeaderBypass().make();
-        DB db2 = DBMaker.fileDB(partPath + ".adjacency.db").fileMmapEnable().
+        db2 = DBMaker.fileDB(partPath + ".adjacency.db").fileMmapEnable().
                                                 fileMmapPreclearDisable().cleanerHackEnable().
                                                 closeOnJvmShutdown().checksumHeaderBypass().make();
         if (db.get(partPath + ".sequence.db") != null) {
@@ -116,7 +132,6 @@ public class GfaParser extends Observable implements Runnable {
     private synchronized void parseSpecific(String filePath) throws IOException {
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-
         String line = br.readLine();
         if (line == null) {
             in.close();
@@ -152,6 +167,8 @@ public class GfaParser extends Observable implements Runnable {
         prefs.putBoolean(partPath, true);
         in.close();
         br.close();
+        db.commit();
+        db2.commit();
     }
 
 
