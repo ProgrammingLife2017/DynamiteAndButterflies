@@ -1,5 +1,7 @@
 package graph;
 
+import sun.awt.image.ImageWatched;
+
 import java.util.*;
 
 /**
@@ -57,19 +59,27 @@ public class SequenceGraph {
         this.nodes.put(upperBoundID, lastNode);
 
 
-        layerizeGraph(lowerBoundID);
+       // layerizeGraph(lowerBoundID);
+        LinkedList<Integer> test = Dfs(lowerBoundID);
     }
 
 
-//    private int[] DFS(int startNodeID, int size) {
-//        boolean[] visited = new boolean[size];
-//        visited[startNodeID] = true;
-//        for(int children: this.getNode(startNodeID).getChildren()) {
-//            if(!visited[children]) {
-//                DFS(children, size);
-//            }
-//        }
-//    }
+    private LinkedList<Integer> Dfs(int startNode) {
+        HashMap<Integer, Boolean> visited = new HashMap<Integer, Boolean>(nodes.size());
+        LinkedList<Integer> longestPath = new LinkedList<Integer>();
+        return DFShelper(startNode, visited, longestPath);
+
+    }
+    private LinkedList<Integer> DFShelper(int currentNode, HashMap<Integer, Boolean> visited, LinkedList<Integer> longestPath) {
+        visited.put(currentNode, true);
+        longestPath.add(currentNode);
+        for(int children: this.getNode(currentNode).getChildren()) {
+            if(!visited.get(children)) {
+                DFShelper(children, visited, longestPath);
+            }
+        }
+        return longestPath;
+    }
 
     /**
      * Adds dummy nodes to the graph for visualisation purposes.
