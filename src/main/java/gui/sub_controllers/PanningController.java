@@ -34,6 +34,7 @@ public class PanningController {
     private void initialize() {
         scrollbar.setMax(drawer.getZoomLevel());
         scrollbar.setVisibleAmount(drawer.getZoomLevel());
+        scrollbar.setValue(scrollbar.getMax() / 2);
         scrollbar.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> ov,
                                 Number oldVal, Number newVal) {
@@ -50,7 +51,7 @@ public class PanningController {
      * @param factor Changing factor of the visible amount.
      */
     public void setScrollbarSize(double factor) {
-        setScrollbarSize(factor, (int) (scrollbar.getMax() / 2));
+        setScrollbarSize(factor, (int) (scrollbar.getValue()));
     }
 
     /**

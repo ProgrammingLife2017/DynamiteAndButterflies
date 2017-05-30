@@ -3,22 +3,25 @@ package gui;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.*;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
+import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -26,7 +29,7 @@ import java.util.prefs.Preferences;
  * Controller for the Menu scene. Used to run all functionality
  * in the main screen of the application.
  */
-public class MenuController {
+public class MenuController implements Observer {
 
     @FXML
     private Button saveBookmark;
@@ -36,6 +39,8 @@ public class MenuController {
     private MenuItem file2;
     @FXML
     private MenuItem file3;
+    @FXML
+    private ProgressBar progressBar;
     @FXML
     private Button bookmark1;
     @FXML
@@ -60,6 +65,8 @@ public class MenuController {
     private TextArea consoleArea;
     @FXML
     private ScrollBar scrollbar;
+    @FXML
+    private CheckBox dummyNodeCheckbox;
 
     private PrintStream ps;
     private GraphicsContext gc;
@@ -71,6 +78,8 @@ public class MenuController {
     private RecentController recentController;
     private PanningController panningController;
 
+    private String filePath;
+
     /**
      * Initializes the canvas.
      */
@@ -81,60 +90,41 @@ public class MenuController {
         gc = canvas.getGraphicsContext2D();
         prefs = Preferences.userRoot();
 
-        fileController = new FileController();
+        fileController = new FileController(new ProgressBarController(progressBar));
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2);
         recentController = new RecentController(file1, file2, file3);
 
         recentController.initialize(prefs);
         ps = new PrintStream(new Console(consoleArea));
-        System.setErr(ps);
-        System.setOut(ps);
+        //System.setErr(ps);
+        //System.setOut(ps);
     }
 
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
      * can be selected and directly be visualised on the screen.
      * @throws IOException if there is no file specified.
+     * @throws InterruptedException Exception when the Thread is interrupted.
      */
     @FXML
-    public void openFileClicked() throws IOException {
+    public void openFileClicked() throws IOException, InterruptedException {
         Stage stage = App.getStage();
         File file = fileController.chooseFile(stage);
-        String filePath = fileController.openFileClicked(gc, file.getAbsolutePath());
-        String fileName = fileController.fileNameFromPath(filePath);
-
-        updateControllers(fileName);
+        String filePath = file.getAbsolutePath();
         recentController.update(filePath, prefs);
+        fileController.openFileClicked(gc, filePath, this);
     }
 
     /**
-     * Opens the file specified in the filepath.
-     * @param filePath the filePath with the file that needs to be opened.
-     * @throws IOException Throws exception when file can't be found.
+     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
+     * can be selected and directly be visualised on the screen.
+     * @throws IOException if there is no file specified.
+     * @throws InterruptedException Exception when the Thread is interrupted.
      */
-    public void openFileClicked(String filePath) throws IOException {
-        fileController.openFileClicked(gc, filePath);
-        String fileName = fileController.fileNameFromPath(filePath);
-
-        updateControllers(fileName);
-    }
-
-    private void updateControllers(String fileName) {
-        Stage stage = App.getStage();
-        String title = stage.getTitle();
-        String split = "---";
-        String[] parts = title.split(split);
-        String offTitle = parts[0];
-        stage.setTitle(offTitle + split + fileName);
-
-        prefs.put("file", fileName);
-        bookmarkController.loadBookmarks(fileName);
-        panningController = new PanningController(scrollbar, fileController.getDrawer());
-        zoomController = new ZoomController(fileController.getDrawer(), panningController,
-                                nodeTextField, radiusTextField);
-
-        displayInfo(fileController.getGraph());
+    @FXML
+    public void openFileClicked(String filePath) throws IOException, InterruptedException {
+        fileController.openFileClicked(gc, filePath, this);
     }
 
     private void displayInfo(SequenceGraph graph) {
@@ -219,6 +209,19 @@ public class MenuController {
     }
 
     /**
+     * Display dummy nodes on checkbox checked and hide them on checkbox unchecked.
+     */
+    @FXML
+    public void toggleDummyNodes() {
+        if (dummyNodeCheckbox.isSelected()) {
+            fileController.getDrawer().setShowDummyNodes(true);
+        } else {
+            fileController.getDrawer().setShowDummyNodes(false);
+        }
+        fileController.getDrawer().redraw();
+    }
+
+    /**
      * Updates and saves the bookmarks.
      */
     @FXML
@@ -259,11 +262,40 @@ public class MenuController {
     }
 
     /**
-     * Getter for the sequence hashMap.
-     * @return the sequence hashMap.
+     * getter for the SequenceMap.
+     * @return The sequenceMap.
      */
     HTreeMap<Long, String> getSequenceHashMap() {
         return fileController.getSequenceHashMap();
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        if (o instanceof GfaParser) {
+            if (arg instanceof String) {
+                filePath = (String) arg;
+
+                String pattern = Pattern.quote(System.getProperty("file.separator"));
+                String[] partPaths = filePath.split(pattern);
+                final String partPath = partPaths[partPaths.length - 1];
+                prefs.put("file", partPath);
+                Platform.runLater(new Runnable() {
+                    public void run() {
+                        Stage stage = App.getStage();
+                        String title = stage.getTitle();
+                        String split = "---";
+                        String[] parts = title.split(split);
+                        String offTitle = parts[0];
+                        stage.setTitle(offTitle + split + filePath);
+                        bookmarkController.loadBookmarks(partPath);
+                        panningController = new PanningController(scrollbar, fileController.getDrawer());
+                        zoomController = new ZoomController(fileController.getDrawer(), panningController,
+                                nodeTextField, radiusTextField);
+                        displayInfo(fileController.getGraph());
+                    }
+                });
+            }
+        }
     }
 
     /**
@@ -302,11 +334,15 @@ public class MenuController {
                 openFileClicked();
             } catch (IOException e1) {
                 e1.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         } else {
             try {
                 openFileClicked(filePath);
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
