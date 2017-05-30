@@ -18,6 +18,7 @@ public class SequenceGraph {
 
     private Integer size;
     private HashMap<Integer, SequenceNode> nodes;
+    private HashMap<Integer, SequenceNode> dummyNodes;
     private ArrayList<Edge> edges;
     private ArrayList<ArrayList<SequenceNode>> columns;
 
@@ -27,6 +28,7 @@ public class SequenceGraph {
     public SequenceGraph() {
         this.size = 0;
         this.nodes = new HashMap<Integer, SequenceNode>();
+        this.dummyNodes = new HashMap<Integer, SequenceNode>();
         this.edges = new ArrayList<Edge>();
     }
 
@@ -35,7 +37,7 @@ public class SequenceGraph {
      * @return integer with size of the graph
      */
     public int size() {
-        return nodes.size();
+        return size;
     }
 
     /**
@@ -136,6 +138,10 @@ public class SequenceGraph {
         return this.nodes;
     }
 
+    public HashMap<Integer, SequenceNode> getDummyNodes() {
+        return dummyNodes;
+    }
+
     /**
      * Sets the node.
      * @param hash with nodes
@@ -218,13 +224,13 @@ public class SequenceGraph {
                 columns.add(new ArrayList<SequenceNode>());
             }
             columns.get(node.getColumn()).add(node);
-            //it.remove();
         }
 
         int counter = nodes.size() + 1;
         for (Edge edge : edges) {
             for (int i : edge.getColumnSpan()) {
                 SequenceNode dummyNode = new SequenceNode(counter);
+                dummyNodes.put(counter, dummyNode);
                 dummyNode.setDummy(true);
                 columns.get(i).add(0, dummyNode);
                 counter++;
