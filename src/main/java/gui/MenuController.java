@@ -123,6 +123,7 @@ public class MenuController implements Observer {
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
      * can be selected and directly be visualised on the screen.
+     * @param filePath the filePath to the file that should be opened
      * @throws IOException if there is no file specified.
      * @throws InterruptedException Exception when the Thread is interrupted.
      */
@@ -186,6 +187,9 @@ public class MenuController implements Observer {
         }
     }
 
+    /**
+     * Checks if the dummynodes is selected.
+     */
     @FXML
     public void checkDummynodes() {
         if (dummyNodeCheckbox.isSelected()) {
@@ -359,6 +363,10 @@ public class MenuController implements Observer {
         }
     }
 
+    /**
+     * Will open tutorial when Help-Help is called.
+     * @throws IOException Throws IO if fxml file can't be found.
+     */
     public void helpWanted() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/tutorial.fxml"));
         Stage stage;
