@@ -6,36 +6,50 @@ import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
 /**
  * This class contains a parser to parse a .gfa file into our data structure.
  */
-public class GfaParser {
+public class GfaParser extends Observable implements Runnable {
     private String header1;
     private String header2;
     private HTreeMap<Long, String> sequenceMap;
     private HTreeMap<Long, int[]> adjacencyHMap;
-    private DB db;
-    private DB db2;
+    private String filePath;
     private String partPath;
     private Preferences prefs;
 
     /**
+     * Constructor.
+     * @param absolutePath The path location of the file.
+     */
+    public GfaParser(String absolutePath) {
+        filePath = absolutePath;
+    }
+
+    @Override
+    public void run() {
+        try {
+            parseGraph(filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * This method parses the file specified in filepath into a sequence graph.
      * @param filePath A string specifying where the file is stored.
-     * @return Returns a sequenceGraph
      * @throws IOException For instance when the file is not found
      */
-    public HTreeMap<Long, int[]> parseGraph(String filePath) throws IOException {
+
+    @SuppressWarnings("Since15")
+    public synchronized void parseGraph(String filePath) throws IOException {
         prefs = Preferences.userRoot();
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
@@ -45,14 +59,13 @@ public class GfaParser {
         if (!prefs.getBoolean(partPath, true)) {
             PopUpController controller = new PopUpController();
             String message = "Database File is corrupt, press 'Reload' to reload the file," + "\n"
-                            + "or press 'Resume' to recover the data still available.";
+                    + "or press 'Resume' to recover the data still available.";
             controller.loadDbCorruptPopUp(partPath, message);
         }
-
-        db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().
+        DB db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().
                                                 fileMmapPreclearDisable().cleanerHackEnable().
                                                 closeOnJvmShutdown().checksumHeaderBypass().make();
-        db2 = DBMaker.fileDB(partPath + ".adjacency.db").fileMmapEnable().
+        DB db2 = DBMaker.fileDB(partPath + ".adjacency.db").fileMmapEnable().
                                                 fileMmapPreclearDisable().cleanerHackEnable().
                                                 closeOnJvmShutdown().checksumHeaderBypass().make();
         if (db.get(partPath + ".sequence.db") != null) {
@@ -62,7 +75,6 @@ public class GfaParser {
             adjacencyHMap = db2.hashMap(partPath + ".adjacency.db").
                             keySerializer(Serializer.LONG).
                             valueSerializer(Serializer.INT_ARRAY).createOrOpen();
-            return adjacencyHMap;
         } else {
             prefs.putBoolean(partPath, false);
             sequenceMap = db.hashMap(partPath + ".sequence.db").
@@ -71,15 +83,19 @@ public class GfaParser {
             adjacencyHMap = db2.hashMap(partPath + ".adjacency.db").
                                     keySerializer(Serializer.LONG).
                                     valueSerializer(Serializer.INT_ARRAY).createOrOpen();
-            return parseSpecific(filePath);
+            parseSpecific(filePath);
         }
+        this.setChanged();
+        this.notifyObservers(adjacencyHMap);
+        this.setChanged();
+        this.notifyObservers(filePath);
     }
 
     /**
      * Getter for the sequenceHashMap.
      * @return The HashMap.
      */
-    public HTreeMap<Long, String> getSequenceHashMap() {
+    public synchronized HTreeMap<Long, String> getSequenceHashMap() {
         return sequenceMap;
     }
 
@@ -87,18 +103,17 @@ public class GfaParser {
      * Getter for the AdjacencyHMap.
      * @return The HashMap.
      */
-    public HTreeMap<Long, int[]> getAdjacencyHMap() {
+    public synchronized HTreeMap<Long, int[]> getAdjacencyHMap() {
         return this.adjacencyHMap;
     }
 
     /**
      * Parses the file with a boolean whether to create a db file or not. Creates the Graph
      * @param filePath The file to parse/
-     * @return The sequenceGraph
      * @throws IOException Reader.
      */
     @SuppressWarnings("Since15")
-    private HTreeMap<Long, int[]> parseSpecific(String filePath) throws IOException {
+    private synchronized void parseSpecific(String filePath) throws IOException {
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 
@@ -106,8 +121,6 @@ public class GfaParser {
         if (line == null) {
             in.close();
             br.close();
-            db.commit();
-            return null;
         }
         header1 = line.split("H")[1];
         line = br.readLine();
@@ -115,8 +128,6 @@ public class GfaParser {
         if (line == null) {
             in.close();
             br.close();
-            db.commit();
-            return null;
         }
         header2 = line.split("H")[1];
         ArrayList<Integer> temp = new ArrayList<Integer>();
@@ -141,8 +152,6 @@ public class GfaParser {
         prefs.putBoolean(partPath, true);
         in.close();
         br.close();
-        db.commit();
-        return adjacencyHMap;
     }
 
 
@@ -159,8 +168,8 @@ public class GfaParser {
 
     /**
      * Converts an List<Integer> to int[].
-     * @param integers list with integers
-     * @return int[]
+     * @param integers list with integers.
+     * @return int[].
      */
     private static int[] convertIntegers(List<Integer> integers) {
         int[] ret = new int[integers.size()];
