@@ -14,7 +14,5 @@ Genome parser and visualisation
 
 ## List of Known issues
 - When opening a gfa file from "Open File", files can become duplicate in "Recent Files".
-- Node length are now the length of the largest node in the column instead of its own length.
-- Sequence in the bottom of the screen goes off the screen istead of wrapping.
 - Edges don't go properly through the dummy nodes yet.
 - When switching to another centrenode, the dummy nodes sometimes lag.
