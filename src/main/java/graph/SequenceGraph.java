@@ -1,9 +1,5 @@
 package graph;
 
-import javafx.util.Pair;
-import parser.GfaParser;
-import parser.Tuple;
-
 import java.util.*;
 
 /**
@@ -65,56 +61,34 @@ public class SequenceGraph {
     }
 
 
-    private int[] DFS(int startNodeID, int size) {
-        boolean[] visited = new boolean[size];
-        visited[startNodeID] = true;
-        for(int children: this.getNode(startNodeID).getChildren()) {
-            if(!visited[children]) {
-                DFS(children, size);
-            }
-        }
-    }
-
-    public void BFS(int startNodeID, int endNodeID, int size) {
-        boolean[] visited = new boolean[size];
-        PriorityQueue<Integer> queue = new PriorityQueue();
-
-        visited[startNodeID] = true;
-        queue.add(startNodeID);
-        while(!queue.isEmpty()) {
-            Integer currentNodeID = queue.poll();
-            if(currentNodeID == endNodeID) {
-                
-            }
-            for(Integer child: this.getNode(currentNodeID).getChildren()) {
-                if (!visited[child]) {
-                    visited[child] = true;
-                    this.getNode(child).addParent(currentNodeID);
-                    queue.add(child);
-                }
-
-            }
-        }
-    }
+//    private int[] DFS(int startNodeID, int size) {
+//        boolean[] visited = new boolean[size];
+//        visited[startNodeID] = true;
+//        for(int children: this.getNode(startNodeID).getChildren()) {
+//            if(!visited[children]) {
+//                DFS(children, size);
+//            }
+//        }
+//    }
 
     /**
      * Adds dummy nodes to the graph for visualisation purposes.
      */
-    private void addDummies() {
-        while (!list.isEmpty()){
-            AbstractNode parent = this.getNode(list.poll());
-            int size = parent.getChildren().size();
-            for (int i = 0; i < size; i++) {
-                int childId = parent.getChildren().get(i);
-                int span = getNode(childId).getLayer() - parent.getLayer();
-                if (span > 1) {
-                    addDummyHelper(span, parent, getNode(childId));
-                }
-            }
-        }
-    }
-
-
+//    private void addDummies() {
+//        while (!list.isEmpty()){
+//            AbstractNode parent = this.getNode(list.poll());
+//            int size = parent.getChildren().size();
+//            for (int i = 0; i < size; i++) {
+//                int childId = parent.getChildren().get(i);
+//                int span = getNode(childId).getLayer() - parent.getLayer();
+//                if (span > 1) {
+//                    addDummyHelper(span, parent, getNode(childId));
+//                }
+//            }
+//        }
+//    }
+//
+//
 
     /** Helper function for addDummy()
      *
@@ -154,18 +128,6 @@ public class SequenceGraph {
 
 
     /**
-     * Returns all the edges contained in the graph.
-     * @return a arrayList of Edges containing all the edges of the graph.
-     */
-    public ArrayList<Edge> getEdges() {
-        return this.edges;
-    }
-
-    public void setEdges(ArrayList<Edge> allEdges) {
-        this.edges = allEdges;
-    }
-
-    /**
      * Add a node to the ArrayList of Nodes.
      * @param node The node to be added.
      */
@@ -199,106 +161,7 @@ public class SequenceGraph {
      * Will add columns to all the nodes and to all the edges.
      */
     public void layerizeGraph(int lowerBoundID) {
-            createColumns(lowerBoundID);
-            createEdgeColumns();
-            this.columns = createColumnList();
-            createIndex();
 
-    }
-
-
-
-    /**
-     * assigns indices to all nodes in the column list.
-     */
-    private void createIndex() {
-        for (ArrayList<SequenceNode> column : columns) {
-            for (int j = 0; j < column.size(); j++) {
-                column.get(j).setIndex(j);
-            }
-        }
-
-    }
-
-    /**
-     * Gives each node a column where it should be built.
-     */
-    private void createColumns(int lowerBoundID) {
-        for (int i = lowerBoundID; i <= nodes.size() + lowerBoundID - 1; i++) {
-            SequenceNode parent = nodes.get(i);     // Start at first node
-            ArrayList<Integer> children = parent.getChildren();    // Get all children
-            for (Integer child : children) {
-                this.getNode(child).incrementColumn(parent.getColumn());
-            }
-        }
-    }
-
-    /**
-     * Gives each edge it's ghost nodes.
-     */
-    private void createEdgeColumns() {
-        for (Edge edge : edges) {
-            int parColumn = nodes.get(edge.getParent()).getColumn();
-            int childColumn = nodes.get(edge.getChild()).getColumn();
-            edge.setEntireColumnSpan(parColumn, childColumn);
-        }
-    }
-
-
-    /**
-     * Get the List of all Columns.
-     * @return The List of Columns.
-     */
-    private ArrayList<ArrayList<SequenceNode>> createColumnList() {
-        ArrayList<ArrayList<SequenceNode>> columns = new ArrayList<ArrayList<SequenceNode>>();
-
-        for (Object o : nodes.entrySet()) {
-            Map.Entry pair = (Map.Entry) o;
-            SequenceNode node = (SequenceNode) pair.getValue();
-            while (columns.size() <= node.getColumn()) {
-                columns.add(new ArrayList<SequenceNode>());
-            }
-            columns.get(node.getColumn()).add(node);
-            //it.remove();
-        }
-
-        int counter = nodes.size()+1;
-        for (Edge edge : edges) {
-            for (int i : edge.getColumnSpan()) {
-                SequenceNode dummyNode = new SequenceNode(counter);
-                dummyNode.setDummy(true);
-                columns.get(i).add(0, dummyNode);
-                counter++;
-            }
-        }
-        return columns;
-    }
-
-    /**
-     * Adder for Hashmap<Integer, List<Integer>)
-     *
-     * @param mapKey - the key in which to add a nodeID
-     * @param nodeID - the nodeID to be added
-     */
-    private synchronized void addToList(Integer mapKey, Integer nodeID) {
-        if (adjacencyMap.get(mapKey) == null) {
-            ArrayList<Integer> idList = new ArrayList<Integer>();
-            idList.add(nodeID);
-            adjacencyMap.put(mapKey, idList);
-
-        }
-        else if(adjacencyMap.get(mapKey) != null) {
-            ArrayList<Integer> idList = adjacencyMap.get(mapKey);
-            // if list does not exist create it
-            if (idList == null) {
-                idList = new ArrayList<Integer>();
-                idList.add(nodeID);
-                adjacencyMap.put(mapKey, idList);
-            } else {
-                // add if item is not already in list
-                if (!idList.contains(nodeID)) idList.add(nodeID);
-            }
-        }
     }
 
 }
