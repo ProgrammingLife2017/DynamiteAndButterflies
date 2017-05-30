@@ -4,18 +4,18 @@ import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
 
 /**
- * Created by Jip on 22-5-2017.
+ * Controller for the progressBar.
  */
 public class ProgressBarController {
 
-    private ProgressBar pb;
+    private ProgressBar progressBar;
 
     /**
      * Constructor.
      * @param bar The progressbar.
      */
     public ProgressBarController(ProgressBar bar) {
-        pb = bar;
+        progressBar = bar;
     }
 
     /**
@@ -24,10 +24,10 @@ public class ProgressBarController {
     void run() {
         Platform.runLater(new Runnable() {
             public void run() {
-                pb.setProgress(-1.0);
+                progressBar.setProgress(-1.0);
             }
         });
-        pb.setVisible(true);
+        progressBar.setVisible(true);
     }
 
     /**
@@ -36,9 +36,9 @@ public class ProgressBarController {
     void done() {
         Platform.runLater(new Runnable() {
             public void run() {
-                pb.setProgress(1.0);
+                progressBar.setProgress(1.0);
             }
         });
-        pb.setVisible(false);
+        progressBar.setVisible(false);
     }
 }
