@@ -298,7 +298,6 @@ public class MenuController implements Observer {
                         zoomController = new ZoomController(fileController.getDrawer(),
                                 nodeTextField, radiusTextField);
                         displayInfo(fileController.getGraph());
-                        recentController.update(filePath, prefs);
                     }
                 });
             }
