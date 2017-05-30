@@ -138,6 +138,7 @@ public class FileController implements Observer {
                 graph = new SequenceGraph();
                 graph.createSubGraph(nodeId, renderRange, adjacencyMap);
                 sequenceHashMap = parser.getSequenceHashMap();
+                assignSequenceLenghts();
                 drawer = new GraphDrawer(graph, gc);
                 drawer.moveShapes(0.0);
                 progressBarController.done();
