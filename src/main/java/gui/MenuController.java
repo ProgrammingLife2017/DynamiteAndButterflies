@@ -111,7 +111,9 @@ public class MenuController implements Observer {
     public void openFileClicked() throws IOException, InterruptedException {
         Stage stage = App.getStage();
         File file = fileController.chooseFile(stage);
-        fileController.openFileClicked(gc, file.getAbsolutePath(), this);
+        String filePath = file.getAbsolutePath();
+        recentController.update(filePath, prefs);
+        fileController.openFileClicked(gc, filePath, this);
     }
 
     /**
@@ -280,7 +282,6 @@ public class MenuController implements Observer {
         if (o instanceof GfaParser) {
             if (arg instanceof String) {
                 filePath = (String) arg;
-                recentController.update(filePath, prefs);
 
                 String pattern = Pattern.quote(System.getProperty("file.separator"));
                 String[] partPaths = filePath.split(pattern);
