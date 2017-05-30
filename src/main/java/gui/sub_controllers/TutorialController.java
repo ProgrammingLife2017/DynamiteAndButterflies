@@ -19,6 +19,12 @@ public class TutorialController {
 
     public Button nextBut;
     public Button prevBut;
+    public Button homeBut;
+    public Button travBut;
+    public Button bookBut;
+    public Button zoomBut;
+    public Button infoBut;
+    public Button debugBut;
 
     private int counter = 0;
 
@@ -34,12 +40,12 @@ public class TutorialController {
 
     private void getNewView(int stage) {
         switch (stage) {
-            case 1: homePage(); break;
-            case 2: traversingGraph(); break;
-            case 3: bookmarks(); break;
-            case 4: zooming(); break;
-            case 5: information(); break;
-            case 6: debugging(); break;
+            case 1: homePage(); homeBut.setVisible(true); break;
+            case 2: traversingGraph(); travBut.setVisible(true); break;
+            case 3: bookmarks(); bookBut.setVisible(true); break;
+            case 4: zooming(); zoomBut.setVisible(true); break;
+            case 5: information(); infoBut.setVisible(true); break;
+            case 6: debugging(); debugBut.setVisible(true); break;
             case 7: finished(); break;
             default: counter = 1; getNewView(counter);
         }
@@ -99,5 +105,35 @@ public class TutorialController {
                                     " or choose a file from your recent files.");
 
 
+    }
+
+    public void homeClick() {
+        counter = 1;
+        homePage();
+    }
+
+    public void travClick() {
+        counter = 2;
+        traversingGraph();
+    }
+
+    public void bookClick() {
+        counter = 3;
+        bookmarks();
+    }
+
+    public void zoomClick() {
+        counter = 4;
+        zooming();
+    }
+
+    public void infoClick() {
+        counter = 5;
+        information();
+    }
+
+    public void debugClick() {
+        counter = 6;
+        debugging();
     }
 }

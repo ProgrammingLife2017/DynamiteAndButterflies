@@ -313,8 +313,6 @@ public class MenuController {
     }
 
     public void helpWanted() throws IOException {
-        //TODO add functionality.
-        System.out.println("We zijn nu hiero Jip");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/tutorial.fxml"));
         Stage stage;
         Parent root = loader.load();
