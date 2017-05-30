@@ -12,12 +12,14 @@ public class SequenceNode {
     private int index;
     private int column;
     private ArrayList<Integer> children;
+    private ArrayList<Integer> parents;
     private boolean isDummy;
 
     public SequenceNode(int id) {
         this.id = id;
         this.index = 0;
         this.column = 0;
+        this.parents = new ArrayList<Integer>();
         this.children = new ArrayList<Integer>();
         this.isDummy = false;
     }
@@ -33,6 +35,12 @@ public class SequenceNode {
     public void addChild(Integer id) {
         if(!this.children.contains(id))
             this.children.add(id);
+    }
+
+    public void addParent(Integer id) {
+        if(!this.parents.contains(id)) {
+            this.parents.add(id);
+        }
     }
 
     public boolean hasChildren() {

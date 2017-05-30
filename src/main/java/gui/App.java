@@ -93,12 +93,4 @@ public class App extends Application {
     public static Stage getStage() {
         return stage;
     }
-
-    /**
-     * Getter for the stage on which the application is loaded.
-     * @return The Stage on which the application is loaded.
-     */
-    public static Stage getStage() {
-        return stage;
-    }
 }

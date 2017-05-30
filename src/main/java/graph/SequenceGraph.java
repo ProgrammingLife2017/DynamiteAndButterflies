@@ -4,10 +4,7 @@ import javafx.util.Pair;
 import parser.GfaParser;
 import parser.Tuple;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Our own Graph Class.
@@ -19,17 +16,15 @@ public class SequenceGraph {
 
 
     private HashMap<Integer, SequenceNode> nodes;
-    private ArrayList<Edge> edges;
     private ArrayList<ArrayList<SequenceNode>> columns;
-    private HashMap<Integer, ArrayList<Integer>> adjacencyMap;
 
     /**
      * The constructor initializes the SequenceGraph with it's basic values.
      */
     public SequenceGraph() {
         this.nodes = new HashMap<Integer, SequenceNode>();
-        this.edges = new ArrayList<Edge>();
     }
+
     public int size() {
         return nodes.size();
     }
@@ -51,20 +46,15 @@ public class SequenceGraph {
         for(int i = 0; i < parentArray.length; i++) {
             int parentID = parentArray[i];
             int childID = childArray[i];
-
             if(parentID >= lowerBoundID) {
                 if (nodes.get(parentID) == null) {
                     SequenceNode node = new SequenceNode(parentID);
                     node.addChild(childID);
                     nodes.put(parentID, node);
+
                 } else {
                     nodes.get(parentID).addChild(childID);
                 }
-//                SequenceNode node = new SequenceNode(parentID);
-//                node.addChild(childID);
-//                this.nodes.put(parentID, node);
-//                addToList(parentID, childID);
-
             }
         }
         SequenceNode lastNode = new SequenceNode(upperBoundID);
@@ -73,6 +63,86 @@ public class SequenceGraph {
 
         layerizeGraph(lowerBoundID);
     }
+
+
+    private int[] DFS(int startNodeID, int size) {
+        boolean[] visited = new boolean[size];
+        visited[startNodeID] = true;
+        for(int children: this.getNode(startNodeID).getChildren()) {
+            if(!visited[children]) {
+                DFS(children, size);
+            }
+        }
+    }
+
+    public void BFS(int startNodeID, int endNodeID, int size) {
+        boolean[] visited = new boolean[size];
+        PriorityQueue<Integer> queue = new PriorityQueue();
+
+        visited[startNodeID] = true;
+        queue.add(startNodeID);
+        while(!queue.isEmpty()) {
+            Integer currentNodeID = queue.poll();
+            if(currentNodeID == endNodeID) {
+                
+            }
+            for(Integer child: this.getNode(currentNodeID).getChildren()) {
+                if (!visited[child]) {
+                    visited[child] = true;
+                    this.getNode(child).addParent(currentNodeID);
+                    queue.add(child);
+                }
+
+            }
+        }
+    }
+
+    /**
+     * Adds dummy nodes to the graph for visualisation purposes.
+     */
+    private void addDummies() {
+        while (!list.isEmpty()){
+            AbstractNode parent = this.getNode(list.poll());
+            int size = parent.getChildren().size();
+            for (int i = 0; i < size; i++) {
+                int childId = parent.getChildren().get(i);
+                int span = getNode(childId).getLayer() - parent.getLayer();
+                if (span > 1) {
+                    addDummyHelper(span, parent, getNode(childId));
+                }
+            }
+        }
+    }
+
+
+
+    /** Helper function for addDummy()
+     *
+     * @param span - the difference in layer level of parent and child
+     * @param parent - the parent node
+     * @param target - the target node
+     */
+    /*
+    private void addDummyHelper(int span, AbstractNode parent, AbstractNode target) {
+        if (span > 1) {
+            DummyNode dummy = new DummyNode(this.size+1, parent.getLayer() + 1);
+            int size = parent.getChildren().size();
+            for (int i = 0; i < size; i++) {
+                if (parent.getChildren().get(i) == target.getId()) {
+                    parent.getChildren().remove(i);
+                    parent.addChild(dummy.getId());
+                    break;
+                }
+            }
+            dummy.addChild(target.getId());
+            this.addNode(dummy);
+            span --;
+            addDummyHelper(span, dummy, target);
+        }
+    }
+    */
+
+
 
     /**
      * Getter for the column list
@@ -136,6 +206,8 @@ public class SequenceGraph {
 
     }
 
+
+
     /**
      * assigns indices to all nodes in the column list.
      */
@@ -154,7 +226,7 @@ public class SequenceGraph {
     private void createColumns(int lowerBoundID) {
         for (int i = lowerBoundID; i <= nodes.size() + lowerBoundID - 1; i++) {
             SequenceNode parent = nodes.get(i);     // Start at first node
-                ArrayList<Integer> children = parent.getChildren();    // Get all children
+            ArrayList<Integer> children = parent.getChildren();    // Get all children
             for (Integer child : children) {
                 this.getNode(child).incrementColumn(parent.getColumn());
             }
@@ -173,7 +245,6 @@ public class SequenceGraph {
     }
 
 
-    //TODO: rework placement of nodes and dummy nodes
     /**
      * Get the List of all Columns.
      * @return The List of Columns.

@@ -29,11 +29,10 @@ public class GfaParser {
     private DB db2;
     private Preferences prefs;
 
-
+    private String partPath;
     private int[] parentArray;
     private int[] childArray;
     private int counter;
-    private String partPath;
 
     /**
      * This method parses the file specified in filepath into a sequence graph.
@@ -42,7 +41,6 @@ public class GfaParser {
      * @throws IOException For instance when the file is not found
      */
     public void parseGraph(String filePath) throws IOException {
-    public HTreeMap<Long, int[]> parseGraph(String filePath) throws IOException{
         prefs = Preferences.userRoot();
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
@@ -56,7 +54,6 @@ public class GfaParser {
         }
 
         db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().closeOnJvmShutdown().checksumHeaderBypass().make();
-        db = DBMaker.fileDB(partPath +  ".sequence.db").fileMmapEnable().fileMmapPreclearDisable().cleanerHackEnable().make();
         if (db.get(partPath+ ".sequence.db") == null) {
             sequenceMap = db.hashMap(partPath + ".sequence.db").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).createOrOpen();
             parseSpecific(filePath, partPath);
@@ -81,7 +78,6 @@ public class GfaParser {
      * @return The sequenceGraph
      * @throws IOException Reader.
      */
-    @SuppressWarnings("Since15")
     private void parseSpecific(String filePath, String partPath) throws IOException {
         LinkedList<Integer> parentList = new LinkedList<Integer>();
         LinkedList<Integer> childList = new LinkedList<Integer>();

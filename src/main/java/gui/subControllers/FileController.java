@@ -2,7 +2,9 @@ package gui.subControllers;
 
 import graph.SequenceGraph;
 import gui.GraphDrawer;
+import javafx.fxml.FXML;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
