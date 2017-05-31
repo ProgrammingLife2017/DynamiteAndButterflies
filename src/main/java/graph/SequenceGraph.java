@@ -38,9 +38,9 @@ public class SequenceGraph {
 //        find centg
 
         int centerNodeIndex = findCenterNodeIndex(centerNodeID, parentArray);
-        int lastNodeIndex = range;
+        int lastNodeIndex = range + centerNodeID;
         if (centerNodeIndex + range > parentArray.length) {
-            lastNodeIndex = parentArray.length - centerNodeIndex;
+            lastNodeIndex = parentArray.length;
         }
 
 
