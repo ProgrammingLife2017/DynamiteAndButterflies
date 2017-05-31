@@ -1,6 +1,7 @@
 package gui.sub_controllers;
 
 import gui.GraphDrawer;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ public class ZoomController {
 
     private final GraphDrawer drawer;
     private final TextField nodeTextField, radiusTextField;
+    private final Button goToNode;
 
     /**
      * Constructor of the Zoom Controller.
@@ -21,10 +23,11 @@ public class ZoomController {
      * @param nodeField The textField that contains the centre node.
      * @param radField The textField that contains the radius.
      */
-    public ZoomController(GraphDrawer drwr, TextField nodeField, TextField radField) {
+    public ZoomController(GraphDrawer drwr, TextField nodeField, TextField radField, Button goToNodeBut) {
         drawer = drwr;
         nodeTextField = nodeField;
         radiusTextField = radField;
+        goToNode = goToNodeBut;
     }
 
     /**
@@ -207,4 +210,9 @@ public class ZoomController {
         radiusTextField.setText(newRadius);
     }
 
+    public void graphLoaded() {
+        nodeTextField.setVisible(true);
+        radiusTextField.setVisible(true);
+        goToNode.setVisible(true);
+    }
 }

@@ -12,7 +12,7 @@ public class BookmarkController {
 
     private static Preferences prefs = Preferences.userRoot();
     private String stringFile;
-    private final Button bookmark1, bookmark2;
+    private final Button bookmark1, bookmark2, saveBookmark;
     private static final String BOOKMARK_SAVE = "bookmarkNum";
 
     /**
@@ -20,9 +20,10 @@ public class BookmarkController {
      * @param bm1 The button with the first bookmark.
      * @param bm2 The button with the second bookmark.
      */
-    public BookmarkController(Button bm1, Button bm2) {
+    public BookmarkController(Button bm1, Button bm2, Button save) {
         bookmark1 = bm1;
         bookmark2 = bm2;
+        saveBookmark = save;
 
         stringFile = "";
     }
@@ -77,5 +78,11 @@ public class BookmarkController {
 
         bookmark2.setText(bookmark1.getText());
         bookmark1.setText(newBookmark);
+    }
+
+    public void graphLoaded() {
+        bookmark1.setVisible(true);
+        bookmark2.setVisible(true);
+        saveBookmark.setVisible(true);
     }
 }

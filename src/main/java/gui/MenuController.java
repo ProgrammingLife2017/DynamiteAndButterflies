@@ -32,6 +32,8 @@ import java.util.regex.Pattern;
 public class MenuController implements Observer {
 
     @FXML
+    public Button goToNode;
+    @FXML
     private Button saveBookmark;
     @FXML
     private MenuItem file1;
@@ -92,7 +94,7 @@ public class MenuController implements Observer {
 
         fileController = new FileController(new ProgressBarController(progressBar));
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
-        bookmarkController = new BookmarkController(bookmark1, bookmark2);
+        bookmarkController = new BookmarkController(bookmark1, bookmark2, saveBookmark);
         recentController = new RecentController(file1, file2, file3);
 
         recentController.initialize(prefs);
@@ -114,6 +116,15 @@ public class MenuController implements Observer {
         String filePath = file.getAbsolutePath();
         recentController.update(filePath, prefs);
         fileController.openFileClicked(gc, filePath, this);
+    }
+
+    /**
+     * Is called once a graph is loaded.
+     * Initializes all the the buttons in the toolbar
+     */
+    private void graphLoaded() {
+        zoomController.graphLoaded();
+        bookmarkController.graphLoaded();
     }
 
     /**
@@ -297,8 +308,9 @@ public class MenuController implements Observer {
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.loadBookmarks(partPath);
                         zoomController = new ZoomController(fileController.getDrawer(),
-                                nodeTextField, radiusTextField);
+                                nodeTextField, radiusTextField, goToNode);
                         displayInfo(fileController.getGraph());
+                        graphLoaded();
                     }
                 });
             }
