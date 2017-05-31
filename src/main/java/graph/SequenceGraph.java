@@ -39,8 +39,8 @@ public class SequenceGraph {
 
         int centerNodeIndex = findCenterNodeIndex(centerNodeID, parentArray);
         int lastNodeIndex = range + centerNodeID;
-        if (centerNodeIndex + range > parentArray.length) {
-            lastNodeIndex = parentArray.length;
+        if (centerNodeIndex + range >= parentArray.length) {
+            lastNodeIndex = parentArray.length-1;
         }
 
 
@@ -51,21 +51,18 @@ public class SequenceGraph {
                 SequenceNode node = new SequenceNode(parentID);
                 node.addChild(childID);
                 nodes.put(parentID, node);
-
             } else {
                 nodes.get(parentID).addChild(childID);
             }
-        }
-
-        int lastChildId = childArray[childArray.length - 1];
-        if (nodes.get(childArray[lastChildId]) == null) {
-            SequenceNode node = new SequenceNode(childArray[lastChildId]);
-            nodes.put(lastChildId, node);
+            if (nodes.get(childID) == null) {
+                SequenceNode node = new SequenceNode(childID);
+                nodes.put(childID, node);
+            }
         }
 
         // order: longest path, column, dummy's,
         // layerizeGraph(lowerBoundID);
-        initColumnLongestPath(parentArray[centerNodeID], parentArray[lastChildId]);
+        initColumnLongestPath(parentArray[centerNodeID]);
         initColumns(centerNodeIndex, lastNodeIndex, parentArray);
         addDummies(parentArray, centerNodeIndex, lastNodeIndex);
         this.columns = createColumnList();
@@ -95,8 +92,8 @@ public class SequenceGraph {
         }
     }
 
-    private void initColumnLongestPath(int startNode, int endNode) {
-        LinkedList<Integer> longestPath = Dfs(startNode, endNode);
+    private void initColumnLongestPath(int startNode) {
+        LinkedList<Integer> longestPath = Dfs(startNode);
         int count = 0;
         for (int id : longestPath) {
             this.getNode(id).setColumn(count);
@@ -105,14 +102,14 @@ public class SequenceGraph {
 
     }
 
-    private LinkedList<Integer> Dfs(int startNode, int endNode) {
+    private LinkedList<Integer> Dfs(int startNode) {
         HashMap<Integer, Boolean> visited = new HashMap<Integer, Boolean>(nodes.size());
         LinkedList<Integer> longestPath = new LinkedList<Integer>();
-        return DFShelper(startNode, endNode, visited, longestPath);
+        return DFShelper(startNode, visited, longestPath);
 
     }
 
-    private LinkedList<Integer> DFShelper(int currentNode, int endNode, HashMap<Integer, Boolean> visited, LinkedList<Integer> longestPath) {
+    private LinkedList<Integer> DFShelper(int currentNode, HashMap<Integer, Boolean> visited, LinkedList<Integer> longestPath) {
         visited.put(currentNode, true);
         longestPath.add(currentNode);
 
