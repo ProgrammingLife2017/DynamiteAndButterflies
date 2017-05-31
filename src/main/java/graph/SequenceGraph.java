@@ -70,12 +70,52 @@ public class SequenceGraph {
         addDummies(parentArray, centerNodeIndex, lastNodeIndex);
         this.columns = createColumnList();
         createIndex();
+        baryCenterAssignment();
+    }
+
+    private void baryCenterAssignment() {
+        for(int i = 1; i < columns.size(); i++ ) {
+            ArrayList<SequenceNode> previousColumn = columns.get(i-1);
+            ArrayList<SequenceNode> currentColumn = columns.get(i);
+
+            // set amount of incoming edges for children and increase barycentervalue by index of parent
+            for (SequenceNode node: previousColumn) {
+                for(int child: node.getChildren()) {
+                    this.nodes.get(child).incrementInDegree();
+                    this.nodes.get(child).incrementBaryCenterValue(node.getIndex()+1);
+                }
+            }
+
+            // sort childlayer based on barycenter values.
+            Collections.sort(currentColumn, new Comparator<SequenceNode>() {
+                public int compare(SequenceNode o1, SequenceNode o2) {
+                    float baryVal1 = nodes.get(o1.getId()).getBaryCenterValue();
+                    float baryVal2 = nodes.get(o2.getId()).getBaryCenterValue();
+                    if (baryVal1 > baryVal2) {
+                        return 1;
+                    } else if (baryVal1 < baryVal2) {
+                        return -1;
+                    } else if (baryVal1 == baryVal2){
+                        if(nodes.get(o1.getId()).isDummy()) {
+                            return 1;
+                        } else {
+                            return -1;
+                        }
+                    }
+                    return 0;
+                }
+            });
+
+            for(int j = 0; j < currentColumn.size(); j++) {
+                currentColumn.get(j).setIndex(j);
+            }
+        }
     }
 
     private int findCenterNodeIndex(int centerNodeID, int[] parentArray) {
         for (int i = 0; i < centerNodeID; i++) {
             if (parentArray[i] == centerNodeID) {
-                return parentArray[i];
+                return i;
             }
         }
         throw new IllegalArgumentException();
@@ -111,8 +151,7 @@ public class SequenceGraph {
         return DFShelper(startNode, endNode, visited, longestPath);
 
     }
-
-    private LinkedList<Integer> DFShelper(int currentNode, int endNode, HashMap<Integer, Boolean> visited, LinkedList<Integer> longestPath) {
+    private LinkedList<Integer> DFShelper(int currentNode,int endNode, HashMap<Integer, Boolean> visited, LinkedList<Integer> longestPath) {
         visited.put(currentNode, true);
         longestPath.add(currentNode);
 

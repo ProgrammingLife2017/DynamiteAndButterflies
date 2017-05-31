@@ -35,6 +35,7 @@ public class GfaParser {
     private int[] parentArray;
     private int[] childArray;
     private int counter;
+    private int maxID;
 
     /**
      * This method parses the file specified in filepath into a sequence graph.
@@ -138,6 +139,7 @@ public class GfaParser {
         int [] nodeArray = new int[size];
         for (int i=0; i < StrNums.length; i++) {
             nodeArray[i] = Integer.parseInt(StrNums[i]);
+
         }
         return nodeArray;
     }
