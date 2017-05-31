@@ -37,6 +37,10 @@ public class SequenceNode {
             this.children.add(id);
     }
 
+    public void removeChild(Integer id) {
+        this.children.remove(id);
+    }
+
     public void addParent(Integer id) {
         if(!this.parents.contains(id)) {
             this.parents.add(id);
@@ -83,5 +87,4 @@ public class SequenceNode {
             column = i + 1;
         }
     }
-
 }
