@@ -74,7 +74,7 @@ public class SequenceGraph {
         visited.put(currentNode, true);
         longestPath.add(currentNode);
         for(int children: this.getNode(currentNode).getChildren()) {
-            if(!visited.get(children)) {
+            if(visited.get(children) == null    ) {
                 DFShelper(children, visited, longestPath);
             }
         }
