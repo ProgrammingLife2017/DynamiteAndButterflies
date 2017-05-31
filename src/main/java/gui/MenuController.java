@@ -158,6 +158,7 @@ public class MenuController implements Observer {
     @FXML
     public void scrollZoom(ScrollEvent scrollEvent) throws IOException {
         int column = fileController.getDrawer().mouseLocationColumn(scrollEvent.getX());
+        nodeTextField.setText(fileController.getDrawer().findColumn(scrollEvent.getX()) + "");
         if (scrollEvent.getDeltaY() > 0) {
             zoomController.zoomIn(column);
         } else {

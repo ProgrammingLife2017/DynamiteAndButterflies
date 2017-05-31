@@ -18,7 +18,6 @@ import java.util.Map;
  */
 public class GraphDrawer {
 
-    private static final double RELATIVE_X_DISTANCE = 0.8;
     private static final double RELATIVE_Y_DISTANCE = 50;
     private static final double LINE_WIDTH_FACTOR = 0.2;
     private static final double Y_SIZE_FACTOR = 4;
@@ -166,7 +165,7 @@ public class GraphDrawer {
                     continue;
                 }
                 double width = visualLength(node, j)
-                        * stepSize * RELATIVE_X_DISTANCE;
+                        * stepSize;
                 double height = getYSize();
                 double x = (columnWidths[j] - xDifference) * stepSize;
                 double y = yBase + (i * RELATIVE_Y_DISTANCE);
@@ -216,6 +215,15 @@ public class GraphDrawer {
             }
         }
         return click;
+    }
+
+    public int findColumn(double xEvent) {
+        for (int i = 0; i < canvasNodes.size(); i++) {
+            if (canvasNodes.get(i).checkClick(xEvent)) {
+                return canvasNodes.get(i).getId();
+            }
+        }
+        return -1;
     }
 
     /**
@@ -336,6 +344,10 @@ public class GraphDrawer {
      */
     public int mouseLocationColumn(double x) {
         return (int) ((x / stepSize) + xDifference);
+    }
+
+    public int mouseLocationColumn2(double x) {
+        return (int) ((x / (gc.getCanvas().getWidth() / radius)) + xDifference);
     }
 }
 
