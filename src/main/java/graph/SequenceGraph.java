@@ -2,6 +2,7 @@ package graph;
 
 import sun.awt.image.ImageWatched;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -15,8 +16,7 @@ public class SequenceGraph {
 
     private HashMap<Integer, SequenceNode> nodes;
     private ArrayList<ArrayList<SequenceNode>> columns;
-    private int upperBoundID;
-    private int lowerBoundID;
+
     private int dummyNodeIDCounter;
 
     /**
@@ -32,61 +32,73 @@ public class SequenceGraph {
 
     // upperbound in incorrect for TB10, the last node is not the highest one.
     public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray) {
-        upperBoundID = childArray[childArray.length -1];
-        lowerBoundID = parentArray[0];
-        range = range + 5;
 
 
-        if(centerNodeID + range <= upperBoundID) {
-            upperBoundID = centerNodeID + range;
+//        centerNode
+//        find centg
+
+        int centerNodeIndex = findCenterNodeIndex(centerNodeID, parentArray);
+        int lastNodeIndex = range;
+        if (centerNodeIndex + range > parentArray.length) {
+            lastNodeIndex = parentArray.length - centerNodeIndex;
         }
-        if(centerNodeID - range >= lowerBoundID) {
-            lowerBoundID = centerNodeID - range;
-        }
 
-        for(int i = 0; i < parentArray.length; i++) {
+
+        for (int i = centerNodeIndex; i <= lastNodeIndex; i++) {
             int parentID = parentArray[i];
             int childID = childArray[i];
-            if(parentID >= lowerBoundID) {
-                if (nodes.get(parentID) == null) {
-                    SequenceNode node = new SequenceNode(parentID);
-                    node.addChild(childID);
-                    nodes.put(parentID, node);
+            if (nodes.get(parentID) == null) {
+                SequenceNode node = new SequenceNode(parentID);
+                node.addChild(childID);
+                nodes.put(parentID, node);
 
-                } else {
-                    nodes.get(parentID).addChild(childID);
-                }
+            } else {
+                nodes.get(parentID).addChild(childID);
             }
         }
-        SequenceNode lastNode = new SequenceNode(upperBoundID);
-        this.nodes.put(upperBoundID, lastNode);
+
+        int lastChildId = childArray[childArray.length - 1];
+        if (nodes.get(childArray[lastChildId]) == null) {
+            SequenceNode node = new SequenceNode(childArray[lastChildId]);
+            nodes.put(lastChildId, node);
+        }
+
         // order: longest path, column, dummy's,
-       // layerizeGraph(lowerBoundID);
-        initColumnLongestPath();
-        initColumns();
-        addDummies();
+        // layerizeGraph(lowerBoundID);
+        initColumnLongestPath(parentArray[centerNodeID], parentArray[lastChildId]);
+        initColumns(centerNodeIndex, lastNodeIndex, parentArray);
+        addDummies(parentArray, centerNodeIndex, lastNodeIndex);
         this.columns = createColumnList();
         createIndex();
     }
 
+    private int findCenterNodeIndex(int centerNodeID, int[] parentArray) {
+        for (int i = 0; i < centerNodeID; i++) {
+            if (parentArray[i] == centerNodeID) {
+                return parentArray[i];
+            }
+        }
+        throw new IllegalArgumentException();
+
+    }
+
     //TODO: weird node is null? and dummy nodes at 0 column?
     // remove the null check.
-    private void initColumns() {
-        System.out.println(upperBoundID);
-        for(int i = lowerBoundID; i < upperBoundID; i++) {
-            int parentColumn = this.getNode(i).getColumn();
-            for(int id: this.getNode(i).getChildren()) {
-                if(this.getNode(id) != null && this.getNode(id).getColumn() == 0) {
+    private void initColumns(int centerNodeIndex, int lastNodeIndex, int[] parentArray) {
+        for (int i = centerNodeIndex; i <= lastNodeIndex; i++) {
+            int parentColumn = this.getNode(parentArray[i]).getColumn();
+            for (int id : this.getNode(parentArray[i]).getChildren()) {
+                if (this.getNode(id) != null && this.getNode(id).getColumn() == 0) {
                     this.getNode(id).setColumn(parentColumn + 1);
                 }
             }
         }
     }
 
-    private void initColumnLongestPath() {
-        LinkedList<Integer> longestPath = Dfs(lowerBoundID, upperBoundID);
+    private void initColumnLongestPath(int startNode, int endNode) {
+        LinkedList<Integer> longestPath = Dfs(startNode, endNode);
         int count = 0;
-        for(int id: longestPath) {
+        for (int id : longestPath) {
             this.getNode(id).setColumn(count);
             count++;
         }
@@ -99,17 +111,18 @@ public class SequenceGraph {
         return DFShelper(startNode, endNode, visited, longestPath);
 
     }
-    private LinkedList<Integer> DFShelper(int currentNode,int endNode, HashMap<Integer, Boolean> visited, LinkedList<Integer> longestPath) {
+
+    private LinkedList<Integer> DFShelper(int currentNode, int endNode, HashMap<Integer, Boolean> visited, LinkedList<Integer> longestPath) {
         visited.put(currentNode, true);
         longestPath.add(currentNode);
 
-        for(int child: this.getNode(currentNode).getChildren()) {
-            if(visited.get(child) == null) {
-                if(child == endNode) {
+        for (int child : this.getNode(currentNode).getChildren()) {
+            if (visited.get(child) == null) {
+                if (child == endNode) {
                     longestPath.add(child);
                     return longestPath;
                 } else {
-                    return DFShelper(child,endNode, visited, longestPath);
+                    return DFShelper(child, endNode, visited, longestPath);
                 }
             }
         }
@@ -119,10 +132,10 @@ public class SequenceGraph {
     /**
      * Adds dummy nodes to the graph for visualisation purposes.
      */
-    private void addDummies() {
-        dummyNodeIDCounter = upperBoundID + 1;
-        for(int i = lowerBoundID + 1; i <= upperBoundID; i++) {
-            SequenceNode parent = this.getNode(i);
+    private void addDummies(int[] parentArray, int centerNodeIndex, int lastNodeIndex) {
+        dummyNodeIDCounter = lastNodeIndex + 1;
+        for (int i = centerNodeIndex; i <= lastNodeIndex; i++) {
+            SequenceNode parent = this.getNode(parentArray[i]);
             int size = parent.getChildren().size();
             for (int j = 0; j < size; j++) {
                 int childId = parent.getChildren().get(j);
@@ -134,9 +147,10 @@ public class SequenceGraph {
         }
     }
 
-    /** Helper function for addDummy()
+    /**
+     * Helper function for addDummy()
      *
-     * @param span - the difference in layer level of parent and child
+     * @param span   - the difference in layer level of parent and child
      * @param parent - the parent node
      * @param target - the target node
      */
@@ -155,13 +169,14 @@ public class SequenceGraph {
             }
             dummy.addChild(target.getId());
             this.addNode(dummy);
-            span --;
+            span--;
             addDummyHelper(span, dummy, target);
         }
     }
 
     /**
      * Getter for the column list
+     *
      * @return the column arraylist with an arraylist with nodes.
      */
     public ArrayList<ArrayList<SequenceNode>> getColumns() {
@@ -171,6 +186,7 @@ public class SequenceGraph {
 
     /**
      * Add a node to the ArrayList of Nodes.
+     *
      * @param node The node to be added.
      */
     public void addNode(SequenceNode node) {
@@ -179,6 +195,7 @@ public class SequenceGraph {
 
     /**
      * Get a specific Node.
+     *
      * @param id The Id of the Node to get.
      * @return The Node with the given Id.
      */
@@ -188,6 +205,7 @@ public class SequenceGraph {
 
     /**
      * Returns all nodes contained in the graph.
+     *
      * @return A HashMap of all nodes and their IDs contained in the graph.
      */
     public HashMap<Integer, SequenceNode> getNodes() {
