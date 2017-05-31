@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 public class MenuController implements Observer {
 
     @FXML
-    public Button goToNode;
+    private Button goToNode;
     @FXML
     private Button saveBookmark;
     @FXML
@@ -130,6 +130,7 @@ public class MenuController implements Observer {
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
      * can be selected and directly be visualised on the screen.
+     * @param filePath The filepath to open.
      * @throws IOException if there is no file specified.
      * @throws InterruptedException Exception when the Thread is interrupted.
      */

@@ -5,10 +5,8 @@ import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -144,7 +142,7 @@ public class GraphDrawer {
     private int visualLength(SequenceNode node, int j) {
         int length = node.getSequenceLength();
         if (length == 0) {
-            return columnWidths[j+1] - columnWidths[j];
+            return columnWidths[j + 1] - columnWidths[j];
         }
         if (length > MAX_X_SIZE) {
             return (int) MAX_X_SIZE;
