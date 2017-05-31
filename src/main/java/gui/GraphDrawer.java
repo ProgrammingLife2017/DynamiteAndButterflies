@@ -217,6 +217,11 @@ public class GraphDrawer {
         return click;
     }
 
+    /**
+     * Find the column corresponding to the x coordinate.
+     * @param xEvent x coordinate of the click event.
+     * @return The column id of the column the x coordinate is in.
+     */
     public int findColumn(double xEvent) {
         for (int i = 0; i < canvasNodes.size(); i++) {
             if (canvasNodes.get(i).checkClick(xEvent)) {
@@ -346,8 +351,5 @@ public class GraphDrawer {
         return (int) ((x / stepSize) + xDifference);
     }
 
-    public int mouseLocationColumn2(double x) {
-        return (int) ((x / (gc.getCanvas().getWidth() / radius)) + xDifference);
-    }
 }
 

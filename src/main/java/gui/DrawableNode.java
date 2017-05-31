@@ -119,6 +119,11 @@ public class DrawableNode {
         return (xEvent > xCoordinate && xEvent < xCoordinate + width && yEvent > yCoordinate && yEvent < yCoordinate + height);
     }
 
+    /**
+     * Check if a click event is whitin the borders of the column of this node.
+     * @param xEvent x coordinate of the click event
+     * @return True if the coordinate of the click event is whithin the borders of the column, false otherwise.
+     */
     public boolean checkClick(double xEvent) {
         return (xEvent > xCoordinate && xEvent < xCoordinate + (width / RELATIVE_X_DISTANCE));
     }
