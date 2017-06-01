@@ -8,6 +8,9 @@ import javafx.stage.Stage;
  * Created by Jip on 1-6-2017.
  */
 public class BookmarkPopUp {
+
+    @FXML
+    private TextField noteBook;
     @FXML
     private TextField radiusBook;
     @FXML
@@ -24,7 +27,7 @@ public class BookmarkPopUp {
 
     @FXML
     public void confirmNewBookmark() {
-        bookmarkController.saving(centreNodeBook.getText(), radiusBook.getText());
+        bookmarkController.saving(noteBook.getText(), centreNodeBook.getText(), radiusBook.getText());
         close();
     }
 

@@ -288,8 +288,8 @@ public class MenuController implements Observer {
         if (!bookmark.getText().equals("-")) {
             String string = bookmark.getText();
             String[] parts = string.split("-");
-            String centre = parts[0];
-            String radius = parts[1];
+            String centre = parts[1];
+            String radius = parts[2];
             traverseGraphClicked(centre, radius);
             zoomController.setNodeTextField(centre);
             zoomController.setRadiusTextField(radius);

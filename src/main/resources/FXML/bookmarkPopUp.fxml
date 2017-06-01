@@ -9,7 +9,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.sub_controllers.BookmarkPopUp">
 <children>
-      <TextField layoutX="104.0" layoutY="58.0" prefHeight="25.0" prefWidth="260.0" promptText="Please add a note..." AnchorPane.bottomAnchor="137.0" />
+      <TextField fx:id="noteBook" layoutX="104.0" layoutY="58.0" prefHeight="25.0" prefWidth="260.0" promptText="Please add a note..." AnchorPane.bottomAnchor="137.0" />
       <TextField fx:id="radiusBook" alignment="CENTER" layoutX="107.0" layoutY="165.0" prefHeight="25.0" prefWidth="90.0" promptText="Radius" AnchorPane.bottomAnchor="29.0" AnchorPane.topAnchor="165.0" />
       <TextField fx:id="centreNodeBook" alignment="CENTER" layoutX="107.0" layoutY="110.0" prefHeight="25.0" prefWidth="90.0" promptText="Centre Node" AnchorPane.topAnchor="110.0" />
       <Label layoutX="20.0" layoutY="114.0" text="Centre Node" />

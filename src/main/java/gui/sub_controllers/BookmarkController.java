@@ -55,18 +55,21 @@ public class BookmarkController {
 
     /**
      * Saves the bookmarks when the user presses save.
+     * @param note The note for the bookmark
      * @param nodes The centre node
      * @param radius The radius of nodes we should save/show
      */
-    public void saving(String nodes, String radius) {
+    public void saving(String note, String nodes, String radius) {
 
         String stringFile = prefs.get("file", "def");
+        String bookmark = note + "-" + nodes + "-" + radius;
+
         int newIndex = prefs.getInt(BOOKMARK_SAVE + stringFile, -1);
         newIndex++;
-        prefs.put(stringFile + newIndex, nodes + "-" + radius);
+        prefs.put(stringFile + newIndex, bookmark);
         prefs.putInt(BOOKMARK_SAVE + stringFile, newIndex);
 
-        updateBookmarks(nodes + "-" + radius);
+        updateBookmarks(bookmark);
     }
 
     /**
