@@ -62,11 +62,7 @@ public class GraphDrawer {
         for (Object o : graph.getNodes().entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             SequenceNode node = (SequenceNode) pair.getValue();
-            if (node.isDummy()) {
-                canvasNodes.add(new DrawableNode(node.getId(), gc, true));
-            } else {
-                canvasNodes.add(new DrawableNode(node.getId(), gc, false));
-            }
+            canvasNodes.add(new DrawableNode(node.getId(), gc, node.isDummy()));
         }
     }
 
@@ -180,10 +176,12 @@ public class GraphDrawer {
     private void drawEdges() {
         setLineWidth();
         HashMap<Integer, SequenceNode> nodes = graph.getNodes();
-        for (int i = 1; i <= nodes.size(); i++) {
-            SequenceNode node = nodes.get(i);
+        Iterator it = nodes.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
             DrawableNode parent = canvasNodes.get(node.getId() - 1);
-            for (int j = 0; j < nodes.get(i).getChildren().size(); j++) {
+            for (int j = 0; j < node.getChildren().size(); j++) {
                 DrawableNode child = canvasNodes.get(graph.getNode(node.getChild(j)).getId() - 1);
                 double startx = parent.getxCoordinate() + parent.getWidth();
                 double starty = parent.getyCoordinate() + (parent.getHeight() / 2);

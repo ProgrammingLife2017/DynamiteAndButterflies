@@ -32,11 +32,6 @@ public class SequenceGraph {
 
     // upperbound in incorrect for TB10, the last node is not the highest one.
     public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray) {
-
-
-//        centerNode
-//        find centg
-
         int centerNodeIndex = findCenterNodeIndex(centerNodeID, parentArray);
         int lastNodeIndex = range + centerNodeID;
         if (centerNodeIndex + range >= parentArray.length) {
@@ -64,7 +59,7 @@ public class SequenceGraph {
         // layerizeGraph(lowerBoundID);
         initColumnLongestPath(parentArray[centerNodeIndex]);
         initColumns(centerNodeIndex, lastNodeIndex, parentArray);
-        addDummies(parentArray, centerNodeIndex, lastNodeIndex);
+        addDummies(parentArray, childArray, centerNodeIndex, lastNodeIndex);
         this.columns = createColumnList();
         createIndex();
         baryCenterAssignment();
@@ -92,7 +87,7 @@ public class SequenceGraph {
                         return 1;
                     } else if (baryVal1 < baryVal2) {
                         return -1;
-                    } else if (baryVal1 == baryVal2){
+                    } else if (baryVal1 == baryVal2) {
                         if (nodes.get(o1.getId()).isDummy()) {
                             return 1;
                         } else {
@@ -105,6 +100,7 @@ public class SequenceGraph {
 
             for(int j = 0; j < currentColumn.size(); j++) {
                 currentColumn.get(j).setIndex(j);
+                this.nodes.get(currentColumn.get(j).getId()).setIndex(j);
             }
         }
     }
@@ -169,8 +165,8 @@ public class SequenceGraph {
     /**
      * Adds dummy nodes to the graph for visualisation purposes.
      */
-    private void addDummies(int[] parentArray, int centerNodeIndex, int lastNodeIndex) {
-        dummyNodeIDCounter = lastNodeIndex + 1;
+    private void addDummies(int[] parentArray, int[] childArray, int centerNodeIndex, int lastNodeIndex) {
+        dummyNodeIDCounter = childArray[lastNodeIndex] + 1;
         for (int i = centerNodeIndex; i <= lastNodeIndex; i++) {
             SequenceNode parent = this.getNode(parentArray[i]);
             int size = parent.getChildren().size();
@@ -251,9 +247,6 @@ public class SequenceGraph {
     public void setNodes(HashMap<Integer, SequenceNode> hash) {
         this.nodes = hash;
     }
-
-
-
 
 
     private ArrayList<ArrayList<SequenceNode>> createColumnList() {

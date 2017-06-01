@@ -97,8 +97,8 @@ public class MenuController implements Observer {
 
         recentController.initialize(prefs);
         ps = new PrintStream(new Console(consoleArea));
-        System.setErr(ps);
-        System.setOut(ps);
+        //System.setErr(ps);
+        //System.setOut(ps);
     }
 
     /**
@@ -239,9 +239,9 @@ public class MenuController implements Observer {
     @FXML
     public void toggleDummyNodes() {
         if (dummyNodeCheckbox.isSelected()) {
-            fileController.getDrawer().setShowDummyNodes(true);
-        } else {
             fileController.getDrawer().setShowDummyNodes(false);
+        } else {
+            fileController.getDrawer().setShowDummyNodes(true);
         }
         fileController.getDrawer().redraw();
     }
@@ -299,7 +299,6 @@ public class MenuController implements Observer {
         if (o instanceof GfaParser) {
             if (arg instanceof String) {
                 filePath = (String) arg;
-
                 String pattern = Pattern.quote(System.getProperty("file.separator"));
                 String[] partPaths = filePath.split(pattern);
                 final String partPath = partPaths[partPaths.length - 1];

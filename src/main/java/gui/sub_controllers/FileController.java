@@ -12,8 +12,7 @@ import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -27,7 +26,7 @@ public class FileController implements Observer {
     private File parDirectory;
     private ProgressBarController progressBarController;
 
-    private final int renderRange = 5000;
+    private final int renderRange = 200;
     private final int nodeId = 1;
 
     private Thread parseThread;
@@ -106,9 +105,14 @@ public class FileController implements Observer {
     }
 
     private void assignSequenceLenghts() {
-        for (int i = 1; i <= graph.size(); i++) {
-            SequenceNode node = graph.getNode(i);
-            node.setSequenceLength(sequenceHashMap.get((long) i).length());
+        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
+        Iterator it = nodes.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            if(!node.isDummy()) {
+                node.setSequenceLength(sequenceHashMap.get((long) node.getId()).length());
+            }
         }
     }
 
@@ -148,7 +152,7 @@ public class FileController implements Observer {
             graph = new SequenceGraph();
             graph.createSubGraph(nodeId, renderRange, parentArray, childArray);
             sequenceHashMap = parser.getSequenceHashMap();
-            //assignSequenceLenghts();
+            assignSequenceLenghts();
             drawer = new GraphDrawer(graph, gc);
             drawer.moveShapes(0.0);
             progressBarController.done();
