@@ -36,7 +36,6 @@ public class GraphDrawer {
     private GraphicsContext gc;
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
-    private HashMap<Integer, DrawableNode> canvasNodes;
     private int highlightedNode;
 
     /**
@@ -49,22 +48,11 @@ public class GraphDrawer {
         this.gc = gc;
         this.graph = graph;
         this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
-        canvasNodes = new HashMap<Integer, DrawableNode>();
         columns = graph.getColumns();
         columnWidths = new int[columns.size() + 1];
-        initializeDrawableNodes();
         initializeColumnWidths();
         zoomLevel = columnWidths[columns.size()];
         radius = columns.size();
-    }
-
-    private void initializeDrawableNodes() {
-        for (Object o : graph.getNodes().entrySet()) {
-            Map.Entry pair = (Map.Entry) o;
-            SequenceNode node = (SequenceNode) pair.getValue();
-            DrawableNode dNode = new DrawableNode(node.getId(), gc, node.isDummy());
-            canvasNodes.put(node.getId(), dNode);
-        }
     }
 
     /**
@@ -138,7 +126,7 @@ public class GraphDrawer {
     private int visualLength(SequenceNode node, int j) {
         int length = node.getSequenceLength();
         if (length == 0) {
-            return columnWidths[j+1] - columnWidths[j];
+            return columnWidths[j + 1] - columnWidths[j];
         }
         if (length > MAX_X_SIZE) {
             return (int) MAX_X_SIZE;
@@ -151,26 +139,22 @@ public class GraphDrawer {
      * is checked dummy nodes are either drawn or skipped.
      */
     private void drawNodes() {
-        HashMap<Integer, DrawableNode> nodes = canvasNodes;
+        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
         Iterator it = nodes.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             SequenceNode node = (SequenceNode) pair.getValue();
-            int nodeID = (Integer) pair.getKey();
-            for (int j = 0; j < node.getChildren().size(); j++) {
-                double width = visualLength(node, j)
-                        * stepSize * RELATIVE_X_DISTANCE;
-                double height = getYSize();
-                double x = (columnWidths[j] - xDifference) * stepSize;
-                double y = yBase + (node.getIndex() * RELATIVE_Y_DISTANCE);
-                if (height > width) {
-                    y += (height - width) / 2;
-                    height = width;
-                }
-                DrawableNode dNode = canvasNodes.get(nodeID);
-                dNode.setCoordinates(x, y, width, height);
-                dNode.draw();
+            double width = visualLength(node, node.getColumn())
+                    * stepSize * RELATIVE_X_DISTANCE;
+            double height = getYSize();
+            double x = (columnWidths[node.getColumn()] - xDifference) * stepSize;
+            double y = yBase + (node.getIndex() * RELATIVE_Y_DISTANCE);
+            if (height > width) {
+                y += (height - width) / 2;
+                height = width;
             }
+            node.setCoordinates(x, y, width, height);
+            node.draw(gc);
         }
     }
 
@@ -180,11 +164,10 @@ public class GraphDrawer {
         Iterator it = nodes.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
             int nodeID = (Integer) pair.getKey();
-            DrawableNode parent = canvasNodes.get(nodeID);
-            for (int j = 0; j < node.getChildren().size(); j++) {
-                DrawableNode child = canvasNodes.get(pair.getKey());
+            SequenceNode parent = graph.getNode(nodeID);
+            for (int j = 0; j < parent.getChildren().size(); j++) {
+                SequenceNode child = graph.getNode(parent.getChild(j));
                 double startx = parent.getxCoordinate() + parent.getWidth();
                 double starty = parent.getyCoordinate() + (parent.getHeight() / 2);
                 double endx = child.getxCoordinate();
@@ -197,18 +180,22 @@ public class GraphDrawer {
     /**
      * Check for each node if the click event is within its borders. If so highlight the node and return it. Also all
      * other nodes are lowlighted.
+     *
      * @param xEvent The x coordinate of the click event.
      * @param yEvent The y coordinate of the click event.
      * @return The sequencenode that has been clicked or null if nothing was clicked.
      */
     public SequenceNode clickNode(double xEvent, double yEvent) {
         SequenceNode click = null;
-        for (int i = 0; i < canvasNodes.size(); i++) {
-            DrawableNode node = canvasNodes.get(i);
+        Iterator it = graph.getNodes().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
             node.lowlight();
             if (node.checkClick(xEvent, yEvent)) {
                 click = graph.getNode(node.getId());
                 node.highlight();
+                node.draw(gc);
             }
         }
         return click;
@@ -269,11 +256,12 @@ public class GraphDrawer {
      *
      * @param node The node that should be highlighted
      */
-    public void highlight(int node) {;
-        if(highlightedNode != 0) {
-            canvasNodes.get(highlightedNode).lowlight();
+    public void highlight(int node) {
+        ;
+        if (highlightedNode != 0) {
+            graph.getNode(highlightedNode).lowlight();
         }
-        canvasNodes.get(node).highlight();
+        graph.getNode(node).highlight();
         highlightedNode = node;
     }
 
@@ -316,6 +304,7 @@ public class GraphDrawer {
 
     /**
      * Return the column the mouse click is in.
+     *
      * @param x The x coordinate of the mouse click event
      * @return The id of the column that the mouse click is in.
      */
