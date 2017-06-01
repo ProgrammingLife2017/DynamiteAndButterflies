@@ -19,7 +19,7 @@ public class FileController {
     private HTreeMap<Long, String> sequenceHashMap;
     private File parDirectory;
 
-    private final int RENDER_RANGE = 10;
+    private final int RENDER_RANGE = 500;
     private final int NODE_ID = 1;
 
     private int[] childArray;
@@ -102,7 +102,7 @@ public class FileController {
 
 
         graph = new SequenceGraph();
-        graph.createSubGraph(NODE_ID,RENDER_RANGE, parentArray, childArray);
+        graph.createSubGraph(NODE_ID, RENDER_RANGE, parentArray, childArray);
         sequenceHashMap = parser.getSequenceHashMap();
         drawer = new GraphDrawer(graph, gc);
         drawer.moveShapes(0.0);

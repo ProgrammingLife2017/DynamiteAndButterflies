@@ -62,7 +62,7 @@ public class SequenceGraph {
 
         // order: longest path, column, dummy's,
         // layerizeGraph(lowerBoundID);
-        initColumnLongestPath(parentArray[centerNodeID]);
+        initColumnLongestPath(parentArray[centerNodeIndex]);
         initColumns(centerNodeIndex, lastNodeIndex, parentArray);
         addDummies(parentArray, centerNodeIndex, lastNodeIndex);
         this.columns = createColumnList();
@@ -93,7 +93,7 @@ public class SequenceGraph {
                     } else if (baryVal1 < baryVal2) {
                         return -1;
                     } else if (baryVal1 == baryVal2){
-                        if(nodes.get(o1.getId()).isDummy()) {
+                        if (nodes.get(o1.getId()).isDummy()) {
                             return 1;
                         } else {
                             return -1;
@@ -154,11 +154,11 @@ public class SequenceGraph {
         longestPath.add(currentNode);
 
         if (this.getNode(currentNode).getChildren().size() == 0) {
+            System.out.println(longestPath.toString());
             return longestPath;
         }
         for (int child : this.getNode(currentNode).getChildren()) {
             if (visited.get(child) == null) {
-
                     return DFShelper(child, visited, longestPath);
                 }
             }
