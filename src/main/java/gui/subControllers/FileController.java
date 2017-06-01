@@ -19,7 +19,7 @@ public class FileController {
     private HTreeMap<Long, String> sequenceHashMap;
     private File parDirectory;
 
-    private final int RENDER_RANGE = 5000;
+    private final int RENDER_RANGE = 10;
     private final int NODE_ID = 1;
 
     private int[] childArray;

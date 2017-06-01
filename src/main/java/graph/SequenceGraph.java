@@ -200,11 +200,12 @@ public class SequenceGraph {
                 if (parent.getChildren().get(i) == target.getId()) {
                     parent.getChildren().remove(i);
                     parent.addChild(dummy.getId());
-                    dummy.setColumn(parent.getColumn() + 1);
                     break;
                 }
             }
             dummy.addChild(target.getId());
+            dummy.addParent(parent.getId());
+            dummy.setColumn(parent.getColumn() + 1);
             this.addNode(dummy);
             span--;
             addDummyHelper(span, dummy, target);

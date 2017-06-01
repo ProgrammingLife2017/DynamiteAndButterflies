@@ -13,6 +13,11 @@ public class SequenceNode {
     private int column;
     private ArrayList<Integer> children;
     private ArrayList<Integer> parents;
+
+    public ArrayList<Integer> getParents() {
+        return parents;
+    }
+
     private boolean isDummy;
     private float baryCenterValue;
     private int inDegree;
