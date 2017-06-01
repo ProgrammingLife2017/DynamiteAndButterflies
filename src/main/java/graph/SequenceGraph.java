@@ -153,18 +153,18 @@ public class SequenceGraph {
         visited.put(currentNode, true);
         longestPath.add(currentNode);
 
+        if (this.getNode(currentNode).getChildren().size() == 0) {
+            return longestPath;
+        }
         for (int child : this.getNode(currentNode).getChildren()) {
             if (visited.get(child) == null) {
-                if (child == endNode) {
-                    longestPath.add(child);
-                    return longestPath;
-                } else {
-                    return DFShelper(child, endNode, visited, longestPath);
+
+                    return DFShelper(child, visited, longestPath);
                 }
             }
-        }
         return longestPath;
-    }
+        }
+
 
     /**
      * Adds dummy nodes to the graph for visualisation purposes.
