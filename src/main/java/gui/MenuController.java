@@ -186,8 +186,9 @@ public class MenuController implements Observer {
      * Adds a button to traverse the graph with.
      */
     public void traverseGraphClicked() {
-        zoomController.traverseGraphClicked(fileController.getGraph().getNodes().size());
-        int centreNodeID = zoomController.getCentreNodeID();
+        int centreNodeID = Integer.parseInt(nodeTextField.getText());
+        int radius = Integer.parseInt(radiusTextField.getText());
+        zoomController.traverseGraphClicked(centreNodeID, radius);
         String newString = "ID: " + centreNodeID + "\nSequence: "
                 + fileController.getSequenceHashMap().get((long) centreNodeID);
         infoController.updateSeqLabel(newString);
@@ -202,8 +203,7 @@ public class MenuController implements Observer {
         int centreNodeID = Integer.parseInt(centreNode);
         int rad = Integer.parseInt(radius);
 
-        zoomController.traverseGraphClicked(fileController.getGraph().getNodes().size(),
-                                            centreNodeID, rad);
+        zoomController.traverseGraphClicked(centreNodeID, rad);
         String newString = "Sequence: "
                 + fileController.getSequenceHashMap().get((long) centreNodeID);
         infoController.updateSeqLabel(newString);
@@ -227,7 +227,7 @@ public class MenuController implements Observer {
      */
     @FXML
     public void saveTheBookmarks() {
-        bookmarkController.saving(zoomController.getCentreNode(), zoomController.getRadius());
+        bookmarkController.saving(Integer.parseInt(nodeTextField.getText()), Integer.parseInt(radiusTextField.getText()));
     }
 
     /**
@@ -290,7 +290,7 @@ public class MenuController implements Observer {
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.loadBookmarks(partPath);
                         panningController = new PanningController(scrollbar, fileController.getDrawer());
-                        zoomController = new ZoomController(fileController.getDrawer(), panningController,
+                        zoomController = new ZoomController(fileController.getGraph(), fileController.getDrawer(), panningController,
                                 nodeTextField, radiusTextField);
                         displayInfo(fileController.getGraph());
                     }

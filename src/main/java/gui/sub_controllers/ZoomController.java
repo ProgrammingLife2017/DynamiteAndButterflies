@@ -1,5 +1,7 @@
 package gui.sub_controllers;
 
+import graph.SequenceGraph;
+import graph.SequenceNode;
 import gui.GraphDrawer;
 import javafx.scene.control.TextField;
 
@@ -17,6 +19,7 @@ public class ZoomController {
     private static final double SCROLL_ZOOM_IN_FACTOR = 0.9;
     private static final double SCROLL_ZOOM_OUT_FACTOR = 1.1;
 
+    private final SequenceGraph graph;
     private final GraphDrawer drawer;
     private final TextField nodeTextField, radiusTextField;
     private final PanningController panningController;
@@ -28,8 +31,9 @@ public class ZoomController {
      * @param nodeField The textField that contains the centre node.
      * @param radField The textField that contains the radius.
      */
-    public ZoomController(GraphDrawer drwr, PanningController panningController,
+    public ZoomController(SequenceGraph graph, GraphDrawer drwr, PanningController panningController,
                           TextField nodeField, TextField radField) {
+        this.graph = graph;
         drawer = drwr;
         nodeTextField = nodeField;
         radiusTextField = radField;
@@ -93,27 +97,12 @@ public class ZoomController {
     }
 
     /**
-     * Adds a button to traverse the graph with.
-     * @param graphSize the size of the graph to determine the end node.
-     */
-    public void traverseGraphClicked(int graphSize) {
-        int startColumn = getStartColumn();
-        int endColumn = getEndColumn(graphSize);
-        int centreNodeID = Integer.parseInt(nodeTextField.getText());
-        drawer.changeZoom(endColumn - startColumn, drawer.getColumnId(centreNodeID));
-        drawer.highlight(centreNodeID);
-    }
-
-    /**
      * Traverses the graph loaded to a specified destination.
-     * @param graphSize The size of the graph
      * @param centreNode The centre node to move to
      * @param radius The radius to be viewed
      */
-    public void traverseGraphClicked(int graphSize, int centreNode, int radius) {
-        int startColumn = getStartColumn(centreNode, radius);
-        int endColumn = getEndColumn(graphSize, centreNode, radius);
-        drawer.changeZoom(radius * 2, drawer.getColumnId(centreNode));
+    public void traverseGraphClicked(int centreNode, int radius) {
+        drawer.changeZoom(graph.getNode(centreNode).getColumn(), radius);
         drawer.highlight(centreNode);
     }
 
@@ -126,88 +115,11 @@ public class ZoomController {
     }
 
     /**
-     * Getter for the centreNode.
-     * @return the ID of the centre node.
-     */
-    public int getCentreNodeID() {
-        return Integer.parseInt(nodeTextField.getText());
-    }
-
-    /**
-     * Getter for the radius.
-     * @return the radius.
-     */
-    public int getRadius() {
-        return (int) Double.parseDouble(radiusTextField.getText());
-    }
-
-    /**
-     * Getter for the centre node.
-     * @return the centre node.
-     */
-    public int getCentreNode() {
-        return Integer.parseInt(nodeTextField.getText());
-    }
-
-    /**
      * Updates the radius.
      * @param newRadius the new radius.
      */
     private void updateRadius(String newRadius) {
         radiusTextField.setText(newRadius);
-    }
-
-    /**
-     * Gets the start column based on the given fields.
-     * @param centre the integer representing the centre node.
-     * @param rad the integer representing the radius.
-     * @return integer representing the starting column
-     */
-    private int getStartColumn(int centre, int rad) {
-
-        int startNode = centre - rad;
-        if (startNode < 1) {
-            startNode = 1;
-        }
-        return drawer.getColumnId(startNode);
-    }
-
-    /**
-     * Gets the start column based on the text fields.
-     * @return integer representing the starting column
-     */
-    private int getStartColumn() {
-        int centreNode = getCentreNodeID();
-        int radius = getRadius();
-
-        return getStartColumn(centreNode, radius);
-    }
-
-    /**
-     * Gets the end column based on the text fields.
-     * @param graphSize the size of the graph.
-     * @return integer representing the end column
-     */
-    private int getEndColumn(int graphSize) {
-        int centreNode = getCentreNodeID();
-        int radius = getRadius();
-
-        return getEndColumn(graphSize, centreNode, radius);
-    }
-
-    /**
-     * Gets the end column based on the text fields.
-     * @param graphSize the size of the graph.
-     * @param centre the integer representing the centre node.
-     * @param rad the integer representing the radius.
-     * @return integer representing the end column
-     */
-    private int getEndColumn(int graphSize, int centre, int rad) {
-        int endNode = centre + rad;
-        if (endNode > graphSize) {
-            endNode = graphSize;
-        }
-        return drawer.getColumnId(endNode);
     }
 
     /**

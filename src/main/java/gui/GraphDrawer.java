@@ -91,13 +91,13 @@ public class GraphDrawer {
     /**
      * Change the zoom (invoked by user by clicking on "Go to this Node".
      *
-     * @param newZoom The new radius.
+     * @param radius The new radius.
      * @param column  The new Column to be in the centre.
      */
-    public void changeZoom(final int newZoom, final int column) {
-        radius = newZoom;
-        zoomLevel = columnWidths[column + newZoom / 2] - columnWidths[column - newZoom / 2];
-        moveShapes(columnWidths[column + 2] - zoomLevel / 2);
+    public void changeZoom(int column, int radius) {
+        this.radius = radius;
+        zoomLevel = columnWidths[column + radius + 1] - columnWidths[column - radius];
+        moveShapes(columnWidths[column - radius]);
     }
 
     /**
