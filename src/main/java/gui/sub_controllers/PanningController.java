@@ -48,27 +48,19 @@ public class PanningController {
 
     /**
      * Change the scrollbar value and visible amount when zooming with the buttons.
-     * @param factor Changing factor of the visible amount.
      */
-    public void setScrollbarSize(double factor) {
-        setScrollbarSize(factor, (int) (scrollbar.getValue()));
+    public void setScrollbarSize() {
+        setScrollbarSize((int) (scrollbar.getValue()));
     }
 
     /**
      * Change the scrollbar value and visible amount when zooming in by scrolling.
-     * @param factor Changing factor of the visible amount
      * @param column Column that is the centre of the zooming.
      */
-    public void setScrollbarSize(double factor, int column) {
+    public void setScrollbarSize(int column) {
         active = false;
-        double max = scrollbar.getMax();
-        double amount = scrollbar.getVisibleAmount();
-        if ((factor < 1 && amount < 1) || (factor > 1 && amount >= max)) {
-            return;
-        }
-        amount = scrollbar.getVisibleAmount() * factor;
         scrollbar.setValue(column);
-        scrollbar.setVisibleAmount(amount);
+        scrollbar.setVisibleAmount(drawer.getZoomLevel());
         active = true;
     }
 
