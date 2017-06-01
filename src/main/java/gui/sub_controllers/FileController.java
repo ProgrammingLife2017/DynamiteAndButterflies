@@ -143,19 +143,21 @@ public class FileController implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof GfaParser) {
-            try {
-                childArray = parser.getChildArray(parser.getPartPath());
-                parentArray = parser.getParentArray(parser.getPartPath());
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(arg instanceof Integer) {
+                try {
+                    childArray = parser.getChildArray(parser.getPartPath());
+                    parentArray = parser.getParentArray(parser.getPartPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                graph = new SequenceGraph();
+                graph.createSubGraph(nodeId, renderRange, parentArray, childArray);
+                sequenceHashMap = parser.getSequenceHashMap();
+                assignSequenceLenghts();
+                drawer = new GraphDrawer(graph, gc);
+                drawer.moveShapes(0.0);
+                progressBarController.done();
             }
-            graph = new SequenceGraph();
-            graph.createSubGraph(nodeId, renderRange, parentArray, childArray);
-            sequenceHashMap = parser.getSequenceHashMap();
-            assignSequenceLenghts();
-            drawer = new GraphDrawer(graph, gc);
-            drawer.moveShapes(0.0);
-            progressBarController.done();
         }
     }
 
