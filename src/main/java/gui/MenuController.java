@@ -2,11 +2,11 @@ package gui;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
+import gui.sub_controllers.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import gui.sub_controllers.*;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -32,8 +32,6 @@ import java.util.regex.Pattern;
 public class MenuController implements Observer {
 
     @FXML
-    private Button saveBookmark;
-    @FXML
     private MenuItem file1;
     @FXML
     private MenuItem file2;
@@ -41,10 +39,16 @@ public class MenuController implements Observer {
     private MenuItem file3;
     @FXML
     private ProgressBar progressBar;
+
     @FXML
-    private Button bookmark1;
+    public MenuItem newBookmark1;
     @FXML
-    private Button bookmark2;
+    public MenuItem newBookmark2;
+    @FXML
+    public MenuItem newBookmark3;
+    @FXML
+    public MenuItem newSaveBookmark;
+
     @FXML
     private Label sequenceInfo;
     @FXML
@@ -92,7 +96,7 @@ public class MenuController implements Observer {
 
         fileController = new FileController(new ProgressBarController(progressBar));
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
-        bookmarkController = new BookmarkController(bookmark1, bookmark2);
+        bookmarkController = new BookmarkController(newBookmark1, newBookmark2, newBookmark3);
         recentController = new RecentController(file1, file2, file3);
 
         recentController.initialize(prefs);
@@ -230,34 +234,42 @@ public class MenuController implements Observer {
     }
 
     /**
-     * Updates and saves the bookmarks.
-     */
-    @FXML
-    public void saveTheBookmarks() {
-        bookmarkController.saving(zoomController.getCentreNode(), zoomController.getRadius());
-    }
-
-    /**
      * Pressed of the bookmark1 button.
      */
     @FXML
-    public void pressBookmark1() {
-        bookmarked(bookmark1);
+    public void pressNewBookmark1() {
+        bookmarked(newBookmark1);
     }
 
     /**
      * Pressed of the bookmark2 button.
      */
     @FXML
-    public void pressBookmark2() {
-        bookmarked(bookmark2);
+    public void pressNewBookmark2() {
+        bookmarked(newBookmark2);
+    }
+
+    /**
+     * Pressed of the bookmark3 button.
+     */
+    @FXML
+    public void pressNewBookmark3() {
+        bookmarked(newBookmark3);
+    }
+
+    /**
+     * Updates and saves the bookmarks.
+     */
+    @FXML
+    public void newSaveBookmarkPress() {
+        bookmarkController.saving(zoomController.getCentreNode(), zoomController.getRadius());
     }
 
     /**
      * Method used to not duplicate code in working out bookmarks.
      * @param bookmark the button that specifies the bookmark
      */
-    private void bookmarked(Button bookmark) {
+    private void bookmarked(MenuItem bookmark) {
         if (!bookmark.getText().equals("-")) {
             String string = bookmark.getText();
             String[] parts = string.split("-");

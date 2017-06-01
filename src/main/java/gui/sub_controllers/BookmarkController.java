@@ -1,6 +1,6 @@
 package gui.sub_controllers;
 
-import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
 import java.util.prefs.Preferences;
 
 /**
@@ -12,7 +12,7 @@ public class BookmarkController {
 
     private static Preferences prefs = Preferences.userRoot();
     private String stringFile;
-    private final Button bookmark1, bookmark2;
+    private final MenuItem bookmark1, bookmark2, bookmark3;
     private static final String BOOKMARK_SAVE = "bookmarkNum";
 
     /**
@@ -20,9 +20,10 @@ public class BookmarkController {
      * @param bm1 The button with the first bookmark.
      * @param bm2 The button with the second bookmark.
      */
-    public BookmarkController(Button bm1, Button bm2) {
+    public BookmarkController(MenuItem bm1, MenuItem bm2, MenuItem bm3) {
         bookmark1 = bm1;
         bookmark2 = bm2;
+        bookmark3 = bm3;
 
         stringFile = "";
     }
@@ -75,6 +76,7 @@ public class BookmarkController {
     private void updateBookmarks(String newBookmark) {
         //TODO Add more visuals to this update
 
+        bookmark3.setText(bookmark2.getText());
         bookmark2.setText(bookmark1.getText());
         bookmark1.setText(newBookmark);
     }
