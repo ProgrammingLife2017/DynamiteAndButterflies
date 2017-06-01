@@ -44,11 +44,11 @@ public class ZoomController {
         if (nodeTextField.getText().equals("")) {
             drawer.zoom(BUTTON_ZOOM_IN_FACTOR,
                     drawer.getRealCentreNode().getColumn());
-            panningController.setScrollbarSize(BUTTON_ZOOM_IN_FACTOR);
+            panningController.setScrollbarSize();
         } else {
             drawer.zoom(BUTTON_ZOOM_IN_FACTOR,
                     drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
-            panningController.setScrollbarSize(BUTTON_ZOOM_IN_FACTOR);
+            panningController.setScrollbarSize();
         }
         updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
@@ -60,7 +60,7 @@ public class ZoomController {
      */
     public void zoomIn(int column) throws IOException {
         drawer.zoom(SCROLL_ZOOM_IN_FACTOR, column);
-        panningController.setScrollbarSize(SCROLL_ZOOM_IN_FACTOR, column);
+        panningController.setScrollbarSize(column);
         updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
 
@@ -72,11 +72,11 @@ public class ZoomController {
         if (nodeTextField.getText().equals("")) {
             drawer.zoom(BUTTON_ZOOM_OUT_FACTOR,
                     drawer.getRealCentreNode().getColumn());
-            panningController.setScrollbarSize(BUTTON_ZOOM_OUT_FACTOR);
+            panningController.setScrollbarSize();
         } else {
             drawer.zoom(BUTTON_ZOOM_OUT_FACTOR,
                     drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
-            panningController.setScrollbarSize(BUTTON_ZOOM_OUT_FACTOR);
+            panningController.setScrollbarSize();
         }
         updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
@@ -88,7 +88,7 @@ public class ZoomController {
      */
     public void zoomOut(int column) throws IOException {
         drawer.zoom(SCROLL_ZOOM_OUT_FACTOR, column);
-        panningController.setScrollbarSize(SCROLL_ZOOM_OUT_FACTOR, column);
+        panningController.setScrollbarSize(column);
         updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
 
@@ -113,7 +113,7 @@ public class ZoomController {
     public void traverseGraphClicked(int graphSize, int centreNode, int radius) {
         int startColumn = getStartColumn(centreNode, radius);
         int endColumn = getEndColumn(graphSize, centreNode, radius);
-        drawer.changeZoom(endColumn - startColumn, drawer.getColumnId(centreNode));
+        drawer.changeZoom(radius * 2, drawer.getColumnId(centreNode));
         drawer.highlight(centreNode);
     }
 
