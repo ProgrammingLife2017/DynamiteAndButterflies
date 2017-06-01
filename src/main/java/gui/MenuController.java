@@ -199,13 +199,6 @@ public class MenuController implements Observer {
         }
     }
 
-    @FXML
-    public void checkDummynodes() {
-        if (dummyNodeCheckbox.isSelected()) {
-
-        }
-    }
-
     /**
      * Adds a button to traverse the graph with.
      */
@@ -231,19 +224,6 @@ public class MenuController implements Observer {
         String newString = "Sequence: "
                 + fileController.getSequenceHashMap().get((long) centreNodeID);
         infoController.updateSeqLabel(newString);
-    }
-
-    /**
-     * Display dummy nodes on checkbox checked and hide them on checkbox unchecked.
-     */
-    @FXML
-    public void toggleDummyNodes() {
-        if (dummyNodeCheckbox.isSelected()) {
-            fileController.getDrawer().setShowDummyNodes(false);
-        } else {
-            fileController.getDrawer().setShowDummyNodes(true);
-        }
-        fileController.getDrawer().redraw();
     }
 
     /**

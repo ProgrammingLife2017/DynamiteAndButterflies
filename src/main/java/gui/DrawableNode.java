@@ -100,7 +100,8 @@ public class DrawableNode {
         if (highlighted) {
             gc.setFill(Color.ORANGE);
         } else if (isDummy) {
-            gc.setFill(Color.BLACK);
+            gc.strokeLine(xCoordinate, yCoordinate + height / 2, xCoordinate + width, yCoordinate + height / 2);
+            return;
         } else {
             gc.setFill(Color.BLUE);
         }

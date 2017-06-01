@@ -33,7 +33,6 @@ public class GraphDrawer {
     private double xDifference;
     private double stepSize;
     private int[] columnWidths;
-    private boolean showDummyNodes;
     private GraphicsContext gc;
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
@@ -154,9 +153,6 @@ public class GraphDrawer {
             ArrayList<SequenceNode> column = columns.get(j);
             for (int i = 0; i < column.size(); i++) {
                 SequenceNode node = column.get(i);
-                if (node.isDummy() && !showDummyNodes) {
-                    continue;
-                }
                 double width = visualLength(node, j)
                         * stepSize * RELATIVE_X_DISTANCE;
                 double height = getYSize();
@@ -309,10 +305,6 @@ public class GraphDrawer {
      */
     public double getRadius() {
         return radius;
-    }
-
-    public void setShowDummyNodes(boolean showDummyNodes) {
-        this.showDummyNodes = showDummyNodes;
     }
 
     /**
