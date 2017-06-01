@@ -213,8 +213,7 @@ public class SequenceGraph {
     }
 
     /**
-     * Getter for the column list
-     *
+     * Getter for the column list.
      * @return the column arraylist with an arraylist with nodes.
      */
     public ArrayList<ArrayList<SequenceNode>> getColumns() {
@@ -224,7 +223,6 @@ public class SequenceGraph {
 
     /**
      * Add a node to the ArrayList of Nodes.
-     *
      * @param node The node to be added.
      */
     public void addNode(SequenceNode node) {
@@ -255,12 +253,7 @@ public class SequenceGraph {
     }
 
 
-    /**
-     * Will add columns to all the nodes and to all the edges.
-     */
-    public void layerizeGraph(int lowerBoundID) {
 
-    }
 
 
     private ArrayList<ArrayList<SequenceNode>> createColumnList() {

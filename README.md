@@ -11,3 +11,8 @@ Genome parser and visualisation
 ![main screen](http://i.imgur.com/f3fXR66.png)
 ![file picker](http://i.imgur.com/4EkWHN8.png)
 ![zooming](http://i.imgur.com/qE3CEvL.png)
+
+## List of Known issues
+- When opening a gfa file from "Open File", files can become duplicate in "Recent Files".
+- Edges don't go properly through the dummy nodes yet.
+- When switching to another centrenode, the dummy nodes sometimes lag.

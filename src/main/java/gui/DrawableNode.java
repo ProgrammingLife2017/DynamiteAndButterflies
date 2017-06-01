@@ -5,7 +5,7 @@ import javafx.scene.paint.Color;
 
 /**
  * Created by Jasper van Tilburg on 17-5-2017.
- *
+ * <p>
  * A drawable version of SequenceNode. This class includes all attributes needed for displaying a node including
  * coordinates, height, width, whether it is a dummy node and whether it is a highlighted node.
  */
@@ -22,16 +22,23 @@ public class DrawableNode {
     private boolean highlighted;
     private boolean isDummy;
 
-    public DrawableNode (int id, GraphicsContext gc) {
+    public DrawableNode(int id, GraphicsContext gc) {
         this.gc = gc;
         this.id = id;
     }
 
+    public DrawableNode(int id, GraphicsContext gc, boolean isDummy) {
+        this.gc = gc;
+        this.id = id;
+        this.isDummy = isDummy;
+    }
+
     /**
      * Set the coordinates, width and height of the node.
-     * @param x x coordinate
-     * @param y y coordinate
-     * @param width Width
+     *
+     * @param x      x coordinate
+     * @param y      y coordinate
+     * @param width  Width
      * @param height Height
      */
     public void setCoordinates(double x, double y, double width, double height) {
@@ -43,6 +50,22 @@ public class DrawableNode {
 
     public int getId() {
         return this.id;
+    }
+
+    public double getxCoordinate() {
+        return xCoordinate;
+    }
+
+    public double getyCoordinate() {
+        return yCoordinate;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
     }
 
     public boolean isDummy() {
@@ -76,7 +99,7 @@ public class DrawableNode {
     public void draw() {
         if (highlighted) {
             gc.setFill(Color.ORANGE);
-        } else if (isDummy){
+        } else if (isDummy) {
             gc.setFill(Color.BLACK);
         } else {
             gc.setFill(Color.BLUE);
@@ -86,6 +109,7 @@ public class DrawableNode {
 
     /**
      * Check if a click event is within the borders of this node.
+     *
      * @param xEvent x coordinate of the click event
      * @param yEvent y coordinate of the click event
      * @return True if the coordinates of the click event are within borders, false otherwise.

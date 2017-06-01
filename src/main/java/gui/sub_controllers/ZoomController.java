@@ -1,4 +1,4 @@
-package gui.subControllers;
+package gui.sub_controllers;
 
 import gui.GraphDrawer;
 import javafx.scene.control.TextField;
@@ -7,12 +7,13 @@ import java.io.IOException;
 
 /**
  * Created by Jip on 17-5-2017.
- * The Zoom Controller controls all buttons in the GUI that aare the boss of zooming.
+ * The Zoom Controller controls all buttons
+ * in the GUI that are the boss of zooming.
  */
 public class ZoomController {
 
-    private gui.GraphDrawer drawer;
-    private TextField nodeTextField, radiusTextField;
+    private final GraphDrawer drawer;
+    private final TextField nodeTextField, radiusTextField;
 
     /**
      * Constructor of the Zoom Controller.
@@ -31,17 +32,22 @@ public class ZoomController {
      * @throws IOException exception.
      */
     public void zoomIn() throws IOException {
-        if (!nodeTextField.getText().equals("")) {
-            drawer.zoom(0.8, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
-        } else {
+        if (nodeTextField.getText().equals("")) {
             drawer.zoom(0.8, drawer.getRealCentreNode().getColumn());
+        } else {
+            drawer.zoom(0.8, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
         }
-        updateRadius(drawer.getZoomLevel() + "");
+        updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
 
+    /**
+     * Zooms in.
+     * @param column the column to zoom in on.
+     * @throws IOException thrown if can't find
+     */
     public void zoomIn(int column) throws IOException {
         drawer.zoom(0.9, column);
-        updateRadius(drawer.getZoomLevel() + "");
+        updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
 
     /**
@@ -49,17 +55,22 @@ public class ZoomController {
      * @throws IOException exception.
      */
     public void zoomOut() throws IOException {
-        if (!nodeTextField.getText().equals("")) {
-            drawer.zoom(1.25, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
-        } else {
+        if (nodeTextField.getText().equals("")) {
             drawer.zoom(1.25, drawer.getRealCentreNode().getColumn());
+        } else {
+            drawer.zoom(1.25, drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
         }
-        updateRadius(drawer.getZoomLevel() + "");
+        updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
 
+    /**
+     * Zooms out.
+     * @param column the column to zoom out on.
+     * @throws IOException thrown if can't find
+     */
     public void zoomOut(int column) throws IOException {
         drawer.zoom(1.1, column);
-        updateRadius(drawer.getZoomLevel() + "");
+        updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
 
     /**
@@ -71,12 +82,20 @@ public class ZoomController {
         int endColumn = getEndColumn(graphSize);
         int centreNodeID = Integer.parseInt(nodeTextField.getText());
         drawer.changeZoom(endColumn - startColumn, drawer.getColumnId(centreNodeID));
+        drawer.highlight(centreNodeID);
     }
 
+    /**
+     * Traverses the graph loaded to a specified destination.
+     * @param graphSize The size of the graph
+     * @param centreNode The centre node to move to
+     * @param radius The radius to be viewed
+     */
     public void traverseGraphClicked(int graphSize, int centreNode, int radius) {
         int startColumn = getStartColumn(centreNode, radius);
         int endColumn = getEndColumn(graphSize, centreNode, radius);
         drawer.changeZoom(endColumn - startColumn, drawer.getColumnId(centreNode));
+        drawer.highlight(centreNode);
     }
 
     /**
@@ -84,7 +103,7 @@ public class ZoomController {
      */
     public void displayInfo() {
         nodeTextField.setText(drawer.getRealCentreNode().getId() + "");
-        radiusTextField.setText(drawer.getZoomLevel() + "");
+        radiusTextField.setText((int) Math.ceil(drawer.getRadius()) + "");
     }
 
     /**

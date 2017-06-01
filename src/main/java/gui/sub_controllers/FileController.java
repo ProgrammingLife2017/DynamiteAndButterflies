@@ -1,7 +1,9 @@
-package gui.subControllers;
+package gui.sub_controllers;
 
 import graph.SequenceGraph;
+import graph.SequenceNode;
 import gui.GraphDrawer;
+import gui.MenuController;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -10,27 +12,41 @@ import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.regex.Pattern;
 
-public class FileController {
+/**
+ * Controller for opening a file.
+ */
+public class FileController implements Observer {
 
     private SequenceGraph graph;
     private gui.GraphDrawer drawer;
     private HTreeMap<Long, String> sequenceHashMap;
     private File parDirectory;
+    private ProgressBarController progressBarController;
 
-    private final int RENDER_RANGE = 500;
-    private final int NODE_ID = 1;
+    private final int renderRange = 5000;
+    private final int nodeId = 1;
+
+    private Thread parseThread;
+
+    private GraphicsContext gc;
+
+    private GfaParser parser;
 
     private int[] childArray;
     private int[] parentArray;
 
     /**
      * Constructor of the FileController object to control the Files.
+     * @param pbc The progressbar.
      */
-    public FileController() {
+    public FileController(ProgressBarController pbc) {
         graph = new SequenceGraph();
         parDirectory = null;
+        progressBarController = pbc;
     }
 
     /**
@@ -61,6 +77,42 @@ public class FileController {
         return res;
     }
 
+
+    /**
+     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa.
+     * can be selected and directly be visualised on the screen.
+     * @param gc the graphicscontext we will use.
+     * @param mC the MenuController so it can Observe.
+     * @param filePath the filePath of the file.
+     * @throws IOException exception if no file is found
+     * @throws InterruptedException Exception if the Thread is interrupted.
+     */
+    public void openFileClicked(GraphicsContext gc, String filePath, MenuController mC)
+            throws IOException, InterruptedException {
+        this.gc = gc;
+        if (parser != null) {
+            parser.getDb().close();
+            parser.getDb2().close();
+        }
+        parser = new GfaParser(filePath);
+        parser.addObserver(this);
+        parser.addObserver(mC);
+        if (this.parseThread != null) {
+            this.parseThread.interrupt();
+        }
+        this.parseThread = new Thread(parser);
+        this.parseThread.start();
+
+        progressBarController.run();
+    }
+
+    private void assignSequenceLenghts() {
+        for (int i = 1; i <= graph.size(); i++) {
+            SequenceNode node = graph.getNode(i);
+            node.setSequenceLength(sequenceHashMap.get((long) i).length());
+        }
+    }
+
     /**
      * Gets the sequenceHashMap.
      * @return the sequenceHashMap with all the sequences
@@ -85,34 +137,20 @@ public class FileController {
         return graph;
     }
 
-    /**
-     * When 'open gfa file' is clicked this method opens the file specified by openFile.
-     * It immediately visualises the graph.
-     * @param gc the graphicscontext we will use
-     * @param filePath the path of the file that needs to be opened
-     * @return The string of the file that has just been loaded.
-     * @throws IOException exception if no file is found
-     */
-    public String openFileClicked(GraphicsContext gc, String filePath) throws IOException {
-        GfaParser parser = new GfaParser();
-        parser.parseGraph(filePath);
-
-        parentArray = parser.getParentArray(parser.getPartPath());
-        childArray = parser.getChildArray(parser.getPartPath());
-
-
-        graph = new SequenceGraph();
-        graph.createSubGraph(NODE_ID, RENDER_RANGE, parentArray, childArray);
-        sequenceHashMap = parser.getSequenceHashMap();
-        drawer = new GraphDrawer(graph, gc);
-        drawer.moveShapes(0.0);
-
-        String pattern = Pattern.quote(System.getProperty("file.separator"));
-        String[] partPaths = filePath.split(pattern);
-        String fileName = partPaths[partPaths.length - 1];
-        System.out.println(fileName);
-
-        return fileName;
+    @Override
+    public void update(Observable o, Object arg) {
+        if (o instanceof GfaParser) {
+            if (arg instanceof HTreeMap) {
+                HTreeMap<Long, int[]> adjacencyMap = (HTreeMap) arg;
+                graph = new SequenceGraph();
+                graph.createSubGraph(nodeId, renderRange, adjacencyMap);
+                sequenceHashMap = parser.getSequenceHashMap();
+                assignSequenceLenghts();
+                drawer = new GraphDrawer(graph, gc);
+                drawer.moveShapes(0.0);
+                progressBarController.done();
+            }
+        }
     }
 
     /**
