@@ -102,8 +102,10 @@ public class ZoomController {
      * @param radius The radius to be viewed
      */
     public void traverseGraphClicked(int centreNode, int radius) {
-        drawer.changeZoom(graph.getNode(centreNode).getColumn(), radius);
+        int column = graph.getNode(centreNode).getColumn();
+        drawer.changeZoom(column, radius);
         drawer.highlight(centreNode);
+        panningController.setScrollbarSize(column);
     }
 
     /**
