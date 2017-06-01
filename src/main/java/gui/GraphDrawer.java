@@ -36,7 +36,8 @@ public class GraphDrawer {
     private GraphicsContext gc;
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
-    private ArrayList<DrawableNode> canvasNodes;
+    private HashMap<Integer, DrawableNode> canvasNodes;
+    private int highlightedNode;
 
     /**
      * Constructor.
@@ -48,7 +49,7 @@ public class GraphDrawer {
         this.gc = gc;
         this.graph = graph;
         this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
-        canvasNodes = new ArrayList<DrawableNode>();
+        canvasNodes = new HashMap<Integer, DrawableNode>();
         columns = graph.getColumns();
         columnWidths = new int[columns.size() + 1];
         initializeDrawableNodes();
@@ -61,7 +62,8 @@ public class GraphDrawer {
         for (Object o : graph.getNodes().entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             SequenceNode node = (SequenceNode) pair.getValue();
-            canvasNodes.add(new DrawableNode(node.getId(), gc, node.isDummy()));
+            DrawableNode dNode = new DrawableNode(node.getId(), gc, node.isDummy());
+            canvasNodes.put(node.getId(), dNode);
         }
     }
 
@@ -149,20 +151,23 @@ public class GraphDrawer {
      * is checked dummy nodes are either drawn or skipped.
      */
     private void drawNodes() {
-        for (int j = 0; j < columns.size(); j++) {
-            ArrayList<SequenceNode> column = columns.get(j);
-            for (int i = 0; i < column.size(); i++) {
-                SequenceNode node = column.get(i);
+        HashMap<Integer, DrawableNode> nodes = canvasNodes;
+        Iterator it = nodes.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            int nodeID = (Integer) pair.getKey();
+            for (int j = 0; j < node.getChildren().size(); j++) {
                 double width = visualLength(node, j)
                         * stepSize * RELATIVE_X_DISTANCE;
                 double height = getYSize();
                 double x = (columnWidths[j] - xDifference) * stepSize;
-                double y = yBase + (i * RELATIVE_Y_DISTANCE);
+                double y = yBase + (node.getIndex() * RELATIVE_Y_DISTANCE);
                 if (height > width) {
                     y += (height - width) / 2;
                     height = width;
                 }
-                DrawableNode dNode = canvasNodes.get(node.getId() - 1);
+                DrawableNode dNode = canvasNodes.get(nodeID);
                 dNode.setCoordinates(x, y, width, height);
                 dNode.draw();
             }
@@ -176,9 +181,10 @@ public class GraphDrawer {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             SequenceNode node = (SequenceNode) pair.getValue();
-            DrawableNode parent = canvasNodes.get(node.getId() - 1);
+            int nodeID = (Integer) pair.getKey();
+            DrawableNode parent = canvasNodes.get(nodeID);
             for (int j = 0; j < node.getChildren().size(); j++) {
-                DrawableNode child = canvasNodes.get(graph.getNode(node.getChild(j)).getId() - 1);
+                DrawableNode child = canvasNodes.get(pair.getKey());
                 double startx = parent.getxCoordinate() + parent.getWidth();
                 double starty = parent.getyCoordinate() + (parent.getHeight() / 2);
                 double endx = child.getxCoordinate();
@@ -263,11 +269,12 @@ public class GraphDrawer {
      *
      * @param node The node that should be highlighted
      */
-    public void highlight(int node) {
-        for (DrawableNode canvasNode : canvasNodes) {
-            canvasNode.lowlight();
+    public void highlight(int node) {;
+        if(highlightedNode != 0) {
+            canvasNodes.get(highlightedNode).lowlight();
         }
-        canvasNodes.get(node - 1).highlight();
+        canvasNodes.get(node).highlight();
+        highlightedNode = node;
     }
 
     //TODO: Loop over the  nodes in the graph (O(n*m) > O(k))
