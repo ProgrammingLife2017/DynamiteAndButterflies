@@ -95,7 +95,7 @@ public class GraphDrawer {
      * @param column  The new Column to be in the centre.
      */
     public void changeZoom(int column, int radius) {
-        this.radius = radius;
+        this.radius = radius + radius + 1;
         zoomLevel = columnWidths[column + radius + 1] - columnWidths[column - radius];
         moveShapes(columnWidths[column - radius]);
     }
@@ -340,6 +340,10 @@ public class GraphDrawer {
      */
     public double getxDifference() {
         return xDifference;
+    }
+
+    public int getColumnWidth(int col) {
+        return columnWidths[col];
     }
 
     /**

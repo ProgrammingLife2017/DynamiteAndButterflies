@@ -105,7 +105,7 @@ public class ZoomController {
         int column = graph.getNode(centreNode).getColumn();
         drawer.changeZoom(column, radius);
         drawer.highlight(centreNode);
-        panningController.setScrollbarSize(column);
+        panningController.setScrollbarSize(drawer.getColumnWidth(column));
     }
 
     /**
