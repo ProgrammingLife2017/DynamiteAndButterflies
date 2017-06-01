@@ -14,11 +14,15 @@ public class SequenceNode {
     private ArrayList<Integer> children;
     private ArrayList<Integer> parents;
     private boolean isDummy;
+    private float baryCenterValue;
+    private int inDegree;
 
     public SequenceNode(int id) {
         this.id = id;
         this.index = 0;
         this.column = 0;
+        this.inDegree = 0;
+        this.baryCenterValue = 0;
         this.parents = new ArrayList<Integer>();
         this.children = new ArrayList<Integer>();
         this.isDummy = false;
@@ -86,5 +90,33 @@ public class SequenceNode {
         if (this.column < i + 1) {
             column = i + 1;
         }
+    }
+
+    /**
+     * method to resolve the baryCenterValue.
+     * @return - returns the barycenterValue / inDegree
+     */
+    public float getBaryCenterValue() {
+        return baryCenterValue / inDegree;
+    }
+
+    public void setBaryCenterValue(float baryCenterValue) {
+        this.baryCenterValue = baryCenterValue;
+    }
+
+    public void incrementBaryCenterValue(float baryCenterValue) {
+        this.baryCenterValue += baryCenterValue;
+    }
+
+    public int getInDegree() {
+        return inDegree;
+    }
+
+    public void setInDegree(int inDegree) {
+        this.inDegree = inDegree;
+    }
+
+    public void incrementInDegree() {
+        this.inDegree++;
     }
 }
