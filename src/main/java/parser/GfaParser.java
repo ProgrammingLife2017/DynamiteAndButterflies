@@ -94,8 +94,6 @@ public class GfaParser extends Observable implements Runnable {
         }
         this.setChanged();
         this.notifyObservers(filePath);
-        this.setChanged();
-        this.notifyObservers(filePath);
     }
 
     /**

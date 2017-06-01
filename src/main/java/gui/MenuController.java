@@ -63,8 +63,6 @@ public class MenuController implements Observer {
     private Label numEdgesLabel;
     @FXML
     private TextArea consoleArea;
-    @FXML
-    private CheckBox dummyNodeCheckbox;
 
     private PrintStream ps;
 

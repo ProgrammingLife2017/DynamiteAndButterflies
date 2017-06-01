@@ -97,6 +97,7 @@ public class DrawableNode {
      * blue for sequence nodes.
      */
     public void draw() {
+        gc.clearRect(xCoordinate, yCoordinate, width, height);
         if (highlighted) {
             gc.setFill(Color.ORANGE);
         } else if (isDummy) {
