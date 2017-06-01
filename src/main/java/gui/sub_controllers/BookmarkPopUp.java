@@ -5,6 +5,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 /**
+ * This class handles adding a bookmark.
+ *
  * Created by Jip on 1-6-2017.
  */
 public class BookmarkPopUp {
@@ -18,6 +20,12 @@ public class BookmarkPopUp {
 
     private BookmarkController bookmarkController;
 
+    /**
+     * Intializes the pop up.
+     * @param centreNode The centre node already filled in in the main application
+     * @param radius The radius already filled in in the main application
+     * @param bookmarkControllerArg The bookmark controller linked to the main application.
+     */
     public void initialize(int centreNode, int radius, BookmarkController bookmarkControllerArg) {
         centreNodeBook.setText(Integer.toString(centreNode));
         radiusBook.setText(Integer.toString(radius));
@@ -25,17 +33,28 @@ public class BookmarkPopUp {
         bookmarkController = bookmarkControllerArg;
     }
 
+    /**
+     * Pressing confirm in the popup saves the bookmark.
+     * And closes the pop up.
+     */
     @FXML
     public void confirmNewBookmark() {
-        bookmarkController.saving(noteBook.getText(), centreNodeBook.getText(), radiusBook.getText());
+        bookmarkController.saving(noteBook.getText(),
+                                    centreNodeBook.getText(), radiusBook.getText());
         close();
     }
 
+    /**
+     * Closes the pop up.
+     */
     @FXML
     public void cancelButtonPress() {
         close();
     }
 
+    /**
+     * A general function that closes the stage.
+     */
     private void close() {
         Stage stage = (Stage) radiusBook.getScene().getWindow();
         stage.close();

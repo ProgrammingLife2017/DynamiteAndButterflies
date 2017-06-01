@@ -53,12 +53,12 @@
                           <items>
                               <Menu mnemonicParsing="false" text="Open bookmarks">
                                 <items>
-                                  <MenuItem fx:id="newBookmark1" mnemonicParsing="false" onAction="#pressNewBookmark1" text="-" />
-                                    <MenuItem fx:id="newBookmark2" mnemonicParsing="false" onAction="#pressNewBookmark2" text="-" />
-                                    <MenuItem fx:id="newBookmark3" mnemonicParsing="false" onAction="#pressNewBookmark3" text="-" />
+                                  <MenuItem fx:id="bookmark1" mnemonicParsing="false" onAction="#pressNewBookmark1" text="-" />
+                                    <MenuItem fx:id="bookmark2" mnemonicParsing="false" onAction="#pressNewBookmark2" text="-" />
+                                    <MenuItem fx:id="bookmark3" mnemonicParsing="false" onAction="#pressNewBookmark3" text="-" />
                                 </items>
                               </Menu>
-                              <MenuItem fx:id="newSaveBookmark" mnemonicParsing="false" onAction="#newSaveBookmarkPress" text="Add bookmark" />
+                              <MenuItem fx:id="saveBookmark" mnemonicParsing="false" onAction="#newSaveBookmarkPress" text="Add bookmark" />
                               <MenuItem mnemonicParsing="false" text="Manage bookmarks"/>
                           </items>
                         </Menu>

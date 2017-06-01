@@ -43,16 +43,14 @@ public class MenuController implements Observer {
     private MenuItem file3;
     @FXML
     private ProgressBar progressBar;
-
     @FXML
-    public MenuItem newBookmark1;
+    private MenuItem bookmark1;
     @FXML
-    public MenuItem newBookmark2;
+    private MenuItem bookmark2;
     @FXML
-    public MenuItem newBookmark3;
+    private MenuItem bookmark3;
     @FXML
-    public MenuItem newSaveBookmark;
-
+    private MenuItem saveBookmark;
     @FXML
     private Label sequenceInfo;
     @FXML
@@ -100,7 +98,7 @@ public class MenuController implements Observer {
 
         fileController = new FileController(new ProgressBarController(progressBar));
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
-        bookmarkController = new BookmarkController(newBookmark1, newBookmark2, newBookmark3);
+        bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
 
         recentController.initialize(prefs);
@@ -242,7 +240,7 @@ public class MenuController implements Observer {
      */
     @FXML
     public void pressNewBookmark1() {
-        bookmarked(newBookmark1);
+        bookmarked(bookmark1);
     }
 
     /**
@@ -250,7 +248,7 @@ public class MenuController implements Observer {
      */
     @FXML
     public void pressNewBookmark2() {
-        bookmarked(newBookmark2);
+        bookmarked(bookmark2);
     }
 
     /**
@@ -258,11 +256,12 @@ public class MenuController implements Observer {
      */
     @FXML
     public void pressNewBookmark3() {
-        bookmarked(newBookmark3);
+        bookmarked(bookmark3);
     }
 
     /**
      * Updates and saves the bookmarks.
+     * @throws IOException Throws expception if it can't find the fxml file.
      */
     @FXML
     public void newSaveBookmarkPress() throws IOException {
@@ -271,7 +270,8 @@ public class MenuController implements Observer {
         Stage stage;
         Parent root = loader.load();
         BookmarkPopUp controller = loader.<BookmarkPopUp>getController();
-        controller.initialize(zoomController.getCentreNode(), zoomController.getRadius(), bookmarkController);
+        controller.initialize(zoomController.getCentreNode(),
+                                zoomController.getRadius(), bookmarkController);
 
         stage = new Stage();
         stage.setScene(new Scene(root));
@@ -287,7 +287,8 @@ public class MenuController implements Observer {
     private void bookmarked(MenuItem bookmark) {
         if (!bookmark.getText().equals("-")) {
             String string = bookmark.getText();
-            String[] parts = string.split("-");
+            String[] parts = string.split(" - ");
+            //We skip parts[0] because that is the note.
             String centre = parts[1];
             String radius = parts[2];
             traverseGraphClicked(centre, radius);
