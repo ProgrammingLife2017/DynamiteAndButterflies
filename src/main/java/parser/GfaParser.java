@@ -24,21 +24,16 @@ public class GfaParser extends Observable implements Runnable {
     private String header1;
     private String header2;
     private HTreeMap<Long, String> sequenceMap;
-    private HTreeMap<Long, int[]> adjacencyHMap;
     private String filePath;
     private String partPath;
     private Preferences prefs;
     private int startNode = Integer.MAX_VALUE;
     private int endNode = Integer.MIN_VALUE;
 
-    private String partPath;
-    private int[] parentArray;
-    private int[] childArray;
     private int counter;
     private int maxID;
 
     private DB db;
-    private DB db2;
 
     /**
      * Constructor.
@@ -65,13 +60,6 @@ public class GfaParser extends Observable implements Runnable {
         return db;
     }
 
-    /**
-     * Getter for db of the adjacencymap.
-     * @return db.
-     */
-    public DB getDb2() {
-        return db2;
-    }
 
     /**
      * This method parses the file specified in filepath into a sequence graph.
@@ -93,28 +81,19 @@ public class GfaParser extends Observable implements Runnable {
         db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().
                                                 fileMmapPreclearDisable().cleanerHackEnable().
                                                 closeOnJvmShutdown().checksumHeaderBypass().make();
-        db2 = DBMaker.fileDB(partPath + ".adjacency.db").fileMmapEnable().
-                                                fileMmapPreclearDisable().cleanerHackEnable().
-                                                closeOnJvmShutdown().checksumHeaderBypass().make();
         if (db.get(partPath + ".sequence.db") != null) {
             sequenceMap = db.hashMap(partPath + ".sequence.db").
                             keySerializer(Serializer.LONG).
                             valueSerializer(Serializer.STRING).createOrOpen();
-            adjacencyHMap = db2.hashMap(partPath + ".adjacency.db").
-                            keySerializer(Serializer.LONG).
-                            valueSerializer(Serializer.INT_ARRAY).createOrOpen();
         } else {
             prefs.putBoolean(partPath, false);
             sequenceMap = db.hashMap(partPath + ".sequence.db").
                                     keySerializer(Serializer.LONG).
                                     valueSerializer(Serializer.STRING).createOrOpen();
-            adjacencyHMap = db2.hashMap(partPath + ".adjacency.db").
-                                    keySerializer(Serializer.LONG).
-                                    valueSerializer(Serializer.INT_ARRAY).createOrOpen();
             parseSpecific(filePath);
         }
         this.setChanged();
-        this.notifyObservers(adjacencyHMap);
+        this.notifyObservers(filePath);
         this.setChanged();
         this.notifyObservers(filePath);
     }
@@ -125,14 +104,6 @@ public class GfaParser extends Observable implements Runnable {
      */
     public synchronized HTreeMap<Long, String> getSequenceHashMap() {
         return sequenceMap;
-    }
-
-    /**
-     * Getter for the AdjacencyHMap.
-     * @return The HashMap.
-     */
-    public synchronized HTreeMap<Long, int[]> getAdjacencyHMap() {
-        return this.adjacencyHMap;
     }
 
     /**
@@ -172,8 +143,8 @@ public class GfaParser extends Observable implements Runnable {
                 childList.add(childId);
             }
         }
-        write(partPath+"parentArray.txt",parentList);
-        write(partPath+"childArray.txt",childList);
+        write(partPath + "parentArray.txt",parentList);
+        write(partPath + "childArray.txt",childList);
         in.close();
         br.close();
         db.commit();

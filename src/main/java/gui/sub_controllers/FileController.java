@@ -92,7 +92,6 @@ public class FileController implements Observer {
         this.gc = gc;
         if (parser != null) {
             parser.getDb().close();
-            parser.getDb2().close();
         }
         parser = new GfaParser(filePath);
         parser.addObserver(this);
@@ -140,18 +139,23 @@ public class FileController implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof GfaParser) {
-            if (arg instanceof HTreeMap) {
-                HTreeMap<Long, int[]> adjacencyMap = (HTreeMap) arg;
-                graph = new SequenceGraph();
-                graph.createSubGraph(nodeId, renderRange, adjacencyMap);
-                sequenceHashMap = parser.getSequenceHashMap();
-                assignSequenceLenghts();
-                drawer = new GraphDrawer(graph, gc);
-                drawer.moveShapes(0.0);
-                progressBarController.done();
+            try {
+                childArray = parser.getChildArray(parser.getPartPath());
+                parentArray = parser.getParentArray(parser.getPartPath());
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            graph = new SequenceGraph();
+            graph.createSubGraph(nodeId, renderRange, parentArray, childArray);
+            sequenceHashMap = parser.getSequenceHashMap();
+            //assignSequenceLenghts();
+            drawer = new GraphDrawer(graph, gc);
+            drawer.moveShapes(0.0);
+            progressBarController.done();
         }
     }
+
+
 
     /**
      * Gets the fileName from the filePath.

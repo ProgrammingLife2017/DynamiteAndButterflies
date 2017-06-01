@@ -50,7 +50,6 @@ public class GraphDrawer {
         this.graph = graph;
         this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
         canvasNodes = new ArrayList<DrawableNode>();
-        graph.layerizeGraph(1);
         columns = graph.getColumns();
         columnWidths = new int[columns.size() + 1];
         initializeDrawableNodes();
@@ -63,12 +62,11 @@ public class GraphDrawer {
         for (Object o : graph.getNodes().entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             SequenceNode node = (SequenceNode) pair.getValue();
-            canvasNodes.add(new DrawableNode(node.getId(), gc, false));
-        }
-        for (Object o : graph.getDummyNodes().entrySet()) {
-            Map.Entry pair = (Map.Entry) o;
-            SequenceNode node = (SequenceNode) pair.getValue();
-            canvasNodes.add(new DrawableNode(node.getId(), gc, true));
+            if (node.isDummy()) {
+                canvasNodes.add(new DrawableNode(node.getId(), gc, true));
+            } else {
+                canvasNodes.add(new DrawableNode(node.getId(), gc, false));
+            }
         }
     }
 
