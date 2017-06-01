@@ -58,7 +58,7 @@ public class BookmarkController {
      * @param nodes The centre node
      * @param radius The radius of nodes we should save/show
      */
-    public void saving(int nodes, int radius) {
+    public void saving(String nodes, String radius) {
 
         String stringFile = prefs.get("file", "def");
         int newIndex = prefs.getInt(BOOKMARK_SAVE + stringFile, -1);

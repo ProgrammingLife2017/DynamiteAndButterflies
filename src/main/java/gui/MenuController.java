@@ -5,12 +5,16 @@ import graph.SequenceNode;
 import gui.sub_controllers.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
 import parser.GfaParser;
@@ -261,8 +265,19 @@ public class MenuController implements Observer {
      * Updates and saves the bookmarks.
      */
     @FXML
-    public void newSaveBookmarkPress() {
-        bookmarkController.saving(zoomController.getCentreNode(), zoomController.getRadius());
+    public void newSaveBookmarkPress() throws IOException {
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/bookmarkPopUp.fxml"));
+        Stage stage;
+        Parent root = loader.load();
+        BookmarkPopUp controller = loader.<BookmarkPopUp>getController();
+        controller.initialize(zoomController.getCentreNode(), zoomController.getRadius(), bookmarkController);
+
+        stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Add a bookmark");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
     }
 
     /**
