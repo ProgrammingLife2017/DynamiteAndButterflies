@@ -8,6 +8,7 @@ import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
 import java.io.*;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,11 +29,6 @@ public class GfaParser extends Observable implements Runnable {
     private String filePath;
     private String partPath;
     private Preferences prefs;
-    private int startNode = Integer.MAX_VALUE;
-    private int endNode = Integer.MIN_VALUE;
-
-    private int counter;
-    private int maxID;
 
 
     private DB db;
@@ -109,8 +105,9 @@ public class GfaParser extends Observable implements Runnable {
      */
     @SuppressWarnings("Since15")
     private synchronized void parseSpecific(String filePath) throws IOException {
-        LinkedList<Integer> parentList = new LinkedList<Integer>();
-        LinkedList<Integer> childList = new LinkedList<Integer>();
+        BufferedWriter parentWriter = new BufferedWriter(new FileWriter(partPath + "parentArray.txt"));
+        BufferedWriter childWriter = new BufferedWriter(new FileWriter(partPath + "childArray.txt"));
+
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line = br.readLine();
@@ -135,30 +132,21 @@ public class GfaParser extends Observable implements Runnable {
                 String[] edgeDataString = line.split("\t");
                 int parentId = (Integer.parseInt(edgeDataString[1]));
                 int childId = Integer.parseInt(edgeDataString[3]);
-                parentList.add(parentId);
-                childList.add(childId);
+               parentWriter.write(parentId + ",");
+               childWriter.write(childId + ",");
             }
         }
-        write(partPath + "parentArray.txt",parentList);
-        write(partPath + "childArray.txt",childList);
         in.close();
         br.close();
+        parentWriter.flush();
+        parentWriter.close();
+        childWriter.flush();
+        childWriter.close();
         db.commit();
+        prefs.putBoolean(partPath, true);
     }
 
-    private void write(String filePath, LinkedList<Integer> x) throws IOException {
-        BufferedWriter edgeWriter = null;
-        edgeWriter =  new BufferedWriter(new FileWriter(filePath));
-
-        for (int i: x) {
-            edgeWriter.write(i +",");
-        }
-        edgeWriter.flush();
-        edgeWriter.close();
-        prefs.putInt(filePath + "size", x.size());
-    }
-
-    private int[] read(String partPath, boolean isParent) throws IOException {
+    private int[] read(boolean isParent) throws IOException {
         String additionToPath;
         if (isParent) {
             additionToPath = "parentArray.txt";
@@ -180,6 +168,13 @@ public class GfaParser extends Observable implements Runnable {
         return nodeArray;
     }
 
+    public int[] getParentArray() throws IOException {
+        return read(true);
+    }
+
+    public int[] getChildArray() throws IOException {
+        return read(false);
+    }
 
     /**
      * Cretes an ArrayList of Strings specifying headers.
@@ -191,35 +186,5 @@ public class GfaParser extends Observable implements Runnable {
         headers.add(header2);
         return headers;
     }
-
-    /**
-     * Converts an List<Integer> to int[].
-     * @param integers list with integers.
-     * @return int[].
-     */
-    private static int[] convertIntegers(List<Integer> integers) {
-        int[] ret = new int[integers.size()];
-        for (int i = 0; i < ret.length; i++) {
-            ret[i] = integers.get(i);
-        }
-        return ret;
-    }
-
-    public int[] getParentArray(String partPath) throws IOException {
-        return read(partPath, true);
-    }
-
-    public int[] getChildArray( String partPath) throws IOException {
-        return read(partPath, false);
-    }
-
-    public int getCounter() {
-        return counter;
-    }
-
-    public String getPartPath() {
-        return partPath;
-    }
-
 
 }
