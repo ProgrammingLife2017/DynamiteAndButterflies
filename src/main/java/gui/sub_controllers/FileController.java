@@ -4,6 +4,7 @@ import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.GraphDrawer;
 import gui.MenuController;
+import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -13,6 +14,7 @@ import parser.GfaParser;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
 /**
@@ -35,6 +37,12 @@ public class FileController implements Observer {
 
     private GfaParser parser;
 
+    private String partPath;
+
+    private Preferences prefs;
+
+    private PopUpController popUpController;
+
     private int[] childArray;
     private int[] parentArray;
 
@@ -46,6 +54,7 @@ public class FileController implements Observer {
         graph = new SequenceGraph();
         parDirectory = null;
         progressBarController = pbc;
+        prefs = Preferences.userRoot();
     }
 
     /**
@@ -95,6 +104,15 @@ public class FileController implements Observer {
         parser = new GfaParser(filePath);
         parser.addObserver(this);
         parser.addObserver(mC);
+        String pattern = Pattern.quote(System.getProperty("file.separator"));
+        String[] partPaths = filePath.split(pattern);
+        partPath = partPaths[partPaths.length - 1];
+        if (!prefs.getBoolean(partPath, true)) {
+            popUpController = new PopUpController();
+                    String message = "Database File is corrupt, press 'Reload' to reload the file," + "\n"
+                            + "or press 'Resume' to recover the data still available.";
+            popUpController.loadDbCorruptPopUp(partPath, message);
+        }
         if (this.parseThread != null) {
             this.parseThread.interrupt();
         }
