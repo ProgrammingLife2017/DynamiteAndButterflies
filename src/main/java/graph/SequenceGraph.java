@@ -184,7 +184,8 @@ public class SequenceGraph {
                 int childId = parent.getChildren().get(j);
                 int span = getNode(childId).getColumn() - parent.getColumn();
                 if (span > 1) {
-                    addDummyHelper(span, parent, getNode(childId));
+                    //parent.removeChild(childId);
+                    addDummyHelper(span, parent.getId(), childId);
                 }
             }
         }
@@ -197,23 +198,17 @@ public class SequenceGraph {
      * @param parent - the parent node
      * @param target - the target node
      */
-    private void addDummyHelper(int span, SequenceNode parent, SequenceNode target) {
+    private void addDummyHelper(int span, int parent, int target) {
         if (span > 1) {
             SequenceNode dummy = new SequenceNode(dummyNodeIDCounter--);
             dummy.setDummy(true);
-            int size = parent.getChildren().size();
-            for (int i = 0; i < size; i++) {
-                if (this.getNode(parent.getId()).getChildren().get(i) == target.getId()) {
-                    this.getNode(parent.getId()).getChildren().remove(i);
-                    this.getNode(parent.getId()).addChild(dummy.getId());
-                    break;
-                }
-            }
-            dummy.addParent(parent.getId());
-            dummy.setColumn(parent.getColumn() + 1);
+            this.getNode(parent).removeChild(target);
+            this.getNode(parent).addChild(dummy.getId());
+            dummy.addChild(target);
+            dummy.setColumn(this.getNode(parent).getColumn() + 1);
             this.addNode(dummy);
             --span;
-            addDummyHelper(span, dummy, target);
+            addDummyHelper(span, dummy.getId(), target);
         }
     }
 
