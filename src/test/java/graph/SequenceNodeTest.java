@@ -41,11 +41,6 @@ public class SequenceNodeTest {
         assertFalse(node.isDummy());
     }
 
-    @Test
-    public void constructorTest() {
-        assertEquals(node.getChildren(), new ArrayList<Integer>());
-        assertEquals(node.getColumn(), 0);
-    }
 
     @Test
     public void returnChildrenTest() {
