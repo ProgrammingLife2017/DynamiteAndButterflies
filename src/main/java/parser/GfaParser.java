@@ -143,6 +143,7 @@ public class GfaParser extends Observable implements Runnable {
         childWriter.flush();
         childWriter.close();
         db.commit();
+        prefs.putBoolean(partPath, true);
     }
 
     private int[] read(boolean isParent) throws IOException {
