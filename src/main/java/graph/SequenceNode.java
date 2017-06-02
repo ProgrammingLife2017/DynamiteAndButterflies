@@ -194,21 +194,11 @@ public class SequenceNode {
         return baryCenterValue / inDegree;
     }
 
-    public void setBaryCenterValue(float baryCenterValue) {
-        this.baryCenterValue = baryCenterValue;
-    }
 
     public void incrementBaryCenterValue(float baryCenterValue) {
         this.baryCenterValue += baryCenterValue;
     }
 
-    public int getInDegree() {
-        return inDegree;
-    }
-
-    public void setInDegree(int inDegree) {
-        this.inDegree = inDegree;
-    }
 
     public void incrementInDegree() {
         this.inDegree++;
@@ -222,10 +212,4 @@ public class SequenceNode {
         this.sequenceLength = sequenceLength;
     }
 
-
-    public void incrementLayer(int parLayer) {
-        if (this.column < parLayer + 1) {
-            this.column = parLayer + 1;
-        }
-    }
 }
