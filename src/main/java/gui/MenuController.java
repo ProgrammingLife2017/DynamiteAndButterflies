@@ -236,7 +236,7 @@ public class MenuController implements Observer {
     }
 
     /**
-     * Pressed of the bookmark1 button.
+     * Pressed the bookmark1 menuItem.
      */
     @FXML
     public void pressNewBookmark1() {
@@ -244,7 +244,7 @@ public class MenuController implements Observer {
     }
 
     /**
-     * Pressed of the bookmark2 button.
+     * Pressed the bookmark2 menuItem.
      */
     @FXML
     public void pressNewBookmark2() {
@@ -252,7 +252,7 @@ public class MenuController implements Observer {
     }
 
     /**
-     * Pressed of the bookmark3 button.
+     * Pressed the bookmark3 menuItem.
      */
     @FXML
     public void pressNewBookmark3() {
@@ -280,6 +280,10 @@ public class MenuController implements Observer {
         stage.showAndWait();
     }
 
+    /**
+     * Handles pressing the manage bookmark button.
+     * @throws IOException if the fxml file doesn't exist.
+     */
     @FXML
     public void manageBookmarks() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/manageBookmarks.fxml"));
