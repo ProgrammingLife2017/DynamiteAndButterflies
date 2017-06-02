@@ -1,5 +1,9 @@
 package graph;
 
+import com.sun.corba.se.impl.orbutil.graph.Graph;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+
 import java.util.ArrayList;
 
 /**
@@ -8,19 +12,113 @@ import java.util.ArrayList;
  */
 public class SequenceNode {
 
+    private static final int ARC_SIZE = 10;
+
     private int id;
     private int index;
     private int column;
     private int sequenceLength;
-    private ArrayList<Integer> children;
+    private double xCoordinate;
+    private double yCoordinate;
+    private double width;
+    private double height;
+    private boolean highlighted;
     private boolean isDummy;
+    private float baryCenterValue;
+    private int inDegree;
+
+
+    private ArrayList<Integer> children;
+    private ArrayList<Integer> parents;
+    private GraphicsContext gc;
 
     public SequenceNode(int id) {
         this.id = id;
         this.index = 0;
-        this.column = 0;
+        this.column = Integer.MIN_VALUE;
+        this.inDegree = 0;
+        this.baryCenterValue = 0;
+        this.parents = new ArrayList<Integer>();
         this.children = new ArrayList<Integer>();
         this.isDummy = false;
+    }
+
+    public void setCoordinates(double x, double y, double width, double height) {
+        this.xCoordinate = x;
+        this.yCoordinate = y;
+        this.width = width;
+        this.height = height;
+    }
+
+    /**
+     * Draw the node highlighted.
+     */
+    public void highlight() {
+        this.highlighted = true;
+    }
+
+    /**
+     * Draw the node lowlighted.
+     */
+    public void lowlight() {
+        this.highlighted = false;
+    }
+
+    /**
+     * Draw the node with the color depending on it's status. Orange for highlighted nodes, black for dummy nodes and
+     * blue for sequence nodes.
+     */
+    public void draw(GraphicsContext gc) {
+        gc.clearRect(xCoordinate, yCoordinate, width, height);
+        if (highlighted) {
+            gc.setFill(Color.ORANGE);
+        } else if (isDummy) {
+            gc.strokeLine(xCoordinate, yCoordinate + height / 2, xCoordinate + width, yCoordinate + height / 2);
+            return;
+        } else {
+            gc.setFill(Color.BLUE);
+        }
+        gc.fillRoundRect(xCoordinate, yCoordinate, width, height, ARC_SIZE, ARC_SIZE);
+    }
+
+    /**
+     * Check if a click event is within the borders of this node.
+     *
+     * @param xEvent x coordinate of the click event
+     * @param yEvent y coordinate of the click event
+     * @return True if the coordinates of the click event are within borders, false otherwise.
+     */
+    public boolean checkClick(double xEvent, double yEvent) {
+        return (xEvent > xCoordinate && xEvent < xCoordinate + width && yEvent > yCoordinate && yEvent < yCoordinate + height);
+    }
+
+
+    /**
+     * Check if a click event is within the borders of this node.
+     *
+     * @param xEvent x coordinate of the click event
+     * @param yEvent y coordinate of the click event
+     * @return True if the coordinates of the click event are within borders, false otherwise.
+     */
+    public boolean checkClickX(double xEvent) {
+        return (xEvent > xCoordinate && xEvent < xCoordinate + width);
+    }
+
+
+    public double getxCoordinate() {
+        return xCoordinate;
+    }
+
+    public double getyCoordinate() {
+        return yCoordinate;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
     }
 
     public Integer getId() {
@@ -32,12 +130,28 @@ public class SequenceNode {
     }
 
     public void addChild(Integer id) {
-        this.children.add(id);
+        if(!this.children.contains(id))
+            this.children.add(id);
+    }
+
+    public void removeChild(Integer id) {
+        this.children.remove(id);
+    }
+
+    public ArrayList<Integer> getParents() {
+        return parents;
+    }
+
+    public void addParent(Integer id) {
+        if(!this.parents.contains(id)) {
+            this.parents.add(id);
+        }
     }
 
     public boolean hasChildren() {
         return children.size() > 0;
     }
+
     public ArrayList<Integer> getChildren() {
         return this.children;
     }
@@ -72,11 +186,46 @@ public class SequenceNode {
         }
     }
 
+    /**
+     * method to resolve the baryCenterValue.
+     * @return - returns the barycenterValue / inDegree
+     */
+    public float getBaryCenterValue() {
+        return baryCenterValue / inDegree;
+    }
+
+    public void setBaryCenterValue(float baryCenterValue) {
+        this.baryCenterValue = baryCenterValue;
+    }
+
+    public void incrementBaryCenterValue(float baryCenterValue) {
+        this.baryCenterValue += baryCenterValue;
+    }
+
+    public int getInDegree() {
+        return inDegree;
+    }
+
+    public void setInDegree(int inDegree) {
+        this.inDegree = inDegree;
+    }
+
+    public void incrementInDegree() {
+        this.inDegree++;
+    }
+
     public int getSequenceLength() {
         return sequenceLength;
     }
 
     public void setSequenceLength(int sequenceLength) {
         this.sequenceLength = sequenceLength;
+    }
+
+
+    public void incrementLayer(int parLayer) {
+        if (this.column < parLayer + 1) {
+            this.column = parLayer + 1;
+        }
     }
 }

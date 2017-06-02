@@ -50,15 +50,13 @@ public class MenuController implements Observer {
     @FXML
     private MenuItem bookmark3;
     @FXML
-    private MenuItem saveBookmark;
-    @FXML
     private Label sequenceInfo;
+    @FXML
+    private MenuItem saveBookmark;
     @FXML
     private TextField nodeTextField;
     @FXML
     private TextField radiusTextField;
-    @FXML
-    private AnchorPane anchorPane;
     @FXML
     private Canvas canvas;
     @FXML
@@ -71,8 +69,6 @@ public class MenuController implements Observer {
     private TextArea consoleArea;
     @FXML
     private ScrollBar scrollbar;
-    @FXML
-    private CheckBox dummyNodeCheckbox;
 
     private PrintStream ps;
     private GraphicsContext gc;
@@ -182,9 +178,26 @@ public class MenuController implements Observer {
         double pressedY = mouseEvent.getY();
         SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, pressedY);
         if (clicked != null) {
-            String newString = "ID: " + clicked.getId() + "\nSequence: "
-                    + fileController.getSequenceHashMap().get((long) clicked.getId());
-            infoController.updateSeqLabel(newString);
+            String newString = "Sequence: "
+                    + fileController.getSequenceHashMap().get((long) clicked.getId()) + "\n";
+
+
+            String childString = "Children: ";
+            for (Integer i: clicked.getChildren()) {
+                childString += i.toString() + "\n";
+            }
+
+            String parentString = "Parents: ";
+            for (Integer i: clicked.getParents()) {
+                parentString += i.toString() + "\n";
+            }
+
+            String nodeID = "Node ID: " + Integer.toString(clicked.getId()) + "\n";
+
+            String columnString = "Column index: " + Integer.toString(clicked.getColumn()) + "\n";
+
+            String concat = nodeID + columnString + parentString + childString + newString;
+            infoController.updateSeqLabel(concat);
         }
     }
 
@@ -215,22 +228,6 @@ public class MenuController implements Observer {
         infoController.updateSeqLabel(newString);
     }
 
-    /**
-     * Display dummy nodes on checkbox checked and hide them on checkbox unchecked.
-     */
-    @FXML
-    public void toggleDummyNodes() {
-        if (dummyNodeCheckbox.isSelected()) {
-            fileController.getDrawer().setShowDummyNodes(true);
-        } else {
-            fileController.getDrawer().setShowDummyNodes(false);
-        }
-        fileController.getDrawer().redraw();
-    }
-
-    /**
-     * Pressed the bookmark1 menuItem.
-     */
     @FXML
     public void pressNewBookmark1() {
         bookmarked(bookmark1);
@@ -320,7 +317,6 @@ public class MenuController implements Observer {
         if (o instanceof GfaParser) {
             if (arg instanceof String) {
                 filePath = (String) arg;
-
                 String pattern = Pattern.quote(System.getProperty("file.separator"));
                 String[] partPaths = filePath.split(pattern);
                 final String partPath = partPaths[partPaths.length - 1];

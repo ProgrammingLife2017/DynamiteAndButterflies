@@ -18,6 +18,7 @@ import java.util.Map;
  */
 public class GraphDrawer {
 
+    private static final double RELATIVE_X_DISTANCE = 0.8;
     private static final double RELATIVE_Y_DISTANCE = 50;
     private static final double LINE_WIDTH_FACTOR = 0.2;
     private static final double Y_SIZE_FACTOR = 4;
@@ -33,11 +34,10 @@ public class GraphDrawer {
     private double xDifference;
     private double stepSize;
     private int[] columnWidths;
-    private boolean showDummyNodes;
     private GraphicsContext gc;
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
-    private ArrayList<DrawableNode> canvasNodes;
+    private int highlightedNode;
 
     /**
      * Constructor.
@@ -48,29 +48,12 @@ public class GraphDrawer {
     public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
         this.graph = graph;
-        this.yBase = (int) (gc.getCanvas().getHeight() * Y_BASE_FACTOR); //TODO explain magic number
-        canvasNodes = new ArrayList<DrawableNode>();
-        graph.initialize();
-        graph.layerizeGraph();
+        this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
         columns = graph.getColumns();
         columnWidths = new int[columns.size() + 1];
-        initializeDrawableNodes();
         initializeColumnWidths();
         zoomLevel = columnWidths[columns.size()];
         radius = columns.size();
-    }
-
-    private void initializeDrawableNodes() {
-        for (Object o : graph.getNodes().entrySet()) {
-            Map.Entry pair = (Map.Entry) o;
-            SequenceNode node = (SequenceNode) pair.getValue();
-            canvasNodes.add(new DrawableNode(node.getId(), gc, false));
-        }
-        for (Object o : graph.getDummyNodes().entrySet()) {
-            Map.Entry pair = (Map.Entry) o;
-            SequenceNode node = (SequenceNode) pair.getValue();
-            canvasNodes.add(new DrawableNode(node.getId(), gc, true));
-        }
     }
 
     /**
@@ -144,7 +127,7 @@ public class GraphDrawer {
     private int visualLength(SequenceNode node, int j) {
         int length = node.getSequenceLength();
         if (length == 0) {
-            return columnWidths[j+1] - columnWidths[j];
+            return columnWidths[j + 1] - columnWidths[j];
         }
         if (length > MAX_X_SIZE) {
             return (int) MAX_X_SIZE;
@@ -157,37 +140,33 @@ public class GraphDrawer {
      * is checked dummy nodes are either drawn or skipped.
      */
     private void drawNodes() {
-        for (int j = 0; j < columns.size(); j++) {
-            ArrayList<SequenceNode> column = columns.get(j);
-            for (int i = 0; i < column.size(); i++) {
-                SequenceNode node = column.get(i);
-                if (node.isDummy() && !showDummyNodes) {
-                    continue;
-                }
-                double width = visualLength(node, j)
-                        * stepSize;
-                double height = getYSize();
-                double x = (columnWidths[j] - xDifference) * stepSize;
-                double y = yBase + (i * RELATIVE_Y_DISTANCE);
-                if (height > width) {
-                    y += (height - width) / 2;
-                    height = width;
-                }
-                DrawableNode dNode = canvasNodes.get(node.getId() - 1);
-                dNode.setCoordinates(x, y, width, height);
-                dNode.draw();
+        Iterator it = graph.getNodes().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            double width = visualLength(node, node.getColumn())
+                    * stepSize * RELATIVE_X_DISTANCE;
+            double height = getYSize();
+            double x = (columnWidths[node.getColumn()] - xDifference) * stepSize;
+            double y = yBase + (node.getIndex() * RELATIVE_Y_DISTANCE);
+            if (height > width) {
+                y += (height - width) / 2;
+                height = width;
             }
+            node.setCoordinates(x, y, width, height);
+            node.draw(gc);
         }
     }
 
     private void drawEdges() {
         setLineWidth();
-        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
-        for (int i = 1; i <= nodes.size(); i++) {
-            SequenceNode node = nodes.get(i);
-            DrawableNode parent = canvasNodes.get(node.getId() - 1);
-            for (int j = 0; j < nodes.get(i).getChildren().size(); j++) {
-                DrawableNode child = canvasNodes.get(graph.getNode(node.getChild(j)).getId() - 1);
+        Iterator it = graph.getNodes().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            int nodeID = (Integer) pair.getKey();
+            SequenceNode parent = graph.getNode(nodeID);
+            for (int j = 0; j < parent.getChildren().size(); j++) {
+                SequenceNode child = graph.getNode(parent.getChild(j));
                 double startx = parent.getxCoordinate() + parent.getWidth();
                 double starty = parent.getyCoordinate() + (parent.getHeight() / 2);
                 double endx = child.getxCoordinate();
@@ -200,18 +179,22 @@ public class GraphDrawer {
     /**
      * Check for each node if the click event is within its borders. If so highlight the node and return it. Also all
      * other nodes are lowlighted.
+     *
      * @param xEvent The x coordinate of the click event.
      * @param yEvent The y coordinate of the click event.
      * @return The sequencenode that has been clicked or null if nothing was clicked.
      */
     public SequenceNode clickNode(double xEvent, double yEvent) {
         SequenceNode click = null;
-        for (int i = 0; i < canvasNodes.size(); i++) {
-            DrawableNode node = canvasNodes.get(i);
+        Iterator it = graph.getNodes().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
             node.lowlight();
             if (node.checkClick(xEvent, yEvent)) {
                 click = graph.getNode(node.getId());
                 node.highlight();
+                node.draw(gc);
             }
         }
         return click;
@@ -223,9 +206,13 @@ public class GraphDrawer {
      * @return The column id of the column the x coordinate is in.
      */
     public int findColumn(double xEvent) {
-        for (int i = 0; i < canvasNodes.size(); i++) {
-            if (canvasNodes.get(i).checkClick(xEvent)) {
-                return canvasNodes.get(i).getId();
+        Iterator it = graph.getNodes().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            int nodeID = (Integer) pair.getKey();
+            if (graph.getNode(nodeID).checkClickX(xEvent)) {
+                return graph.getNode(nodeID).getId();
             }
         }
         return -1;
@@ -287,10 +274,11 @@ public class GraphDrawer {
      * @param node The node that should be highlighted
      */
     public void highlight(int node) {
-        for (DrawableNode canvasNode : canvasNodes) {
-            canvasNode.lowlight();
+        if (highlightedNode != 0) {
+            graph.getNode(highlightedNode).lowlight();
         }
-        canvasNodes.get(node - 1).highlight();
+        graph.getNode(node).highlight();
+        highlightedNode = node;
     }
 
     //TODO: Loop over the  nodes in the graph (O(n*m) > O(k))
@@ -330,10 +318,6 @@ public class GraphDrawer {
         return radius;
     }
 
-    public void setShowDummyNodes(boolean showDummyNodes) {
-        this.showDummyNodes = showDummyNodes;
-    }
-
     /**
      * Get function for x difference.
      * @return The x difference.
@@ -348,12 +332,12 @@ public class GraphDrawer {
 
     /**
      * Return the column the mouse click is in.
+     *
      * @param x The x coordinate of the mouse click event
      * @return The id of the column that the mouse click is in.
      */
     public int mouseLocationColumn(double x) {
         return (int) ((x / stepSize) + xDifference);
     }
-
 }
 

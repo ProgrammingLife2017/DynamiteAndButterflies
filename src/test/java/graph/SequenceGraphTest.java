@@ -51,14 +51,14 @@ public class SequenceGraphTest {
         hash.put(3, node3);
         hash.put(4, node4);
 
-        graph.setEdges(edges);
+//        graph.setEdges(edges);
         graph.setNodes(hash);
     }
 
     @Test
     public void constructorTest() {
         assertEquals(graph.getNodes(), new HashMap<Integer, SequenceNode>());
-        assertEquals(graph.getEdges(), new ArrayList<Edge>());
+//        assertEquals(graph.getEdges(), new ArrayList<Edge>());
     }
 
     @Test
@@ -69,17 +69,6 @@ public class SequenceGraphTest {
         assertEquals(graph.getNode(1), node1);
     }
 
-    @Test
-    public void initialize() throws Exception {
-        startLargeGraph();
-
-        graph.initialize();
-
-        assertTrue(graph.getNode(1).hasChildren());
-        assertTrue(graph.getNode(2).hasChildren());
-        assertTrue(graph.getNode(3).hasChildren());
-        assertFalse(graph.getNode(4).hasChildren());
-    }
 
     @Test
     public void sizeTest() throws Exception {

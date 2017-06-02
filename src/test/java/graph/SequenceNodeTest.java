@@ -41,11 +41,6 @@ public class SequenceNodeTest {
         assertFalse(node.isDummy());
     }
 
-    @Test
-    public void constructorTest() {
-        assertEquals(node.getChildren(), new ArrayList<Integer>());
-        assertEquals(node.getColumn(), 0);
-    }
 
     @Test
     public void returnChildrenTest() {
@@ -90,5 +85,35 @@ public class SequenceNodeTest {
     public void setNodeTest() {
         node.setIndex(20);
         assertEquals(node.getIndex(), 20);
+    }
+
+    @Test
+    public void checkClickTestTrue() {
+        node.setCoordinates(0,0,10,10);
+        assertTrue(node.checkClick(5,5));
+    }
+
+    @Test
+    public void checkClickTestFalseRight() {
+        node.setCoordinates(0,0,10,10);
+        assertFalse(node.checkClick(11,5));
+    }
+
+    @Test
+    public void checkClickTestFalseLeft() {
+        node.setCoordinates(2,2,10,10);
+        assertFalse(node.checkClick(1,5));
+    }
+
+    @Test
+    public void checkClickTestFalseUp() {
+        node.setCoordinates(2,2,10,10);
+        assertFalse(node.checkClick(5,1));
+    }
+
+    @Test
+    public void checkClickTestFalseDown() {
+        node.setCoordinates(0,0,10,10);
+        assertFalse(node.checkClick(5,11));
     }
 }
