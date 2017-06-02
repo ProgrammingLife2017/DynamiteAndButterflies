@@ -190,10 +190,4 @@ public class GfaParser extends Observable implements Runnable {
         return read(false);
     }
 
-
-    public String getPartPath() {
-        return partPath;
-    }
-
-
 }
