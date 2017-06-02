@@ -206,9 +206,13 @@ public class GraphDrawer {
      * @return The column id of the column the x coordinate is in.
      */
     public int findColumn(double xEvent) {
-        for (int i = 0; i < canvasNodes.size(); i++) {
-            if (canvasNodes.get(i).checkClick(xEvent)) {
-                return canvasNodes.get(i).getId();
+        Iterator it = graph.getNodes().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            int nodeID = (Integer) pair.getKey();
+            if (graph.getNode(nodeID).checkClickX(xEvent)) {
+                return graph.getNode(nodeID).getId();
             }
         }
         return -1;
