@@ -88,7 +88,7 @@
                                     </Pane>
                                  </center>
                                   <bottom>
-                                      <ScrollBar fx:id="scrollbar" visibleAmount="100.0" BorderPane.alignment="CENTER" />
+                                      <ScrollBar fx:id="scrollbar" value="50.0" visibleAmount="100.0" BorderPane.alignment="CENTER" />
                                   </bottom>
                               </BorderPane>
                            </children>
