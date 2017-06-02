@@ -26,7 +26,7 @@ public class FileController implements Observer {
     private File parDirectory;
     private ProgressBarController progressBarController;
 
-    private final int renderRange = 200;
+    private final int renderRange = 300;
     private final int nodeId = 1;
 
     private Thread parseThread;

@@ -57,17 +57,37 @@ public class SequenceGraph {
 
         // order: longest path, column, dummy's,
         // layerizeGraph(lowerBoundID);
-        initColumnLongestPath(parentArray[centerNodeIndex]);
-        initColumns(centerNodeIndex, lastNodeIndex, parentArray);
+
+        this.getNode(centerNodeID).setColumn(0);
+        Queue<Integer> queue = createQueue();
+        findLongestPath(queue);
+        //initColumns2();
+
+
+        //initColumns(centerNodeIndex, lastNodeIndex, parentArray);
         addDummies(parentArray, childArray, centerNodeIndex, lastNodeIndex);
         this.columns = createColumnList();
         createIndex();
         baryCenterAssignment();
     }
 
+    private void findLongestPath(Queue<Integer> queue) {
+        while (!queue.isEmpty()) {
+            SequenceNode currentNode = this.getNode(queue.poll());
+            if (currentNode.getColumn() != Integer.MIN_VALUE) {
+                for (int child : currentNode.getChildren()) {
+                    if (this.getNode(child).getColumn() < currentNode.getColumn() + 1) {
+                        this.getNode(child).addParent(currentNode.getId());
+                        this.getNode(child).setColumn(currentNode.getColumn() + 1);
+                    }
+                }
+            }
+        }
+    }
+
     private void baryCenterAssignment() {
-        for(int i = 1; i < columns.size(); i++ ) {
-            ArrayList<SequenceNode> previousColumn = columns.get(i-1);
+        for(int i = 1; i < columns.size(); i++) {
+            ArrayList<SequenceNode> previousColumn = columns.get(i - 1);
             ArrayList<SequenceNode> currentColumn = columns.get(i);
 
             // set amount of incoming edges for children and increase barycentervalue by index of parent
@@ -106,7 +126,7 @@ public class SequenceGraph {
     }
 
     private int findCenterNodeIndex(int centerNodeID, int[] parentArray) {
-        for (int i = 0; i < centerNodeID; i++) {
+        for (int i = 0; i < parentArray.length; i++) {
             if (parentArray[i] == centerNodeID) {
                 return i;
             }
@@ -127,46 +147,36 @@ public class SequenceGraph {
             }
         }
     }
-
-    private void initColumnLongestPath(int startNode) {
-        LinkedList<Integer> longestPath = Dfs(startNode);
-        int count = 0;
-        for (int id : longestPath) {
-            this.getNode(id).setColumn(count);
-            count++;
+    private Queue<Integer> createQueue() {
+        Queue<Integer> queue = new PriorityQueue<Integer>();
+        Iterator it = this.getNodes().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            int nodeID = (Integer) pair.getKey();
+            queue.add(nodeID);
         }
-
+        return queue;
     }
-
-    private LinkedList<Integer> Dfs(int startNode) {
-        HashMap<Integer, Boolean> visited = new HashMap<Integer, Boolean>(nodes.size());
-        LinkedList<Integer> longestPath = new LinkedList<Integer>();
-        return DFShelper(startNode, visited, longestPath);
-
-    }
-
-    private LinkedList<Integer> DFShelper(int currentNode, HashMap<Integer, Boolean> visited, LinkedList<Integer> longestPath) {
-        visited.put(currentNode, true);
-        longestPath.add(currentNode);
-
-        if (this.getNode(currentNode).getChildren().size() == 0) {
-            System.out.println(longestPath.toString());
-            return longestPath;
-        }
-        for (int child : this.getNode(currentNode).getChildren()) {
-            if (visited.get(child) == null) {
-                    return DFShelper(child, visited, longestPath);
-                }
-            }
-        return longestPath;
-        }
 
 
     /**
      * Adds dummy nodes to the graph for visualisation purposes.
      */
-    private void addDummies(int[] parentArray, int[] childArray, int centerNodeIndex, int lastNodeIndex) {
-        dummyNodeIDCounter = childArray[lastNodeIndex] + 1;
+    private void addDummies(int[] parentArray,int[] childArray,int centerNodeIndex,int lastNodeIndex) {
+//        Iterator it = this.getNodes().entrySet().iterator();
+//        while (it.hasNext()) {
+//            Map.Entry pair = (Map.Entry) it.next();
+//            SequenceNode node = (SequenceNode) pair.getValue();
+//            int nodeID = (Integer) pair.getKey();
+//            for(int child: node.getChildren()) {
+//                int span = this.getNode(child).getColumn() - node.getColumn();
+//                for(int i = 1; i < span; i++) {
+//                    SequenceNode dummy = new SequenceNode(dummyNodeIDCounter--);
+//                }
+//            }
+//        }
+        dummyNodeIDCounter = -1;
         for (int i = centerNodeIndex; i <= lastNodeIndex; i++) {
             SequenceNode parent = this.getNode(parentArray[i]);
             int size = parent.getChildren().size();
@@ -189,21 +199,20 @@ public class SequenceGraph {
      */
     private void addDummyHelper(int span, SequenceNode parent, SequenceNode target) {
         if (span > 1) {
-            SequenceNode dummy = new SequenceNode(dummyNodeIDCounter++);
+            SequenceNode dummy = new SequenceNode(dummyNodeIDCounter--);
             dummy.setDummy(true);
             int size = parent.getChildren().size();
             for (int i = 0; i < size; i++) {
-                if (parent.getChildren().get(i) == target.getId()) {
-                    parent.getChildren().remove(i);
-                    parent.addChild(dummy.getId());
+                if (this.getNode(parent.getId()).getChildren().get(i) == target.getId()) {
+                    this.getNode(parent.getId()).getChildren().remove(i);
+                    this.getNode(parent.getId()).addChild(dummy.getId());
                     break;
                 }
             }
-            dummy.addChild(target.getId());
             dummy.addParent(parent.getId());
             dummy.setColumn(parent.getColumn() + 1);
             this.addNode(dummy);
-            span--;
+            --span;
             addDummyHelper(span, dummy, target);
         }
     }

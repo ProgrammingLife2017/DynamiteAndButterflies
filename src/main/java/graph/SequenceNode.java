@@ -26,6 +26,8 @@ public class SequenceNode {
     private boolean isDummy;
     private float baryCenterValue;
     private int inDegree;
+
+
     private ArrayList<Integer> children;
     private ArrayList<Integer> parents;
     private GraphicsContext gc;
@@ -33,7 +35,7 @@ public class SequenceNode {
     public SequenceNode(int id) {
         this.id = id;
         this.index = 0;
-        this.column = 0;
+        this.column = Integer.MIN_VALUE;
         this.inDegree = 0;
         this.baryCenterValue = 0;
         this.parents = new ArrayList<Integer>();
@@ -205,5 +207,12 @@ public class SequenceNode {
 
     public void setSequenceLength(int sequenceLength) {
         this.sequenceLength = sequenceLength;
+    }
+
+
+    public void incrementLayer(int parLayer) {
+        if (this.column < parLayer + 1) {
+            this.column = parLayer + 1;
+        }
     }
 }

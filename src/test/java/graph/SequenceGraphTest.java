@@ -56,6 +56,14 @@ public class SequenceGraphTest {
     }
 
     @Test
+    public void sequenceNodeTest() {
+        SequenceNode node = graph.getNode(1);
+        graph.getNode(node.getId()).removeChild(2);
+        graph.getNode(node.getId()).getChild(2);
+    }
+
+
+    @Test
     public void constructorTest() {
         assertEquals(graph.getNodes(), new HashMap<Integer, SequenceNode>());
 //        assertEquals(graph.getEdges(), new ArrayList<Edge>());

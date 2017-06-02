@@ -139,8 +139,7 @@ public class GraphDrawer {
      * is checked dummy nodes are either drawn or skipped.
      */
     private void drawNodes() {
-        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
-        Iterator it = nodes.entrySet().iterator();
+        Iterator it = graph.getNodes().entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             SequenceNode node = (SequenceNode) pair.getValue();
@@ -160,8 +159,7 @@ public class GraphDrawer {
 
     private void drawEdges() {
         setLineWidth();
-        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
-        Iterator it = nodes.entrySet().iterator();
+        Iterator it = graph.getNodes().entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             int nodeID = (Integer) pair.getKey();
