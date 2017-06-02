@@ -4,6 +4,9 @@ import graph.SequenceGraph;
 import graph.SequenceNode;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import gui.sub_controllers.*;
@@ -11,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
 import parser.GfaParser;
@@ -119,6 +123,7 @@ public class MenuController implements Observer {
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
      * can be selected and directly be visualised on the screen.
+     * @param filePath the filePath to the file that should be opened
      * @throws IOException if there is no file specified.
      * @throws InterruptedException Exception when the Thread is interrupted.
      */
@@ -182,6 +187,9 @@ public class MenuController implements Observer {
         }
     }
 
+    /**
+     * Checks if the dummynodes is selected.
+     */
     @FXML
     public void checkDummynodes() {
         if (dummyNodeCheckbox.isSelected()) {
@@ -353,5 +361,21 @@ public class MenuController implements Observer {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Will open tutorial when Help-Help is called.
+     * @throws IOException Throws IO if fxml file can't be found.
+     */
+    public void helpWanted() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/tutorial.fxml"));
+        Stage stage;
+        Parent root = loader.load();
+        stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Tutorial");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setResizable(false);
+        stage.showAndWait();
     }
 }

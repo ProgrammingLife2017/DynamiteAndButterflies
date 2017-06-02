@@ -5,10 +5,8 @@ import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -153,7 +151,8 @@ public class GraphDrawer {
     }
 
     /**
-     * Gives all nodes the right coordinates on the canvas and draw them. Depending on whether the dummy nodes checkbox
+     * Gives all nodes the right coordinates on the canvas and draw them.
+     * Depending on whether the dummy nodes checkbox.
      * is checked dummy nodes are either drawn or skipped.
      */
     private void drawNodes() {
@@ -198,8 +197,8 @@ public class GraphDrawer {
     }
 
     /**
-     * Check for each node if the click event is within its borders. If so highlight the node and return it. Also all
-     * other nodes are lowlighted.
+     * Check for each node if the click event is within its borders. If so highlight the node and return it.
+     * Also all other nodes are lowlighted.
      * @param xEvent The x coordinate of the click event.
      * @param yEvent The y coordinate of the click event.
      * @return The sequencenode that has been clicked or null if nothing was clicked.
@@ -316,6 +315,10 @@ public class GraphDrawer {
         return radius;
     }
 
+    /**
+     * Shows the dummynodes based on the boolean.
+     * @param showDummyNodes boolean specifying if dummynodes are to be seen
+     */
     public void setShowDummyNodes(boolean showDummyNodes) {
         this.showDummyNodes = showDummyNodes;
     }
