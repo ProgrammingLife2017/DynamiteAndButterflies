@@ -59,21 +59,17 @@ public class SequenceGraph {
         // layerizeGraph(lowerBoundID);
 
         this.getNode(centerNodeID).setColumn(0);
-        Queue<Integer> queue = createQueue();
-        findLongestPath(queue);
-        //initColumns2();
-
-
-        //initColumns(centerNodeIndex, lastNodeIndex, parentArray);
-        addDummies(parentArray, childArray, centerNodeIndex, lastNodeIndex);
+        findLongestPath();
+        addDummies(parentArray, centerNodeIndex, lastNodeIndex);
         this.columns = createColumnList();
         createIndex();
         baryCenterAssignment();
     }
 
-    private void findLongestPath(Queue<Integer> queue) {
-        while (!queue.isEmpty()) {
-            SequenceNode currentNode = this.getNode(queue.poll());
+    private void findLongestPath() {
+        for (Object o : this.getNodes().entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
+            SequenceNode currentNode = (SequenceNode) pair.getValue();
             if (currentNode.getColumn() != Integer.MIN_VALUE) {
                 for (int child : currentNode.getChildren()) {
                     if (this.getNode(child).getColumn() < currentNode.getColumn() + 1) {
@@ -135,47 +131,12 @@ public class SequenceGraph {
 
     }
 
-    //TODO: weird node is null? and dummy nodes at 0 column?
-    // remove the null check.
-    private void initColumns(int centerNodeIndex, int lastNodeIndex, int[] parentArray) {
-        for (int i = centerNodeIndex; i <= lastNodeIndex; i++) {
-            int parentColumn = this.getNode(parentArray[i]).getColumn();
-            for (int id : this.getNode(parentArray[i]).getChildren()) {
-                if (this.getNode(id) != null && this.getNode(id).getColumn() == 0) {
-                    this.getNode(id).setColumn(parentColumn + 1);
-                }
-            }
-        }
-    }
-    private Queue<Integer> createQueue() {
-        Queue<Integer> queue = new PriorityQueue<Integer>();
-        Iterator it = this.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
-            int nodeID = (Integer) pair.getKey();
-            queue.add(nodeID);
-        }
-        return queue;
-    }
-
 
     /**
      * Adds dummy nodes to the graph for visualisation purposes.
      */
-    private void addDummies(int[] parentArray,int[] childArray,int centerNodeIndex,int lastNodeIndex) {
-//        Iterator it = this.getNodes().entrySet().iterator();
-//        while (it.hasNext()) {
-//            Map.Entry pair = (Map.Entry) it.next();
-//            SequenceNode node = (SequenceNode) pair.getValue();
-//            int nodeID = (Integer) pair.getKey();
-//            for(int child: node.getChildren()) {
-//                int span = this.getNode(child).getColumn() - node.getColumn();
-//                for(int i = 1; i < span; i++) {
-//                    SequenceNode dummy = new SequenceNode(dummyNodeIDCounter--);
-//                }
-//            }
-//        }
+    private void addDummies(int[] parentArray,int centerNodeIndex,int lastNodeIndex) {
+
         dummyNodeIDCounter = -1;
         for (int i = centerNodeIndex; i <= lastNodeIndex; i++) {
             SequenceNode parent = this.getNode(parentArray[i]);
