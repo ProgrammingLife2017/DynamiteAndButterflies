@@ -8,6 +8,7 @@ import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
 import java.io.*;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -30,7 +31,6 @@ public class GfaParser extends Observable implements Runnable {
     private Preferences prefs;
     private int startNode = Integer.MAX_VALUE;
     private int endNode = Integer.MIN_VALUE;
-
     private int counter;
     private int maxID;
     private PopUpController popUpController;
@@ -120,8 +120,9 @@ public class GfaParser extends Observable implements Runnable {
      */
     @SuppressWarnings("Since15")
     private synchronized void parseSpecific(String filePath) throws IOException {
-        LinkedList<Integer> parentList = new LinkedList<Integer>();
-        LinkedList<Integer> childList = new LinkedList<Integer>();
+        BufferedWriter parentWriter = new BufferedWriter(new FileWriter(partPath + "parentArray.txt"));
+        BufferedWriter childWriter = new BufferedWriter(new FileWriter(partPath + "childArray.txt"));
+
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line = br.readLine();
@@ -146,27 +147,17 @@ public class GfaParser extends Observable implements Runnable {
                 String[] edgeDataString = line.split("\t");
                 int parentId = (Integer.parseInt(edgeDataString[1]));
                 int childId = Integer.parseInt(edgeDataString[3]);
-                parentList.add(parentId);
-                childList.add(childId);
+               parentWriter.write(parentId + ",");
+               childWriter.write(childId + ",");
             }
         }
-        write(partPath + "parentArray.txt",parentList);
-        write(partPath + "childArray.txt",childList);
         in.close();
         br.close();
+        parentWriter.flush();
+        parentWriter.close();
+        childWriter.flush();
+        childWriter.close();
         db.commit();
-    }
-
-    private void write(String filePath, LinkedList<Integer> x) throws IOException {
-        BufferedWriter edgeWriter = null;
-        edgeWriter =  new BufferedWriter(new FileWriter(filePath));
-
-        for (int i: x) {
-            edgeWriter.write(i +",");
-        }
-        edgeWriter.flush();
-        edgeWriter.close();
-        prefs.putInt(filePath + "size", x.size());
     }
 
     private int[] read(boolean isParent) throws IOException {

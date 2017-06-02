@@ -162,7 +162,6 @@ public class FileController implements Observer {
     }
 
 
-
     /**
      * Gets the fileName from the filePath.
      * @param filePath The path to the file you want the name off
