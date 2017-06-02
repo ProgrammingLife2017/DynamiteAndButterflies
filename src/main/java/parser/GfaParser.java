@@ -169,7 +169,7 @@ public class GfaParser extends Observable implements Runnable {
         prefs.putInt(filePath + "size", x.size());
     }
 
-    private int[] read(String partPath, boolean isParent) throws IOException {
+    private int[] read(boolean isParent) throws IOException {
         String additionToPath;
         if (isParent) {
             additionToPath = "parentArray.txt";
@@ -191,42 +191,14 @@ public class GfaParser extends Observable implements Runnable {
         return nodeArray;
     }
 
-
-    /**
-     * Cretes an ArrayList of Strings specifying headers.
-     * @return an arrayList containing all headers
-     */
-    public ArrayList<String> getHeaders() {
-        ArrayList<String> headers = new ArrayList<String>();
-        headers.add(header1);
-        headers.add(header2);
-        return headers;
+    public int[] getParentArray() throws IOException {
+        return read(true);
     }
 
-    /**
-     * Converts an List<Integer> to int[].
-     * @param integers list with integers.
-     * @return int[].
-     */
-    private static int[] convertIntegers(List<Integer> integers) {
-        int[] ret = new int[integers.size()];
-        for (int i = 0; i < ret.length; i++) {
-            ret[i] = integers.get(i);
-        }
-        return ret;
+    public int[] getChildArray() throws IOException {
+        return read(false);
     }
 
-    public int[] getParentArray(String partPath) throws IOException {
-        return read(partPath, true);
-    }
-
-    public int[] getChildArray( String partPath) throws IOException {
-        return read(partPath, false);
-    }
-
-    public int getCounter() {
-        return counter;
-    }
 
     public String getPartPath() {
         return partPath;

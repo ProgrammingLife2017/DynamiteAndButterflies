@@ -145,8 +145,8 @@ public class FileController implements Observer {
         if (o instanceof GfaParser) {
             if(arg instanceof Integer) {
                 try {
-                    childArray = parser.getChildArray(parser.getPartPath());
-                    parentArray = parser.getParentArray(parser.getPartPath());
+                    childArray = parser.getChildArray();
+                    parentArray = parser.getParentArray();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
