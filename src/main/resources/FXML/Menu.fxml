@@ -2,6 +2,7 @@
 
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -75,7 +76,7 @@
                                     </Pane>
                                  </center>
                                   <bottom>
-                                      <ScrollBar fx:id="scrollbar" visibleAmount="100.0" BorderPane.alignment="CENTER" />
+                                      <ScrollBar fx:id="scrollbar" value="50.0" visibleAmount="100.0" BorderPane.alignment="CENTER" />
                                   </bottom>
                               </BorderPane>
                            </children>
