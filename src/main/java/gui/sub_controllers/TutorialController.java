@@ -8,6 +8,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.prefs.Preferences;
+
 /**
  * Created by Jip on 29-5-2017.
  *
@@ -50,16 +52,38 @@ public class TutorialController {
     private static final int DEBUG = 6;
     private static final int FIN = 7;
 
+    private static final String TUTORIAL_CHECK = "completedTutorial";
+    private static Preferences prefs = Preferences.userRoot();
+
     /**
      * Handles the button press of next.
      */
     public void nextClicked() {
         if (nextBut.getText().equals("End")) {
+            prefs.putBoolean(TUTORIAL_CHECK, true);
             Stage stage = (Stage) nextBut.getScene().getWindow();
             stage.close();
         }
+
+        if (prefs.getBoolean(TUTORIAL_CHECK, false)) {
+            //TODO put this in an initialize
+           showButtonBar();
+        }
+
         counter++;
         getNewView(counter);
+    }
+
+    /**
+     * Will show the button bar.
+     */
+    private void showButtonBar() {
+        homeBut.setVisible(true);
+        travBut.setVisible(true);
+        bookBut.setVisible(true);
+        zoomBut.setVisible(true);
+        infoBut.setVisible(true);
+        debugBut.setVisible(true);
     }
 
     /**
