@@ -280,6 +280,19 @@ public class MenuController implements Observer {
         stage.showAndWait();
     }
 
+    @FXML
+    public void manageBookmarks() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/manageBookmarks.fxml"));
+        Stage stage;
+        Parent root = loader.load();
+
+        stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Manage bookmarks");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+    }
+
     /**
      * Method used to not duplicate code in working out bookmarks.
      * @param bookmark the button that specifies the bookmark

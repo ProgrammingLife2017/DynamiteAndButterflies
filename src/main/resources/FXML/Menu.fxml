@@ -59,7 +59,7 @@
                                 </items>
                               </Menu>
                               <MenuItem fx:id="saveBookmark" mnemonicParsing="false" onAction="#newSaveBookmarkPress" text="Add bookmark" />
-                              <MenuItem mnemonicParsing="false" text="Manage bookmarks"/>
+                              <MenuItem mnemonicParsing="false" text="Manage bookmarks" onAction="#manageBookmarks"/>
                           </items>
                         </Menu>
                     </menus>
