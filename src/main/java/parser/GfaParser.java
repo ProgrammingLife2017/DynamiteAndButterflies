@@ -23,7 +23,8 @@ import static java.lang.Math.toIntExact;
  * This class contains a parser to parse a .gfa file into our data structure.
  */
 public class GfaParser extends Observable implements Runnable {
-  
+    private String header1;
+    private String header2;
     private HTreeMap<Long, String> sequenceMap;
     private String filePath;
     private String partPath;
@@ -183,6 +184,17 @@ public class GfaParser extends Observable implements Runnable {
 
     public int[] getChildArray() throws IOException {
         return read(false);
+    }
+
+    /**
+     * Cretes an ArrayList of Strings specifying headers.
+     * @return an arrayList containing all headers
+     */
+    public ArrayList<String> getHeaders() {
+        ArrayList<String> headers = new ArrayList<String>();
+        headers.add(header1);
+        headers.add(header2);
+        return headers;
     }
 
 }
