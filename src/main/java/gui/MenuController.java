@@ -101,7 +101,7 @@ public class MenuController implements Observer {
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
 
-        recentController.initialize(prefs);
+        recentController.initialize();
         ps = new PrintStream(new Console(consoleArea));
         System.setErr(ps);
         System.setOut(ps);
@@ -118,7 +118,7 @@ public class MenuController implements Observer {
         Stage stage = App.getStage();
         File file = fileController.chooseFile(stage);
         String filePath = file.getAbsolutePath();
-        recentController.update(filePath, prefs);
+        recentController.update(filePath);
         fileController.openFileClicked(gc, filePath, this);
     }
 
