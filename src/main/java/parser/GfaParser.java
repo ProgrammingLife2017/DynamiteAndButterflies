@@ -33,7 +33,7 @@ public class GfaParser extends Observable implements Runnable {
 
     private int counter;
     private int maxID;
-    private PopUpController popUpController;
+
 
     private DB db;
 
@@ -74,17 +74,6 @@ public class GfaParser extends Observable implements Runnable {
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         partPath = partPaths[partPaths.length - 1];
-        if (!prefs.getBoolean(partPath, true)) {
-            popUpController = new PopUpController();
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    String message = "Database File is corrupt, press 'Reload' to reload the file," + "\n"
-                            + "or press 'Resume' to recover the data still available.";
-                    popUpController.loadDbCorruptPopUp(partPath, message);
-                }
-            });
-        }
         db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().
                                                 fileMmapPreclearDisable().cleanerHackEnable().
                                                 closeOnJvmShutdown().checksumHeaderBypass().make();
