@@ -12,17 +12,27 @@ public class BookmarkController {
 
     private static Preferences prefs = Preferences.userRoot();
     private String stringFile;
-    private final Button bookmark1, bookmark2;
+    private final Button bookmark1, bookmark2, saveBookmark;
     private static final String BOOKMARK_SAVE = "bookmarkNum";
+
+    //As a user,
+    // When viewing a file with bookmarks,
+    // And choosing a new file to view
+    // And that file has no bookmarks
+    // I want to not see the old bookmarks.
+    // Initializing this number as -2 ensures the above user story.
+    private static final int loopStart = -2;
 
     /**
      * Constructor of the bookmark controller to handle the bookmarks.
      * @param bm1 The button with the first bookmark.
      * @param bm2 The button with the second bookmark.
+     * @param save the button that saves the boomarks.
      */
-    public BookmarkController(Button bm1, Button bm2) {
+    public BookmarkController(Button bm1, Button bm2, Button save) {
         bookmark1 = bm1;
         bookmark2 = bm2;
+        saveBookmark = save;
 
         stringFile = "";
     }
@@ -40,13 +50,7 @@ public class BookmarkController {
         }
 
         int largestIndex = prefs.getInt(BOOKMARK_SAVE + stringFile, -1);
-        //As a user,
-        // When viewing a file with bookmarks,
-        // And choosing a new file to view
-        // And that file has no bookmarks
-        // I want to not see the old bookmarks.
-        // Initializing this number as -2 ensures the above user story.
-        for (int i = -2; i <= largestIndex; i++) {
+        for (int i = loopStart; i <= largestIndex; i++) {
             String realBM = prefs.get(stringFile + i, "-");
             updateBookmarks(realBM);
         }
@@ -77,5 +81,14 @@ public class BookmarkController {
 
         bookmark2.setText(bookmark1.getText());
         bookmark1.setText(newBookmark);
+    }
+
+    /**
+     * Sets all buttons to visible so they can be used.
+     */
+    public void graphLoaded() {
+        bookmark1.setVisible(true);
+        bookmark2.setVisible(true);
+        saveBookmark.setVisible(true);
     }
 }
