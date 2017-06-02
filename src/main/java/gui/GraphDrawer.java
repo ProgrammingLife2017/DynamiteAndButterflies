@@ -18,10 +18,10 @@ import java.util.Map;
  */
 public class GraphDrawer {
 
-    private static final double RELATIVE_X_DISTANCE = 0.8;
     private static final double RELATIVE_Y_DISTANCE = 50;
     private static final double LINE_WIDTH_FACTOR = 0.2;
     private static final double Y_SIZE_FACTOR = 4;
+    private static final double Y_BASE_FACTOR = 0.25;
     private static final double MIN_LINE_WIDTH = 0.01;
     private static final double MAX_LINE_WIDTH = 1;
     private static final double MAX_Y_SIZE = 20;
@@ -48,7 +48,7 @@ public class GraphDrawer {
     public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
         this.graph = graph;
-        this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
+        this.yBase = (int) (gc.getCanvas().getHeight() * Y_BASE_FACTOR); //TODO explain magic number
         canvasNodes = new ArrayList<DrawableNode>();
         graph.initialize();
         graph.layerizeGraph();
@@ -91,13 +91,13 @@ public class GraphDrawer {
     /**
      * Change the zoom (invoked by user by clicking on "Go to this Node".
      *
-     * @param newZoom The new radius.
+     * @param radius The new radius.
      * @param column  The new Column to be in the centre.
      */
-    public void changeZoom(final int newZoom, final int column) {
-        radius = newZoom;
-        zoomLevel = columnWidths[column + newZoom / 2] - columnWidths[column - newZoom / 2];
-        moveShapes(columnWidths[column + 2] - zoomLevel / 2);
+    public void changeZoom(int column, int radius) {
+        this.radius = radius + radius + 1;
+        zoomLevel = columnWidths[column + radius + 1] - columnWidths[column - radius];
+        moveShapes(columnWidths[column - radius]);
     }
 
     /**
@@ -165,7 +165,7 @@ public class GraphDrawer {
                     continue;
                 }
                 double width = visualLength(node, j)
-                        * stepSize * RELATIVE_X_DISTANCE;
+                        * stepSize;
                 double height = getYSize();
                 double x = (columnWidths[j] - xDifference) * stepSize;
                 double y = yBase + (i * RELATIVE_Y_DISTANCE);
@@ -215,6 +215,20 @@ public class GraphDrawer {
             }
         }
         return click;
+    }
+
+    /**
+     * Find the column corresponding to the x coordinate.
+     * @param xEvent x coordinate of the click event.
+     * @return The column id of the column the x coordinate is in.
+     */
+    public int findColumn(double xEvent) {
+        for (int i = 0; i < canvasNodes.size(); i++) {
+            if (canvasNodes.get(i).checkClick(xEvent)) {
+                return canvasNodes.get(i).getId();
+            }
+        }
+        return -1;
     }
 
     /**
@@ -321,6 +335,18 @@ public class GraphDrawer {
     }
 
     /**
+     * Get function for x difference.
+     * @return The x difference.
+     */
+    public double getxDifference() {
+        return xDifference;
+    }
+
+    public int getColumnWidth(int col) {
+        return columnWidths[col];
+    }
+
+    /**
      * Return the column the mouse click is in.
      * @param x The x coordinate of the mouse click event
      * @return The id of the column that the mouse click is in.
@@ -328,5 +354,6 @@ public class GraphDrawer {
     public int mouseLocationColumn(double x) {
         return (int) ((x / stepSize) + xDifference);
     }
+
 }
 

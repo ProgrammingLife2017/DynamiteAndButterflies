@@ -46,7 +46,7 @@ public class BookmarkController {
         // And that file has no bookmarks
         // I want to not see the old bookmarks.
         // Initializing this number as -2 ensures the above user story.
-        for (int i = -2; i <= largestIndex; i++) {
+        for (int i = -2; i <= largestIndex; i++) { //TODO magic number
             String realBM = prefs.get(stringFile + i, "-");
             updateBookmarks(realBM);
         }

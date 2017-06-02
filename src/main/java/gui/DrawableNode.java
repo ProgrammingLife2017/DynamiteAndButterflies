@@ -12,6 +12,7 @@ import javafx.scene.paint.Color;
 public class DrawableNode {
 
     private static final int ARC_SIZE = 10;
+    private static final double RELATIVE_X_DISTANCE = 0.8;
 
     private static GraphicsContext gc;
     private int id;
@@ -44,7 +45,7 @@ public class DrawableNode {
     public void setCoordinates(double x, double y, double width, double height) {
         this.xCoordinate = x;
         this.yCoordinate = y;
-        this.width = width;
+        this.width = width * RELATIVE_X_DISTANCE;
         this.height = height;
     }
 
@@ -116,6 +117,15 @@ public class DrawableNode {
      */
     public boolean checkClick(double xEvent, double yEvent) {
         return (xEvent > xCoordinate && xEvent < xCoordinate + width && yEvent > yCoordinate && yEvent < yCoordinate + height);
+    }
+
+    /**
+     * Check if a click event is whitin the borders of the column of this node.
+     * @param xEvent x coordinate of the click event
+     * @return True if the coordinate of the click event is whithin the borders of the column, false otherwise.
+     */
+    public boolean checkClick(double xEvent) {
+        return (xEvent > xCoordinate && xEvent < xCoordinate + (width / RELATIVE_X_DISTANCE));
     }
 
 }
