@@ -12,7 +12,9 @@ Genome parser and visualisation
 ![file picker](http://i.imgur.com/4EkWHN8.png)
 ![zooming](http://i.imgur.com/qE3CEvL.png)
 
+## Before you start
+When opening the current release for the first time, there might be some problems with the database files already on your computer. To fix this, please delete those files once (they can be found in the folder that also holds you .jar file).
+
 ## List of Known issues
-- When opening a gfa file from "Open File", files can become duplicate in "Recent Files".
 - Edges don't go properly through the dummy nodes yet.
 - When switching to another centrenode, the dummy nodes sometimes lag.
