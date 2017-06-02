@@ -1,7 +1,6 @@
 package gui.sub_controllers;
 
 import graph.SequenceGraph;
-import graph.SequenceNode;
 import gui.GraphDrawer;
 import javafx.scene.control.TextField;
 
@@ -114,6 +113,30 @@ public class ZoomController {
     public void displayInfo() {
         nodeTextField.setText(drawer.getRealCentreNode().getId() + "");
         radiusTextField.setText((int) Math.ceil(drawer.getRadius()) + "");
+    }
+
+    /**
+     * Getter for the centreNode.
+     * @return the ID of the centre node.
+     */
+    public int getCentreNodeID() {
+        return Integer.parseInt(nodeTextField.getText());
+    }
+
+    /**
+     * Getter for the radius.
+     * @return the radius.
+     */
+    public int getRadius() {
+        return (int) Double.parseDouble(radiusTextField.getText());
+    }
+
+    /**
+     * Getter for the centre node.
+     * @return the centre node.
+     */
+    public int getCentreNode() {
+        return Integer.parseInt(nodeTextField.getText());
     }
 
     /**

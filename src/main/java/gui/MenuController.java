@@ -3,14 +3,18 @@ package gui;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.*;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
 import parser.GfaParser;
@@ -32,8 +36,6 @@ import java.util.regex.Pattern;
 public class MenuController implements Observer {
 
     @FXML
-    private Button saveBookmark;
-    @FXML
     private MenuItem file1;
     @FXML
     private MenuItem file2;
@@ -42,17 +44,19 @@ public class MenuController implements Observer {
     @FXML
     private ProgressBar progressBar;
     @FXML
-    private Button bookmark1;
+    private MenuItem bookmark1;
     @FXML
-    private Button bookmark2;
+    private MenuItem bookmark2;
+    @FXML
+    private MenuItem bookmark3;
     @FXML
     private Label sequenceInfo;
+    @FXML
+    private MenuItem saveBookmark;
     @FXML
     private TextField nodeTextField;
     @FXML
     private TextField radiusTextField;
-    @FXML
-    private AnchorPane anchorPane;
     @FXML
     private Canvas canvas;
     @FXML
@@ -90,7 +94,7 @@ public class MenuController implements Observer {
 
         fileController = new FileController(new ProgressBarController(progressBar));
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
-        bookmarkController = new BookmarkController(bookmark1, bookmark2);
+        bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
 
         recentController.initialize();
@@ -224,40 +228,76 @@ public class MenuController implements Observer {
         infoController.updateSeqLabel(newString);
     }
 
-    /**
-     * Updates and saves the bookmarks.
-     */
     @FXML
-    public void saveTheBookmarks() {
-        bookmarkController.saving(Integer.parseInt(nodeTextField.getText()), Integer.parseInt(radiusTextField.getText()));
-    }
-
-    /**
-     * Pressed of the bookmark1 button.
-     */
-    @FXML
-    public void pressBookmark1() {
+    public void pressNewBookmark1() {
         bookmarked(bookmark1);
     }
 
     /**
-     * Pressed of the bookmark2 button.
+     * Pressed the bookmark2 menuItem.
      */
     @FXML
-    public void pressBookmark2() {
+    public void pressNewBookmark2() {
         bookmarked(bookmark2);
+    }
+
+    /**
+     * Pressed the bookmark3 menuItem.
+     */
+    @FXML
+    public void pressNewBookmark3() {
+        bookmarked(bookmark3);
+    }
+
+    /**
+     * Updates and saves the bookmarks.
+     * @throws IOException Throws expception if it can't find the fxml file.
+     */
+    @FXML
+    public void newSaveBookmarkPress() throws IOException {
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/bookmarkPopUp.fxml"));
+        Stage stage;
+        Parent root = loader.load();
+        BookmarkPopUp controller = loader.<BookmarkPopUp>getController();
+        controller.initialize(zoomController.getCentreNode(),
+                            zoomController.getRadius(), bookmarkController);
+
+        stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Add a bookmark");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+    }
+
+    /**
+     * Handles pressing the manage bookmark button.
+     * @throws IOException if the fxml file doesn't exist.
+     */
+    @FXML
+    public void manageBookmarks() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/manageBookmarks.fxml"));
+        Stage stage;
+        Parent root = loader.load();
+
+        stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Manage bookmarks");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
     }
 
     /**
      * Method used to not duplicate code in working out bookmarks.
      * @param bookmark the button that specifies the bookmark
      */
-    private void bookmarked(Button bookmark) {
+    private void bookmarked(MenuItem bookmark) {
         if (!bookmark.getText().equals("-")) {
             String string = bookmark.getText();
-            String[] parts = string.split("-");
-            String centre = parts[0];
-            String radius = parts[1];
+            String[] parts = string.split(" - ");
+            //We skip parts[0] because that is the note.
+            String centre = parts[1];
+            String radius = parts[2];
             traverseGraphClicked(centre, radius);
             zoomController.setNodeTextField(centre);
             zoomController.setRadiusTextField(radius);
