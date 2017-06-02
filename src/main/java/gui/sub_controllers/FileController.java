@@ -12,8 +12,7 @@ import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -27,7 +26,7 @@ public class FileController implements Observer {
     private File parDirectory;
     private ProgressBarController progressBarController;
 
-    private final int renderRange = 5000;
+    private final int renderRange = 1000;
     private final int nodeId = 1;
 
     private Thread parseThread;
@@ -35,6 +34,9 @@ public class FileController implements Observer {
     private GraphicsContext gc;
 
     private GfaParser parser;
+
+    private int[] childArray;
+    private int[] parentArray;
 
     /**
      * Constructor of the FileController object to control the Files.
@@ -89,7 +91,6 @@ public class FileController implements Observer {
         this.gc = gc;
         if (parser != null) {
             parser.getDb().close();
-            parser.getDb2().close();
         }
         parser = new GfaParser(filePath);
         parser.addObserver(this);
@@ -104,9 +105,14 @@ public class FileController implements Observer {
     }
 
     private void assignSequenceLenghts() {
-        for (int i = 1; i <= graph.size(); i++) {
-            SequenceNode node = graph.getNode(i);
-            node.setSequenceLength(sequenceHashMap.get((long) i).length());
+        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
+        Iterator it = nodes.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            if(!node.isDummy()) {
+                node.setSequenceLength(sequenceHashMap.get((long) node.getId()).length());
+            }
         }
     }
 
@@ -137,10 +143,15 @@ public class FileController implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof GfaParser) {
-            if (arg instanceof HTreeMap) {
-                HTreeMap<Long, int[]> adjacencyMap = (HTreeMap) arg;
+            if(arg instanceof Integer) {
+                try {
+                    childArray = parser.getChildArray(parser.getPartPath());
+                    parentArray = parser.getParentArray(parser.getPartPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 graph = new SequenceGraph();
-                graph.createSubGraph(nodeId, renderRange, adjacencyMap);
+                graph.createSubGraph(nodeId, renderRange, parentArray, childArray);
                 sequenceHashMap = parser.getSequenceHashMap();
                 assignSequenceLenghts();
                 drawer = new GraphDrawer(graph, gc);
@@ -149,6 +160,8 @@ public class FileController implements Observer {
             }
         }
     }
+
+
 
     /**
      * Gets the fileName from the filePath.

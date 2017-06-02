@@ -61,8 +61,6 @@
                               <Button fx:id="saveBookmark" layoutX="15.0" layoutY="224.0" mnemonicParsing="false" onAction="#saveTheBookmarks" text="Save Bookmark" />
                               <Button fx:id="bookmark1" layoutX="27.0" layoutY="268.0" mnemonicParsing="false" onAction="#pressBookmark1" prefHeight="24.0" prefWidth="98.0" text="-" textAlignment="CENTER" />
                               <Button fx:id="bookmark2" layoutX="27.0" layoutY="311.0" mnemonicParsing="false" onAction="#pressBookmark2" prefHeight="24.0" prefWidth="97.0" text="-" textAlignment="CENTER" />
-                              <CheckBox fx:id="dummyNodeCheckbox" layoutX="62.0" layoutY="405.0" mnemonicParsing="false" onAction="#toggleDummyNodes" />
-                              <Label layoutX="3.0" layoutY="372.0" text="Display dummy nodes" />
                            </children>
                         </AnchorPane>
                       <AnchorPane fx:id="canvasPanel">
