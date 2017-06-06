@@ -20,12 +20,9 @@ public class GraphDrawer {
 
     private static final double RELATIVE_X_DISTANCE = 0.8;
     private static final double RELATIVE_Y_DISTANCE = 50;
-    private static final double LINE_WIDTH_FACTOR = 0.2;
-    private static final double Y_SIZE_FACTOR = 4;
+    private static final double LINE_WIDTH_FACTOR = 4;
+    private static final double Y_SIZE_FACTOR = 3;
     private static final double LOG_BASE = 2;
-    private static final double MIN_LINE_WIDTH = 0.01;
-    private static final double MAX_LINE_WIDTH = 1;
-    private static final double MAX_Y_SIZE = 20;
 
     private int yBase;
     private double zoomLevel;
@@ -214,27 +211,14 @@ public class GraphDrawer {
      * Set the height of the node depending on the level of zoom.
      */
     private double getYSize() {
-        double size = stepSize * Y_SIZE_FACTOR;
-        if (size < 1) {
-            size = 1;
-        }
-        if (size > MAX_Y_SIZE) {
-            size = MAX_Y_SIZE;
-        }
-        return size;
+        return Math.log(stepSize + 1) / Math.log(LOG_BASE) * Y_SIZE_FACTOR;
     }
 
     /**
      * Set the width of the line depending on the level of zoom.
      */
     private void setLineWidth() {
-        double width = stepSize * LINE_WIDTH_FACTOR;
-        if (width == 0) {
-            width = MIN_LINE_WIDTH;
-        }
-        if (width > 1) {
-            width = MAX_LINE_WIDTH;
-        }
+        double width = (Math.log(stepSize + 1) / Math.log(LOG_BASE)) / LINE_WIDTH_FACTOR;
         gc.setLineWidth(width);
     }
 
