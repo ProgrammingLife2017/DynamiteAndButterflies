@@ -190,11 +190,9 @@ public class GraphDrawer {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             SequenceNode node = (SequenceNode) pair.getValue();
-            node.lowlight();
             if (node.checkClick(xEvent, yEvent)) {
                 click = graph.getNode(node.getId());
-                node.highlight();
-                node.draw(gc);
+                highlight(node.getId());
             }
         }
         return click;
@@ -276,8 +274,10 @@ public class GraphDrawer {
     public void highlight(int node) {
         if (highlightedNode != 0) {
             graph.getNode(highlightedNode).lowlight();
+            graph.getNode(highlightedNode).draw(gc);
         }
         graph.getNode(node).highlight();
+        graph.getNode(node).draw(gc);
         highlightedNode = node;
     }
 
