@@ -22,18 +22,17 @@ public class GraphDrawer {
     private static final double RELATIVE_Y_DISTANCE = 50;
     private static final double LINE_WIDTH_FACTOR = 0.2;
     private static final double Y_SIZE_FACTOR = 4;
-    private static final double Y_BASE_FACTOR = 0.25;
+    private static final double LOG_BASE = 2;
     private static final double MIN_LINE_WIDTH = 0.01;
     private static final double MAX_LINE_WIDTH = 1;
     private static final double MAX_Y_SIZE = 20;
-    private static final double MAX_X_SIZE = 100;
 
     private int yBase;
     private double zoomLevel;
     private double radius;
     private double xDifference;
     private double stepSize;
-    private int[] columnWidths;
+    private double[] columnWidths;
     private GraphicsContext gc;
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
@@ -50,7 +49,7 @@ public class GraphDrawer {
         this.graph = graph;
         this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
         columns = graph.getColumns();
-        columnWidths = new int[columns.size() + 1];
+        columnWidths = new double[columns.size() + 1];
         initializeColumnWidths();
         zoomLevel = columnWidths[columns.size()];
         radius = columns.size();
@@ -111,10 +110,10 @@ public class GraphDrawer {
     public void initializeColumnWidths() {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
-            int max = 1;
+            double max = 1;
             for (int i = 0; i < column.size(); i++) {
                 if (!column.get(i).isDummy()) {
-                    int length = visualLength(column.get(i), 0);
+                    double length = computeNodeWidth(column.get(i));
                     if (length > max) {
                         max = length;
                     }
@@ -122,17 +121,6 @@ public class GraphDrawer {
             }
             columnWidths[j + 1] = columnWidths[j] + max;
         }
-    }
-
-    private int visualLength(SequenceNode node, int j) {
-        int length = node.getSequenceLength();
-        if (length == 0) {
-            return columnWidths[j + 1] - columnWidths[j];
-        }
-        if (length > MAX_X_SIZE) {
-            return (int) MAX_X_SIZE;
-        }
-        return length;
     }
 
     /**
@@ -144,8 +132,7 @@ public class GraphDrawer {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             SequenceNode node = (SequenceNode) pair.getValue();
-            double width = visualLength(node, node.getColumn())
-                    * stepSize * RELATIVE_X_DISTANCE;
+            double width = computeNodeWidth(node) * stepSize * RELATIVE_X_DISTANCE;
             double height = getYSize();
             double x = (columnWidths[node.getColumn()] - xDifference) * stepSize;
             double y = yBase + (node.getIndex() * RELATIVE_Y_DISTANCE);
@@ -174,6 +161,13 @@ public class GraphDrawer {
                 gc.strokeLine(startx, starty, endx, endy);
             }
         }
+    }
+
+    public double computeNodeWidth(SequenceNode node) {
+        if (node.isDummy()) {
+            return columnWidths[node.getColumn() + 1] - columnWidths[node.getColumn()];
+        }
+        return Math.log(node.getSequenceLength() + (LOG_BASE - 1)) / Math.log(LOG_BASE);
     }
 
     /**
@@ -326,7 +320,7 @@ public class GraphDrawer {
         return xDifference;
     }
 
-    public int getColumnWidth(int col) {
+    public double getColumnWidth(int col) {
         return columnWidths[col];
     }
 
