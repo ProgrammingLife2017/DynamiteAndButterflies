@@ -2,6 +2,7 @@ package gui.sub_controllers;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
+import gui.CustomProperties;
 import gui.GraphDrawer;
 import gui.MenuController;
 import javafx.scene.canvas.GraphicsContext;
@@ -17,7 +18,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Observer;
 import java.util.Observable;
-import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
 /**
@@ -42,7 +42,7 @@ public class FileController implements Observer {
 
     private String partPath;
 
-    private Preferences prefs;
+    private CustomProperties properties;
 
     private PopUpController popUpController;
 
@@ -57,7 +57,8 @@ public class FileController implements Observer {
         graph = new SequenceGraph();
         parDirectory = null;
         progressBarController = pbc;
-        prefs = Preferences.userRoot();
+
+        properties = new CustomProperties();
     }
 
     /**
@@ -110,7 +111,9 @@ public class FileController implements Observer {
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         partPath = partPaths[partPaths.length - 1];
-        if (!prefs.getBoolean(partPath, true)) {
+        properties.updateProperties();
+        boolean flag = Boolean.parseBoolean(properties.getProperty(partPath, "true"));
+        if (!flag) {
             popUpController = new PopUpController();
                     String message = "Database File is corrupt,"
                                 + " press 'Reload' to reload the file," + "\n"

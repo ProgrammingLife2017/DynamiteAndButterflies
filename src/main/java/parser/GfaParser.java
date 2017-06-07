@@ -1,5 +1,6 @@
 package parser;
 
+import gui.CustomProperties;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
@@ -8,7 +9,6 @@ import org.mapdb.Serializer;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Observable;
-import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
 /**
@@ -20,7 +20,7 @@ public class GfaParser extends Observable implements Runnable {
     private HTreeMap<Long, String> sequenceMap;
     private String filePath;
     private String partPath;
-    private Preferences prefs;
+    private CustomProperties properties = new CustomProperties();
 
 
     private DB db;
@@ -58,7 +58,7 @@ public class GfaParser extends Observable implements Runnable {
      */
     @SuppressWarnings("Since15")
     private synchronized void parseGraph(String filePath) throws IOException {
-        prefs = Preferences.userRoot();
+        properties.updateProperties();
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         partPath = partPaths[partPaths.length - 1];
@@ -70,7 +70,8 @@ public class GfaParser extends Observable implements Runnable {
                             keySerializer(Serializer.LONG).
                             valueSerializer(Serializer.STRING).createOrOpen();
         } else {
-            prefs.putBoolean(partPath, false);
+            properties.setProperty(partPath, "false");
+            properties.saveProperties();
             sequenceMap = db.hashMap(partPath + ".sequence.db").
                                     keySerializer(Serializer.LONG).
                                     valueSerializer(Serializer.STRING).createOrOpen();
@@ -137,7 +138,9 @@ public class GfaParser extends Observable implements Runnable {
         childWriter.flush();
         childWriter.close();
         db.commit();
-        prefs.putBoolean(partPath, true);
+        properties.updateProperties();
+        properties.setProperty(partPath, "true");
+        properties.saveProperties();
     }
 
     private int[] read(boolean isParent) throws IOException {
@@ -151,7 +154,9 @@ public class GfaParser extends Observable implements Runnable {
                         + System.getProperty("file.separator") + partPath + additionToPath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String []strNums = br.readLine().split(",");
-        int size = prefs.getInt(partPath + "childArray.txtsize", -1);
+        //TODO actually put this in preferences file.
+        //int size = Integer.parseInt(properties.getProperty(partPath + "childArray.txtsize", "-1"));
+        int size = Integer.MAX_VALUE / 1000;
         if (size == -1) {
             throw new java.lang.RuntimeException("Size not in preferences file");
         }
