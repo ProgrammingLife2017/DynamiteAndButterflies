@@ -6,10 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.prefs.Preferences;
+import java.io.*;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -41,7 +38,7 @@ public class App extends Application {
 
     private static Stage stage;
     private static AnchorPane pane;
-    private static Preferences prefs = Preferences.userRoot();
+    private static JipProps properties;
     private static FXMLLoader loader;
 
     /**
@@ -52,6 +49,18 @@ public class App extends Application {
     public static FXMLLoader loadScene(String path) {
 
         try {
+            properties = new JipProps();
+            try {
+                FileReader fileReader = new FileReader("properties.txt");
+                properties.load(fileReader);
+                fileReader.close();
+            } catch (FileNotFoundException e) {
+                System.out.println("Making the properties.txt file");
+                FileWriter fileWriter = new FileWriter("properties.txt");
+                properties.store(fileWriter, "Property files for Dynamite and Butterflies");
+                fileWriter.close();
+            }
+
             // Load the anchor pane
             loader = new FXMLLoader();
             loader.setLocation(App.class.getResource(path));
@@ -76,9 +85,14 @@ public class App extends Application {
 
     @Override
     public void stop() {
-        String stringOfFile = prefs.get("file", "def");
-        int numOfBookmarks = prefs.getInt("bookmarkNum" + stringOfFile, -1);
-        prefs.putInt("bookmarkNum" + stringOfFile, numOfBookmarks);
+        properties.updateProperties();
+
+        String stringOfFile = properties.getProperty("file", "def");
+        int numOfBookmarks = Integer.parseInt(properties.getProperty("bookmarkNum" + stringOfFile, "-1"));
+        properties.setProperty("bookmarkNum" + stringOfFile, Integer.toString(numOfBookmarks));
+
+        properties.saveProperties();
+
         MenuController controller = loader.getController();
         if (controller.getSequenceHashMap() != null) {
             controller.getSequenceHashMap().close();

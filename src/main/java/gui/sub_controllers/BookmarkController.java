@@ -1,8 +1,8 @@
 package gui.sub_controllers;
 
+import gui.JipProps;
 import javafx.scene.control.MenuItem;
 
-import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
 /**
@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  */
 public class BookmarkController {
 
-    private static Preferences prefs = Preferences.userRoot();
+    private static JipProps properties;
     private String stringFile;
     private final MenuItem bookmark1, bookmark2, bookmark3;
     private static final String BOOKMARK_SAVE = "bookmarkNum";
@@ -31,22 +31,26 @@ public class BookmarkController {
         bookmark3 = bm3;
 
         stringFile = "";
+        properties = new JipProps();
     }
 
     /**
      * Loads the bookmarks of the specific file stringFile.
      *
-     * @param stringOfFile The file that is being
+     * @param filePath The file that is being
      *                     loaded whose bookmarks should be loaded.
      */
-    public void loadBookmarks(String stringOfFile) {
-        stringFile = stringOfFile;
+    public void loadBookmarks(String filePath) {
+        properties.updateProperties();
+        stringFile = filePath;
 
-        if (prefs.getInt(BOOKMARK_SAVE + stringFile, -1) == -1) {
-            prefs.putInt(BOOKMARK_SAVE + stringFile, 0);
+        if (properties.getProperty(BOOKMARK_SAVE + stringFile, "non").equals("non")) {
+            properties.setProperty(BOOKMARK_SAVE + stringFile, "0");
+            properties.saveProperties();
         }
 
-        int largestIndex = prefs.getInt(BOOKMARK_SAVE + stringFile, -1);
+        int largestIndex = Integer.parseInt(properties.getProperty(BOOKMARK_SAVE + stringFile, "-1"));
+
         //As a user,
         // When viewing a file with bookmarks,
         // And choosing a new file to view
@@ -54,7 +58,7 @@ public class BookmarkController {
         // I want to not see the old bookmarks.
         // Initializing this number as -2 ensures the above user story.
         for (int i = -2; i <= largestIndex; i++) { //TODO magic number
-            String realBM = prefs.get(stringFile + i, "-");
+            String realBM = properties.getProperty(stringFile + i, "-");
             String checkedString = checkBookmark(realBM);
             updateBookmarks(checkedString);
         }
@@ -80,14 +84,18 @@ public class BookmarkController {
      * @param radius The radius of nodes we should save/show
      */
     public void saving(String note, String nodes, String radius) {
+        properties.updateProperties();
 
-        String stringFile = prefs.get("file", "def");
+        String filePath = properties.getProperty("file", "def");
         String bookmark = note + " - " + nodes + " - " + radius;
 
-        int newIndex = prefs.getInt(BOOKMARK_SAVE + stringFile, -1);
+        int newIndex = Integer.parseInt(properties.getProperty(BOOKMARK_SAVE + filePath, "-1"));
         newIndex++;
-        prefs.put(stringFile + newIndex, bookmark);
-        prefs.putInt(BOOKMARK_SAVE + stringFile, newIndex);
+
+        properties.setProperty(filePath + newIndex, bookmark);
+        properties.setProperty(BOOKMARK_SAVE + filePath, Integer.toString(newIndex));
+
+        properties.saveProperties();
 
         assert (bookmark.equals(checkBookmark(bookmark)));
         updateBookmarks(bookmark);
