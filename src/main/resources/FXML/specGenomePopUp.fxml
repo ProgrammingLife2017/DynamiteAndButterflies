@@ -15,7 +15,7 @@
             <TableColumn prefWidth="75.0" text="Highlight" />
         </columns>
       </TableView>
-      <Label fx:id="table" layoutX="208.0" layoutY="14.0" prefHeight="30.0" prefWidth="390.0" text="Choose a specific Genome to view" textAlignment="CENTER" AnchorPane.bottomAnchor="365.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+      <Label layoutX="208.0" layoutY="14.0" prefHeight="30.0" prefWidth="390.0" text="Choose a specific Genome to view" textAlignment="CENTER" AnchorPane.bottomAnchor="365.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
          <font>
             <Font size="22.0" />
          </font>
