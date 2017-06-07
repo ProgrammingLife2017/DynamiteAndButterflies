@@ -81,7 +81,6 @@ public class RecentController {
                 break;
             default: throw new UnsupportedOperationException();
         }
-        System.out.println("JE BENT NU HIER BABY");
         properties.saveProperties();
     }
 

@@ -13,10 +13,12 @@ import java.util.regex.Pattern;
 public class BookmarkController {
 
     private static JipProps properties;
-    private String stringFile;
     private final MenuItem bookmark1, bookmark2, bookmark3;
-    private static final String BOOKMARK_SAVE = "bookmarkNum";
     private static final String BOOKMARK_REGEX = "\\w.*\\s-\\s\\d+\\s+-\\s\\d+";
+    private static final String EMPTY = "-";
+    private static final String FILE_BOOKMARK3 = "thirdBookmarkOf";
+    private static final String FILE_BOOKMARK2 = "secondBookmarkOf";
+    private static final String FILE_BOOKMARK1 = "firstBookmarkOf ";
 
     /**
      * Constructor of the bookmark controller to handle the bookmarks.
@@ -30,38 +32,7 @@ public class BookmarkController {
         bookmark2 = bm2;
         bookmark3 = bm3;
 
-        stringFile = "";
         properties = new JipProps();
-    }
-
-    /**
-     * Loads the bookmarks of the specific file stringFile.
-     *
-     * @param filePath The file that is being
-     *                     loaded whose bookmarks should be loaded.
-     */
-    public void loadBookmarks(String filePath) {
-        properties.updateProperties();
-        stringFile = filePath;
-
-        if (properties.getProperty(BOOKMARK_SAVE + stringFile, "non").equals("non")) {
-            properties.setProperty(BOOKMARK_SAVE + stringFile, "0");
-            properties.saveProperties();
-        }
-
-        int largestIndex = Integer.parseInt(properties.getProperty(BOOKMARK_SAVE + stringFile, "-1"));
-
-        //As a user,
-        // When viewing a file with bookmarks,
-        // And choosing a new file to view
-        // And that file has no bookmarks
-        // I want to not see the old bookmarks.
-        // Initializing this number as -2 ensures the above user story.
-        for (int i = -2; i <= largestIndex; i++) { //TODO magic number
-            String realBM = properties.getProperty(stringFile + i, "-");
-            String checkedString = checkBookmark(realBM);
-            updateBookmarks(checkedString);
-        }
     }
 
     /**
@@ -89,16 +60,8 @@ public class BookmarkController {
         String filePath = properties.getProperty("file", "def");
         String bookmark = note + " - " + nodes + " - " + radius;
 
-        int newIndex = Integer.parseInt(properties.getProperty(BOOKMARK_SAVE + filePath, "-1"));
-        newIndex++;
-
-        properties.setProperty(filePath + newIndex, bookmark);
-        properties.setProperty(BOOKMARK_SAVE + filePath, Integer.toString(newIndex));
-
-        properties.saveProperties();
-
         assert (bookmark.equals(checkBookmark(bookmark)));
-        updateBookmarks(bookmark);
+        updateBookmarks(bookmark, filePath);
     }
 
     /**
@@ -106,12 +69,37 @@ public class BookmarkController {
      *
      * @param newBookmark The string that should be added.
      */
-    private void updateBookmarks(String newBookmark) {
-        //TODO Add more visuals to this update
-        //Is this still neccesary? Maybe a confirmation message.
+    private void updateBookmarks(String newBookmark, String filePath) {
+        properties.updateProperties();
+
+        properties.setProperty(FILE_BOOKMARK3 + filePath, bookmark2.getText());
+        properties.setProperty(FILE_BOOKMARK2 + filePath, bookmark1.getText());
+        properties.setProperty(FILE_BOOKMARK1 + filePath, newBookmark);
+
+        properties.saveProperties();
 
         bookmark3.setText(bookmark2.getText());
         bookmark2.setText(bookmark1.getText());
         bookmark1.setText(newBookmark);
+    }
+
+    /**
+     * Loads the bookmarks of the specific file filePath.
+     *
+     * @param filePath The file that is being
+     *                     loaded whose bookmarks should be loaded.
+     */
+    public void initialize(String filePath) {
+        properties.updateProperties();
+        properties.setProperty(FILE_BOOKMARK3 + filePath,
+                                properties.getProperty(FILE_BOOKMARK3 + filePath, EMPTY));
+        properties.setProperty(FILE_BOOKMARK2 + filePath,
+                                properties.getProperty(FILE_BOOKMARK2 + filePath, EMPTY));
+        properties.setProperty(FILE_BOOKMARK1 + filePath,
+                                properties.getProperty(FILE_BOOKMARK1 + filePath, EMPTY));
+
+        bookmark3.setText(properties.getProperty(FILE_BOOKMARK3 + filePath, EMPTY));
+        bookmark2.setText(properties.getProperty(FILE_BOOKMARK2 + filePath, EMPTY));
+        bookmark1.setText(properties.getProperty(FILE_BOOKMARK1 + filePath, EMPTY));
     }
 }

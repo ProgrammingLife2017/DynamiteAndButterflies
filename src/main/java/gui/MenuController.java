@@ -118,6 +118,7 @@ public class MenuController implements Observer {
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
      * can be selected and directly be visualised on the screen.
+     * @param filePath the file that should be opened
      * @throws IOException if there is no file specified.
      * @throws InterruptedException Exception when the Thread is interrupted.
      */
@@ -327,7 +328,7 @@ public class MenuController implements Observer {
                         String[] parts = title.split(split);
                         String offTitle = parts[0];
                         stage.setTitle(offTitle + split + filePath);
-                        bookmarkController.loadBookmarks(filePath);
+                        bookmarkController.initialize(filePath);
                         panningController = new PanningController(scrollbar, fileController.getDrawer());
                         zoomController = new ZoomController(fileController.getGraph(), fileController.getDrawer(), panningController,
                                 nodeTextField, radiusTextField);
