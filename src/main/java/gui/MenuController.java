@@ -70,7 +70,7 @@ public class MenuController implements Observer {
 
     private PrintStream ps;
     private GraphicsContext gc;
-    private JipProps properties;
+    private CustomProperties properties;
     private BookmarkController bookmarkController;
     private FileController fileController;
     private ZoomController zoomController;
@@ -88,7 +88,7 @@ public class MenuController implements Observer {
         canvas.widthProperty().bind(canvasPanel.widthProperty());
         canvas.heightProperty().bind(canvasPanel.heightProperty());
         gc = canvas.getGraphicsContext2D();
-        properties = new JipProps();
+        properties = new CustomProperties();
 
         fileController = new FileController(new ProgressBarController(progressBar));
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
@@ -230,6 +230,9 @@ public class MenuController implements Observer {
         infoController.updateSeqLabel(newString);
     }
 
+    /**
+     * Pressed the bookmark1 menuItem.
+     */
     @FXML
     public void pressNewBookmark1() {
         bookmarked(bookmark1);
@@ -333,9 +336,11 @@ public class MenuController implements Observer {
                         String offTitle = parts[0];
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
-                        panningController = new PanningController(scrollbar, fileController.getDrawer());
-                        zoomController = new ZoomController(fileController.getGraph(), fileController.getDrawer(), panningController,
-                                nodeTextField, radiusTextField);
+                        panningController =
+                                new PanningController(scrollbar, fileController.getDrawer());
+                        zoomController = new ZoomController(fileController.getGraph(),
+                                    fileController.getDrawer(), panningController,
+                                    nodeTextField, radiusTextField);
                         displayInfo(fileController.getGraph());
                     }
                 });

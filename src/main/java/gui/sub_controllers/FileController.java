@@ -4,7 +4,6 @@ import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.GraphDrawer;
 import gui.MenuController;
-import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -13,7 +12,11 @@ import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Observer;
+import java.util.Observable;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
@@ -109,8 +112,9 @@ public class FileController implements Observer {
         partPath = partPaths[partPaths.length - 1];
         if (!prefs.getBoolean(partPath, true)) {
             popUpController = new PopUpController();
-                    String message = "Database File is corrupt, press 'Reload' to reload the file," + "\n"
-                            + "or press 'Resume' to recover the data still available.";
+                    String message = "Database File is corrupt,"
+                                + " press 'Reload' to reload the file," + "\n"
+                                + "or press 'Resume' to recover the data still available.";
             popUpController.loadDbCorruptPopUp(partPath, message);
         }
         if (this.parseThread != null) {
@@ -128,7 +132,7 @@ public class FileController implements Observer {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             SequenceNode node = (SequenceNode) pair.getValue();
-            if(!node.isDummy()) {
+            if (!node.isDummy()) {
                 node.setSequenceLength(sequenceHashMap.get((long) node.getId()).length());
             }
         }
@@ -161,7 +165,7 @@ public class FileController implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof GfaParser) {
-            if(arg instanceof Integer) {
+            if (arg instanceof Integer) {
                 try {
                     childArray = parser.getChildArray();
                     parentArray = parser.getParentArray();
@@ -178,7 +182,6 @@ public class FileController implements Observer {
             }
         }
     }
-
 
     /**
      * Gets the fileName from the filePath.

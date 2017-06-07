@@ -1,6 +1,6 @@
 package gui.sub_controllers;
 
-import gui.JipProps;
+import gui.CustomProperties;
 import javafx.scene.control.MenuItem;
 
 import java.util.regex.Pattern;
@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  */
 public class BookmarkController {
 
-    private static JipProps properties;
+    private CustomProperties properties;
     private final MenuItem bookmark1, bookmark2, bookmark3;
     private static final String BOOKMARK_REGEX = "\\w.*\\s-\\s\\d+\\s+-\\s\\d+";
     private static final String EMPTY = "-";
@@ -32,7 +32,7 @@ public class BookmarkController {
         bookmark2 = bm2;
         bookmark3 = bm3;
 
-        properties = new JipProps();
+        properties = new CustomProperties();
     }
 
     /**

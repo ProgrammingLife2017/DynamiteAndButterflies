@@ -1,6 +1,6 @@
 package gui.sub_controllers;
 
-import gui.JipProps;
+import gui.CustomProperties;
 import javafx.scene.control.MenuItem;
 
 /**
@@ -16,7 +16,7 @@ public class RecentController {
     private String filePref2 = "file2";
     private String filePref3 = "file3";
 
-    private JipProps properties;
+    private CustomProperties properties;
     private static final String EMPTY = "<No recent file>";
 
     /**
@@ -31,7 +31,7 @@ public class RecentController {
         file2 = filebut2;
         file3 = filebut3;
 
-        properties = new JipProps();
+        properties = new CustomProperties();
         this.initialize();
         properties.saveProperties();
     }
