@@ -97,7 +97,6 @@ public class SequenceNode {
      * Check if a click event is within the borders of this node.
      *
      * @param xEvent x coordinate of the click event
-     * @param yEvent y coordinate of the click event
      * @return True if the coordinates of the click event are within borders, false otherwise.
      */
     public boolean checkClickX(double xEvent) {
