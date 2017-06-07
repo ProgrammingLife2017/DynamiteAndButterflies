@@ -156,7 +156,7 @@ public class SequenceGraph {
     }
 
     /**
-     * Helper function for addDummy()
+     * Helper function for addDummy().
      *
      * @param span   - the difference in layer level of parent and child
      * @param parent - the parent node

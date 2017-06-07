@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.prefs.Preferences;
-import java.util.regex.Pattern;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -72,7 +70,7 @@ public class MenuController implements Observer {
 
     private PrintStream ps;
     private GraphicsContext gc;
-    private Preferences prefs;
+    private CustomProperties properties;
     private BookmarkController bookmarkController;
     private FileController fileController;
     private ZoomController zoomController;
@@ -90,14 +88,13 @@ public class MenuController implements Observer {
         canvas.widthProperty().bind(canvasPanel.widthProperty());
         canvas.heightProperty().bind(canvasPanel.heightProperty());
         gc = canvas.getGraphicsContext2D();
-        prefs = Preferences.userRoot();
+        properties = new CustomProperties();
 
         fileController = new FileController(new ProgressBarController(progressBar));
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
 
-        recentController.initialize();
         ps = new PrintStream(new Console(consoleArea));
         //System.setErr(ps);
         //System.setOut(ps);
@@ -121,6 +118,7 @@ public class MenuController implements Observer {
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
      * can be selected and directly be visualised on the screen.
+     * @param filePath the file that should be opened
      * @throws IOException if there is no file specified.
      * @throws InterruptedException Exception when the Thread is interrupted.
      */
@@ -232,6 +230,9 @@ public class MenuController implements Observer {
         infoController.updateSeqLabel(newString);
     }
 
+    /**
+     * Pressed the bookmark1 menuItem.
+     */
     @FXML
     public void pressNewBookmark1() {
         bookmarked(bookmark1);
@@ -321,10 +322,11 @@ public class MenuController implements Observer {
         if (o instanceof GfaParser) {
             if (arg instanceof String) {
                 filePath = (String) arg;
-                String pattern = Pattern.quote(System.getProperty("file.separator"));
-                String[] partPaths = filePath.split(pattern);
-                final String partPath = partPaths[partPaths.length - 1];
-                prefs.put("file", partPath);
+
+                properties.updateProperties();
+                properties.setProperty("file", filePath);
+                properties.saveProperties();
+
                 Platform.runLater(new Runnable() {
                     public void run() {
                         Stage stage = App.getStage();
@@ -333,10 +335,12 @@ public class MenuController implements Observer {
                         String[] parts = title.split(split);
                         String offTitle = parts[0];
                         stage.setTitle(offTitle + split + filePath);
-                        bookmarkController.loadBookmarks(partPath);
-                        panningController = new PanningController(scrollbar, fileController.getDrawer());
-                        zoomController = new ZoomController(fileController.getGraph(), fileController.getDrawer(), panningController,
-                                nodeTextField, radiusTextField);
+                        bookmarkController.initialize(filePath);
+                        panningController =
+                                new PanningController(scrollbar, fileController.getDrawer());
+                        zoomController = new ZoomController(fileController.getGraph(),
+                                    fileController.getDrawer(), panningController,
+                                    nodeTextField, radiusTextField);
                         displayInfo(fileController.getGraph());
                     }
                 });

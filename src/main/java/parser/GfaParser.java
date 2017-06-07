@@ -1,23 +1,15 @@
 package parser;
 
-import gui.sub_controllers.PopUpController;
-import javafx.application.Platform;
+import gui.CustomProperties;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
 import java.io.*;
-import java.nio.Buffer;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Observable;
-import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
-
-import static java.lang.Math.toIntExact;
 
 /**
  * This class contains a parser to parse a .gfa file into our data structure.
@@ -28,7 +20,7 @@ public class GfaParser extends Observable implements Runnable {
     private HTreeMap<Long, String> sequenceMap;
     private String filePath;
     private String partPath;
-    private Preferences prefs;
+    private CustomProperties properties = new CustomProperties();
 
 
     private DB db;
@@ -66,7 +58,7 @@ public class GfaParser extends Observable implements Runnable {
      */
     @SuppressWarnings("Since15")
     private synchronized void parseGraph(String filePath) throws IOException {
-        prefs = Preferences.userRoot();
+        properties.updateProperties();
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         partPath = partPaths[partPaths.length - 1];
@@ -78,7 +70,8 @@ public class GfaParser extends Observable implements Runnable {
                             keySerializer(Serializer.LONG).
                             valueSerializer(Serializer.STRING).createOrOpen();
         } else {
-            prefs.putBoolean(partPath, false);
+            properties.setProperty(partPath, "false");
+            properties.saveProperties();
             sequenceMap = db.hashMap(partPath + ".sequence.db").
                                     keySerializer(Serializer.LONG).
                                     valueSerializer(Serializer.STRING).createOrOpen();
@@ -105,8 +98,10 @@ public class GfaParser extends Observable implements Runnable {
      */
     @SuppressWarnings("Since15")
     private synchronized void parseSpecific(String filePath) throws IOException {
-        BufferedWriter parentWriter = new BufferedWriter(new FileWriter(partPath + "parentArray.txt"));
-        BufferedWriter childWriter = new BufferedWriter(new FileWriter(partPath + "childArray.txt"));
+        BufferedWriter parentWriter =
+                new BufferedWriter(new FileWriter(partPath + "parentArray.txt"));
+        BufferedWriter childWriter =
+                new BufferedWriter(new FileWriter(partPath + "childArray.txt"));
 
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
@@ -123,6 +118,7 @@ public class GfaParser extends Observable implements Runnable {
             br.close();
         }
         header2 = line.split("H")[1];
+        int sizeOfFile = 0;
         while ((line = br.readLine()) != null) {
             if (line.startsWith("S")) {
                 String[] data = line.split(("\t"));
@@ -134,6 +130,7 @@ public class GfaParser extends Observable implements Runnable {
                 int childId = Integer.parseInt(edgeDataString[3]);
                parentWriter.write(parentId + ",");
                childWriter.write(childId + ",");
+               sizeOfFile++;
             }
         }
         in.close();
@@ -143,7 +140,10 @@ public class GfaParser extends Observable implements Runnable {
         childWriter.flush();
         childWriter.close();
         db.commit();
-        prefs.putBoolean(partPath, true);
+        properties.updateProperties();
+        properties.setProperty(partPath + "childArray.txtsize", Integer.toString(sizeOfFile));
+        properties.setProperty(partPath, "true");
+        properties.saveProperties();
     }
 
     private int[] read(boolean isParent) throws IOException {
@@ -153,16 +153,17 @@ public class GfaParser extends Observable implements Runnable {
         } else {
             additionToPath = "childArray.txt";
         }
-        InputStream in = new FileInputStream(System.getProperty("user.dir")+ System.getProperty("file.separator") + partPath + additionToPath);
+        InputStream in = new FileInputStream(System.getProperty("user.dir")
+                        + System.getProperty("file.separator") + partPath + additionToPath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-        String []StrNums = br.readLine().split(",");
-        int size = prefs.getInt(partPath+"childArray.txtsize", -1);
+        String []strNums = br.readLine().split(",");
+        int size = Integer.parseInt(properties.getProperty(partPath + "childArray.txtsize", "-1"));
         if (size == -1) {
             throw new java.lang.RuntimeException("Size not in preferences file");
         }
         int [] nodeArray = new int[size];
-        for (int i=0; i < StrNums.length; i++) {
-            nodeArray[i] = Integer.parseInt(StrNums[i]);
+        for (int i = 0; i < strNums.length; i++) {
+            nodeArray[i] = Integer.parseInt(strNums[i]);
 
         }
         return nodeArray;
