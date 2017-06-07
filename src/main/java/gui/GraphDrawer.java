@@ -96,6 +96,7 @@ public class GraphDrawer {
         gc.setFill(Color.BLUE);
         this.xDifference = xDifference;
         this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
+        setLineWidth();
         drawNodes();
         drawEdges();
     }
@@ -143,7 +144,6 @@ public class GraphDrawer {
     }
 
     private void drawEdges() {
-        setLineWidth();
         Iterator it = graph.getNodes().entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
