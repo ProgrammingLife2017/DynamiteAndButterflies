@@ -32,14 +32,12 @@ public class SequenceGraph {
      * @param parentArray Array with all the parentID's.
      * @param childArray Array with all the childID's, combined with parentArray is all edges.
      */
-    public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray) {
+    public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray, int[] ids) {
         int centerNodeIndex = findCenterNodeIndex(centerNodeID, parentArray);
         int lastNodeIndex = range + centerNodeID;
         if (centerNodeIndex + range >= parentArray.length) {
             lastNodeIndex = parentArray.length - 1;
         }
-
-
         for (int i = centerNodeIndex; i <= lastNodeIndex; i++) {
             int parentID = parentArray[i];
             int childID = childArray[i];
