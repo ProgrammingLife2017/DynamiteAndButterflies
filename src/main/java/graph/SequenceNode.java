@@ -14,6 +14,7 @@ public class SequenceNode {
     private static final int ARC_SIZE = 10;
 
     private int id;
+    private int[] genomes;
     private int index;
     private int column;
     private int sequenceLength;
@@ -25,6 +26,7 @@ public class SequenceNode {
     private boolean isDummy;
     private float baryCenterValue;
     private int inDegree;
+    private boolean selected;
 
 
     private ArrayList<Integer> children;
@@ -35,8 +37,9 @@ public class SequenceNode {
      * Constructor for the sequenceNode.
      * @param id The id of the node.
      */
-    SequenceNode(int id) {
+    SequenceNode(int id, int[] genomesArg) {
         this.id = id;
+        this.genomes = genomesArg;
         this.index = 0;
         this.column = 0;
         this.inDegree = 0;
@@ -44,6 +47,7 @@ public class SequenceNode {
         this.parents = new ArrayList<Integer>();
         this.children = new ArrayList<Integer>();
         this.isDummy = false;
+        this.selected = false;
     }
 
     /**
@@ -79,7 +83,11 @@ public class SequenceNode {
      * black for dummy nodes and blue for sequence nodes.
      * @param gc The grapicsContext of the screen.
      */
-    public void draw(GraphicsContext gc) {
+    public void draw(GraphicsContext gc, int selectedGenome) {
+        if (contains(genomes, selectedGenome)) {
+            selected = true;
+        }
+        //Waarom doen we dit?
         gc.clearRect(xCoordinate, yCoordinate, width, height);
         if (highlighted) {
             gc.setFill(Color.ORANGE);
@@ -87,10 +95,23 @@ public class SequenceNode {
             gc.strokeLine(xCoordinate, yCoordinate + height / 2,
                     xCoordinate + width, yCoordinate + height / 2);
             return;
+        } else if (selected) {
+            gc.setFill(Color.RED);
         } else {
             gc.setFill(Color.BLUE);
         }
+
+
         gc.fillRoundRect(xCoordinate, yCoordinate, width, height, ARC_SIZE, ARC_SIZE);
+    }
+
+    private boolean contains(int[] genomes, int selectedGenome) {
+        for (int curGenome : genomes) {
+            if (curGenome == selectedGenome) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -4,6 +4,7 @@ import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.*;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,6 +23,7 @@ import parser.GfaParser;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -396,5 +398,21 @@ public class MenuController implements Observer {
                 e.printStackTrace();
             }
         }
+    }
+
+    @FXML
+    public void chooseGenomePress(ActionEvent actionEvent) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/specGenomePopUp.fxml"));
+        Stage stage;
+        Parent root = loader.load();
+        specGenomeChooserController controller = loader.<specGenomeChooserController>getController();
+        HashMap<Integer, String> hash = new HashMap<Integer, String>();
+        controller.initialize(hash);
+
+        stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Choose a specific genome to view");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
     }
 }
