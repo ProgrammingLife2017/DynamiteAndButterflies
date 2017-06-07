@@ -78,8 +78,8 @@ public class ZoomController {
      * Displays the centre node and radius of the current view.
      */
     public void displayInfo() {
-        nodeTextField.setText(drawer.getRealCentreNode().getId() + "");
-        radiusTextField.setText((int) Math.ceil(drawer.getRadius()) + "");
+        //nodeTextField.setText(drawer.getRealCentreNode().getId() + "");
+        //radiusTextField.setText((int) Math.ceil(drawer.getRadius()) + "");
     }
 
     /**
