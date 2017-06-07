@@ -118,6 +118,7 @@ public class GfaParser extends Observable implements Runnable {
             br.close();
         }
         header2 = line.split("H")[1];
+        int sizeOfFile = 0;
         while ((line = br.readLine()) != null) {
             if (line.startsWith("S")) {
                 String[] data = line.split(("\t"));
@@ -129,6 +130,7 @@ public class GfaParser extends Observable implements Runnable {
                 int childId = Integer.parseInt(edgeDataString[3]);
                parentWriter.write(parentId + ",");
                childWriter.write(childId + ",");
+               sizeOfFile++;
             }
         }
         in.close();
@@ -139,6 +141,7 @@ public class GfaParser extends Observable implements Runnable {
         childWriter.close();
         db.commit();
         properties.updateProperties();
+        properties.setProperty(partPath + "childArray.txtsize", Integer.toString(sizeOfFile));
         properties.setProperty(partPath, "true");
         properties.saveProperties();
     }
@@ -154,9 +157,7 @@ public class GfaParser extends Observable implements Runnable {
                         + System.getProperty("file.separator") + partPath + additionToPath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String []strNums = br.readLine().split(",");
-        //TODO actually put this in preferences file.
-        //int size = Integer.parseInt(properties.getProperty(partPath + "childArray.txtsize", "-1"));
-        int size = Integer.MAX_VALUE / 1000;
+        int size = Integer.parseInt(properties.getProperty(partPath + "childArray.txtsize", "-1"));
         if (size == -1) {
             throw new java.lang.RuntimeException("Size not in preferences file");
         }
