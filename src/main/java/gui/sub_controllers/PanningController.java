@@ -47,17 +47,10 @@ public class PanningController {
     }
 
     /**
-     * Change the scrollbar value and visible amount when zooming with the buttons.
-     */
-    public void setScrollbarSize() {
-        setScrollbarSize((int) (scrollbar.getValue()));
-    }
-
-    /**
      * Change the scrollbar value and visible amount when zooming in by scrolling.
      * @param column Column that is the centre of the zooming.
      */
-    public void setScrollbarSize(int column) {
+    public void setScrollbarSize(double column) {
         active = false;
         scrollbar.setValue(column);
         scrollbar.setVisibleAmount(drawer.getZoomLevel());

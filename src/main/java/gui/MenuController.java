@@ -138,7 +138,9 @@ public class MenuController implements Observer {
      */
     @FXML
     public void zoomInClicked() throws IOException {
-        zoomController.zoomIn();
+        double xCentre = canvas.getWidth() / 2;
+        zoomController.zoomIn(fileController.getDrawer().mouseLocationColumn(xCentre));
+        nodeTextField.setText(fileController.getDrawer().findColumn(xCentre) + "");
     }
 
     /**
@@ -147,7 +149,9 @@ public class MenuController implements Observer {
      */
     @FXML
     public void zoomOutClicked() throws IOException {
-        zoomController.zoomOut();
+        double xCentre = canvas.getWidth() / 2;
+        zoomController.zoomOut(fileController.getDrawer().mouseLocationColumn(xCentre));
+        nodeTextField.setText(fileController.getDrawer().findColumn(xCentre) + "");
     }
 
     /**

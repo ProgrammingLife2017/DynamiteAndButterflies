@@ -40,23 +40,6 @@ public class ZoomController {
     }
 
     /**
-     * ZoomIn.
-     * @throws IOException exception.
-     */
-    public void zoomIn() {
-        if (nodeTextField.getText().equals("")) {
-            drawer.zoom(BUTTON_ZOOM_IN_FACTOR,
-                    drawer.getRealCentreNode().getColumn());
-            panningController.setScrollbarSize();
-        } else {
-            drawer.zoom(BUTTON_ZOOM_IN_FACTOR,
-                    drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
-            panningController.setScrollbarSize();
-        }
-        updateRadius((int) Math.ceil(drawer.getRadius()) + "");
-    }
-
-    /**
      * Zooms in.
      * @param column the column to zoom in on.
      * @throws IOException thrown if can't find
@@ -64,23 +47,6 @@ public class ZoomController {
     public void zoomIn(int column) throws IOException {
         drawer.zoom(SCROLL_ZOOM_IN_FACTOR, column);
         panningController.setScrollbarSize(column);
-        updateRadius((int) Math.ceil(drawer.getRadius()) + "");
-    }
-
-    /**
-     * ZoomOut.
-     * @throws IOException exception.
-     */
-    public void zoomOut() throws IOException {
-        if (nodeTextField.getText().equals("")) {
-            drawer.zoom(BUTTON_ZOOM_OUT_FACTOR,
-                    drawer.getRealCentreNode().getColumn());
-            panningController.setScrollbarSize();
-        } else {
-            drawer.zoom(BUTTON_ZOOM_OUT_FACTOR,
-                    drawer.getColumnId(Integer.parseInt(nodeTextField.getText())));
-            panningController.setScrollbarSize();
-        }
         updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
 

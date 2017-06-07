@@ -16,5 +16,11 @@ Genome parser and visualisation
 When opening the current release for the first time, there might be some problems with the database files already on your computer. To fix this, please delete those files once (they can be found in the folder that also holds you .jar file).
 
 ## List of Known issues
-- Edges don't go properly through the dummy nodes yet.
+- When loading a second file, the first file sometimes glitches through the graph on zooming.
+- On mac the application doesn't work.
+- preferences aren't available on all computers, this will be avoided sometime in the future.
+- Sometimes the program gives the error: "Size not in preferences file". (GfaParser: 161).
+- When using the soom buttons (+/-) the graph shits left/right.
+- When selecting a node, the previous node stays flagged (orange), until you zoom/pan.
+- When going to a node, it is a bit off centre (to the right).
 - When switching to another centrenode, the dummy nodes sometimes lag.
