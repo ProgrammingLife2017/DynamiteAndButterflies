@@ -1,8 +1,5 @@
 package graph;
 
-import sun.awt.image.ImageWatched;
-
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -16,14 +13,20 @@ public class SequenceGraph {
 
     private HashMap<Integer, SequenceNode> nodes;
     private ArrayList<ArrayList<SequenceNode>> columns;
+    private int startNodeIndex;
+    private int endNodeIndex;
+    private int[] parentArray;
+    private int[] childArray;
 
     private int dummyNodeIDCounter;
 
     /**
      * The constructor initializes the SequenceGraph with it's basic values.
      */
-    public SequenceGraph() {
-        this.nodes = new HashMap<Integer, SequenceNode>();
+    public SequenceGraph(int[] parentArray, int[] childArray) {
+        this.parentArray = parentArray;
+        this.childArray = childArray;
+
     }
 
     public int size() {
@@ -31,14 +34,22 @@ public class SequenceGraph {
     }
 
     // upperbound in incorrect for TB10, the last node is not the highest one.
-    public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray) {
-        int centerNodeIndex = findCenterNodeIndex(centerNodeID, parentArray);
-        int lastNodeIndex = range + centerNodeID;
-        if (centerNodeIndex + range >= parentArray.length) {
-            lastNodeIndex = parentArray.length-1;
+    public void createSubGraph(int centerNodeID, int range) {
+        this.nodes = new HashMap<Integer, SequenceNode>();
+        this.columns = new ArrayList<ArrayList<SequenceNode>>();
+
+        startNodeIndex = findCenterNodeIndex(centerNodeID, parentArray);
+        endNodeIndex = range + centerNodeID;
+        if (startNodeIndex + range >= parentArray.length) {
+            endNodeIndex = parentArray.length - 1;
         }
+        initNodes(startNodeIndex, endNodeIndex);
+        findLongestPath(centerNodeID);
+        addDummies(startNodeIndex, endNodeIndex);
+        this.columns = initColumns();
+    }
 
-
+    private void initNodes(int centerNodeIndex, int lastNodeIndex) {
         for (int i = centerNodeIndex; i <= lastNodeIndex; i++) {
             int parentID = parentArray[i];
             int childID = childArray[i];
@@ -51,22 +62,15 @@ public class SequenceGraph {
             }
             if (nodes.get(childID) == null) {
                 SequenceNode node = new SequenceNode(childID);
+                node.addParent(parentID);
                 nodes.put(childID, node);
             }
         }
 
-        // order: longest path, column, dummy's,
-        // layerizeGraph(lowerBoundID);
-
-        this.getNode(centerNodeID).setColumn(0);
-        findLongestPath();
-        addDummies(parentArray, centerNodeIndex, lastNodeIndex);
-        this.columns = createColumnList();
-        createIndex();
-        baryCenterAssignment();
     }
 
-    private void findLongestPath() {
+    private void findLongestPath(int centerNodeID) {
+        this.getNode(centerNodeID).setColumn(0);
         for (Object o : this.getNodes().entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             SequenceNode currentNode = (SequenceNode) pair.getValue();
@@ -81,16 +85,16 @@ public class SequenceGraph {
         }
     }
 
-    private void baryCenterAssignment() {
-        for(int i = 1; i < columns.size(); i++) {
+    private void minimiseEdgeCrossings(ArrayList<ArrayList<SequenceNode>> columns) {
+        for (int i = 1; i < columns.size(); i++) {
             ArrayList<SequenceNode> previousColumn = columns.get(i - 1);
             ArrayList<SequenceNode> currentColumn = columns.get(i);
 
             // set amount of incoming edges for children and increase barycentervalue by index of parent
-            for (SequenceNode node: previousColumn) {
-                for(int child: node.getChildren()) {
+            for (SequenceNode node : previousColumn) {
+                for (int child : node.getChildren()) {
                     this.nodes.get(child).incrementInDegree();
-                    this.nodes.get(child).incrementBaryCenterValue(node.getIndex()+1);
+                    this.nodes.get(child).incrementBaryCenterValue(node.getIndex() + 1);
                 }
             }
 
@@ -114,7 +118,7 @@ public class SequenceGraph {
                 }
             });
 
-            for(int j = 0; j < currentColumn.size(); j++) {
+            for (int j = 0; j < currentColumn.size(); j++) {
                 currentColumn.get(j).setIndex(j);
                 this.nodes.get(currentColumn.get(j).getId()).setIndex(j);
             }
@@ -135,8 +139,7 @@ public class SequenceGraph {
     /**
      * Adds dummy nodes to the graph for visualisation purposes.
      */
-    private void addDummies(int[] parentArray,int centerNodeIndex,int lastNodeIndex) {
-
+    private void addDummies(int centerNodeIndex, int lastNodeIndex) {
         dummyNodeIDCounter = -1;
         for (int i = centerNodeIndex; i <= lastNodeIndex; i++) {
             SequenceNode parent = this.getNode(parentArray[i]);
@@ -175,6 +178,7 @@ public class SequenceGraph {
 
     /**
      * Getter for the column list.
+     *
      * @return the column arraylist with an arraylist with nodes.
      */
     public ArrayList<ArrayList<SequenceNode>> getColumns() {
@@ -184,6 +188,7 @@ public class SequenceGraph {
 
     /**
      * Add a node to the ArrayList of Nodes.
+     *
      * @param node The node to be added.
      */
     public void addNode(SequenceNode node) {
@@ -214,7 +219,7 @@ public class SequenceGraph {
     }
 
 
-    private ArrayList<ArrayList<SequenceNode>> createColumnList() {
+    private ArrayList<ArrayList<SequenceNode>> initColumns() {
         ArrayList<ArrayList<SequenceNode>> columns = new ArrayList<ArrayList<SequenceNode>>();
 
         for (Object o : nodes.entrySet()) {
@@ -225,19 +230,87 @@ public class SequenceGraph {
             }
             columns.get(node.getColumn()).add(node);
         }
+        createIndex(columns);
+        minimiseEdgeCrossings(columns);
         return columns;
     }
 
     /**
      * assigns indices to all nodes in the column list.
      */
-    private void createIndex() {
+    private void createIndex(ArrayList<ArrayList<SequenceNode>> columns) {
         for (ArrayList<SequenceNode> column : columns) {
             for (int j = 0; j < column.size(); j++) {
                 column.get(j).setIndex(j);
             }
         }
 
+    }
+
+
+    public SequenceGraph extendGraph(int range) {
+        int currentDummyNodeIndexCounter = this.getDummyNodeIDCounter();
+        int endNodeIndex = this.getEndNodeIndex();
+
+        SequenceGraph graphExtension = new SequenceGraph(this.parentArray, this.childArray);
+        graphExtension.setDummyNodeIDCounter(currentDummyNodeIndexCounter);
+        graphExtension.createSubGraph(endNodeIndex, range);
+
+
+        HashMap<Integer, SequenceNode> mapExtension = graphExtension.getNodes();
+        mergeNodeMaps(this, mapExtension);
+
+        int baseGraphHighestColumn = this.getColumns().size();
+
+        ArrayList<ArrayList<SequenceNode>> columnExtension = graphExtension.getColumns();
+        for (int i = 0; i < columnExtension.size(); i++) {
+            for (int j = 0; j < columnExtension.get(i).size(); j++) {
+                columnExtension.get(i).get(j).setColumn(baseGraphHighestColumn + i);
+            }
+        }
+
+        ArrayList<ArrayList<SequenceNode>> newColumnList = new ArrayList<ArrayList<SequenceNode>>(columns);
+        newColumnList.addAll(graphExtension.getColumns());
+        this.setColumns(newColumnList);
+
+        return this;
+    }
+
+    private void mergeNodeMaps(SequenceGraph graph, HashMap<Integer, SequenceNode> mapExtension) {
+        Iterator it = mapExtension.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            graph.addNode(node);
+        }
+    }
+
+    public int getDummyNodeIDCounter() {
+        return dummyNodeIDCounter;
+    }
+
+    public void setDummyNodeIDCounter(int dummyNodeIDCounter) {
+        this.dummyNodeIDCounter = dummyNodeIDCounter;
+    }
+
+    public void setColumns(ArrayList<ArrayList<SequenceNode>> columns) {
+        this.columns = columns;
+    }
+
+    public int[] getParentArray() {
+        return parentArray;
+    }
+
+    public int[] getChildArray() {
+        return childArray;
+    }
+
+    public int getStartNodeIndex() {
+        return startNodeIndex;
+    }
+
+    public int getEndNodeIndex() {
+        return endNodeIndex;
     }
 
 }

@@ -23,6 +23,7 @@ public class GraphDrawer {
     private static final double LINE_WIDTH_FACTOR = 4;
     private static final double Y_SIZE_FACTOR = 3;
     private static final double LOG_BASE = 2;
+    private double range;
 
     private int yBase;
     private double zoomLevel;
@@ -48,6 +49,7 @@ public class GraphDrawer {
         columns = graph.getColumns();
         columnWidths = new double[columns.size() + 1];
         initializeColumnWidths();
+        this.range = columnWidths[columns.size()];
         zoomLevel = columnWidths[columns.size()];
         radius = columns.size();
     }
@@ -317,5 +319,19 @@ public class GraphDrawer {
     public int mouseLocationColumn(double x) {
         return (int) ((x / stepSize) + xDifference);
     }
+
+    public double getRange() {
+        return range;
+    }
+
+
+    public void setGraph(SequenceGraph graph) {
+        this.graph = graph;
+    }
+
+    public SequenceGraph getGraph() {
+        return graph;
+    }
+
 }
 

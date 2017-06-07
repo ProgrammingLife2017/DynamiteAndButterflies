@@ -1,5 +1,6 @@
 package gui.sub_controllers;
 
+import graph.SequenceGraph;
 import gui.GraphDrawer;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -41,7 +42,14 @@ public class PanningController {
                 if (active) {
                     drawer.moveShapes(drawer.getxDifference()
                             + (newVal.doubleValue() - oldVal.doubleValue()));
+                    System.out.println("Right bound: " + (drawer.getxDifference() + drawer.getZoomLevel()) + "Range: " + drawer.getRange());
                 }
+                if (drawer.getxDifference() + drawer.getZoomLevel() > drawer.getRange()) {
+                    SequenceGraph graph = drawer.getGraph().extendGraph(100);
+                    drawer.setGraph(graph);
+                    drawer.initializeColumnWidths();
+                }
+
             }
         });
     }

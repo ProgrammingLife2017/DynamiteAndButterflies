@@ -28,7 +28,7 @@ public class FileController implements Observer {
     private File parDirectory;
     private ProgressBarController progressBarController;
 
-    private final int renderRange = 1000;
+    private final int renderRange = 1;
     private final int nodeId = 1;
 
     private Thread parseThread;
@@ -51,7 +51,7 @@ public class FileController implements Observer {
      * @param pbc The progressbar.
      */
     public FileController(ProgressBarController pbc) {
-        graph = new SequenceGraph();
+        graph = new SequenceGraph(parentArray, childArray);
         parDirectory = null;
         progressBarController = pbc;
         prefs = Preferences.userRoot();
@@ -160,7 +160,6 @@ public class FileController implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (o instanceof GfaParser) {
             if(arg instanceof Integer) {
                 try {
                     childArray = parser.getChildArray();
@@ -168,15 +167,14 @@ public class FileController implements Observer {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                graph = new SequenceGraph();
-                graph.createSubGraph(nodeId, renderRange, parentArray, childArray);
+                graph = new SequenceGraph(parentArray, childArray);
+                graph.createSubGraph(nodeId, renderRange);
                 sequenceHashMap = parser.getSequenceHashMap();
                 assignSequenceLenghts();
                 drawer = new GraphDrawer(graph, gc);
                 drawer.moveShapes(0.0);
                 progressBarController.done();
             }
-        }
     }
 
 
