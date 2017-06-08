@@ -87,7 +87,7 @@ public class GfaParser extends Observable implements Runnable {
     /**
      * Getter for the sequenceHashMap.
      * @return The HashMap.
-     */
+         */
     public synchronized HTreeMap<Long, String> getSequenceHashMap() {
         return sequenceMap;
     }
