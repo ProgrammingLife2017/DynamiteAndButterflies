@@ -336,5 +336,9 @@ public class GraphDrawer {
     public int mouseLocationColumn(double x) {
         return (int) ((x / stepSize) + xDifference);
     }
+
+    public SequenceGraph getGraph() {
+        return this.graph;
+    }
 }
 
