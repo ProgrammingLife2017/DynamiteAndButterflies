@@ -47,7 +47,7 @@ public class ZoomController {
      */
     public void zoomIn(int column) throws IOException {
         drawer.zoom(SCROLL_ZOOM_IN_FACTOR, column);
-        panningController.setScrollbarSize(column);
+        //panningController.setScrollbarSize(column);
         updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
 
@@ -58,7 +58,7 @@ public class ZoomController {
      */
     public void zoomOut(int column) throws IOException {
         drawer.zoom(SCROLL_ZOOM_OUT_FACTOR, column);
-        panningController.setScrollbarSize(column);
+        //panningController.setScrollbarSize(column);
         updateRadius((int) Math.ceil(drawer.getRadius()) + "");
     }
 
@@ -71,7 +71,7 @@ public class ZoomController {
         int column = graph.getNode(centreNode).getColumn();
         drawer.changeZoom(column, radius);
         drawer.highlight(centreNode);
-        panningController.setScrollbarSize(drawer.getColumnWidth(column));
+        //panningController.setScrollbarSize(drawer.getColumnWidth(column));
     }
 
     /**

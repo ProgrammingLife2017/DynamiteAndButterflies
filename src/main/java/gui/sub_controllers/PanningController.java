@@ -1,9 +1,17 @@
 package gui.sub_controllers;
 
 import gui.GraphDrawer;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.control.ScrollBar;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
+import javafx.util.Duration;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Jasper van Tilburg on 29-5-2017.
@@ -12,49 +20,75 @@ import javafx.scene.control.ScrollBar;
  */
 public class PanningController {
 
-    private final ScrollBar scrollbar;
-    private final GraphDrawer drawer;
-    private boolean active;
+    public static final double PANN_FACTOR = 0.01;
 
-    /**
-     * Constructor.
-     * @param scrollBar Scrollbar.
-     * @param drawer The graphdrawer.
-     */
-    public PanningController(ScrollBar scrollBar, GraphDrawer drawer) {
-        this.scrollbar = scrollBar;
+    private GraphDrawer drawer;
+    private Button rightPannButton;
+    private Button leftPannButton;
+    private Timeline timelineRight;
+    private Timeline timelineLeft;
+
+    public PanningController(GraphDrawer drawer, Button leftPannButton, Button rightPannButton) {
         this.drawer = drawer;
-        initialize();
+        this.leftPannButton = leftPannButton;
+        this.rightPannButton = rightPannButton;
+        initializeTimer();
+        initializeButtons();
     }
 
-    /**
-     * Initializes the scrollbar and adds a listener to it.
-     * The listener is only active when it is manually changed, not by zooming.
-     */
-    private void initialize() {
-        scrollbar.setMax(drawer.getZoomLevel());
-        scrollbar.setVisibleAmount(drawer.getZoomLevel());
-        scrollbar.setValue(scrollbar.getMax() / 2);
-        scrollbar.valueProperty().addListener(new ChangeListener<Number>() {
-            public void changed(ObservableValue<? extends Number> ov,
-                                Number oldVal, Number newVal) {
-                if (active) {
-                    drawer.moveShapes(drawer.getxDifference()
-                            + (newVal.doubleValue() - oldVal.doubleValue()));
-                }
+    public void initializeTimer() {
+        timelineRight = new Timeline(new KeyFrame(Duration.millis(10), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                pannRight();
+                System.out.println("test");
+            }
+        }));
+        timelineRight.setCycleCount(Animation.INDEFINITE);
+
+        timelineLeft = new Timeline(new KeyFrame(Duration.millis(10), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                pannLeft();
+            }
+        }));
+        timelineLeft.setCycleCount(Animation.INDEFINITE);
+    }
+
+    public void initializeButtons() {
+        rightPannButton.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                timelineRight.play();
+            }
+        });
+        rightPannButton.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                timelineRight.pause();
+            }
+        });
+
+        leftPannButton.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                timelineLeft.play();
+            }
+        });
+        leftPannButton.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                timelineLeft.pause();
             }
         });
     }
 
-    /**
-     * Change the scrollbar value and visible amount when zooming in by scrolling.
-     * @param column Column that is the centre of the zooming.
-     */
-    public void setScrollbarSize(double column) {
-        active = false;
-        scrollbar.setValue(column);
-        scrollbar.setVisibleAmount(drawer.getZoomLevel());
-        active = true;
+    public void pannRight() {
+        drawer.moveShapes(drawer.getxDifference() + drawer.getZoomLevel() * PANN_FACTOR);
+    }
+
+    public void pannLeft() {
+        drawer.moveShapes(drawer.getxDifference() - drawer.getZoomLevel() * PANN_FACTOR);
     }
 
 }

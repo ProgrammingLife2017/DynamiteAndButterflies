@@ -67,6 +67,10 @@ public class MenuController implements Observer {
     private TextArea consoleArea;
     @FXML
     private ScrollBar scrollbar;
+    @FXML
+    private Button rightPannButton;
+    @FXML
+    private Button leftPannButton;
 
     private PrintStream ps;
     private GraphicsContext gc;
@@ -337,7 +341,7 @@ public class MenuController implements Observer {
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
                         panningController =
-                                new PanningController(scrollbar, fileController.getDrawer());
+                                new PanningController(fileController.getDrawer(), leftPannButton, rightPannButton);
                         zoomController = new ZoomController(fileController.getGraph(),
                                     fileController.getDrawer(), panningController,
                                     nodeTextField, radiusTextField);
