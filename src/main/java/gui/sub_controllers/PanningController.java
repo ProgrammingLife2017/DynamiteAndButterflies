@@ -88,6 +88,7 @@ public class PanningController {
             drawer.getGraph().createSubGraph(1, drawer.getGraph().getEndNodeIndex() + 100);
             drawer.initGraph();
         }
+        //TODO check for left bound
         drawer.moveShapes(drawer.getxDifference() + drawer.getZoomLevel() * PANN_FACTOR);
     }
 
