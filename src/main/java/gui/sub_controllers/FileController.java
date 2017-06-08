@@ -26,13 +26,12 @@ import java.util.regex.Pattern;
  */
 public class FileController extends Observable implements Observer {
 
-    private SequenceGraph graph;
+
     private File parDirectory;
     private ProgressBarController progressBarController;
 
     private Thread parseThread;
 
-    private GraphicsContext gc;
 
 
     private String partPath;
@@ -46,7 +45,6 @@ public class FileController extends Observable implements Observer {
      * @param pbc The progressbar.
      */
     public FileController(ProgressBarController pbc) {
-        graph = new SequenceGraph();
         parDirectory = null;
         progressBarController = pbc;
 
@@ -85,15 +83,13 @@ public class FileController extends Observable implements Observer {
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa.
      * can be selected and directly be visualised on the screen.
-     * @param gc the graphicscontext we will use.
      * @param mC the MenuController so it can Observe.
      * @param filePath the filePath of the file.
      * @throws IOException exception if no file is found
      * @throws InterruptedException Exception if the Thread is interrupted.
      */
-    public void openFileClicked(GraphicsContext gc, String filePath, MenuController mC)
+    public void openFileClicked(String filePath, MenuController mC)
             throws IOException, InterruptedException {
-        this.gc = gc;
         GfaParser parser;
         if (DrawableCanvas.getInstance().getParser() != null) {
             parser = DrawableCanvas.getInstance().getParser();
@@ -126,20 +122,13 @@ public class FileController extends Observable implements Observer {
     }
 
 
-    /**
-     * Gets the graph.
-     * @return the graph.
-     */
-    public SequenceGraph getGraph() {
-        return graph;
-    }
-
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof GfaParser) {
             if (arg instanceof Integer) {
                 setChanged();
                 notifyObservers(0);
+                setChanged();
                 progressBarController.done();
             }
         }

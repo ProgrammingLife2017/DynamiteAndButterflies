@@ -112,7 +112,7 @@ public class MenuController implements Observer {
         File file = fileController.chooseFile(stage);
         String filePath = file.getAbsolutePath();
         recentController.update(filePath);
-        fileController.openFileClicked(gc, filePath, this);
+        fileController.openFileClicked(filePath, this);
     }
 
     /**
@@ -124,7 +124,7 @@ public class MenuController implements Observer {
      */
     @FXML
     public void openFileClicked(String filePath) throws IOException, InterruptedException {
-        fileController.openFileClicked(gc, filePath, this);
+        fileController.openFileClicked(filePath, this);
     }
 
     private void displayInfo(SequenceGraph graph) {
@@ -338,10 +338,10 @@ public class MenuController implements Observer {
                         bookmarkController.initialize(filePath);
                         panningController =
                                 new PanningController(scrollbar, GraphDrawer.getInstance());
-                        zoomController = new ZoomController(fileController.getGraph(),
+                        zoomController = new ZoomController(GraphDrawer.getInstance().getGraph(),
                                 GraphDrawer.getInstance(), panningController,
                                     nodeTextField, radiusTextField);
-                        displayInfo(fileController.getGraph());
+                        displayInfo(GraphDrawer.getInstance().getGraph());
                     }
                 });
             }
