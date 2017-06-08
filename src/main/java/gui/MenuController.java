@@ -87,6 +87,7 @@ public class MenuController implements Observer {
     public void initialize() {
         canvas.widthProperty().bind(canvasPanel.widthProperty());
         canvas.heightProperty().bind(canvasPanel.heightProperty());
+        GraphDrawer.getInstance().setCanvas(canvas);
         gc = canvas.getGraphicsContext2D();
         properties = new CustomProperties();
 
