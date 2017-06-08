@@ -1,7 +1,10 @@
 package gui;
 
+import graph.SequenceGraph;
+import gui.sub_controllers.PanningController;
 import parser.GfaParser;
 
+import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -13,8 +16,6 @@ public class DrawableCanvas implements Observer {
 
     private static DrawableCanvas canvas = new DrawableCanvas( );
 
-    private double lowerBound;
-    private double upperBound;
     private GfaParser parser;
 
 
@@ -48,28 +49,31 @@ public class DrawableCanvas implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-//        if (o instanceof DrawableCanvas) {
+        if (o instanceof PanningController) {
+            {
+                if (arg instanceof Integer) {
+                    try {
+                        int[] childArray = parser.getChildArray();
+
+                        int [] parentArray = parser.getParentArray();
+                        SequenceGraph graph = new SequenceGraph();
+
+                        graph.createSubGraph(nodeId, renderRange )
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
 //
 //        }
 //        Flag new datastructure
 //        draw data structure
 
 
-    }
+//        Suppose the panning exceeds on the possitive
 
-    public double getLowerBound() {
-        return lowerBound;
-    }
 
-    public void setLowerBound(double lowerBound) {
-        this.lowerBound = lowerBound;
-    }
 
-    public double getUpperBound() {
-        return upperBound;
-    }
-
-    public void setUpperBound(double upperBound) {
-        this.upperBound = upperBound;
     }
 }
