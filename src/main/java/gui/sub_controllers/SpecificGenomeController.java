@@ -25,7 +25,7 @@ import java.util.HashMap;
  */
 public class SpecificGenomeController {
 
-    private boolean[] selectedGenomes;
+    private int[] selectedGenomes;
     @FXML
     private TableView<Genome> table;
     @FXML
@@ -42,12 +42,19 @@ public class SpecificGenomeController {
      * @param hashMap       data on the different genomes.
      * @param alreadyChosen data on what genomes want to be viewed.
      */
-    public void initialize(HashMap<Integer, String> hashMap, boolean[] alreadyChosen) {
-        this.selectedGenomes = alreadyChosen;
+    public void initialize(HashMap<Integer, String> hashMap, int[] alreadyChosen) {
+
+        selectedGenomes = alreadyChosen;
+
         ArrayList<Genome> realData = new ArrayList<Genome>();
         for (int i = 0; i < hashMap.size(); i++) {
             Genome genome = new Genome(i, hashMap.get(i));
-            genome.setSelected(Boolean.toString(alreadyChosen[i]));
+            for (int hasBeenSelected : alreadyChosen) {
+                if (i == hasBeenSelected) {
+                    genome.setSelected("true");
+                    break;
+                }
+            }
             realData.add(genome);
         }
         final ObservableList<Genome> data = FXCollections.observableArrayList(realData);
@@ -83,13 +90,12 @@ public class SpecificGenomeController {
     }
 
     /**
-     * Gets the bool[] of selected genomes.
-     * The key is the id.
-     * The value is the value.
+     * Gets the int[] of selected genomes.
+     * All integers in the list represent the ID of a selected genome.
      *
-     * @return a boll[] representing the genomes
+     * @return a int[] representing the genomes
      */
-    public boolean[] getSelectedGenomes() {
+    public int[] getSelectedGenomes() {
         return selectedGenomes;
     }
 
@@ -99,9 +105,18 @@ public class SpecificGenomeController {
      */
     @FXML
     public void saveSelected() {
+        ArrayList<Integer> temp = new ArrayList<Integer>();
+
+        for (int i = 0; i < table.getItems().size(); i++) {
+            Genome genome = table.getItems().get(i);
+            if (Boolean.parseBoolean(genome.getSelected())) {
+                temp.add(genome.getId());
+            }
+        }
+
+        selectedGenomes = new int[temp.size()];
         for (int i = 0; i < selectedGenomes.length; i++) {
-            Genome temp = table.getItems().get(i);
-            selectedGenomes[i] = Boolean.parseBoolean(temp.getSelected());
+            selectedGenomes[i] = temp.get(i);
         }
     }
 

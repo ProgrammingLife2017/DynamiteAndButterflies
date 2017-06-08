@@ -7,7 +7,6 @@ import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.regex.Pattern;
@@ -111,7 +110,7 @@ public class GfaParser extends Observable implements Runnable {
         HashMap<String, Integer> genome = new HashMap<String, Integer>();
         int sizeOfFile = 0;
         while ((line = br.readLine()) != null) {
-            if(line.startsWith("H")) {
+            if (line.startsWith("H")) {
                 String header = line.split("\t")[1];
                 if (header.startsWith("ORI:Z:")) {
                     String allGenomes = header.split(":")[2];

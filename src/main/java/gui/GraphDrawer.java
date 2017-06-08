@@ -320,5 +320,9 @@ public class GraphDrawer {
     public void setSelected(int[] newSelection) {
         this.selected = newSelection;
     }
+
+    public int[] getSelected() {
+        return selected;
+    }
 }
 

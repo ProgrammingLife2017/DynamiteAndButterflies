@@ -81,7 +81,7 @@ public class SequenceGraph {
             String line = lines.skip(node).findFirst().get();
             String[] text = line.split(";");
             int[] genomes = new int[text.length];
-            for(int i = 0; i < text.length; i++) {
+            for (int i = 0; i < text.length; i++) {
                 genomes[i] = Integer.parseInt(text[i]);
             }
             return genomes;

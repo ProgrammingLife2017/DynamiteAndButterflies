@@ -24,7 +24,6 @@ import parser.GfaParser;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
@@ -213,11 +212,12 @@ public class MenuController implements Observer {
             String columnString = "Column index: " + Integer.toString(clicked.getColumn()) + "\n";
 
             String genomeInfo = "Genomes that go through this:\t";
-            for(Integer i : clicked.getGenomes()) {
+            for (Integer i : clicked.getGenomes()) {
                 genomeInfo += i.toString() + "\t";
             }
 
-            String concat = nodeID + columnString + parentString + childString + genomeInfo + newString;
+            String concat = nodeID + columnString + parentString
+                            + childString + genomeInfo + newString;
             infoController.updateSeqLabel(concat);
         }
     }
@@ -446,11 +446,7 @@ public class MenuController implements Observer {
             }
         }
 
-        if (selectedGenomes == null) {
-            selectedGenomes = new boolean[hashMap.size()];
-        }
-
-        controller.initialize(hashMap, selectedGenomes);
+        controller.initialize(hashMap, fileController.getDrawer().getSelected());
 
         stage = new Stage();
         stage.setScene(new Scene(root));
@@ -460,31 +456,11 @@ public class MenuController implements Observer {
                 new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent event) {
-                        boolean[] tempNewGenomes = controller.getSelectedGenomes();
-                        System.arraycopy(tempNewGenomes, 0, selectedGenomes,
-                                0, tempNewGenomes.length);
-                        int[] selection = getRealSelection(tempNewGenomes);
-                        fileController.getDrawer().setSelected(selection);
+                        fileController.getDrawer().setSelected(controller.getSelectedGenomes());
                         fileController.getDrawer().redraw();
                     }
                 }
         );
         stage.showAndWait();
-    }
-
-    private int[] getRealSelection(boolean[] tempNewGenomes) {
-        ArrayList<Integer> temp = new ArrayList<Integer>();
-
-        for (int i = 0; i < tempNewGenomes.length; i++) {
-            if (tempNewGenomes[i]) {
-                temp.add(i);
-            }
-        }
-
-        int[] res = new int[temp.size()];
-        for (int i = 0; i < res.length; i++) {
-            res[i] = temp.get(i);
-        }
-        return res;
     }
 }

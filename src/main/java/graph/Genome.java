@@ -12,10 +12,18 @@ public class Genome {
     private SimpleStringProperty name = new SimpleStringProperty();
     private SimpleStringProperty selected = new SimpleStringProperty();
 
+    /**
+     * Basic constructor I think I needed to make.
+     */
     public Genome() {
         this(-1, null);
     }
 
+    /**
+     * Real constructor of Genome object.
+     * @param idArg the id of the genome
+     * @param nameArg the name of the genome
+     */
     public Genome(int idArg, String nameArg) {
         id.set(idArg);
         name.set(nameArg);

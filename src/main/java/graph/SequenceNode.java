@@ -85,9 +85,11 @@ public class SequenceNode {
      * black for dummy nodes and blue for sequence nodes.
      *
      * @param gc The grapicsContext of the screen.
+     * @param selectedGenes A int[] with all the genomeIds that are selected.
      */
     public void draw(GraphicsContext gc, int[] selectedGenes) {
         gc.clearRect(xCoordinate, yCoordinate, width, height);
+        selected = false;
 
         for (int selectedGene : selectedGenes) {
             for (int genome : genomes) {
