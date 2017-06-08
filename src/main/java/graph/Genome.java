@@ -1,6 +1,5 @@
 package graph;
 
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -11,7 +10,7 @@ public class Genome {
 
     private SimpleIntegerProperty id = new SimpleIntegerProperty();
     private SimpleStringProperty name = new SimpleStringProperty();
-    private SimpleBooleanProperty selected = new SimpleBooleanProperty();
+    private SimpleStringProperty selected = new SimpleStringProperty();
 
     public Genome() {
         this(-1, null);
@@ -20,7 +19,7 @@ public class Genome {
     public Genome(int idArg, String nameArg) {
         id.set(idArg);
         name.set(nameArg);
-        selected.set(false);
+        selected.set("false");
     }
 
     public void setId(int id) {
@@ -31,8 +30,14 @@ public class Genome {
         this.name.set(name);
     }
 
-    public void setSelected(boolean selected) {
-        this.selected.set(selected);
+    public void setSelected(String selected) {
+        if (selected.startsWith("t")) {
+            this.selected.set("true");
+        } else if (selected.startsWith("f")) {
+            this.selected.set("false");
+        } else {
+            this.selected.set(null);
+        }
     }
 
     public int getId() {
@@ -43,7 +48,7 @@ public class Genome {
         return name.get();
     }
 
-    public boolean getSelected() {
+    public String getSelected() {
         return selected.get();
     }
 }

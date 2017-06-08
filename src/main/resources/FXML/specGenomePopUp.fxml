@@ -22,7 +22,6 @@
          </font>
       </Label>
       <Button layoutX="88.0" layoutY="365.0" mnemonicParsing="false" onAction="#saveSelected" text="Save" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="75.0" />
-      <Button mnemonicParsing="false" text="Button" />
       <Button layoutX="286.0" layoutY="370.0" mnemonicParsing="false" onAction="#cancelClicked" text="Cancel" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="75.0" />
    </children>
 </AnchorPane>
