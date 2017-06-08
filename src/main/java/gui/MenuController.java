@@ -5,6 +5,7 @@ import graph.SequenceNode;
 import gui.sub_controllers.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -17,6 +18,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.mapdb.HTreeMap;
 import parser.GfaParser;
 
@@ -405,14 +407,31 @@ public class MenuController implements Observer {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/specGenomePopUp.fxml"));
         Stage stage;
         Parent root = loader.load();
-        specGenomeChooserController controller = loader.<specGenomeChooserController>getController();
-        HashMap<Integer, String> hash = new HashMap<Integer, String>();
-        controller.initialize(hash);
+        final specGenomeChooserController controller = loader.<specGenomeChooserController>getController();
+
+        //TODO replace this hashmap with the one with all the genomes.
+        HashMap<Integer, String> hashMap = new HashMap<Integer, String>();
+        hashMap.put(0, "Jip");
+        hashMap.put(1, "Jappie");
+        hashMap.put(2, "Marc dikke lulz");
+
+        //TODO make this a global variable in menuController. Different classes will need it.
+        final boolean[] selectedGenomes = new boolean[hashMap.size() + 1];
+        controller.initialize(hashMap, selectedGenomes);
 
         stage = new Stage();
         stage.setScene(new Scene(root));
         stage.setTitle("Choose a specific genome to view");
         stage.initModality(Modality.APPLICATION_MODAL);
+        //TODO check if this works.
+        stage.setOnHidden(
+                new EventHandler<WindowEvent>() {
+                    @Override
+                    public void handle(WindowEvent event) {
+                        final boolean[] newStuff = controller.getSelectedGenomes();
+                    }
+                }
+        );
         stage.showAndWait();
     }
 }
