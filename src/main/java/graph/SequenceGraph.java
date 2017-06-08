@@ -1,5 +1,8 @@
 package graph;
 
+import sun.awt.image.ImageWatched;
+
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -23,20 +26,16 @@ public class SequenceGraph {
         this.nodes = new HashMap<Integer, SequenceNode>();
     }
 
-    // upperbound in incorrect for TB10, the last node is not the highest one.
+    public int size() {
+        return nodes.size();
+    }
 
-    /**
-     * Function to create a subgraph.
-     * @param centerNodeID The Centre node.
-     * @param range The range to of the subgraph.
-     * @param parentArray Array with all the parentID's.
-     * @param childArray Array with all the childID's, combined with parentArray is all edges.
-     */
+    // upperbound in incorrect for TB10, the last node is not the highest one.
     public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray) {
         int centerNodeIndex = findCenterNodeIndex(centerNodeID, parentArray);
         int lastNodeIndex = range + centerNodeID;
         if (centerNodeIndex + range >= parentArray.length) {
-            lastNodeIndex = parentArray.length - 1;
+            lastNodeIndex = parentArray.length-1;
         }
 
 
@@ -56,6 +55,10 @@ public class SequenceGraph {
             }
         }
 
+        // order: longest path, column, dummy's,
+        // layerizeGraph(lowerBoundID);
+
+        this.getNode(centerNodeID).setColumn(0);
         findLongestPath();
         addDummies(parentArray, centerNodeIndex, lastNodeIndex);
         this.columns = createColumnList();
@@ -79,16 +82,15 @@ public class SequenceGraph {
     }
 
     private void baryCenterAssignment() {
-        for (int i = 1; i < columns.size(); i++) {
+        for(int i = 1; i < columns.size(); i++) {
             ArrayList<SequenceNode> previousColumn = columns.get(i - 1);
             ArrayList<SequenceNode> currentColumn = columns.get(i);
 
-            // set amount of incoming edges for children and increase barycentervalue
-            // by index of parent.
+            // set amount of incoming edges for children and increase barycentervalue by index of parent
             for (SequenceNode node: previousColumn) {
-                for (int child: node.getChildren()) {
+                for(int child: node.getChildren()) {
                     this.nodes.get(child).incrementInDegree();
-                    this.nodes.get(child).incrementBaryCenterValue(node.getIndex() + 1);
+                    this.nodes.get(child).incrementBaryCenterValue(node.getIndex()+1);
                 }
             }
 
@@ -112,7 +114,7 @@ public class SequenceGraph {
                 }
             });
 
-            for (int j = 0; j < currentColumn.size(); j++) {
+            for(int j = 0; j < currentColumn.size(); j++) {
                 currentColumn.get(j).setIndex(j);
                 this.nodes.get(currentColumn.get(j).getId()).setIndex(j);
             }
@@ -133,7 +135,7 @@ public class SequenceGraph {
     /**
      * Adds dummy nodes to the graph for visualisation purposes.
      */
-    private void addDummies(int[] parentArray, int centerNodeIndex, int lastNodeIndex) {
+    private void addDummies(int[] parentArray,int centerNodeIndex,int lastNodeIndex) {
 
         dummyNodeIDCounter = -1;
         for (int i = centerNodeIndex; i <= lastNodeIndex; i++) {
@@ -151,7 +153,7 @@ public class SequenceGraph {
     }
 
     /**
-     * Helper function for addDummy().
+     * Helper function for addDummy()
      *
      * @param span   - the difference in layer level of parent and child
      * @param parent - the parent node
@@ -184,7 +186,7 @@ public class SequenceGraph {
      * Add a node to the ArrayList of Nodes.
      * @param node The node to be added.
      */
-    private void addNode(SequenceNode node) {
+    public void addNode(SequenceNode node) {
         this.nodes.put(node.getId(), node);
     }
 
@@ -206,6 +208,11 @@ public class SequenceGraph {
     public HashMap<Integer, SequenceNode> getNodes() {
         return this.nodes;
     }
+
+    public void setNodes(HashMap<Integer, SequenceNode> hash) {
+        this.nodes = hash;
+    }
+
 
     private ArrayList<ArrayList<SequenceNode>> createColumnList() {
         ArrayList<ArrayList<SequenceNode>> columns = new ArrayList<ArrayList<SequenceNode>>();

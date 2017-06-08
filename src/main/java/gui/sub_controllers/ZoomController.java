@@ -25,19 +25,18 @@ public class ZoomController {
 
     /**
      * Constructor of the Zoom Controller.
-     * @param graph The SequenceGraph we will be drawing.
      * @param drwr A GraphDrawer that can draw the graph for us.
-     * @param panController The panningcontroller.
+     * @param panningController The panningcontroller.
      * @param nodeField The textField that contains the centre node.
      * @param radField The textField that contains the radius.
      */
-    public ZoomController(SequenceGraph graph, GraphDrawer drwr, PanningController panController,
+    public ZoomController(SequenceGraph graph, GraphDrawer drwr, PanningController panningController,
                           TextField nodeField, TextField radField) {
         this.graph = graph;
         drawer = drwr;
         nodeTextField = nodeField;
         radiusTextField = radField;
-        this.panningController = panController;
+        this.panningController = panningController;
     }
 
     /**

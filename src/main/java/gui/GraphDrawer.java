@@ -23,6 +23,7 @@ public class GraphDrawer {
     private static final double LOG_BASE = 2;
 
     private int yBase;
+    private double range;
     private double zoomLevel;
     private double radius;
     private double xDifference;
@@ -46,6 +47,7 @@ public class GraphDrawer {
         columns = graph.getColumns();
         columnWidths = new double[columns.size() + 1];
         initializeColumnWidths();
+        this.range = columnWidths[columns.size()];
         zoomLevel = columnWidths[columns.size()];
         radius = columns.size();
     }
@@ -57,11 +59,8 @@ public class GraphDrawer {
      * @param column The Column that has to be in the centre.
      */
     public void zoom(final double factor, final int column) {
-        if ((factor < 1 && radius < 1) || (factor > 1 && radius >= columns.size())) {
-            return;
-        }
-        this.zoomLevel = zoomLevel * factor;
-        this.radius = radius * factor;
+        setZoomLevel(zoomLevel * factor);
+        setRadius(radius * factor);
         moveShapes(column - ((column - xDifference) * factor));
     }
 
@@ -72,8 +71,8 @@ public class GraphDrawer {
      * @param column  The new Column to be in the centre.
      */
     public void changeZoom(int column, int radius) {
-        this.radius = radius + radius + 1;
-        zoomLevel = columnWidths[column + radius + 1] - columnWidths[column - radius];
+        setRadius(radius);
+        setZoomLevel(columnWidths[column + radius + 1] - columnWidths[column - radius]);
         moveShapes(columnWidths[column - radius]);
     }
 
@@ -92,8 +91,8 @@ public class GraphDrawer {
     public void moveShapes(double xDifference) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         gc.setFill(Color.BLUE);
-        this.xDifference = xDifference;
         this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
+        setxDifference(xDifference);
         setLineWidth();
         drawNodes();
         drawEdges();
@@ -315,6 +314,37 @@ public class GraphDrawer {
      */
     public int mouseLocationColumn(double x) {
         return (int) ((x / stepSize) + xDifference);
+    }
+
+    public void setxDifference(double xDifference) {
+        if (xDifference < 0) { xDifference = 0; }
+        if (xDifference + zoomLevel > range) { xDifference = range - zoomLevel; }
+        this.xDifference = xDifference;
+    }
+
+    public void setRadius(double radius) {
+        if (radius < 1) { radius = 1; }
+        if (radius > range) { radius = range; }
+        this.radius = radius;
+    }
+
+    public void setZoomLevel(double zoomLevel) {
+        if (zoomLevel < 1) { zoomLevel = 1; }
+        if (zoomLevel > range) { zoomLevel = range; }
+        this.zoomLevel = zoomLevel;
+    }
+
+    public double getRange() {
+        return range;
+    }
+
+
+    public void setGraph(SequenceGraph graph) {
+        this.graph = graph;
+    }
+
+    public SequenceGraph getGraph() {
+        return graph;
     }
 }
 

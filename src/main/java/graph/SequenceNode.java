@@ -1,5 +1,6 @@
 package graph;
 
+import com.sun.corba.se.impl.orbutil.graph.Graph;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -31,14 +32,10 @@ public class SequenceNode {
     private ArrayList<Integer> parents;
     private GraphicsContext gc;
 
-    /**
-     * Constructor for the sequenceNode.
-     * @param id The id of the node.
-     */
-    SequenceNode(int id) {
+    public SequenceNode(int id) {
         this.id = id;
         this.index = 0;
-        this.column = 0;
+        this.column = Integer.MIN_VALUE;
         this.inDegree = 0;
         this.baryCenterValue = 0;
         this.parents = new ArrayList<Integer>();
@@ -46,13 +43,6 @@ public class SequenceNode {
         this.isDummy = false;
     }
 
-    /**
-     * Setter for the location of a node.
-     * @param x XLocation.
-     * @param y YLocation.
-     * @param width Width.
-     * @param height Height.
-     */
     public void setCoordinates(double x, double y, double width, double height) {
         this.xCoordinate = x;
         this.yCoordinate = y;
@@ -75,17 +65,15 @@ public class SequenceNode {
     }
 
     /**
-     * Draw the node with the color depending on it's status. Orange for highlighted nodes,
-     * black for dummy nodes and blue for sequence nodes.
-     * @param gc The grapicsContext of the screen.
+     * Draw the node with the color depending on it's status. Orange for highlighted nodes, black for dummy nodes and
+     * blue for sequence nodes.
      */
     public void draw(GraphicsContext gc) {
         gc.clearRect(xCoordinate, yCoordinate, width, height);
         if (highlighted) {
             gc.setFill(Color.ORANGE);
         } else if (isDummy) {
-            gc.strokeLine(xCoordinate, yCoordinate + height / 2,
-                    xCoordinate + width, yCoordinate + height / 2);
+            gc.strokeLine(xCoordinate, yCoordinate + height / 2, xCoordinate + width, yCoordinate + height / 2);
             return;
         } else {
             gc.setFill(Color.BLUE);
@@ -101,8 +89,7 @@ public class SequenceNode {
      * @return True if the coordinates of the click event are within borders, false otherwise.
      */
     public boolean checkClick(double xEvent, double yEvent) {
-        return (xEvent > xCoordinate && xEvent < xCoordinate + width
-                && yEvent > yCoordinate && yEvent < yCoordinate + height);
+        return (xEvent > xCoordinate && xEvent < xCoordinate + width && yEvent > yCoordinate && yEvent < yCoordinate + height);
     }
 
 
@@ -141,13 +128,12 @@ public class SequenceNode {
         return children.get(id);
     }
 
-    void addChild(Integer id) {
-        if (!this.children.contains(id)) {
+    public void addChild(Integer id) {
+        if(!this.children.contains(id))
             this.children.add(id);
-        }
     }
 
-    void removeChild(Integer id) {
+    public void removeChild(Integer id) {
         this.children.remove(id);
     }
 
@@ -155,13 +141,13 @@ public class SequenceNode {
         return parents;
     }
 
-    void addParent(Integer id) {
-        if (!this.parents.contains(id)) {
+    public void addParent(Integer id) {
+        if(!this.parents.contains(id)) {
             this.parents.add(id);
         }
     }
 
-    boolean hasChildren() {
+    public boolean hasChildren() {
         return children.size() > 0;
     }
 
@@ -173,7 +159,7 @@ public class SequenceNode {
         return isDummy;
     }
 
-    void setDummy(boolean dummy) {
+    public void setDummy(boolean dummy) {
         isDummy = dummy;
     }
 
@@ -181,7 +167,7 @@ public class SequenceNode {
         return this.index;
     }
 
-    void setIndex(int index) {
+    public void setIndex(int index) {
         this.index = index;
     }
 
@@ -189,11 +175,11 @@ public class SequenceNode {
         return column;
     }
 
-    void setColumn(int col) {
+    public void setColumn(int col) {
         this.column = col;
     }
 
-    void incrementColumn(int i) {
+    public void incrementColumn(int i) {
         if (this.column < i + 1) {
             column = i + 1;
         }
@@ -203,17 +189,17 @@ public class SequenceNode {
      * method to resolve the baryCenterValue.
      * @return - returns the barycenterValue / inDegree
      */
-    float getBaryCenterValue() {
+    public float getBaryCenterValue() {
         return baryCenterValue / inDegree;
     }
 
 
-    void incrementBaryCenterValue(float baryCenterValue) {
+    public void incrementBaryCenterValue(float baryCenterValue) {
         this.baryCenterValue += baryCenterValue;
     }
 
 
-    void incrementInDegree() {
+    public void incrementInDegree() {
         this.inDegree++;
     }
 

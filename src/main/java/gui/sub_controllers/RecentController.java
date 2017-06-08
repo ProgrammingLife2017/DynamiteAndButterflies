@@ -1,7 +1,8 @@
 package gui.sub_controllers;
 
-import gui.CustomProperties;
 import javafx.scene.control.MenuItem;
+
+import java.util.prefs.Preferences;
 
 /**
  * Created by Jip on 23-5-2017.
@@ -16,7 +17,7 @@ public class RecentController {
     private String filePref2 = "file2";
     private String filePref3 = "file3";
 
-    private CustomProperties properties;
+    private Preferences prefs;
     private static final String EMPTY = "<No recent file>";
 
     /**
@@ -31,9 +32,7 @@ public class RecentController {
         file2 = filebut2;
         file3 = filebut3;
 
-        properties = new CustomProperties();
-        this.initialize();
-        properties.saveProperties();
+        prefs = Preferences.userRoot();
     }
 
     /**
@@ -56,14 +55,12 @@ public class RecentController {
      * @param filePath The new path to be added.
      */
     public void update(String filePath) {
-        properties.updateProperties();
-        //updateProperties has to be before the isDuplicate method call.
         int check = isDuplicate(filePath);
         switch (check) {
             case -1:
-                properties.setProperty(filePref3, file2.getText());
-                properties.setProperty(filePref2, file1.getText());
-                properties.setProperty(filePref1, filePath);
+                prefs.put(filePref3, file2.getText());
+                prefs.put(filePref2, file1.getText());
+                prefs.put(filePref1, filePath);
 
                 file3.setText(file2.getText());
                 file2.setText(file1.getText());
@@ -72,16 +69,15 @@ public class RecentController {
             case 1:
                 break;
             case 2:
-                String temp = properties.getProperty(filePref2, EMPTY);
-                properties.setProperty(filePref2, properties.getProperty(filePref1, EMPTY));
-                properties.setProperty(filePref1, temp);
+                String temp = prefs.get(filePref2, EMPTY);
+                prefs.put(filePref2, prefs.get(filePref1, EMPTY));
+                prefs.put(filePref1, temp);
 
                 file1.setText(temp);
-                file2.setText(properties.getProperty(filePref2, EMPTY));
+                file2.setText(prefs.get(filePref2, EMPTY));
                 break;
             default: throw new UnsupportedOperationException();
         }
-        properties.saveProperties();
     }
 
     /**
@@ -92,14 +88,13 @@ public class RecentController {
      */
     private int isDuplicate(String filePath) {
         int res = -1;
-
-        if (properties.getProperty(filePref1, EMPTY).equals(filePath)) {
+        if (prefs.get(filePref1, EMPTY).equals(filePath)) {
             res = 1;
-        } else if (properties.getProperty(filePref2, EMPTY).equals(filePath)) {
+        } else if (prefs.get(filePref2, EMPTY).equals(filePath)) {
             res = 2;
-        } else if (properties.getProperty(filePref3, EMPTY).equals(filePath)) {
+        } else if (prefs.get(filePref3, EMPTY).equals(filePath)) {
             res = -1;    //The last recent file is the same behaviour as adding the new filepath
-            // Get rid of the last one and add the new one at the top.
+                        // Get rid of the last one and add the new one at the top.
         }
         return res;
     }
@@ -108,13 +103,12 @@ public class RecentController {
      * Initializes all the recent files from Preferences.
      */
     public void initialize() {
-        properties.updateProperties();
-        properties.setProperty(filePref3, properties.getProperty(filePref3, EMPTY));
-        properties.setProperty(filePref2, properties.getProperty(filePref2, EMPTY));
-        properties.setProperty(filePref1, properties.getProperty(filePref1, EMPTY));
+        prefs.put(filePref3, prefs.get(filePref3, EMPTY));
+        prefs.put(filePref2, prefs.get(filePref2, EMPTY));
+        prefs.put(filePref1, prefs.get(filePref1, EMPTY));
 
-        file1.setText(properties.getProperty(filePref1, EMPTY));
-        file2.setText(properties.getProperty(filePref2, EMPTY));
-        file3.setText(properties.getProperty(filePref3, EMPTY));
+        file1.setText(prefs.get(filePref1, EMPTY));
+        file2.setText(prefs.get(filePref2, EMPTY));
+        file3.setText(prefs.get(filePref3, EMPTY));
     }
 }
