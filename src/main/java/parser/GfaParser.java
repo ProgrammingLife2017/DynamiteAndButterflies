@@ -1,5 +1,6 @@
 package parser;
 
+import graph.SequenceNode;
 import gui.CustomProperties;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -187,5 +188,19 @@ public class GfaParser extends Observable implements Runnable {
         headers.add(header2);
         return headers;
     }
+
+
+
+//    private void assignSequenceLenghts() {
+//        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
+//        Iterator it = nodes.entrySet().iterator();
+//        while (it.hasNext()) {
+//            Map.Entry pair = (Map.Entry) it.next();
+//            SequenceNode node = (SequenceNode) pair.getValue();
+//            if (!node.isDummy()) {
+//                node.setSequenceLength(sequenceHashMap.get((long) node.getId()).length());
+//            }
+//        }
+//    }
 
 }

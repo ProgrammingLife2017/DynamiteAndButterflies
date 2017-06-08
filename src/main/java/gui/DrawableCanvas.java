@@ -4,6 +4,7 @@ import graph.SequenceGraph;
 import gui.sub_controllers.PanningController;
 import parser.GfaParser;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
@@ -14,13 +15,13 @@ import java.util.Observer;
 public class DrawableCanvas implements Observer {
 
 
-    private static DrawableCanvas canvas = new DrawableCanvas( );
+    private static DrawableCanvas canvas = new DrawableCanvas();
 
     private GfaParser parser;
 
 
-    private DrawableCanvas(GfaParser parser) {
-        this.parser = parser;
+    private DrawableCanvas() {
+
     }
 
 
@@ -52,15 +53,17 @@ public class DrawableCanvas implements Observer {
         if (o instanceof PanningController) {
             {
                 if (arg instanceof Integer) {
-                    try {
-                        int[] childArray = parser.getChildArray();
+                    if ( ( (Integer) arg) == 0) {
+                        try {
+                            int[] childArray = parser.getChildArray();
 
-                        int [] parentArray = parser.getParentArray();
-                        SequenceGraph graph = new SequenceGraph();
+                            int [] parentArray = parser.getParentArray();
+                            SequenceGraph graph = new SequenceGraph();
+                            graph.createSubGraph(1, 1000, childArray, parentArray);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                    }
 
-                        graph.createSubGraph(nodeId, renderRange )
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
                 }
             }
@@ -75,5 +78,9 @@ public class DrawableCanvas implements Observer {
 
 
 
+    }
+
+    public void setParser(GfaParser parser) {
+        this.parser = parser;
     }
 }

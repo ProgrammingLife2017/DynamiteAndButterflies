@@ -1,5 +1,7 @@
 package graph;
 
+import parser.GfaParser;
+
 import java.util.*;
 
 /**
@@ -61,6 +63,7 @@ public class SequenceGraph {
         this.columns = createColumnList();
         createIndex();
         baryCenterAssignment();
+
     }
 
     private void findLongestPath() {
@@ -231,6 +234,18 @@ public class SequenceGraph {
             }
         }
 
+    }
+
+    public void assignSequenceLenghts(GfaParser parser) {
+        HashMap<Integer, SequenceNode> nodes = this.getNodes();
+        Iterator it = nodes.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            if (!node.isDummy()) {
+                node.setSequenceLength(parser.getSequenceHashMap().get((long) node.getId()).length());
+            }
+        }
     }
 
 }

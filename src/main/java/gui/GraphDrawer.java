@@ -2,6 +2,8 @@ package gui;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
+import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -16,12 +18,15 @@ import java.util.Map;
  */
 public class GraphDrawer {
 
+    private static GraphDrawer drawer = new GraphDrawer();
+
     private static final double RELATIVE_X_DISTANCE = 0.8;
     private static final double RELATIVE_Y_DISTANCE = 50;
     private static final double LINE_WIDTH_FACTOR = 4;
     private static final double Y_SIZE_FACTOR = 3;
     private static final double LOG_BASE = 2;
 
+    private Canvas canvas;
     private int yBase;
     private double zoomLevel;
     private double radius;
@@ -34,24 +39,29 @@ public class GraphDrawer {
     private SequenceGraph graph;
     private int highlightedNode;
 
-    /**
-     * Constructor.
-     *
-     * @param graph The sequencegraph to be drawn to the canvas.
-     * @param gc    The graphics context used to actually draw shapes.
-     */
-    public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
-        this.gc = gc;
+    
+    public static GraphDrawer getInstance(){
+        return drawer;
+    }
+
+    public void setGraph(SequenceGraph graph) {
         this.graph = graph;
-        this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
         columns = graph.getColumns();
-        columnWidths = new double[columns.size() + 1];
+        columnWidths = new double[columns.size() +1];
         initializeColumnWidths();
         zoomLevel = columnWidths[columns.size()];
         range = columnWidths[columns.size()];
         radius = columns.size();
     }
 
+    public void setCanvas(Canvas canvas) {
+        this.canvas = canvas;
+        this.gc = canvas.getGraphicsContext2D();
+
+//        MAGIC NUMBER
+        this.yBase = (int) (canvas.getHeight() / 4);
+
+    }
     /**
      * Function what to do on Zoom.
      *
