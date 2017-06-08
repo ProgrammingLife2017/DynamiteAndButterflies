@@ -1,6 +1,10 @@
 package graph;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Our own Graph Class.
@@ -15,6 +19,8 @@ public class SequenceGraph {
     private ArrayList<ArrayList<SequenceNode>> columns;
 
     private int dummyNodeIDCounter;
+
+    private String partPath;
 
     /**
      * The constructor initializes the SequenceGraph with it's basic values.
@@ -31,8 +37,11 @@ public class SequenceGraph {
      * @param range The range to of the subgraph.
      * @param parentArray Array with all the parentID's.
      * @param childArray Array with all the childID's, combined with parentArray is all edges.
+     * @param partPath The path of the file for reading.
+     * @throws IOException for file reading.
      */
-    public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray, int[] ids) {
+    public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray, String partPath) throws IOException {
+        this.partPath = partPath;
         int centerNodeIndex = findCenterNodeIndex(centerNodeID, parentArray);
         int lastNodeIndex = range + centerNodeID;
         if (centerNodeIndex + range >= parentArray.length) {
@@ -43,6 +52,8 @@ public class SequenceGraph {
             int childID = childArray[i];
             if (nodes.get(parentID) == null) {
                 SequenceNode node = new SequenceNode(parentID);
+                int[] genomes = getGenomes(parentID);
+                node.setGenomes(genomes);
                 node.addChild(childID);
                 nodes.put(parentID, node);
             } else {
@@ -50,6 +61,9 @@ public class SequenceGraph {
             }
             if (nodes.get(childID) == null) {
                 SequenceNode node = new SequenceNode(childID);
+                int[] genomes = getGenomes(childID);
+                node.setGenomes(genomes);
+                System.out.println(genomes[0]);
                 nodes.put(childID, node);
             }
         }
@@ -59,6 +73,23 @@ public class SequenceGraph {
         this.columns = createColumnList();
         createIndex();
         baryCenterAssignment();
+    }
+
+    @SuppressWarnings("Since15")
+    private int[] getGenomes(int node) throws IOException {
+        try {
+            Stream<String> lines = Files.lines(Paths.get(partPath + "genomes.txt"));
+            String line = lines.skip(node).findFirst().get();
+            String[] text = line.split(";");
+            int[] genomes = new int[text.length];
+            for(int i = 0; i < text.length; i++) {
+                genomes[i] = Integer.parseInt(text[i]);
+            }
+            return genomes;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void findLongestPath() {

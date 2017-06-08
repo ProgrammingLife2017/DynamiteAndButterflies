@@ -48,7 +48,6 @@ public class FileController implements Observer {
 
     private int[] childArray;
     private int[] parentArray;
-    private int[] ids;
     private HashMap<Integer, String> allGenomes;
     private HashMap<Integer, String> genomes;
 
@@ -176,12 +175,15 @@ public class FileController implements Observer {
                     childArray = parser.getChildArray();
                     parentArray = parser.getParentArray();
                     allGenomes = parser.getAllGenomesMapReversed();
-                    ids = parser.getIdArray();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 graph = new SequenceGraph();
-                graph.createSubGraph(nodeId, renderRange, parentArray, childArray, ids);
+                try {
+                    graph.createSubGraph(nodeId, renderRange, parentArray, childArray, partPath);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 sequenceHashMap = parser.getSequenceHashMap();
                 assignSequenceLenghts();
                 drawer = new GraphDrawer(graph, gc);

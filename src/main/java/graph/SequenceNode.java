@@ -25,6 +25,7 @@ public class SequenceNode {
     private boolean isDummy;
     private float baryCenterValue;
     private int inDegree;
+    private int[] genomes;
 
 
     private ArrayList<Integer> children;
@@ -197,6 +198,10 @@ public class SequenceNode {
         if (this.column < i + 1) {
             column = i + 1;
         }
+    }
+
+    public void setGenomes(int[] genomes) {
+        this.genomes = genomes;
     }
 
     /**
