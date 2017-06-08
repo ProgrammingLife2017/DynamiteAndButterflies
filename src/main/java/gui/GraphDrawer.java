@@ -39,7 +39,7 @@ public class GraphDrawer {
     private SequenceGraph graph;
     private int highlightedNode;
 
-    
+
     public static GraphDrawer getInstance(){
         return drawer;
     }
