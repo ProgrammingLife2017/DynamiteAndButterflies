@@ -30,23 +30,16 @@ public class FileController extends Observable implements Observer {
     private File parDirectory;
     private ProgressBarController progressBarController;
 
-    private final int renderRange = 1000;
-    private final int nodeId = 1;
-
     private Thread parseThread;
 
     private GraphicsContext gc;
 
-    private GfaParser parser;
 
     private String partPath;
 
     private CustomProperties properties;
 
     private PopUpController popUpController;
-
-    private int[] childArray;
-    private int[] parentArray;
 
     /**
      * Constructor of the FileController object to control the Files.
@@ -101,14 +94,16 @@ public class FileController extends Observable implements Observer {
     public void openFileClicked(GraphicsContext gc, String filePath, MenuController mC)
             throws IOException, InterruptedException {
         this.gc = gc;
-        if (parser != null) {
+        GfaParser parser;
+        if (DrawableCanvas.getInstance().getParser() != null) {
+            parser = DrawableCanvas.getInstance().getParser();
             parser.getDb().close();
         }
         parser = new GfaParser(filePath);
+        DrawableCanvas.getInstance().setParser(parser);
         parser.addObserver(this);
         parser.addObserver(mC);
         this.addObserver(DrawableCanvas.getInstance());
-        DrawableCanvas.getInstance().setParser(parser);
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         partPath = partPaths[partPaths.length - 1];
