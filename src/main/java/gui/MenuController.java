@@ -4,6 +4,8 @@ import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.*;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,12 +18,14 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.mapdb.HTreeMap;
 import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -396,5 +400,38 @@ public class MenuController implements Observer {
                 e.printStackTrace();
             }
         }
+    }
+
+    @FXML
+    public void chooseGenomePress(ActionEvent actionEvent) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/specGenomePopUp.fxml"));
+        Stage stage;
+        Parent root = loader.load();
+        final specGenomeChooserController controller = loader.<specGenomeChooserController>getController();
+
+        //TODO replace this hashmap with the one with all the genomes.
+        HashMap<Integer, String> hashMap = new HashMap<Integer, String>();
+        hashMap.put(0, "Jip");
+        hashMap.put(1, "Jappie");
+        hashMap.put(2, "Marc dikke lulz");
+
+        //TODO make this a global variable in menuController. Different classes will need it.
+        final boolean[] selectedGenomes = new boolean[hashMap.size() + 1];
+        controller.initialize(hashMap, selectedGenomes);
+
+        stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Choose a specific genome to view");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        //TODO check if this works.
+        stage.setOnHidden(
+                new EventHandler<WindowEvent>() {
+                    @Override
+                    public void handle(WindowEvent event) {
+                        final boolean[] newStuff = controller.getSelectedGenomes();
+                    }
+                }
+        );
+        stage.showAndWait();
     }
 }

@@ -3,7 +3,6 @@ package gui;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -91,7 +90,6 @@ public class GraphDrawer {
      */
     public void moveShapes(double xDifference) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
-        gc.setFill(Color.BLUE);
         this.xDifference = xDifference;
         this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
         setLineWidth();

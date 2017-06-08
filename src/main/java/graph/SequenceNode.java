@@ -14,6 +14,7 @@ public class SequenceNode {
     private static final int ARC_SIZE = 10;
 
     private int id;
+    private int[] genomes;
     private int index;
     private int column;
     private int sequenceLength;
@@ -25,7 +26,7 @@ public class SequenceNode {
     private boolean isDummy;
     private float baryCenterValue;
     private int inDegree;
-    private int[] genomes;
+    private boolean selected;
 
 
     private ArrayList<Integer> children;
@@ -45,6 +46,7 @@ public class SequenceNode {
         this.parents = new ArrayList<Integer>();
         this.children = new ArrayList<Integer>();
         this.isDummy = false;
+        this.selected = false;
     }
 
     /**
@@ -88,6 +90,8 @@ public class SequenceNode {
             gc.strokeLine(xCoordinate, yCoordinate + height / 2,
                     xCoordinate + width, yCoordinate + height / 2);
             return;
+        } else if (selected) {
+            gc.setFill(Color.RED);
         } else {
             gc.setFill(Color.BLUE);
         }
