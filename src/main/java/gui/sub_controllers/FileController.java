@@ -175,8 +175,8 @@ public class FileController implements Observer {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                graph = new SequenceGraph();
-                graph.createSubGraph(nodeId, renderRange, parentArray, childArray);
+                graph = new SequenceGraph(parentArray, childArray);
+                graph.createSubGraph(nodeId, renderRange);
                 sequenceHashMap = parser.getSequenceHashMap();
                 assignSequenceLenghts();
                 drawer = new GraphDrawer(graph, gc);
