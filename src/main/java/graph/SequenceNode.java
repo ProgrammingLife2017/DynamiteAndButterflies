@@ -35,7 +35,7 @@ public class SequenceNode {
     public SequenceNode(int id) {
         this.id = id;
         this.index = 0;
-        this.column = Integer.MIN_VALUE;
+        this.column = 0;
         this.inDegree = 0;
         this.baryCenterValue = 0;
         this.parents = new ArrayList<Integer>();

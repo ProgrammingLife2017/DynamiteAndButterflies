@@ -84,6 +84,10 @@ public class PanningController {
     }
 
     public void pannRight() {
+        if (drawer.getxDifference() + drawer.getZoomLevel() > drawer.getRange()) {
+            drawer.getGraph().createSubGraph(1, drawer.getGraph().getEndNodeIndex() + 100);
+            drawer.initGraph();
+        }
         drawer.moveShapes(drawer.getxDifference() + drawer.getZoomLevel() * PANN_FACTOR);
     }
 

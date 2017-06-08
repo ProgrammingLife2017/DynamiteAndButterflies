@@ -100,7 +100,8 @@ public class GraphDrawer {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         gc.setFill(Color.BLUE);
         this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
-        setxDifference(xDifference);
+        this.xDifference = xDifference;
+        //setxDifference(xDifference);
         setLineWidth();
         drawNodes();
         drawEdges();
