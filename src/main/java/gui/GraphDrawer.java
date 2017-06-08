@@ -103,7 +103,7 @@ public class GraphDrawer {
      * Initializes the widths of each column.
      * Using the widest node of each column.
      */
-    public void initializeColumnWidths() {
+    private void initializeColumnWidths() {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             double max = 1;
@@ -159,7 +159,7 @@ public class GraphDrawer {
         }
     }
 
-    public double computeNodeWidth(SequenceNode node) {
+    private double computeNodeWidth(SequenceNode node) {
         if (node.isDummy()) {
             return columnWidths[node.getColumn() + 1] - columnWidths[node.getColumn()];
         }
