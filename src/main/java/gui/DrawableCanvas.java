@@ -60,6 +60,10 @@ public class DrawableCanvas implements Observer {
                             int [] parentArray = parser.getParentArray();
                             SequenceGraph graph = new SequenceGraph();
                             graph.createSubGraph(1, 1000, childArray, parentArray);
+                            graph.assignSequenceLenghts(parser);
+                            GraphDrawer.getInstance().setGraph(graph);
+                            GraphDrawer.getInstance().moveShapes(0.0);
+
                         } catch (IOException e) {
                             e.printStackTrace();
                     }
@@ -68,13 +72,6 @@ public class DrawableCanvas implements Observer {
                 }
             }
         }
-//
-//        }
-//        Flag new datastructure
-//        draw data structure
-
-
-//        Suppose the panning exceeds on the possitive
 
 
 
@@ -82,5 +79,9 @@ public class DrawableCanvas implements Observer {
 
     public void setParser(GfaParser parser) {
         this.parser = parser;
+    }
+
+    public GfaParser getParser() {
+        return this.parser;
     }
 }
