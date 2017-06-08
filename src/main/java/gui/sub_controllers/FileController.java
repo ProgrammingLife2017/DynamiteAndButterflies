@@ -83,22 +83,18 @@ public class FileController extends Observable implements Observer {
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa.
      * can be selected and directly be visualised on the screen.
-     * @param mC the MenuController so it can Observe.
      * @param filePath the filePath of the file.
      * @throws IOException exception if no file is found
      * @throws InterruptedException Exception if the Thread is interrupted.
      */
-    public void openFileClicked(String filePath, MenuController mC)
+    public void openFileClicked(String filePath)
             throws IOException, InterruptedException {
-        GfaParser parser;
         if (DrawableCanvas.getInstance().getParser() != null) {
-            parser = DrawableCanvas.getInstance().getParser();
-            parser.getDb().close();
+            DrawableCanvas.getInstance().getParser().getDb().close();
         }
-        parser = new GfaParser(filePath);
+        GfaParser parser = new GfaParser(filePath);
         DrawableCanvas.getInstance().setParser(parser);
         parser.addObserver(this);
-        parser.addObserver(mC);
         this.addObserver(DrawableCanvas.getInstance());
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);

@@ -95,8 +95,8 @@ public class MenuController implements Observer {
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
-
         ps = new PrintStream(new Console(consoleArea));
+        DrawableCanvas.getInstance().setMenuController(this);
         //System.setErr(ps);
         //System.setOut(ps);
     }
@@ -113,7 +113,7 @@ public class MenuController implements Observer {
         File file = fileController.chooseFile(stage);
         String filePath = file.getAbsolutePath();
         recentController.update(filePath);
-        fileController.openFileClicked(filePath, this);
+        fileController.openFileClicked(filePath);
     }
 
     /**
@@ -125,7 +125,7 @@ public class MenuController implements Observer {
      */
     @FXML
     public void openFileClicked(String filePath) throws IOException, InterruptedException {
-        fileController.openFileClicked(filePath, this);
+        fileController.openFileClicked(filePath);
     }
 
     private void displayInfo(SequenceGraph graph) {

@@ -1,6 +1,7 @@
 package gui;
 
 import graph.SequenceGraph;
+import gui.sub_controllers.FileController;
 import gui.sub_controllers.PanningController;
 import parser.GfaParser;
 
@@ -12,12 +13,14 @@ import java.util.Observer;
 /**
  * Created by eric on 8-6-17.
  */
-public class DrawableCanvas implements Observer {
+public class DrawableCanvas extends Observable implements Observer {
 
 
     private static DrawableCanvas canvas = new DrawableCanvas();
 
     private GfaParser parser;
+
+    private MenuController mc;
 
 
     private DrawableCanvas() {
@@ -50,7 +53,7 @@ public class DrawableCanvas implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (o instanceof PanningController) {
+        if (o instanceof FileController) {
             {
                 if (arg instanceof Integer) {
                     if ( ( (Integer) arg) == 0) {
@@ -59,10 +62,13 @@ public class DrawableCanvas implements Observer {
 
                             int [] parentArray = parser.getParentArray();
                             SequenceGraph graph = new SequenceGraph();
-                            graph.createSubGraph(1, 1000, childArray, parentArray);
+                            graph.createSubGraph(2, 1000, childArray, parentArray);
                             graph.assignSequenceLenghts(parser);
                             GraphDrawer.getInstance().setGraph(graph);
                             GraphDrawer.getInstance().moveShapes(0.0);
+                            setChanged();
+                            notifyObservers(parser.getFilePath());
+                            setChanged();
 
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -77,8 +83,14 @@ public class DrawableCanvas implements Observer {
 
     }
 
+
+    public void setMenuController(MenuController mc) {
+        this.mc = mc;
+        this.addObserver(mc);
+    }
     public void setParser(GfaParser parser) {
         this.parser = parser;
+
     }
 
     public GfaParser getParser() {

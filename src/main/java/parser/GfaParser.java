@@ -19,6 +19,8 @@ public class GfaParser extends Observable implements Runnable {
     private String header1;
     private String header2;
     private HTreeMap<Long, String> sequenceMap;
+
+
     private String filePath;
     private String partPath;
     private CustomProperties properties = new CustomProperties();
@@ -41,6 +43,10 @@ public class GfaParser extends Observable implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getFilePath() {
+        return filePath;
     }
 
     /**
@@ -81,7 +87,6 @@ public class GfaParser extends Observable implements Runnable {
         this.setChanged();
         this.notifyObservers(1);
         this.setChanged();
-        this.notifyObservers(filePath);
     }
 
     /**
@@ -190,17 +195,5 @@ public class GfaParser extends Observable implements Runnable {
     }
 
 
-
-//    private void assignSequenceLenghts() {
-//        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
-//        Iterator it = nodes.entrySet().iterator();
-//        while (it.hasNext()) {
-//            Map.Entry pair = (Map.Entry) it.next();
-//            SequenceNode node = (SequenceNode) pair.getValue();
-//            if (!node.isDummy()) {
-//                node.setSequenceLength(sequenceHashMap.get((long) node.getId()).length());
-//            }
-//        }
-//    }
 
 }
