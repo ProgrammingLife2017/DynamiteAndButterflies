@@ -23,7 +23,7 @@ public class GfaParser extends Observable implements Runnable {
     private String partPath;
     private CustomProperties properties = new CustomProperties();
 
-
+    Boolean indexedGfaFile = false;
     private DB db;
 
     /**
@@ -123,6 +123,9 @@ public class GfaParser extends Observable implements Runnable {
                     genomesWriter.close();
                     genome = getAllGenomesMap();
                 }
+                else if (header.startsWith("BUILD:Z:VCF2GRAPH")) {
+                    indexedGfaFile = true;
+                }
             }
             if (line.startsWith("S")) {
                 String[] data = line.split(("\t"));
@@ -132,12 +135,22 @@ public class GfaParser extends Observable implements Runnable {
                         String[] genomes = data[i].split(":")[2].split(";");
                         for (int j = 0; j < genomes.length; j++) {
                             genomeWriter.flush();
-                            if (j == genomes.length - 1) {
-                                genomeWriter.write(genome.get(genomes[j]).toString());
-                                genomeWriter.newLine();
+                            if(indexedGfaFile) {
+                                if (j == genomes.length - 1) {
+                                    genomeWriter.write(genomes[j].toString());
+                                    genomeWriter.newLine();
+                                } else {
+                                    genomeWriter.write(genomes[j] + ";");
+                                }
                             } else {
-                                genomeWriter.write(genome.get(genomes[j]) + ";");
+                                if (j == genomes.length - 1) {
+                                    genomeWriter.write(genome.get(genomes[j]).toString());
+                                    genomeWriter.newLine();
+                                } else {
+                                    genomeWriter.write(genome.get(genomes[j]) + ";");
+                                }
                             }
+
                         }
                     }
                 }
