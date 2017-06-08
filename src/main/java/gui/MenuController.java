@@ -68,8 +68,6 @@ public class MenuController implements Observer {
     @FXML
     private TextArea consoleArea;
     @FXML
-    private ScrollBar scrollbar;
-    @FXML
     private Button rightPannButton;
     @FXML
     private Button leftPannButton;
