@@ -96,8 +96,8 @@ public class MenuController implements Observer {
         recentController = new RecentController(file1, file2, file3);
 
         ps = new PrintStream(new Console(consoleArea));
-        System.setErr(ps);
-        System.setOut(ps);
+        //System.setErr(ps);
+        //System.setOut(ps);
     }
 
     /**
@@ -139,8 +139,8 @@ public class MenuController implements Observer {
     @FXML
     public void zoomInClicked() throws IOException {
         double xCentre = canvas.getWidth() / 2;
-        zoomController.zoomIn(fileController.getDrawer().mouseLocationColumn(xCentre));
-        nodeTextField.setText(fileController.getDrawer().findColumn(xCentre) + "");
+        zoomController.zoomIn(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
+        nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
     }
 
     /**
@@ -150,8 +150,8 @@ public class MenuController implements Observer {
     @FXML
     public void zoomOutClicked() throws IOException {
         double xCentre = canvas.getWidth() / 2;
-        zoomController.zoomOut(fileController.getDrawer().mouseLocationColumn(xCentre));
-        nodeTextField.setText(fileController.getDrawer().findColumn(xCentre) + "");
+        zoomController.zoomOut(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
+        nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
     }
 
     /**
@@ -161,8 +161,8 @@ public class MenuController implements Observer {
      */
     @FXML
     public void scrollZoom(ScrollEvent scrollEvent) throws IOException {
-        int column = fileController.getDrawer().mouseLocationColumn(scrollEvent.getX());
-        nodeTextField.setText(fileController.getDrawer().findColumn(scrollEvent.getX()) + "");
+        int column = GraphDrawer.getInstance().mouseLocationColumn(scrollEvent.getX());
+        nodeTextField.setText(GraphDrawer.getInstance().findColumn(scrollEvent.getX()) + "");
         if (scrollEvent.getDeltaY() > 0) {
             zoomController.zoomIn(column);
         } else {
@@ -178,10 +178,10 @@ public class MenuController implements Observer {
     public void clickMouse(MouseEvent mouseEvent) {
         double pressedX = mouseEvent.getX();
         double pressedY = mouseEvent.getY();
-        SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, pressedY);
+        SequenceNode clicked = GraphDrawer.getInstance().clickNode(pressedX, pressedY);
         if (clicked != null) {
             String newString = "Sequence: "
-                    + fileController.getSequenceHashMap().get((long) clicked.getId()) + "\n";
+                    + DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId()) + "\n";
 
 
             String childString = "Children: ";
@@ -211,7 +211,7 @@ public class MenuController implements Observer {
         int radius = Integer.parseInt(radiusTextField.getText());
         zoomController.traverseGraphClicked(centreNodeID, radius);
         String newString = "ID: " + centreNodeID + "\nSequence: "
-                + fileController.getSequenceHashMap().get((long) centreNodeID);
+                + DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
         infoController.updateSeqLabel(newString);
     }
 
@@ -226,7 +226,7 @@ public class MenuController implements Observer {
 
         zoomController.traverseGraphClicked(centreNodeID, rad);
         String newString = "Sequence: "
-                + fileController.getSequenceHashMap().get((long) centreNodeID);
+                + DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
         infoController.updateSeqLabel(newString);
     }
 
@@ -314,7 +314,7 @@ public class MenuController implements Observer {
      * @return The sequenceMap.
      */
     HTreeMap<Long, String> getSequenceHashMap() {
-        return fileController.getSequenceHashMap();
+        return DrawableCanvas.getInstance().getParser().getSequenceHashMap();
     }
 
     @Override
@@ -337,9 +337,9 @@ public class MenuController implements Observer {
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
                         panningController =
-                                new PanningController(scrollbar, fileController.getDrawer());
+                                new PanningController(scrollbar, GraphDrawer.getInstance());
                         zoomController = new ZoomController(fileController.getGraph(),
-                                    fileController.getDrawer(), panningController,
+                                GraphDrawer.getInstance(), panningController,
                                     nodeTextField, radiusTextField);
                         displayInfo(fileController.getGraph());
                     }
