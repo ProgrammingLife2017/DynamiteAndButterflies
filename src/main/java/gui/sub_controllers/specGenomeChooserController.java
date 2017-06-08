@@ -40,6 +40,7 @@ public class specGenomeChooserController {
         }
         final ObservableList<Genome> data = FXCollections.observableArrayList(realData);
 
+        // commit lol
         //Explain how the table should read the info
         idCol.setCellValueFactory(new PropertyValueFactory<Genome, Integer>("id"));
         nameCol.setCellValueFactory(new PropertyValueFactory<Genome, String>("name"));
