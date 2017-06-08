@@ -154,6 +154,8 @@ public class GraphDrawer {
                 double starty = parent.getyCoordinate() + (parent.getHeight() / 2);
                 double endx = child.getxCoordinate();
                 double endy = child.getyCoordinate() + (child.getHeight() / 2);
+                gc.setLineWidth(Math.log(child.getGenomes().length)
+                                / Math.log(LOG_BASE + 1.3));
                 gc.strokeLine(startx, starty, endx, endy);
             }
         }
