@@ -25,6 +25,7 @@ public class GraphDrawer {
     private int yBase;
     private double zoomLevel;
     private double radius;
+    private double range;
     private double xDifference;
     private double stepSize;
     private double[] columnWidths;
@@ -47,6 +48,7 @@ public class GraphDrawer {
         columnWidths = new double[columns.size() + 1];
         initializeColumnWidths();
         zoomLevel = columnWidths[columns.size()];
+        range = columnWidths[columns.size()];
         radius = columns.size();
     }
 
@@ -295,6 +297,10 @@ public class GraphDrawer {
         return radius;
     }
 
+    public double getRange() {
+        return range;
+    }
+
     /**
      * Get function for x difference.
      * @return The x difference.
@@ -306,6 +312,10 @@ public class GraphDrawer {
     public double getColumnWidth(int col) {
         return columnWidths[col];
     }
+
+    public double getRightbound() { return xDifference + zoomLevel; }
+
+    public double getLeftbound() { return xDifference; }
 
     /**
      * Return the column the mouse click is in.

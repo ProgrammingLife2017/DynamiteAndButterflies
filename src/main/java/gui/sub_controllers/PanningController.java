@@ -5,12 +5,17 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ScrollBar;
 
+import java.util.Observable;
+
 /**
  * Created by Jasper van Tilburg on 29-5-2017.
  *
  * Controls the panning functionality.
  */
-public class PanningController {
+public class PanningController extends Observable {
+
+    public static final int EXTEND_LEFT = 0;
+    public static final int EXTEND_RIGHT = 1;
 
     private final ScrollBar scrollbar;
     private final GraphDrawer drawer;
@@ -41,6 +46,13 @@ public class PanningController {
                 if (active) {
                     drawer.moveShapes(drawer.getxDifference()
                             + (newVal.doubleValue() - oldVal.doubleValue()));
+                }
+                if (drawer.getLeftbound() < 0) {
+                    setChanged();
+                    notifyObservers(EXTEND_LEFT);
+                } else if (drawer.getRightbound() > drawer.getRange()) {
+                    setChanged();
+                    notifyObservers(EXTEND_RIGHT);
                 }
             }
         });
