@@ -182,6 +182,7 @@ public class MenuController implements Observer {
         if (clicked != null) {
             String sequence = fileController.getSequenceHashMap().get((long) clicked.getId());
             infoController.updateSeqLabel(clicked.toString(sequence));
+            nodeTextField.setText(clicked.getId().toString());
         }
     }
 
