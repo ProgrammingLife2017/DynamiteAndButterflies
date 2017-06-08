@@ -63,7 +63,6 @@ public class SequenceGraph {
                 SequenceNode node = new SequenceNode(childID);
                 int[] genomes = getGenomes(childID);
                 node.setGenomes(genomes);
-                System.out.println(genomes[0]);
                 nodes.put(childID, node);
             }
         }

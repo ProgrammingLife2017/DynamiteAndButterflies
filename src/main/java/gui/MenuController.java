@@ -409,11 +409,7 @@ public class MenuController implements Observer {
         Parent root = loader.load();
         final specGenomeChooserController controller = loader.<specGenomeChooserController>getController();
 
-        //TODO replace this hashmap with the one with all the genomes.
-        HashMap<Integer, String> hashMap = new HashMap<Integer, String>();
-        hashMap.put(0, "Jip");
-        hashMap.put(1, "Jappie");
-        hashMap.put(2, "Marc dikke lulz");
+        HashMap<Integer, String> hashMap = fileController.getAllGenomes();
 
         //TODO make this a global variable in menuController. Different classes will need it.
         final boolean[] selectedGenomes = new boolean[hashMap.size() + 1];

@@ -48,6 +48,7 @@ public class FileController implements Observer {
 
     private int[] childArray;
     private int[] parentArray;
+
     private HashMap<Integer, String> allGenomes;
     private HashMap<Integer, String> genomes;
 
@@ -192,6 +193,11 @@ public class FileController implements Observer {
             }
         }
     }
+
+    public HashMap<Integer, String> getAllGenomes() {
+        return allGenomes;
+    }
+
 
     /**
      * Gets the fileName from the filePath.

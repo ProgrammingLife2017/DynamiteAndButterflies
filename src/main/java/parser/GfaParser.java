@@ -118,7 +118,6 @@ public class GfaParser extends Observable implements Runnable {
                     BufferedWriter genomesWriter =
                             new BufferedWriter(new FileWriter(partPath + "allGenomes.txt"));
                     genomesWriter.write(allGenomes + ",");
-                    System.out.println(allGenomes);
                     genomesWriter.flush();
                     genomesWriter.close();
                     genome = getAllGenomesMap();
@@ -134,10 +133,9 @@ public class GfaParser extends Observable implements Runnable {
                     if (data[i].startsWith("ORI:Z:")) {
                         String[] genomes = data[i].split(":")[2].split(";");
                         for (int j = 0; j < genomes.length; j++) {
-                            genomeWriter.flush();
-                            if(indexedGfaFile) {
+                            if (indexedGfaFile) {
                                 if (j == genomes.length - 1) {
-                                    genomeWriter.write(genomes[j].toString());
+                                    genomeWriter.write(genomes[j]);
                                     genomeWriter.newLine();
                                 } else {
                                     genomeWriter.write(genomes[j] + ";");
@@ -154,8 +152,6 @@ public class GfaParser extends Observable implements Runnable {
                         }
                     }
                 }
-
-
                 sequenceMap.put((long) (id), data[2]);
             } else if (line.startsWith("L")) {
                 String[] edgeDataString = line.split("\t");
@@ -216,18 +212,6 @@ public class GfaParser extends Observable implements Runnable {
         return readAllGenomeFile();
     }
 
-    private int[] readIds() throws IOException {
-        InputStream in = new FileInputStream(System.getProperty("user.dir")
-                + System.getProperty("file.separator") + partPath + "ids.txt");
-        BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-        String [] strNums = br.readLine().split(",");
-        int[] ids = new int[strNums.length];
-        for (int i = 0; i < strNums.length; i++) {
-            ids[i] = Integer.parseInt(strNums[i]);
-        }
-        return ids;
-    }
-
     private HashMap<String, Integer> readAllGenomeFile() throws IOException {
         InputStream in = new FileInputStream(System.getProperty("user.dir")
                 + System.getProperty("file.separator") + partPath + "allGenomes.txt");
@@ -241,17 +225,6 @@ public class GfaParser extends Observable implements Runnable {
     }
 
     /**
-     * Cretes an ArrayList of Strings specifying headers.
-     * @return an arrayList containing all headers
-     */
-    public ArrayList<String> getHeaders() {
-        ArrayList<String> headers = new ArrayList<String>();
-        headers.add(header1);
-        headers.add(header2);
-        return headers;
-    }
-
-    /**
      *
      * @return The map with the genomes.
      * @throws IOException For reading a file.
@@ -262,7 +235,7 @@ public class GfaParser extends Observable implements Runnable {
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String[] strNums = br.readLine().split(";");
         HashMap<Integer, String> genomesMap = new HashMap<Integer, String>();
-        for (int i = 0; i < strNums.length; i++) {
+        for (int i = 0; i < strNums.length - 1; i++) {
             genomesMap.put(i, strNums[i]);
         }
         return genomesMap;
