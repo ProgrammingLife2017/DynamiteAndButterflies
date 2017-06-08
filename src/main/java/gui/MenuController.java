@@ -24,6 +24,7 @@ import parser.GfaParser;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
@@ -193,7 +194,7 @@ public class MenuController implements Observer {
         double pressedY = mouseEvent.getY();
         SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, pressedY);
         if (clicked != null) {
-            String newString = "Sequence: "
+            String newString = "\nSequence: "
                     + fileController.getSequenceHashMap().get((long) clicked.getId()) + "\n";
 
 
@@ -211,7 +212,12 @@ public class MenuController implements Observer {
 
             String columnString = "Column index: " + Integer.toString(clicked.getColumn()) + "\n";
 
-            String concat = nodeID + columnString + parentString + childString + newString;
+            String genomeInfo = "Genomes that go through this:\t";
+            for(Integer i : clicked.getGenomes()) {
+                genomeInfo += i.toString() + "\t";
+            }
+
+            String concat = nodeID + columnString + parentString + childString + genomeInfo + newString;
             infoController.updateSeqLabel(concat);
         }
     }
@@ -457,9 +463,28 @@ public class MenuController implements Observer {
                         boolean[] tempNewGenomes = controller.getSelectedGenomes();
                         System.arraycopy(tempNewGenomes, 0, selectedGenomes,
                                 0, tempNewGenomes.length);
+                        int[] selection = getRealSelection(tempNewGenomes);
+                        fileController.getDrawer().setSelected(selection);
+                        fileController.getDrawer().redraw();
                     }
                 }
         );
         stage.showAndWait();
+    }
+
+    private int[] getRealSelection(boolean[] tempNewGenomes) {
+        ArrayList<Integer> temp = new ArrayList<Integer>();
+
+        for (int i = 0; i < tempNewGenomes.length; i++) {
+            if (tempNewGenomes[i]) {
+                temp.add(i);
+            }
+        }
+
+        int[] res = new int[temp.size()];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = temp.get(i);
+        }
+        return res;
     }
 }

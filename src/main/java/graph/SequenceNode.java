@@ -35,6 +35,7 @@ public class SequenceNode {
 
     /**
      * Constructor for the sequenceNode.
+     *
      * @param id The id of the node.
      */
     SequenceNode(int id) {
@@ -47,13 +48,15 @@ public class SequenceNode {
         this.children = new ArrayList<Integer>();
         this.isDummy = false;
         this.selected = false;
+        this.genomes = new int[0];
     }
 
     /**
      * Setter for the location of a node.
-     * @param x XLocation.
-     * @param y YLocation.
-     * @param width Width.
+     *
+     * @param x      XLocation.
+     * @param y      YLocation.
+     * @param width  Width.
      * @param height Height.
      */
     public void setCoordinates(double x, double y, double width, double height) {
@@ -80,10 +83,21 @@ public class SequenceNode {
     /**
      * Draw the node with the color depending on it's status. Orange for highlighted nodes,
      * black for dummy nodes and blue for sequence nodes.
+     *
      * @param gc The grapicsContext of the screen.
      */
-    public void draw(GraphicsContext gc) {
+    public void draw(GraphicsContext gc, int[] selectedGenes) {
         gc.clearRect(xCoordinate, yCoordinate, width, height);
+
+        for (int selectedGene : selectedGenes) {
+            for (int genome : genomes) {
+                if (selectedGene == genome) {
+                    selected = true;
+                    break;
+                }
+            }
+        }
+
         if (highlighted) {
             gc.setFill(Color.ORANGE);
         } else if (isDummy) {
@@ -204,12 +218,13 @@ public class SequenceNode {
         }
     }
 
-    public void setGenomes(int[] genomes) {
-        this.genomes = genomes;
+    public void setGenomes(int[] genomesArg) {
+        this.genomes = genomesArg;
     }
 
     /**
      * method to resolve the baryCenterValue.
+     *
      * @return - returns the barycenterValue / inDegree
      */
     float getBaryCenterValue() {
@@ -234,4 +249,7 @@ public class SequenceNode {
         this.sequenceLength = sequenceLength;
     }
 
+    public int[] getGenomes() {
+        return genomes;
+    }
 }
