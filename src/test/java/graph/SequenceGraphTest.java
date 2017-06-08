@@ -48,6 +48,7 @@ public class SequenceGraphTest {
 
     @Test
     public void addNode() throws Exception {
+        assertTrue(graph.size() == 27);
         SequenceNode node = new SequenceNode(42);
         graph.getNode(19).addChild(42);
         graph.addNode(node);

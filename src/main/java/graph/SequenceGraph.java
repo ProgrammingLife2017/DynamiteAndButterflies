@@ -22,35 +22,53 @@ public class SequenceGraph {
 
     /**
      * The constructor initializes the SequenceGraph with it's basic values.
+     * @param parentArray - the parent array for edges.
+     * @param childArray - the child array for edges.
      */
-    public SequenceGraph(int[] parentArray, int[] childArray) {
+    public SequenceGraph(final int[] parentArray, final int[] childArray) {
         this.parentArray = parentArray;
         this.childArray = childArray;
 
     }
 
+    /**
+     * size method for nodes.
+     * @return the size of the HashMap
+     */
     public int size() {
         return nodes.size();
     }
 
-    // upperbound in incorrect for TB10, the last node is not the highest one.
+    /**
+     * Creates a subgraph.
+     * @param centerNodeID - the node to start rendering at.
+     * @param range - the amount of edges to add to the graph
+     */
     public void createSubGraph(int centerNodeID, int range) {
         this.nodes = new HashMap<Integer, SequenceNode>();
         this.columns = new ArrayList<ArrayList<SequenceNode>>();
 
         startNodeIndex = findCenterNodeIndex(centerNodeID, parentArray);
+        endNodeIndex = findEndNodeIndex(centerNodeID, range);
+        initNodes();
+        findLongestPath();
+        addDummies();
+        this.columns = initColumns();
+    }
+
+    private int findEndNodeIndex(int centerNodeID, int range) {
         endNodeIndex = range + centerNodeID;
         if (startNodeIndex + range >= parentArray.length) {
             endNodeIndex = parentArray.length - 1;
         }
-        initNodes(startNodeIndex, endNodeIndex);
-        findLongestPath(centerNodeID);
-        addDummies(startNodeIndex, endNodeIndex);
-        this.columns = initColumns();
+        return endNodeIndex;
     }
 
-    private void initNodes(int centerNodeIndex, int lastNodeIndex) {
-        for (int i = centerNodeIndex; i <= lastNodeIndex; i++) {
+    /**
+     * Add nodes with children to the nodes hashmap.
+     */
+    private void initNodes() {
+        for (int i = startNodeIndex; i <= endNodeIndex; i++) {
             int parentID = parentArray[i];
             int childID = childArray[i];
             if (nodes.get(parentID) == null) {
@@ -69,8 +87,10 @@ public class SequenceGraph {
 
     }
 
-    private void findLongestPath(int centerNodeID) {
-        this.getNode(centerNodeID).setColumn(0);
+    /**
+     * Finds the longest path of the graph and sets columns accordingly.
+     */
+    private void findLongestPath() {
         for (Object o : this.getNodes().entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             SequenceNode currentNode = (SequenceNode) pair.getValue();
@@ -85,38 +105,17 @@ public class SequenceGraph {
         }
     }
 
+    /**
+     * Uses barycenter heuristics to approach edge crossing reduction.
+     * @param columns - the columns with nodes, on which the algorithem is applied.
+     */
     private void minimiseEdgeCrossings(ArrayList<ArrayList<SequenceNode>> columns) {
         for (int i = 1; i < columns.size(); i++) {
             ArrayList<SequenceNode> previousColumn = columns.get(i - 1);
             ArrayList<SequenceNode> currentColumn = columns.get(i);
 
-            // set amount of incoming edges for children and increase barycentervalue by index of parent
-            for (SequenceNode node : previousColumn) {
-                for (int child : node.getChildren()) {
-                    this.nodes.get(child).incrementInDegree();
-                    this.nodes.get(child).incrementBaryCenterValue(node.getIndex() + 1);
-                }
-            }
-
-            // sort childlayer based on barycenter values.
-            Collections.sort(currentColumn, new Comparator<SequenceNode>() {
-                public int compare(SequenceNode o1, SequenceNode o2) {
-                    float baryVal1 = nodes.get(o1.getId()).getBaryCenterValue();
-                    float baryVal2 = nodes.get(o2.getId()).getBaryCenterValue();
-                    if (baryVal1 > baryVal2) {
-                        return 1;
-                    } else if (baryVal1 < baryVal2) {
-                        return -1;
-                    } else if (baryVal1 == baryVal2) {
-                        if (nodes.get(o1.getId()).isDummy()) {
-                            return 1;
-                        } else {
-                            return -1;
-                        }
-                    }
-                    return 0;
-                }
-            });
+            setBarycenterValues(previousColumn);
+            sortColumns(currentColumn);
 
             for (int j = 0; j < currentColumn.size(); j++) {
                 currentColumn.get(j).setIndex(j);
@@ -125,6 +124,51 @@ public class SequenceGraph {
         }
     }
 
+    /**
+     * set amount of incoming edges for children and increase barycenter value by index of parent.
+     * @param previousColumn - the column on which to base the barycenter values.
+     */
+    private void setBarycenterValues(ArrayList<SequenceNode> previousColumn) {
+        for (SequenceNode node : previousColumn) {
+            for (int child : node.getChildren()) {
+                this.nodes.get(child).incrementInDegree();
+                this.nodes.get(child).incrementBaryCenterValue(node.getIndex() + 1);
+            }
+        }
+    }
+
+    /**
+     * Sorts the columns using barycenter points.
+     * @param currentColumn - the column which to sort.
+     */
+    private void sortColumns(ArrayList<SequenceNode> currentColumn) {
+        // sort childlayer based on barycenter values.
+        Collections.sort(currentColumn, new Comparator<SequenceNode>() {
+            public int compare(SequenceNode o1, SequenceNode o2) {
+                float baryVal1 = nodes.get(o1.getId()).getBaryCenterValue();
+                float baryVal2 = nodes.get(o2.getId()).getBaryCenterValue();
+                if (baryVal1 > baryVal2) {
+                    return 1;
+                } else if (baryVal1 < baryVal2) {
+                    return -1;
+                } else if (baryVal1 == baryVal2) {
+                    if (nodes.get(o1.getId()).isDummy()) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                }
+                return 0;
+            }
+        });
+    }
+
+    /**
+     * Finds the centerNode index (for in the hashmap).
+     * @param centerNodeID - the node to lookup.
+     * @param parentArray - the array in which to look.
+     * @return - index of centerNode.
+     */
     private int findCenterNodeIndex(int centerNodeID, int[] parentArray) {
         for (int i = 0; i < parentArray.length; i++) {
             if (parentArray[i] == centerNodeID) {
@@ -132,16 +176,16 @@ public class SequenceGraph {
             }
         }
         throw new IllegalArgumentException();
-
     }
 
 
     /**
-     * Adds dummy nodes to the graph for visualisation purposes.
+     * Adds dummy's so that the span is always 1.
+     *
      */
-    private void addDummies(int centerNodeIndex, int lastNodeIndex) {
+    private void addDummies() {
         dummyNodeIDCounter = -1;
-        for (int i = centerNodeIndex; i <= lastNodeIndex; i++) {
+        for (int i = startNodeIndex; i <= endNodeIndex; i++) {
             SequenceNode parent = this.getNode(parentArray[i]);
             int size = parent.getChildren().size();
             for (int j = 0; j < size; j++) {
@@ -214,11 +258,10 @@ public class SequenceGraph {
         return this.nodes;
     }
 
-    public void setNodes(HashMap<Integer, SequenceNode> hash) {
-        this.nodes = hash;
-    }
-
-
+    /**
+     * Creates a column list for easier crossing reduction.
+     * @return - the column list with solved edge crossings.
+     */
     private ArrayList<ArrayList<SequenceNode>> initColumns() {
         ArrayList<ArrayList<SequenceNode>> columns = new ArrayList<ArrayList<SequenceNode>>();
 
@@ -247,14 +290,15 @@ public class SequenceGraph {
 
     }
 
-
+    /**
+     * Extend the current graph with a given range. (range is amount of edges)
+     * @param range - the amount of edges to add.
+     * @return the extended graph
+     */
     public SequenceGraph extendGraph(int range) {
-        int currentDummyNodeIndexCounter = this.getDummyNodeIDCounter();
-        int endNodeIndex = this.getEndNodeIndex();
-
         SequenceGraph graphExtension = new SequenceGraph(this.parentArray, this.childArray);
-        graphExtension.setDummyNodeIDCounter(currentDummyNodeIndexCounter);
-        graphExtension.createSubGraph(endNodeIndex, range);
+        graphExtension.setDummyNodeIDCounter(this.getDummyNodeIDCounter());
+        graphExtension.createSubGraph(this.getEndNodeIndex(), range);
 
 
         HashMap<Integer, SequenceNode> mapExtension = graphExtension.getNodes();
@@ -269,48 +313,56 @@ public class SequenceGraph {
             }
         }
 
-        ArrayList<ArrayList<SequenceNode>> newColumnList = new ArrayList<ArrayList<SequenceNode>>(columns);
+        ArrayList<ArrayList<SequenceNode>> newColumnList =
+                new ArrayList<ArrayList<SequenceNode>>(columns);
         newColumnList.addAll(graphExtension.getColumns());
         this.setColumns(newColumnList);
 
         return this;
     }
 
+    /**
+     * Method to merge a node hashmmap into the current hashmap.
+     * @param graph - the graph
+     * @param mapExtension - the hashmap Extension.
+     */
     private void mergeNodeMaps(SequenceGraph graph, HashMap<Integer, SequenceNode> mapExtension) {
-        Iterator it = mapExtension.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
+        for (Object o : mapExtension.entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
             SequenceNode node = (SequenceNode) pair.getValue();
             graph.addNode(node);
         }
     }
 
-    public int getDummyNodeIDCounter() {
+    /**
+     * Getter for dummyNodeIDCounter.
+     * @return - the dummyNodeIDCounter.
+     */
+    private int getDummyNodeIDCounter() {
         return dummyNodeIDCounter;
     }
 
-    public void setDummyNodeIDCounter(int dummyNodeIDCounter) {
+    /**
+     * Setter for dummyNodeIDCounter.
+     * @param dummyNodeIDCounter - value which to set.
+     */
+    private void setDummyNodeIDCounter(int dummyNodeIDCounter) {
         this.dummyNodeIDCounter = dummyNodeIDCounter;
     }
 
-    public void setColumns(ArrayList<ArrayList<SequenceNode>> columns) {
+    /**
+     * Setter for columns.
+     * @param columns - the colums which to set.
+     */
+    private void setColumns(ArrayList<ArrayList<SequenceNode>> columns) {
         this.columns = columns;
     }
 
-    public int[] getParentArray() {
-        return parentArray;
-    }
-
-    public int[] getChildArray() {
-        return childArray;
-    }
-
-    public int getStartNodeIndex() {
-        return startNodeIndex;
-    }
-
-    public int getEndNodeIndex() {
+    /**
+     * getter for EndNodeIndex.
+     * @return - the endNodeIndex.
+     */
+    private int getEndNodeIndex() {
         return endNodeIndex;
     }
-
 }

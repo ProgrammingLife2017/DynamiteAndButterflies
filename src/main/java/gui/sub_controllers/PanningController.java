@@ -44,11 +44,11 @@ public class PanningController {
                             + (newVal.doubleValue() - oldVal.doubleValue()));
                     System.out.println("Right bound: " + (drawer.getxDifference() + drawer.getZoomLevel()) + "Range: " + drawer.getRange());
                 }
-                if (drawer.getxDifference() + drawer.getZoomLevel() > drawer.getRange()) {
-                    SequenceGraph graph = drawer.getGraph().extendGraph(100);
-                    drawer.setGraph(graph);
-                    drawer.initializeColumnWidths();
-                }
+//                if (drawer.getxDifference() + drawer.getZoomLevel() > drawer.getRange()) {
+//                    SequenceGraph graph = drawer.getGraph().extendGraph(100);
+//                    drawer.setGraph(graph);
+//                    drawer.initializeColumnWidths();
+//                }
 
             }
         });

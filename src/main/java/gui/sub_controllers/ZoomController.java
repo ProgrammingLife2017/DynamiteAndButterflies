@@ -78,9 +78,9 @@ public class ZoomController {
      * Displays the centre node and radius of the current view.
      */
     public void displayInfo() {
-        // commented outbecaus it glitches out the graph drawer, drawing graphs on eachother.
+        // commented out becaus it glitches out the graph drawer, drawing graphs on eachother.
         //nodeTextField.setText(drawer.getRealCentreNode().getId() + "");
-        radiusTextField.setText((int) Math.ceil(drawer.getRadius()) + "");
+        //radiusTextField.setText((int) Math.ceil(drawer.getRadius()) + "");
     }
 
     /**
