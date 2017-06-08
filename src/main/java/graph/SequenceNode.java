@@ -1,5 +1,6 @@
 package graph;
 
+import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -84,33 +85,26 @@ public class SequenceNode {
      * Draw the node with the color depending on it's status. Orange for highlighted nodes,
      * black for dummy nodes and blue for sequence nodes.
      *
-     * @param gc The grapicsContext of the screen.
+     * @param gc            The grapicsContext of the screen.
      * @param selectedGenes A int[] with all the genomeIds that are selected.
      */
     public void draw(GraphicsContext gc, int[] selectedGenes) {
         gc.clearRect(xCoordinate, yCoordinate, width, height);
-        selected = false;
+        //selected = false;
 
-        for (int selectedGene : selectedGenes) {
-            for (int genome : genomes) {
-                if (selectedGene == genome) {
-                    selected = true;
-                    break;
-                }
-            }
-        }
+        ColourController colourController = new ColourController(selectedGenes);
+        gc.setFill(colourController.getColor(genomes));
 
         if (highlighted) {
-            gc.setFill(Color.ORANGE);
+            gc.setFill(Color.BLANCHEDALMOND);
         } else if (isDummy) {
             gc.strokeLine(xCoordinate, yCoordinate + height / 2,
                     xCoordinate + width, yCoordinate + height / 2);
             return;
-        } else if (selected) {
-            gc.setFill(Color.RED);
-        } else {
-            gc.setFill(Color.BLUE);
         }
+//        else if (!selected) {
+//            gc.setFill(colourController.getBase());
+//        }
         gc.fillRoundRect(xCoordinate, yCoordinate, width, height, ARC_SIZE, ARC_SIZE);
     }
 
