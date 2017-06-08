@@ -42,13 +42,21 @@ public class GraphDrawer {
      */
     public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
-        this.graph = graph;
         this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
+        initializeDrawer(graph);
+    }
+
+    public void initializeDrawer(SequenceGraph graph) {
+        this.graph = graph;
+        initGraph();
+        zoomLevel = columnWidths[columns.size()];
+    }
+
+    public void initGraph() {
         columns = graph.getColumns();
         columnWidths = new double[columns.size() + 1];
         initializeColumnWidths();
-        this.range = columnWidths[columns.size()];
-        zoomLevel = columnWidths[columns.size()];
+        range = columnWidths[columns.size()];
         radius = columns.size();
     }
 
@@ -336,11 +344,6 @@ public class GraphDrawer {
 
     public double getRange() {
         return range;
-    }
-
-
-    public void setGraph(SequenceGraph graph) {
-        this.graph = graph;
     }
 
     public SequenceGraph getGraph() {
