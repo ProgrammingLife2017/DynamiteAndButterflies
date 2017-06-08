@@ -225,4 +225,25 @@ public class SequenceNode {
         this.sequenceLength = sequenceLength;
     }
 
+    public String toString(String sequence) {
+        String str = "Node ID: " + this.id + "\n"
+                + "Column index: " + this.column + "\n"
+                + "Children: ";
+        for (Integer i : children) {
+            str += i.toString() + ", ";
+        }
+        str = str.substring(0, str.length() - 2) + "\n" + "Parents: ";
+        for (Integer i : parents) {
+            str += i.toString() + ", ";
+        }
+        str = str.substring(0, str.length() - 2) +  "\n"
+                + "SequenceLength: ";
+        if (isDummy) {
+            str += "-\n" + "Sequence: -";
+        } else {
+            str += this.sequenceLength + "\n" + "Sequence: " + sequence;
+        }
+        return str;
+    }
+
 }
