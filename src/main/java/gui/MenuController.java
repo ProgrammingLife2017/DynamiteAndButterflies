@@ -4,7 +4,6 @@ import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.*;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -132,7 +131,7 @@ public class MenuController implements Observer {
      * @throws InterruptedException Exception when the Thread is interrupted.
      */
     @FXML
-    public void openFileClicked(String filePath) throws IOException, InterruptedException {
+    private void openFileClicked(String filePath) throws IOException, InterruptedException {
         fileController.openFileClicked(gc, filePath, this);
         selectedGenomes = null;
     }
@@ -418,13 +417,17 @@ public class MenuController implements Observer {
         }
     }
 
+    /**
+     * Handles pressing the specific genome button.
+     * @throws IOException when something goes wrong with IO.
+     */
     @FXML
-    public void chooseGenomePress(ActionEvent actionEvent) throws IOException {
+    public void chooseGenomePress() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/specGenomePopUp.fxml"));
         Stage stage;
         Parent root = loader.load();
-        final specGenomeChooserController controller
-                = loader.<specGenomeChooserController>getController();
+        final SpecificGenomeController controller
+                = loader.<SpecificGenomeController>getController();
 
         HashMap<Integer, String> hashMap;
 

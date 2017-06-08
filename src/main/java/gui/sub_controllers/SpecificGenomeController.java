@@ -5,10 +5,12 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -18,8 +20,10 @@ import java.util.HashMap;
 
 /**
  * Created by Jip on 7-6-2017.
+ * <p>
+ * This class handles choosing a specific genome and the tableView that accompanies it.
  */
-public class specGenomeChooserController {
+public class SpecificGenomeController {
 
     private boolean[] selectedGenomes;
     @FXML
@@ -31,10 +35,15 @@ public class specGenomeChooserController {
     @FXML
     private TableColumn highlightCol;
 
-
+    /**
+     * This method initializes the environment.
+     * It loads the hashmap to genomes to the table.
+     *
+     * @param hashMap       data on the different genomes.
+     * @param alreadyChosen data on what genomes want to be viewed.
+     */
     public void initialize(HashMap<Integer, String> hashMap, boolean[] alreadyChosen) {
-        this.selectedGenomes = alreadyChosen;
-
+        System.arraycopy(alreadyChosen, 0, selectedGenomes, 0, alreadyChosen.length);
         ArrayList<Genome> realData = new ArrayList<Genome>();
         for (int i = 0; i < hashMap.size(); i++) {
             Genome genome = new Genome(i, hashMap.get(i));
@@ -50,7 +59,6 @@ public class specGenomeChooserController {
                     }
                 };
 
-        //Explain how the table should read the info
         idCol.setCellValueFactory(new PropertyValueFactory<Genome, Integer>("id"));
         nameCol.setCellValueFactory(new PropertyValueFactory<Genome, String>("name"));
         highlightCol.setCellValueFactory(new PropertyValueFactory<Genome, String>("selected"));
@@ -71,15 +79,24 @@ public class specGenomeChooserController {
                     }
                 }
         );
-
         table.getItems().setAll(data);
     }
 
+    /**
+     * Gets the bool[] of selected genomes.
+     * The key is the id.
+     * The value is the value.
+     *
+     * @return a boll[] representing the genomes
+     */
     public boolean[] getSelectedGenomes() {
-        return this.selectedGenomes;
+        return selectedGenomes;
     }
 
-    //Save button ensure the selected genomes is updated see line 62
+    /**
+     * Handles pressing the save button.
+     * Updates the selectedgenomes with what is in the table.
+     */
     @FXML
     public void saveSelected() {
         for (int i = 0; i < selectedGenomes.length; i++) {
@@ -88,8 +105,11 @@ public class specGenomeChooserController {
         }
     }
 
+    /**
+     * Closes the pop up.
+     */
     @FXML
-    public void cancelClicked(ActionEvent actionEvent) {
+    public void cancelClicked() {
         close();
     }
 
@@ -102,11 +122,19 @@ public class specGenomeChooserController {
     }
 }
 
+/**
+ * A class taken from.
+ * http://docs.oracle.com/javafx/2/ui_controls/table-view.htm
+ * Handles editing a cell
+ */
 class EditingCell extends TableCell<Genome, String> {
 
     private TextField textField;
 
-    public EditingCell() {
+    /**
+     * Constructor.
+     */
+    EditingCell() {
     }
 
     @Override
