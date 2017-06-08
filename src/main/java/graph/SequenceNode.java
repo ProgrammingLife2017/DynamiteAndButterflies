@@ -95,12 +95,12 @@ public class SequenceNode {
         ColourController colourController = new ColourController(selectedGenes);
         gc.setFill(colourController.getColor(genomes));
 
-        if (highlighted) {
-            gc.setFill(Color.BLANCHEDALMOND);
-        } else if (isDummy) {
+        if (isDummy) {
             gc.strokeLine(xCoordinate, yCoordinate + height / 2,
                     xCoordinate + width, yCoordinate + height / 2);
             return;
+        } else if (highlighted) {
+            gc.setFill(Color.BLANCHEDALMOND);
         }
 //        else if (!selected) {
 //            gc.setFill(colourController.getBase());

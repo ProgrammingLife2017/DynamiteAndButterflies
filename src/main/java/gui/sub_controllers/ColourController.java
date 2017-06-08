@@ -145,7 +145,7 @@ public class ColourController {
             case 7:
                 return Color.DARKGREEN;
             default:
-                return Color.DARKBLUE;
+                return getBase();
         }
     }
 
@@ -187,7 +187,7 @@ public class ColourController {
                 lowMiddleCounter = 0;
                 return getLowMiddle();
             default:
-                return Color.WHITE;
+                return getBase();
         }
     }
 
@@ -230,6 +230,6 @@ public class ColourController {
 //    }
 
     public Color getBase() {
-        return Color.DARKBLUE;
+        return Color.BLUE;
     }
 }
