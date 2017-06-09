@@ -37,6 +37,14 @@ import java.util.Observer;
 public class MenuController implements Observer {
 
     @FXML
+    private Button saveGenomeBut;
+    @FXML
+    private MenuItem genome1;
+    @FXML
+    private MenuItem genome2;
+    @FXML
+    private MenuItem genome3;
+    @FXML
     private MenuItem file1;
     @FXML
     private MenuItem file2;
@@ -80,6 +88,7 @@ public class MenuController implements Observer {
     private InfoController infoController;
     private RecentController recentController;
     private PanningController panningController;
+    private SpecificGenomeProperties specificGenomeProperties;
 
     private boolean[] selectedGenomes;
 
@@ -99,6 +108,8 @@ public class MenuController implements Observer {
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
+        specificGenomeProperties = new SpecificGenomeProperties(saveGenomeBut,
+                                                    genome1, genome2, genome3);
 
         ps = new PrintStream(new Console(consoleArea));
         //System.setErr(ps);
@@ -119,6 +130,7 @@ public class MenuController implements Observer {
         String filePath = file.getAbsolutePath();
         recentController.update(filePath);
         fileController.openFileClicked(gc, filePath, this);
+        specificGenomeProperties.hideSave();
         selectedGenomes = null;
     }
 
@@ -133,6 +145,8 @@ public class MenuController implements Observer {
     @FXML
     private void openFileClicked(String filePath) throws IOException, InterruptedException {
         fileController.openFileClicked(gc, filePath, this);
+        recentController.update(filePath);
+        specificGenomeProperties.hideSave();
         selectedGenomes = null;
     }
 
@@ -338,6 +352,7 @@ public class MenuController implements Observer {
                         String offTitle = parts[0];
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
+                        specificGenomeProperties.initialize();
                         panningController =
                                 new PanningController(scrollbar, fileController.getDrawer());
                         zoomController = new ZoomController(fileController.getGraph(),
@@ -437,9 +452,73 @@ public class MenuController implements Observer {
                     public void handle(WindowEvent event) {
                         fileController.getDrawer().setSelected(controller.getSelectedGenomes());
                         fileController.getDrawer().redraw();
+                        specificGenomeProperties.showSave();
                     }
                 }
         );
         stage.showAndWait();
+    }
+
+    /**
+     * Handles pressing the save button.
+     */
+    @FXML
+    public void saveGenomesClick() {
+        specificGenomeProperties.saving(fileController.getDrawer().getSelected());
+    }
+
+    /**
+     * Handles pressing the save button in the menu.
+     */
+    @FXML
+    public void otherSaveGenomeClick() {
+        specificGenomeProperties.saving(fileController.getDrawer().getSelected());
+    }
+
+    /**
+     * Pressing on the first saved genomes.
+     */
+    @FXML
+    public void genome1Click() {
+        genomeBookmarkClicked(genome1);
+    }
+
+    /**
+     * Pressing on the second saved genomes.
+     */
+    @FXML
+    public void genome2Click() {
+        genomeBookmarkClicked(genome2);
+    }
+
+    /**
+     * Pressing on the third saved genomes.
+     */
+    @FXML
+    public void genome3Click() {
+        genomeBookmarkClicked(genome3);
+    }
+
+    /**
+     * Generic genome bookmark function to not duplicate code.
+     * @param bookmark The MenuItem that was pressed.
+     */
+    private void genomeBookmarkClicked(MenuItem bookmark) {
+        if (!bookmark.getText().equals("-")) {
+            String string = bookmark.getText();
+            String[] parts = string.split(" - ");
+            //We skip parts[0] because that is "Genomes".
+            String listOfIds = parts[1];
+
+            parts = listOfIds.split(", ");
+            int[] res = new int[parts.length];
+            for (int i = 0; i < parts.length; i++) {
+                int oneSelected = Integer.parseInt(parts[i]);
+                res[i] = oneSelected;
+            }
+
+            fileController.getDrawer().setSelected(res);
+            fileController.getDrawer().redraw();
+        }
     }
 }

@@ -97,9 +97,11 @@ public class BookmarkController {
                                 properties.getProperty(FILE_BOOKMARK2 + filePath, EMPTY));
         properties.setProperty(FILE_BOOKMARK1 + filePath,
                                 properties.getProperty(FILE_BOOKMARK1 + filePath, EMPTY));
+        properties.saveProperties();
 
         bookmark3.setText(properties.getProperty(FILE_BOOKMARK3 + filePath, EMPTY));
         bookmark2.setText(properties.getProperty(FILE_BOOKMARK2 + filePath, EMPTY));
         bookmark1.setText(properties.getProperty(FILE_BOOKMARK1 + filePath, EMPTY));
+
     }
 }
