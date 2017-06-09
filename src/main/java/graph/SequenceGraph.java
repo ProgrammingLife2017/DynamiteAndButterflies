@@ -78,7 +78,7 @@ public class SequenceGraph {
     private int[] getGenomes(int node) throws IOException {
         try {
             Stream<String> lines = Files.lines(Paths.get(partPath + "genomes.txt"));
-            String line = lines.skip(node).findFirst().get();
+            String line = lines.skip(node - 1).findFirst().get();
             String[] text = line.split(";");
             int[] genomes = new int[text.length];
             for (int i = 0; i < text.length; i++) {
