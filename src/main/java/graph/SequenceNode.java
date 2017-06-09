@@ -1,5 +1,6 @@
 package graph;
 
+import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -14,6 +15,7 @@ public class SequenceNode {
     private static final int ARC_SIZE = 10;
 
     private int id;
+    private int[] genomes;
     private int index;
     private int column;
     private int sequenceLength;
@@ -33,6 +35,7 @@ public class SequenceNode {
 
     /**
      * Constructor for the sequenceNode.
+     *
      * @param id The id of the node.
      */
     SequenceNode(int id) {
@@ -44,13 +47,15 @@ public class SequenceNode {
         this.parents = new ArrayList<Integer>();
         this.children = new ArrayList<Integer>();
         this.isDummy = false;
+        this.genomes = new int[0];
     }
 
     /**
      * Setter for the location of a node.
-     * @param x XLocation.
-     * @param y YLocation.
-     * @param width Width.
+     *
+     * @param x      XLocation.
+     * @param y      YLocation.
+     * @param width  Width.
      * @param height Height.
      */
     public void setCoordinates(double x, double y, double width, double height) {
@@ -77,18 +82,20 @@ public class SequenceNode {
     /**
      * Draw the node with the color depending on it's status. Orange for highlighted nodes,
      * black for dummy nodes and blue for sequence nodes.
-     * @param gc The grapicsContext of the screen.
+     *
+     * @param gc            The grapicsContext of the screen.
+     * @param selectedGenes A int[] with all the genomeIds that are selected.
      */
-    public void draw(GraphicsContext gc) {
+    public void draw(GraphicsContext gc, int[] selectedGenes, ColourController colourController) {
         gc.clearRect(xCoordinate, yCoordinate, width, height);
-        if (highlighted) {
-            gc.setFill(Color.ORANGE);
-        } else if (isDummy) {
+        gc.setFill(colourController.getColor(genomes));
+
+        if (isDummy) {
             gc.strokeLine(xCoordinate, yCoordinate + height / 2,
                     xCoordinate + width, yCoordinate + height / 2);
             return;
-        } else {
-            gc.setFill(Color.BLUE);
+        } else if (highlighted) {
+            gc.setFill(Color.BLANCHEDALMOND);
         }
         gc.fillRoundRect(xCoordinate, yCoordinate, width, height, ARC_SIZE, ARC_SIZE);
     }
@@ -199,8 +206,13 @@ public class SequenceNode {
         }
     }
 
+    public void setGenomes(int[] genomesArg) {
+        this.genomes = genomesArg;
+    }
+
     /**
      * method to resolve the baryCenterValue.
+     *
      * @return - returns the barycenterValue / inDegree
      */
     float getBaryCenterValue() {
@@ -225,6 +237,15 @@ public class SequenceNode {
         this.sequenceLength = sequenceLength;
     }
 
+    public int[] getGenomes() {
+        return genomes;
+    }
+
+    /**
+     * Forms a string of the sequence node.
+     * @param sequence With it's sequence which we do not constantly want in memory
+     * @return A string representation of the node.
+     */
     public String toString(String sequence) {
         String str = "Node ID: " + this.id + "\n"
                 + "Column index: " + this.column + "\n"
@@ -241,9 +262,12 @@ public class SequenceNode {
         if (isDummy) {
             str += "-\n" + "Sequence: -";
         } else {
-            str += this.sequenceLength + "\n" + "Sequence: " + sequence;
+            str += this.sequenceLength + "\n" + "Sequence: " + sequence + "\n";
+            str += "Genomes that go through this:\t";
+            for (Integer i : this.getGenomes()) {
+                str += i.toString() + "\t";
+            }
         }
         return str;
     }
-
 }

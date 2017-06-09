@@ -4,6 +4,7 @@ import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.*;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,18 +17,20 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.mapdb.HTreeMap;
 import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
- *
+ * <p>
  * Controller for the Menu scene. Used to run all functionality
  * in the main screen of the application.
  */
@@ -78,6 +81,8 @@ public class MenuController implements Observer {
     private RecentController recentController;
     private PanningController panningController;
 
+    private boolean[] selectedGenomes;
+
     private String filePath;
 
     /**
@@ -96,14 +101,15 @@ public class MenuController implements Observer {
         recentController = new RecentController(file1, file2, file3);
 
         ps = new PrintStream(new Console(consoleArea));
-        System.setErr(ps);
-        System.setOut(ps);
+        //System.setErr(ps);
+        //System.setOut(ps);
     }
 
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
      * can be selected and directly be visualised on the screen.
-     * @throws IOException if there is no file specified.
+     *
+     * @throws IOException          if there is no file specified.
      * @throws InterruptedException Exception when the Thread is interrupted.
      */
     @FXML
@@ -113,18 +119,21 @@ public class MenuController implements Observer {
         String filePath = file.getAbsolutePath();
         recentController.update(filePath);
         fileController.openFileClicked(gc, filePath, this);
+        selectedGenomes = null;
     }
 
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
      * can be selected and directly be visualised on the screen.
+     *
      * @param filePath the file that should be opened
-     * @throws IOException if there is no file specified.
+     * @throws IOException          if there is no file specified.
      * @throws InterruptedException Exception when the Thread is interrupted.
      */
     @FXML
-    public void openFileClicked(String filePath) throws IOException, InterruptedException {
+    private void openFileClicked(String filePath) throws IOException, InterruptedException {
         fileController.openFileClicked(gc, filePath, this);
+        selectedGenomes = null;
     }
 
     private void displayInfo(SequenceGraph graph) {
@@ -134,6 +143,7 @@ public class MenuController implements Observer {
 
     /**
      * ZoomIn Action Handler.
+     *
      * @throws IOException exception.
      */
     @FXML
@@ -145,6 +155,7 @@ public class MenuController implements Observer {
 
     /**
      * ZoomOut Action Handler.
+     *
      * @throws IOException exception.
      */
     @FXML
@@ -156,6 +167,7 @@ public class MenuController implements Observer {
 
     /**
      * Ensures the scroll bar zooms in and out.
+     *
      * @param scrollEvent The scroll.
      * @throws IOException throws exception if column doesn't exist.
      */
@@ -172,6 +184,7 @@ public class MenuController implements Observer {
 
     /**
      * Get the X-Coordinate of the cursor on click.
+     *
      * @param mouseEvent the mouse event.
      */
     @FXML
@@ -201,8 +214,9 @@ public class MenuController implements Observer {
 
     /**
      * Adds a button to traverse the graph with.
+     *
      * @param centreNode specifies the centre node to be showed
-     * @param radius specifies the radius to be showed
+     * @param radius     specifies the radius to be showed
      */
     private void traverseGraphClicked(String centreNode, String radius) {
         int centreNodeID = Integer.parseInt(centreNode);
@@ -240,6 +254,7 @@ public class MenuController implements Observer {
 
     /**
      * Updates and saves the bookmarks.
+     *
      * @throws IOException Throws expception if it can't find the fxml file.
      */
     @FXML
@@ -250,7 +265,7 @@ public class MenuController implements Observer {
         Parent root = loader.load();
         BookmarkPopUp controller = loader.<BookmarkPopUp>getController();
         controller.initialize(zoomController.getCentreNode(),
-                            zoomController.getRadius(), bookmarkController);
+                zoomController.getRadius(), bookmarkController);
 
         stage = new Stage();
         stage.setScene(new Scene(root));
@@ -261,6 +276,7 @@ public class MenuController implements Observer {
 
     /**
      * Handles pressing the manage bookmark button.
+     *
      * @throws IOException if the fxml file doesn't exist.
      */
     @FXML
@@ -278,6 +294,7 @@ public class MenuController implements Observer {
 
     /**
      * Method used to not duplicate code in working out bookmarks.
+     *
      * @param bookmark the button that specifies the bookmark
      */
     private void bookmarked(MenuItem bookmark) {
@@ -295,6 +312,7 @@ public class MenuController implements Observer {
 
     /**
      * getter for the SequenceMap.
+     *
      * @return The sequenceMap.
      */
     HTreeMap<Long, String> getSequenceHashMap() {
@@ -323,8 +341,8 @@ public class MenuController implements Observer {
                         panningController =
                                 new PanningController(scrollbar, fileController.getDrawer());
                         zoomController = new ZoomController(fileController.getGraph(),
-                                    fileController.getDrawer(), panningController,
-                                    nodeTextField, radiusTextField);
+                                fileController.getDrawer(), panningController,
+                                nodeTextField, radiusTextField);
                         displayInfo(fileController.getGraph());
                     }
                 });
@@ -358,6 +376,7 @@ public class MenuController implements Observer {
 
     /**
      * Method used to not duplicate recentFile presses.
+     *
      * @param file the menuItem that has been pressed
      */
     private void pressedRecent(MenuItem file) {
@@ -380,5 +399,47 @@ public class MenuController implements Observer {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Handles pressing the specific genome button.
+     *
+     * @throws IOException when something goes wrong with IO.
+     */
+    @FXML
+    public void chooseGenomePress() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/specGenomePopUp.fxml"));
+        Stage stage;
+        Parent root = loader.load();
+        final SpecificGenomeController controller
+                = loader.<SpecificGenomeController>getController();
+
+        HashMap<Integer, String> hashMap;
+
+        hashMap = fileController.getAllGenomes();
+        if (hashMap == null) {
+            try {
+                openFileClicked();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        controller.initialize(hashMap, fileController.getDrawer().getSelected());
+
+        stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Choose a specific genome to view");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setOnHidden(
+                new EventHandler<WindowEvent>() {
+                    @Override
+                    public void handle(WindowEvent event) {
+                        fileController.getDrawer().setSelected(controller.getSelectedGenomes());
+                        fileController.getDrawer().redraw();
+                    }
+                }
+        );
+        stage.showAndWait();
     }
 }

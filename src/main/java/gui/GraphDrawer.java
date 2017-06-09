@@ -2,8 +2,8 @@ package gui;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
+import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,6 +32,8 @@ public class GraphDrawer {
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
     private int highlightedNode;
+    private int[] selected;
+    private ColourController colourController;
 
     /**
      * Constructor.
@@ -48,6 +50,8 @@ public class GraphDrawer {
         initializeColumnWidths();
         zoomLevel = columnWidths[columns.size()];
         radius = columns.size();
+        selected = new int[0];
+        colourController = new ColourController(selected);
     }
 
     /**
@@ -91,32 +95,12 @@ public class GraphDrawer {
      */
     public void moveShapes(double xDifference) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
-        gc.setFill(Color.BLUE);
         this.xDifference = xDifference;
         this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
         setLineWidth();
+        colourController = new ColourController(selected);
         drawNodes();
         drawEdges();
-    }
-
-    /**
-     * Initializes the widths of each column.
-     * Using the widest node of each column.
-     */
-    public void initializeColumnWidths() {
-        for (int j = 0; j < columns.size(); j++) {
-            ArrayList<SequenceNode> column = columns.get(j);
-            double max = 1;
-            for (int i = 0; i < column.size(); i++) {
-                if (!column.get(i).isDummy()) {
-                    double length = computeNodeWidth(column.get(i));
-                    if (length > max) {
-                        max = length;
-                    }
-                }
-            }
-            columnWidths[j + 1] = columnWidths[j] + max;
-        }
     }
 
     /**
@@ -138,7 +122,27 @@ public class GraphDrawer {
                 height = width;
             }
             node.setCoordinates(x, y, width, height);
-            node.draw(gc);
+            node.draw(gc, selected, colourController);
+        }
+    }
+
+    /**
+     * Initializes the widths of each column.
+     * Using the widest node of each column.
+     */
+    public void initializeColumnWidths() {
+        for (int j = 0; j < columns.size(); j++) {
+            ArrayList<SequenceNode> column = columns.get(j);
+            double max = 1;
+            for (int i = 0; i < column.size(); i++) {
+                if (!column.get(i).isDummy()) {
+                    double length = computeNodeWidth(column.get(i));
+                    if (length > max) {
+                        max = length;
+                    }
+                }
+            }
+            columnWidths[j + 1] = columnWidths[j] + max;
         }
     }
 
@@ -251,10 +255,10 @@ public class GraphDrawer {
     public void highlight(int node) {
         if (highlightedNode != 0) {
             graph.getNode(highlightedNode).lowlight();
-            graph.getNode(highlightedNode).draw(gc);
+            graph.getNode(highlightedNode).draw(gc, selected, colourController);
         }
         graph.getNode(node).highlight();
-        graph.getNode(node).draw(gc);
+        graph.getNode(node).draw(gc, selected, colourController);
         highlightedNode = node;
     }
 
@@ -315,6 +319,15 @@ public class GraphDrawer {
      */
     public int mouseLocationColumn(double x) {
         return (int) ((x / stepSize) + xDifference);
+    }
+
+    public void setSelected(int[] newSelection) {
+        this.selected = newSelection;
+        this.colourController = new ColourController(selected);
+    }
+
+    public int[] getSelected() {
+        return selected;
     }
 }
 
