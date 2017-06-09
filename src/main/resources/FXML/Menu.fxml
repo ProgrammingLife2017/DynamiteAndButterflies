@@ -61,6 +61,18 @@
                               <MenuItem mnemonicParsing="false" onAction="#manageBookmarks" text="Manage bookmarks" />
                           </items>
                         </Menu>
+                        <Menu mnemonicParsing="false" text="Genomes">
+                          <items>
+                              <Menu mnemonicParsing="false" text="Open genomes">
+                                <items>
+                                  <MenuItem fx:id="genome1" mnemonicParsing="false" onAction="#genome1Click" text="-" />
+                                    <MenuItem fx:id="genome2" mnemonicParsing="false" onAction="#genome2Click" text="-" />
+                                    <MenuItem fx:id="genome3" mnemonicParsing="false" onAction="#genome3Click" text="-" />
+                                </items>
+                              </Menu>
+                            <MenuItem fx:id="saveGenomesMenuIt" mnemonicParsing="false" onAction="#otherSaveGenomeClick" text="saveGenomeMenu" />
+                          </items>
+                        </Menu>
                     </menus>
                   </MenuBar>
                   <SplitPane dividerPositions="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="32.0">
@@ -71,6 +83,7 @@
                               <Button layoutX="26.0" layoutY="72.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
                               <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="27.0" layoutY="111.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
                               <Button fx:id="chooseGenome" layoutX="14.0" layoutY="171.0" mnemonicParsing="false" onAction="#chooseGenomePress" prefHeight="25.0" prefWidth="120.0" text="Specific Genome" />
+                              <Button fx:id="saveGenomeBut" layoutX="15.0" layoutY="207.0" mnemonicParsing="false" onAction="#saveGenomesClick" prefHeight="25.0" prefWidth="120.0" text="Save genomes" visible="false" />
                            </children>
                         </AnchorPane>
                       <AnchorPane fx:id="canvasPanel">
