@@ -41,7 +41,6 @@ public class PanningController {
             @Override
             public void handle(ActionEvent event) {
                 pannRight();
-                System.out.println("test");
             }
         }));
         timelineRight.setCycleCount(Animation.INDEFINITE);

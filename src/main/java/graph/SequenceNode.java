@@ -245,27 +245,28 @@ public class SequenceNode {
      * @return A string representation of the node.
      */
     public String toString(String sequence) {
-        String str = "Node ID: " + this.id + "\n"
-                + "Column index: " + this.column + "\n"
-                + "Children: ";
+        String str = "Node ID:\t" + this.id + "\n"
+                + "Column index:\t" + this.column + "\n"
+                + "Children:\t";
         for (Integer i : children) {
             str += i.toString() + ", ";
         }
-        str = str.substring(0, str.length() - 2) + "\n" + "Parents: ";
+        str = str.substring(0, str.length() - 2) + "\n" + "Parents:\t";
         for (Integer i : parents) {
             str += i.toString() + ", ";
         }
         str = str.substring(0, str.length() - 2) +  "\n"
-                + "SequenceLength: ";
+                + "SequenceLength:\t";
         if (isDummy) {
-            str += "-\n" + "Sequence: -";
+            str += "-\n" + "Sequence:\t-";
         } else {
-            str += this.sequenceLength + "\n" + "Sequence: " + sequence + "\n";
+            str += this.sequenceLength + "\n" + "Sequence:\t" + sequence + "\n";
             str += "Genomes that go through this:\t";
             for (Integer i : this.getGenomes()) {
-                str += i.toString() + "\t";
+                str += i.toString() + ", ";
             }
         }
+        str = str.substring(0, str.length() - 2);
         return str;
     }
 }
