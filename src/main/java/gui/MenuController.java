@@ -37,15 +37,13 @@ import java.util.Observer;
 public class MenuController implements Observer {
 
     @FXML
-    public Button saveGenomeBut;
+    private Button saveGenomeBut;
     @FXML
-    public MenuItem genome1;
+    private MenuItem genome1;
     @FXML
-    public MenuItem genome2;
+    private MenuItem genome2;
     @FXML
-    public MenuItem genome3;
-    @FXML
-    public MenuItem saveGenomesMenuIt;
+    private MenuItem genome3;
     @FXML
     private MenuItem file1;
     @FXML
@@ -110,7 +108,8 @@ public class MenuController implements Observer {
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
-        specificGenomeProperties = new SpecificGenomeProperties(saveGenomeBut, genome1, genome2, genome3, saveGenomesMenuIt);
+        specificGenomeProperties = new SpecificGenomeProperties(saveGenomeBut,
+                                                    genome1, genome2, genome3);
 
         ps = new PrintStream(new Console(consoleArea));
         System.setErr(ps);
@@ -481,31 +480,50 @@ public class MenuController implements Observer {
         stage.showAndWait();
     }
 
+    /**
+     * Handles pressing the save button.
+     */
     @FXML
     public void saveGenomesClick() {
         specificGenomeProperties.saving(fileController.getDrawer().getSelected());
     }
 
+    /**
+     * Handles pressing the save button in the menu.
+     */
     @FXML
     public void otherSaveGenomeClick() {
         specificGenomeProperties.saving(fileController.getDrawer().getSelected());
     }
 
+    /**
+     * Pressing on the first saved genomes.
+     */
     @FXML
     public void genome1Click() {
         genomeBookmarkClicked(genome1);
     }
 
+    /**
+     * Pressing on the second saved genomes.
+     */
     @FXML
     public void genome2Click() {
         genomeBookmarkClicked(genome2);
     }
 
+    /**
+     * Pressing on the third saved genomes.
+     */
     @FXML
     public void genome3Click() {
         genomeBookmarkClicked(genome3);
     }
 
+    /**
+     * Generic genome bookmark function to not duplicate code.
+     * @param bookmark The MenuItem that was pressed.
+     */
     private void genomeBookmarkClicked(MenuItem bookmark) {
         if (!bookmark.getText().equals("-")) {
             String string = bookmark.getText();

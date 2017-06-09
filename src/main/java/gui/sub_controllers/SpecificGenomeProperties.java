@@ -7,6 +7,8 @@ import javafx.scene.control.MenuItem;
 
 /**
  * Created by Jip on 9-6-2017.
+ *
+ * This class handles the menu part of saving bookmarks about the genome views.
  */
 public class SpecificGenomeProperties {
 
@@ -15,7 +17,6 @@ public class SpecificGenomeProperties {
     private MenuItem genomes1;
     private MenuItem genomes2;
     private MenuItem genomes3;
-    private MenuItem addGenomes;
     private CustomProperties properties;
 
     private static final String PROP_ONE = "firstGenomes";
@@ -25,16 +26,26 @@ public class SpecificGenomeProperties {
 
     private String filePath;
 
-    public SpecificGenomeProperties(Button saveButtonArg, MenuItem g1, MenuItem g2, MenuItem g3, MenuItem addArg) {
+    /**
+     * Constructor of the genomeproperties.
+     * @param saveButtonArg The save button.
+     * @param g1 The first menui=Item
+     * @param g2 the second menuItem
+     * @param g3 the third menuItem
+     */
+    public SpecificGenomeProperties(Button saveButtonArg, MenuItem g1, MenuItem g2, MenuItem g3) {
         saveButton = saveButtonArg;
         genomes1 = g1;
         genomes2 = g2;
         genomes3 = g3;
-        addGenomes = addArg;
         properties = new CustomProperties();
 
     }
 
+    /**
+     * Updates the list of bookmarked genomes.
+     * @param genomes The string to add.
+     */
     public void update(String genomes) {
         properties.updateProperties();
         properties.setProperty(PROP_THREE + filePath, genomes2.getText());
@@ -47,6 +58,9 @@ public class SpecificGenomeProperties {
         properties.saveProperties();
     }
 
+    /**
+     * Initializes the genome bookmarks.
+     */
     public void initialize() {
         properties.updateProperties();
 
@@ -65,14 +79,24 @@ public class SpecificGenomeProperties {
         properties.saveProperties();
     }
 
+    /**
+     * Shows the save button.
+     */
     public void showSave() {
         saveButton.setVisible(true);
     }
 
+    /**
+     * Hides the save button.
+     */
     public void hideSave() {
         saveButton.setVisible(false);
     }
 
+    /**
+     * Handles the save button and parsing data to a string.
+     * @param selectedGenomes The selectedGenomes.
+     */
     public void saving(int[] selectedGenomes) {
         String save = "Genomes" + " - ";
 
