@@ -22,7 +22,7 @@ public class SequenceGraphTest {
         parentArray = new int[]{1,2,2,3,4,4,5,5,6,7,7,7,8,9,10,11,11,11,12,13,14,15,15,16,16,17,18};
         childArray = new int[]{2,3,4,4,5,7,6,7,7,8,9,10,11,11,11,12,13,14,13,15,15,16,19,17,18,19,19};
         graph = new SequenceGraph(parentArray, childArray, null);
-        graph.createSubGraph(1, 27);
+        graph.createSubGraph(1, 27, null);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class SequenceGraphTest {
     @Test
     public void extendGraph() throws Exception {
         graph = new SequenceGraph(parentArray, childArray, null);
-        graph.createSubGraph(1, 1);
+        graph.createSubGraph(1, 1, null);
         graph.extendGraph(26);
         assertEquals(graph.size(), 27);
     }
@@ -87,6 +87,6 @@ public class SequenceGraphTest {
     @Test (expected = IllegalArgumentException.class)
     public void invalidArgument() throws Exception {
         graph = new SequenceGraph(parentArray, childArray, null);
-        graph.createSubGraph(-1, 1);
+        graph.createSubGraph(-1, 1, null);
     }
 }

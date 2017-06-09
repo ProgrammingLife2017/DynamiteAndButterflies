@@ -1,5 +1,6 @@
 package parser;
 
+import gui.CustomProperties;
 import gui.sub_controllers.PopUpController;
 import javafx.application.Platform;
 import org.mapdb.DB;
@@ -24,6 +25,9 @@ public class GfaParser extends Observable implements Runnable {
     private String header2;
     private HTreeMap<Long, String> sequenceMap;
     private String filePath;
+
+
+
     private String partPath;
     private CustomProperties properties = new CustomProperties();
 
@@ -240,5 +244,8 @@ public class GfaParser extends Observable implements Runnable {
             genomesMap.put(i, strNums[i]);
         }
         return genomesMap;
+    }
+    public String getPartPath() {
+        return partPath;
     }
 }

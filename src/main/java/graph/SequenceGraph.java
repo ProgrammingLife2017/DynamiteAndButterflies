@@ -1,5 +1,7 @@
 package graph;
 
+import org.mapdb.HTreeMap;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -24,6 +26,8 @@ public class SequenceGraph {
     private HTreeMap<Long, String> sequenceHashMap;
 
     private int dummyNodeIDCounter = -1;
+
+
 
     private String partPath;
 
@@ -53,7 +57,8 @@ public class SequenceGraph {
      * @param centerNodeID - the node to start rendering at.
      * @param range - the amount of edges to add to the graph
      */
-    public void createSubGraph(int centerNodeID, int range) {
+    public void createSubGraph(int centerNodeID, int range, String partPath) {
+        this.partPath = partPath;
         this.nodes = new HashMap<Integer, SequenceNode>();
         this.columns = new ArrayList<ArrayList<SequenceNode>>();
 
@@ -95,7 +100,12 @@ public class SequenceGraph {
             int childID = childArray[i];
             if (nodes.get(parentID) == null) {
                 SequenceNode node = new SequenceNode(parentID);
-                int[] genomes = getGenomes(parentID);
+                int[] genomes = new int[0];
+                try {
+                    genomes = getGenomes(parentID);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 node.setGenomes(genomes);
                 node.addChild(childID);
                 nodes.put(parentID, node);
@@ -104,7 +114,12 @@ public class SequenceGraph {
             }
             if (nodes.get(childID) == null) {
                 SequenceNode node = new SequenceNode(childID);
-                int[] genomes = getGenomes(childID);
+                int[] genomes = new int[0];
+                try {
+                    genomes = getGenomes(childID);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 node.setGenomes(genomes);
                 nodes.put(childID, node);
             }
@@ -339,7 +354,7 @@ public class SequenceGraph {
     public SequenceGraph extendGraph(int range) {
         SequenceGraph graphExtension = new SequenceGraph(this.parentArray, this.childArray, this.sequenceHashMap);
         graphExtension.setDummyNodeIDCounter(this.getDummyNodeIDCounter());
-        graphExtension.createSubGraph(this.getEndNodeIndex(), range);
+        graphExtension.createSubGraph(this.getEndNodeIndex(), range, this.partPath);
 
 
         HashMap<Integer, SequenceNode> mapExtension = graphExtension.getNodes();
@@ -409,5 +424,9 @@ public class SequenceGraph {
 
     public int getStartNodeIndex() {
         return startNodeIndex;
+    }
+
+    public String getPartPath() {
+        return partPath;
     }
 }

@@ -85,7 +85,7 @@ public class PanningController {
 
     public void pannRight() {
         if (drawer.getxDifference() + drawer.getZoomLevel() > drawer.getRange()) {
-            drawer.getGraph().createSubGraph(1, drawer.getGraph().getEndNodeIndex() + 100);
+            drawer.getGraph().createSubGraph(1, drawer.getGraph().getEndNodeIndex() + 100, drawer.getGraph().getPartPath());
             drawer.initGraph();
         }
         //TODO check for left bound

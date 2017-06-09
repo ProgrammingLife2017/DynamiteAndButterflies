@@ -56,7 +56,7 @@ public class ZoomController {
      */
     public void zoomOut(int column) throws IOException {
         if (drawer.getxDifference() + drawer.getZoomLevel() > drawer.getRange()) {
-            drawer.getGraph().createSubGraph(1, drawer.getGraph().getEndNodeIndex() + 100);
+            drawer.getGraph().createSubGraph(1, drawer.getGraph().getEndNodeIndex() + 100, drawer.getGraph().getPartPath());
             drawer.initGraph();
         }
         drawer.zoom(SCROLL_ZOOM_OUT_FACTOR, column);

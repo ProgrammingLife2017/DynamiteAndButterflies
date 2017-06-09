@@ -170,15 +170,9 @@ public class FileController implements Observer {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                graph = new SequenceGraph();
-                try {
-                    graph.createSubGraph(nodeId, renderRange, parentArray, childArray, partPath);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 sequenceHashMap = parser.getSequenceHashMap();
                 graph = new SequenceGraph(parentArray, childArray, sequenceHashMap);
-                graph.createSubGraph(nodeId, renderRange);
+                graph.createSubGraph(nodeId, renderRange, partPath);
                 drawer = new GraphDrawer(graph, gc);
                 drawer.moveShapes(0.0);
                 progressBarController.done();
