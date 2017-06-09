@@ -2,6 +2,7 @@ package gui;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
+import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.GraphicsContext;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class GraphDrawer {
     private SequenceGraph graph;
     private int highlightedNode;
     private int[] selected;
+    private ColourController colourController;
 
     /**
      * Constructor.
@@ -49,6 +51,7 @@ public class GraphDrawer {
         zoomLevel = columnWidths[columns.size()];
         radius = columns.size();
         selected = new int[0];
+        colourController = new ColourController(selected);
     }
 
     /**
@@ -95,6 +98,7 @@ public class GraphDrawer {
         this.xDifference = xDifference;
         this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
         setLineWidth();
+        colourController = new ColourController(selected);
         drawNodes();
         drawEdges();
     }
@@ -118,7 +122,7 @@ public class GraphDrawer {
                 height = width;
             }
             node.setCoordinates(x, y, width, height);
-            node.draw(gc, selected);
+            node.draw(gc, selected, colourController);
         }
     }
 
@@ -251,10 +255,10 @@ public class GraphDrawer {
     public void highlight(int node) {
         if (highlightedNode != 0) {
             graph.getNode(highlightedNode).lowlight();
-            graph.getNode(highlightedNode).draw(gc, selected);
+            graph.getNode(highlightedNode).draw(gc, selected, colourController);
         }
         graph.getNode(node).highlight();
-        graph.getNode(node).draw(gc, selected);
+        graph.getNode(node).draw(gc, selected, colourController);
         highlightedNode = node;
     }
 
@@ -319,6 +323,7 @@ public class GraphDrawer {
 
     public void setSelected(int[] newSelection) {
         this.selected = newSelection;
+        this.colourController = new ColourController(selected);
     }
 
     public int[] getSelected() {

@@ -217,7 +217,7 @@ public class GfaParser extends Observable implements Runnable {
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String[] strNums = br.readLine().split(";");
         HashMap<String, Integer> genomesMap = new HashMap<String, Integer>();
-        for (int i = 0; i < strNums.length; i++) {
+        for (int i = 0; i < strNums.length - 1; i++) {
             genomesMap.put(strNums[i], i);
         }
         return genomesMap;
