@@ -1,5 +1,6 @@
 package gui.sub_controllers;
 
+import graph.SequenceGraph;
 import gui.GraphDrawer;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -24,6 +25,7 @@ public class PanningController {
     public PanningController(ScrollBar scrollBar, GraphDrawer drawer) {
         this.scrollbar = scrollBar;
         this.drawer = drawer;
+        this.active = true;
         initialize();
     }
 
@@ -39,8 +41,15 @@ public class PanningController {
             public void changed(ObservableValue<? extends Number> ov,
                                 Number oldVal, Number newVal) {
                 if (active) {
+                    if (drawer.getxDifference() + drawer.getZoomLevel() > drawer.getRange()) {
+                        //SequenceGraph newGraph = drawer.getGraph().extendGraph(500);
+                        //drawer.setGraph(newGraph);
+                        drawer.getGraph().createSubGraph(1, drawer.getGraph().getEndNodeIndex() + 500);
+                        drawer.initGraph();
+                    }
                     drawer.moveShapes(drawer.getxDifference()
                             + (newVal.doubleValue() - oldVal.doubleValue()));
+                    System.out.println("Right bound: " + (drawer.getxDifference() + drawer.getZoomLevel()) + "Range: " + drawer.getRange());
                 }
             }
         });

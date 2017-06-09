@@ -21,6 +21,7 @@ public class GraphDrawer {
     private static final double LINE_WIDTH_FACTOR = 4;
     private static final double Y_SIZE_FACTOR = 3;
     private static final double LOG_BASE = 2;
+    private double range;
 
     private int yBase;
     private double zoomLevel;
@@ -41,12 +42,21 @@ public class GraphDrawer {
      */
     public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
-        this.graph = graph;
         this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
+        initializeDrawer(graph);
+    }
+
+    public void initializeDrawer(SequenceGraph graph) {
+        this.graph = graph;
+        initGraph();
+        zoomLevel = columnWidths[columns.size()];
+    }
+
+    public void initGraph() {
         columns = graph.getColumns();
         columnWidths = new double[columns.size() + 1];
         initializeColumnWidths();
-        zoomLevel = columnWidths[columns.size()];
+        range = columnWidths[columns.size()];
         radius = columns.size();
     }
 
@@ -316,5 +326,14 @@ public class GraphDrawer {
     public int mouseLocationColumn(double x) {
         return (int) ((x / stepSize) + xDifference);
     }
+
+    public double getRange() {
+        return range;
+    }
+
+    public SequenceGraph getGraph() {
+        return graph;
+    }
+
 }
 
