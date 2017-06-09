@@ -31,7 +31,7 @@ public class FileController implements Observer {
     private File parDirectory;
     private ProgressBarController progressBarController;
 
-    private final int renderRange = 1000;
+    private final int renderRange = 500;
     private final int nodeId = 1;
 
     private Thread parseThread;
@@ -54,7 +54,7 @@ public class FileController implements Observer {
      * @param pbc The progressbar.
      */
     public FileController(ProgressBarController pbc) {
-        graph = new SequenceGraph(parentArray, childArray);
+        graph = new SequenceGraph(parentArray, childArray, getSequenceHashMap());
         parDirectory = null;
         progressBarController = pbc;
 
@@ -129,17 +129,7 @@ public class FileController implements Observer {
         progressBarController.run();
     }
 
-    private void assignSequenceLenghts() {
-        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
-        Iterator it = nodes.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
-            if (!node.isDummy()) {
-                node.setSequenceLength(sequenceHashMap.get((long) node.getId()).length());
-            }
-        }
-    }
+
 
     /**
      * Gets the sequenceHashMap.
@@ -175,10 +165,9 @@ public class FileController implements Observer {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                graph = new SequenceGraph(parentArray, childArray);
-                graph.createSubGraph(nodeId, renderRange);
                 sequenceHashMap = parser.getSequenceHashMap();
-                assignSequenceLenghts();
+                graph = new SequenceGraph(parentArray, childArray, sequenceHashMap);
+                graph.createSubGraph(nodeId, renderRange);
                 drawer = new GraphDrawer(graph, gc);
                 drawer.moveShapes(0.0);
                 progressBarController.done();

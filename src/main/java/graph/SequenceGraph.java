@@ -1,5 +1,7 @@
 package graph;
 
+import org.mapdb.HTreeMap;
+
 import java.util.*;
 
 /**
@@ -17,18 +19,19 @@ public class SequenceGraph {
     private int endNodeIndex;
     private int[] parentArray;
     private int[] childArray;
+    private HTreeMap<Long, String> sequenceHashMap;
 
-    private int dummyNodeIDCounter;
+    private int dummyNodeIDCounter = -1;
 
     /**
      * The constructor initializes the SequenceGraph with it's basic values.
      * @param parentArray - the parent array for edges.
      * @param childArray - the child array for edges.
      */
-    public SequenceGraph(final int[] parentArray, final int[] childArray) {
+    public SequenceGraph(final int[] parentArray, final int[] childArray, HTreeMap<Long, String> sequenceHashMap) {
+        this.sequenceHashMap = sequenceHashMap;
         this.parentArray = parentArray;
         this.childArray = childArray;
-
     }
 
     /**
@@ -38,6 +41,8 @@ public class SequenceGraph {
     public int size() {
         return nodes.size();
     }
+
+    public int totalSize() { return parentArray.length; }
 
     /**
      * Creates a subgraph.
@@ -54,6 +59,19 @@ public class SequenceGraph {
         findLongestPath();
         addDummies();
         this.columns = initColumns();
+        assignSequenceLenghts();
+
+    }
+
+    private void assignSequenceLenghts() {
+        Iterator it = nodes.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            if (!node.isDummy()) {
+                node.setSequenceLength(sequenceHashMap.get((long) node.getId()).length());
+            }
+        }
     }
 
     private int findEndNodeIndex(int centerNodeID, int range) {
@@ -184,7 +202,6 @@ public class SequenceGraph {
      *
      */
     private void addDummies() {
-        dummyNodeIDCounter = -1;
         for (int i = startNodeIndex; i <= endNodeIndex; i++) {
             SequenceNode parent = this.getNode(parentArray[i]);
             int size = parent.getChildren().size();
@@ -296,7 +313,7 @@ public class SequenceGraph {
      * @return the extended graph
      */
     public SequenceGraph extendGraph(int range) {
-        SequenceGraph graphExtension = new SequenceGraph(this.parentArray, this.childArray);
+        SequenceGraph graphExtension = new SequenceGraph(this.parentArray, this.childArray, this.sequenceHashMap);
         graphExtension.setDummyNodeIDCounter(this.getDummyNodeIDCounter());
         graphExtension.createSubGraph(this.getEndNodeIndex(), range);
 
@@ -362,7 +379,11 @@ public class SequenceGraph {
      * getter for EndNodeIndex.
      * @return - the endNodeIndex.
      */
-    private int getEndNodeIndex() {
+    public int getEndNodeIndex() {
         return endNodeIndex;
+    }
+
+    public int getStartNodeIndex() {
+        return startNodeIndex;
     }
 }

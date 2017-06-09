@@ -3,7 +3,6 @@ package graph;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mapdb.HTreeMap;
 import parser.GfaParser;
 
 import java.io.File;
@@ -101,7 +100,7 @@ public class SequenceGraphTest {
 
     @Test
     public void extendGraph() throws Exception {
-        graph = new SequenceGraph(parentArray, childArray);
+        graph = new SequenceGraph(parentArray, childArray, null);
         graph.createSubGraph(1, 1);
         graph.extendGraph(26);
         assertEquals(graph.size(), 27);
@@ -109,7 +108,7 @@ public class SequenceGraphTest {
 
     @Test (expected = IllegalArgumentException.class)
     public void invalidArgument() throws Exception {
-        graph = new SequenceGraph(parentArray, childArray);
+        graph = new SequenceGraph(parentArray, childArray, null);
         graph.createSubGraph(-1, 1);
     }
 }
