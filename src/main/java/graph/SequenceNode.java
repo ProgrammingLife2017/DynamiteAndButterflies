@@ -95,7 +95,7 @@ public class SequenceNode {
                     xCoordinate + width, yCoordinate + height / 2);
             return;
         } else if (highlighted) {
-            gc.setFill(Color.BLANCHEDALMOND);
+            gc.setFill(Color.BLACK);
         }
         gc.fillRoundRect(xCoordinate, yCoordinate, width, height, ARC_SIZE, ARC_SIZE);
     }

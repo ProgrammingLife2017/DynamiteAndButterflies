@@ -131,19 +131,19 @@ public class ColourController {
     public Color getSingle(int combo) {
         switch (combo) {
             case 1:
-                return Color.LIGHTBLUE;
+                return Color.color(0.8471, 0, 0);
             case 2:
-                return Color.LIGHTGREEN;
+                return Color.color(0, 0, 0.8471);
             case 3:
-                return Color.LIGHTPINK;
+                return Color.color(0.8471, 0.8471, 0);
             case 4:
-                return Color.BLUEVIOLET;
+                return Color.color(0.8471, 0, 0.8471);
             case 5:
-                return Color.ORANGE;
+                return Color.color(1, 0.6039, 0);
             case 6:
-                return Color.RED;
+                return Color.color(0, 0.8471, 0);
             case 7:
-                return Color.DARKGREEN;
+                return Color.color(0.6078, 0.2588, 0);
             default:
                 return getBase();
         }
@@ -230,6 +230,6 @@ public class ColourController {
 //    }
 
     public Color getBase() {
-        return Color.BLUE;
+        return Color.gray(0.5098);
     }
 }
