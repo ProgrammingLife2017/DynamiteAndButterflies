@@ -64,6 +64,9 @@ public class SequenceGraph {
     }
 
     private void assignSequenceLenghts() {
+        if (getSequenceHashMap() == null)
+            return;
+
         Iterator it = nodes.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
