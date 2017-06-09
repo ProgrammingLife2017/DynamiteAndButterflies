@@ -1,8 +1,10 @@
 package graph;
 
-import org.mapdb.HTreeMap;
-
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Our own Graph Class.
@@ -22,6 +24,8 @@ public class SequenceGraph {
     private HTreeMap<Long, String> sequenceHashMap;
 
     private int dummyNodeIDCounter = -1;
+
+    private String partPath;
 
     /**
      * The constructor initializes the SequenceGraph with it's basic values.
@@ -91,6 +95,8 @@ public class SequenceGraph {
             int childID = childArray[i];
             if (nodes.get(parentID) == null) {
                 SequenceNode node = new SequenceNode(parentID);
+                int[] genomes = getGenomes(parentID);
+                node.setGenomes(genomes);
                 node.addChild(childID);
                 nodes.put(parentID, node);
             } else {
@@ -98,7 +104,8 @@ public class SequenceGraph {
             }
             if (nodes.get(childID) == null) {
                 SequenceNode node = new SequenceNode(childID);
-                node.addParent(parentID);
+                int[] genomes = getGenomes(childID);
+                node.setGenomes(genomes);
                 nodes.put(childID, node);
             }
         }
@@ -108,6 +115,23 @@ public class SequenceGraph {
     /**
      * Finds the longest path of the graph and sets columns accordingly.
      */
+    @SuppressWarnings("Since15")
+    private int[] getGenomes(int node) throws IOException {
+        try {
+            Stream<String> lines = Files.lines(Paths.get(partPath + "genomes.txt"));
+            String line = lines.skip(node - 1).findFirst().get();
+            String[] text = line.split(";");
+            int[] genomes = new int[text.length];
+            for (int i = 0; i < text.length; i++) {
+                genomes[i] = Integer.parseInt(text[i]);
+            }
+            return genomes;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private void findLongestPath() {
         for (Object o : this.getNodes().entrySet()) {
             Map.Entry pair = (Map.Entry) o;

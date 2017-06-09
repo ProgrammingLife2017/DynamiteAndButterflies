@@ -2,6 +2,7 @@ package gui.sub_controllers;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
+import gui.CustomProperties;
 import gui.GraphDrawer;
 import gui.MenuController;
 import javafx.application.Platform;
@@ -13,8 +14,11 @@ import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
-import java.util.prefs.Preferences;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Observer;
+import java.util.Observable;
 import java.util.regex.Pattern;
 
 /**
@@ -28,7 +32,7 @@ public class FileController implements Observer {
     private File parDirectory;
     private ProgressBarController progressBarController;
 
-    private final int renderRange = 100;
+    private final int renderRange = 1000;
     private final int nodeId = 1;
 
     private Thread parseThread;
@@ -39,12 +43,15 @@ public class FileController implements Observer {
 
     private String partPath;
 
-    private Preferences prefs;
+    private CustomProperties properties;
 
     private PopUpController popUpController;
 
     private int[] childArray;
     private int[] parentArray;
+
+    private HashMap<Integer, String> allGenomes;
+    private HashMap<Integer, String> genomes;
 
     /**
      * Constructor of the FileController object to control the Files.
@@ -54,7 +61,8 @@ public class FileController implements Observer {
         graph = new SequenceGraph(parentArray, childArray, getSequenceHashMap());
         parDirectory = null;
         progressBarController = pbc;
-        prefs = Preferences.userRoot();
+
+        properties = new CustomProperties();
     }
 
     /**
@@ -107,10 +115,13 @@ public class FileController implements Observer {
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         partPath = partPaths[partPaths.length - 1];
-        if (!prefs.getBoolean(partPath, true)) {
+        properties.updateProperties();
+        boolean flag = Boolean.parseBoolean(properties.getProperty(partPath, "true"));
+        if (!flag) {
             popUpController = new PopUpController();
-                    String message = "Database File is corrupt, press 'Reload' to reload the file," + "\n"
-                            + "or press 'Resume' to recover the data still available.";
+                    String message = "Database File is corrupt,"
+                                + " press 'Reload' to reload the file," + "\n"
+                                + "or press 'Resume' to recover the data still available.";
             popUpController.loadDbCorruptPopUp(partPath, message);
         }
         if (this.parseThread != null) {
@@ -155,6 +166,13 @@ public class FileController implements Observer {
                 try {
                     childArray = parser.getChildArray();
                     parentArray = parser.getParentArray();
+                    allGenomes = parser.getAllGenomesMapReversed();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                graph = new SequenceGraph();
+                try {
+                    graph.createSubGraph(nodeId, renderRange, parentArray, childArray, partPath);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -167,6 +185,11 @@ public class FileController implements Observer {
             }
         }
     }
+
+    public HashMap<Integer, String> getAllGenomes() {
+        return allGenomes;
+    }
+
 
     /**
      * Gets the fileName from the filePath.

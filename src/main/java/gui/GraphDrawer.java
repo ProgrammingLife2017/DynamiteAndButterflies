@@ -2,8 +2,8 @@ package gui;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
+import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -33,6 +33,8 @@ public class GraphDrawer {
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
     private int highlightedNode;
+    private int[] selected;
+    private ColourController colourController;
 
     /**
      * Constructor.
@@ -58,6 +60,8 @@ public class GraphDrawer {
         initializeColumnWidths();
         range = columnWidths[columns.size()];
         radius = columns.size();
+        selected = new int[0];
+        colourController = new ColourController(selected);
     }
 
     /**
@@ -98,11 +102,10 @@ public class GraphDrawer {
      */
     public void moveShapes(double xDifference) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
-        gc.setFill(Color.BLUE);
-        this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
         this.xDifference = xDifference;
-        //setxDifference(xDifference);
+        this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
         setLineWidth();
+        colourController = new ColourController(selected);
         drawNodes();
         drawEdges();
     }
@@ -146,7 +149,7 @@ public class GraphDrawer {
                 height = width;
             }
             node.setCoordinates(x, y, width, height);
-            node.draw(gc);
+            node.draw(gc, selected, colourController);
         }
     }
 
@@ -162,6 +165,8 @@ public class GraphDrawer {
                 double starty = parent.getyCoordinate() + (parent.getHeight() / 2);
                 double endx = child.getxCoordinate();
                 double endy = child.getyCoordinate() + (child.getHeight() / 2);
+                gc.setLineWidth(Math.log(child.getGenomes().length)
+                                / Math.log(LOG_BASE + 1.1));
                 gc.strokeLine(startx, starty, endx, endy);
             }
         }
@@ -259,10 +264,10 @@ public class GraphDrawer {
     public void highlight(int node) {
         if (highlightedNode != 0) {
             graph.getNode(highlightedNode).lowlight();
-            graph.getNode(highlightedNode).draw(gc);
+            graph.getNode(highlightedNode).draw(gc, selected, colourController);
         }
         graph.getNode(node).highlight();
-        graph.getNode(node).draw(gc);
+        graph.getNode(node).draw(gc, selected, colourController);
         highlightedNode = node;
     }
 
@@ -323,6 +328,15 @@ public class GraphDrawer {
      */
     public int mouseLocationColumn(double x) {
         return (int) ((x / stepSize) + xDifference);
+    }
+
+    public void setSelected(int[] newSelection) {
+        this.selected = newSelection;
+        this.colourController = new ColourController(selected);
+    }
+
+    public int[] getSelected() {
+        return selected;
     }
 
     public void setxDifference(double xDifference) {

@@ -1,6 +1,6 @@
 package graph;
 
-import com.sun.corba.se.impl.orbutil.graph.Graph;
+import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -15,6 +15,7 @@ public class SequenceNode {
     private static final int ARC_SIZE = 10;
 
     private int id;
+    private int[] genomes;
     private int index;
     private int column;
     private int sequenceLength;
@@ -32,7 +33,12 @@ public class SequenceNode {
     private ArrayList<Integer> parents;
     private GraphicsContext gc;
 
-    public SequenceNode(int id) {
+    /**
+     * Constructor for the sequenceNode.
+     *
+     * @param id The id of the node.
+     */
+    SequenceNode(int id) {
         this.id = id;
         this.index = 0;
         this.column = 0;
@@ -41,8 +47,17 @@ public class SequenceNode {
         this.parents = new ArrayList<Integer>();
         this.children = new ArrayList<Integer>();
         this.isDummy = false;
+        this.genomes = new int[0];
     }
 
+    /**
+     * Setter for the location of a node.
+     *
+     * @param x      XLocation.
+     * @param y      YLocation.
+     * @param width  Width.
+     * @param height Height.
+     */
     public void setCoordinates(double x, double y, double width, double height) {
         this.xCoordinate = x;
         this.yCoordinate = y;
@@ -65,18 +80,22 @@ public class SequenceNode {
     }
 
     /**
-     * Draw the node with the color depending on it's status. Orange for highlighted nodes, black for dummy nodes and
-     * blue for sequence nodes.
+     * Draw the node with the color depending on it's status. Orange for highlighted nodes,
+     * black for dummy nodes and blue for sequence nodes.
+     *
+     * @param gc            The grapicsContext of the screen.
+     * @param selectedGenes A int[] with all the genomeIds that are selected.
      */
-    public void draw(GraphicsContext gc) {
+    public void draw(GraphicsContext gc, int[] selectedGenes, ColourController colourController) {
         gc.clearRect(xCoordinate, yCoordinate, width, height);
-        if (highlighted) {
-            gc.setFill(Color.ORANGE);
-        } else if (isDummy) {
-            gc.strokeLine(xCoordinate, yCoordinate + height / 2, xCoordinate + width, yCoordinate + height / 2);
+        gc.setFill(colourController.getColor(genomes));
+
+        if (isDummy) {
+            gc.strokeLine(xCoordinate, yCoordinate + height / 2,
+                    xCoordinate + width, yCoordinate + height / 2);
             return;
-        } else {
-            gc.setFill(Color.BLUE);
+        } else if (highlighted) {
+            gc.setFill(Color.BLACK);
         }
         gc.fillRoundRect(xCoordinate, yCoordinate, width, height, ARC_SIZE, ARC_SIZE);
     }
@@ -133,7 +152,7 @@ public class SequenceNode {
             this.children.add(id);
     }
 
-    public void removeChild(Integer id) {
+    void removeChild(Integer id) {
         this.children.remove(id);
     }
 
@@ -141,13 +160,13 @@ public class SequenceNode {
         return parents;
     }
 
-    public void addParent(Integer id) {
-        if(!this.parents.contains(id)) {
+    void addParent(Integer id) {
+        if (!this.parents.contains(id)) {
             this.parents.add(id);
         }
     }
 
-    public boolean hasChildren() {
+    boolean hasChildren() {
         return children.size() > 0;
     }
 
@@ -159,7 +178,7 @@ public class SequenceNode {
         return isDummy;
     }
 
-    public void setDummy(boolean dummy) {
+    void setDummy(boolean dummy) {
         isDummy = dummy;
     }
 
@@ -167,7 +186,7 @@ public class SequenceNode {
         return this.index;
     }
 
-    public void setIndex(int index) {
+    void setIndex(int index) {
         this.index = index;
     }
 
@@ -175,31 +194,36 @@ public class SequenceNode {
         return column;
     }
 
-    public void setColumn(int col) {
+    void setColumn(int col) {
         this.column = col;
     }
 
-    public void incrementColumn(int i) {
+    void incrementColumn(int i) {
         if (this.column < i + 1) {
             column = i + 1;
         }
     }
 
+    public void setGenomes(int[] genomesArg) {
+        this.genomes = genomesArg;
+    }
+
     /**
      * method to resolve the baryCenterValue.
+     *
      * @return - returns the barycenterValue / inDegree
      */
-    public float getBaryCenterValue() {
+    float getBaryCenterValue() {
         return baryCenterValue / inDegree;
     }
 
 
-    public void incrementBaryCenterValue(float baryCenterValue) {
+    void incrementBaryCenterValue(float baryCenterValue) {
         this.baryCenterValue += baryCenterValue;
     }
 
 
-    public void incrementInDegree() {
+    void incrementInDegree() {
         this.inDegree++;
     }
 
@@ -211,4 +235,37 @@ public class SequenceNode {
         this.sequenceLength = sequenceLength;
     }
 
+    public int[] getGenomes() {
+        return genomes;
+    }
+
+    /**
+     * Forms a string of the sequence node.
+     * @param sequence With it's sequence which we do not constantly want in memory
+     * @return A string representation of the node.
+     */
+    public String toString(String sequence) {
+        String str = "Node ID: " + this.id + "\n"
+                + "Column index: " + this.column + "\n"
+                + "Children: ";
+        for (Integer i : children) {
+            str += i.toString() + ", ";
+        }
+        str = str.substring(0, str.length() - 2) + "\n" + "Parents: ";
+        for (Integer i : parents) {
+            str += i.toString() + ", ";
+        }
+        str = str.substring(0, str.length() - 2) +  "\n"
+                + "SequenceLength: ";
+        if (isDummy) {
+            str += "-\n" + "Sequence: -";
+        } else {
+            str += this.sequenceLength + "\n" + "Sequence: " + sequence + "\n";
+            str += "Genomes that go through this:\t";
+            for (Integer i : this.getGenomes()) {
+                str += i.toString() + "\t";
+            }
+        }
+        return str;
+    }
 }
