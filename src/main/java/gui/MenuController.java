@@ -146,6 +146,7 @@ public class MenuController implements Observer {
     @FXML
     private void openFileClicked(String filePath) throws IOException, InterruptedException {
         fileController.openFileClicked(gc, filePath, this);
+        recentController.update(filePath);
         specificGenomeProperties.hideSave();
         selectedGenomes = null;
     }
