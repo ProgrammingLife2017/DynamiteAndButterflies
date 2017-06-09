@@ -101,8 +101,8 @@ public class MenuController implements Observer {
         recentController = new RecentController(file1, file2, file3);
 
         ps = new PrintStream(new Console(consoleArea));
-        System.setErr(ps);
-        System.setOut(ps);
+        //System.setErr(ps);
+        //System.setOut(ps);
     }
 
     /**
