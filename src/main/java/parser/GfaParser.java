@@ -187,12 +187,9 @@ public class GfaParser extends Observable implements Runnable {
                         + System.getProperty("file.separator") + partPath + additionToPath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String []strNums = br.readLine().split(",");
-        int size = Integer.parseInt(properties.getProperty(partPath + "childArray.txtsize", "-1"));
-        if (size == -1) {
-            throw new java.lang.RuntimeException("Size not in preferences file");
-        }
+        int size = strNums.length;
         int [] nodeArray = new int[size];
-        for (int i = 0; i < strNums.length; i++) {
+        for (int i = 0; i < size; i++) {
             nodeArray[i] = Integer.parseInt(strNums[i]);
 
         }
