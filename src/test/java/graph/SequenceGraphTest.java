@@ -3,9 +3,11 @@ package graph;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mapdb.HTreeMap;
 import parser.GfaParser;
 
 import java.io.File;
+import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -15,12 +17,34 @@ public class SequenceGraphTest {
     private int[] parentArray = new int[27];
     private int[] childArray = new int[27];
     private SequenceGraph graph;
+    private HashMap<Long, String> sequenceMap;
 
     @Before
     public void setUp() throws Exception {
         parentArray = new int[]{1,2,2,3,4,4,5,5,6,7,7,7,8,9,10,11,11,11,12,13,14,15,15,16,16,17,18};
         childArray = new int[]{2,3,4,4,5,7,6,7,7,8,9,10,11,11,11,12,13,14,13,15,15,16,19,17,18,19,19};
+//        sequenceMap = new HashMap<Long, String>();
+//        sequenceMap.put((long) 1, "A");
+//        sequenceMap.put((long) 2, "T");
+//        sequenceMap.put((long) 3, "C");
+//        sequenceMap.put((long) 4, "G");
+//        sequenceMap.put((long) 5, "A");
+//        sequenceMap.put((long) 6, "T");
+//        sequenceMap.put((long) 7, "C");
+//        sequenceMap.put((long) 8, "G");
+//        sequenceMap.put((long) 9, "A");
+//        sequenceMap.put((long) 10, "T");
+//        sequenceMap.put((long) 11, "C");
+//        sequenceMap.put((long) 12, "G");
+//        sequenceMap.put((long) 13, "A");
+//        sequenceMap.put((long) 14, "T");
+//        sequenceMap.put((long) 15, "C");
+//        sequenceMap.put((long) 16, "G");
+//        sequenceMap.put((long) 17, "A");
+//        sequenceMap.put((long) 18, "T");
+//        sequenceMap.put((long) 19, "C");
         graph = new SequenceGraph(parentArray, childArray);
+
         graph.createSubGraph(1, 27);
     }
 
