@@ -27,7 +27,6 @@ public class SequenceNode {
     private boolean isDummy;
     private float baryCenterValue;
     private int inDegree;
-    private boolean selected;
 
 
     private ArrayList<Integer> children;
@@ -48,7 +47,6 @@ public class SequenceNode {
         this.parents = new ArrayList<Integer>();
         this.children = new ArrayList<Integer>();
         this.isDummy = false;
-        this.selected = false;
         this.genomes = new int[0];
     }
 
@@ -88,11 +86,8 @@ public class SequenceNode {
      * @param gc            The grapicsContext of the screen.
      * @param selectedGenes A int[] with all the genomeIds that are selected.
      */
-    public void draw(GraphicsContext gc, int[] selectedGenes) {
+    public void draw(GraphicsContext gc, int[] selectedGenes, ColourController colourController) {
         gc.clearRect(xCoordinate, yCoordinate, width, height);
-        //selected = false;
-
-        ColourController colourController = new ColourController(selectedGenes);
         gc.setFill(colourController.getColor(genomes));
 
         if (isDummy) {
@@ -102,9 +97,6 @@ public class SequenceNode {
         } else if (highlighted) {
             gc.setFill(Color.BLANCHEDALMOND);
         }
-//        else if (!selected) {
-//            gc.setFill(colourController.getBase());
-//        }
         gc.fillRoundRect(xCoordinate, yCoordinate, width, height, ARC_SIZE, ARC_SIZE);
     }
 
@@ -247,5 +239,35 @@ public class SequenceNode {
 
     public int[] getGenomes() {
         return genomes;
+    }
+
+    /**
+     * Forms a string of the sequence node.
+     * @param sequence With it's sequence which we do not constantly want in memory
+     * @return A string representation of the node.
+     */
+    public String toString(String sequence) {
+        String str = "Node ID: " + this.id + "\n"
+                + "Column index: " + this.column + "\n"
+                + "Children: ";
+        for (Integer i : children) {
+            str += i.toString() + ", ";
+        }
+        str = str.substring(0, str.length() - 2) + "\n" + "Parents: ";
+        for (Integer i : parents) {
+            str += i.toString() + ", ";
+        }
+        str = str.substring(0, str.length() - 2) +  "\n"
+                + "SequenceLength: ";
+        if (isDummy) {
+            str += "-\n" + "Sequence: -";
+        } else {
+            str += this.sequenceLength + "\n" + "Sequence: " + sequence + "\n";
+            str += "Genomes that go through this:\t";
+            for (Integer i : this.getGenomes()) {
+                str += i.toString() + "\t";
+            }
+        }
+        return str;
     }
 }

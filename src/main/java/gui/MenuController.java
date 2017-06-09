@@ -193,45 +193,23 @@ public class MenuController implements Observer {
         double pressedY = mouseEvent.getY();
         SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, pressedY);
         if (clicked != null) {
-            String newString = "\nSequence: "
-                    + fileController.getSequenceHashMap().get((long) clicked.getId()) + "\n";
-
-
-            String childString = "Children: ";
-            for (Integer i : clicked.getChildren()) {
-                childString += i.toString() + "\n";
-            }
-
-            String parentString = "Parents: ";
-            for (Integer i : clicked.getParents()) {
-                parentString += i.toString() + "\n";
-            }
-
-            String nodeID = "Node ID: " + Integer.toString(clicked.getId()) + "\n";
-
-            String columnString = "Column index: " + Integer.toString(clicked.getColumn()) + "\n";
-
-            String genomeInfo = "Genomes that go through this:\t";
-            for (Integer i : clicked.getGenomes()) {
-                genomeInfo += i.toString() + "\t";
-            }
-
-            String concat = nodeID + columnString + parentString
-                            + childString + genomeInfo + newString;
-            infoController.updateSeqLabel(concat);
+            String sequence = fileController.getSequenceHashMap().get((long) clicked.getId());
+            infoController.updateSeqLabel(clicked.toString(sequence));
+            nodeTextField.setText(clicked.getId().toString());
         }
     }
 
     /**
      * Adds a button to traverse the graph with.
      */
+    @FXML
     public void traverseGraphClicked() {
         int centreNodeID = Integer.parseInt(nodeTextField.getText());
         int radius = Integer.parseInt(radiusTextField.getText());
         zoomController.traverseGraphClicked(centreNodeID, radius);
-        String newString = "ID: " + centreNodeID + "\nSequence: "
-                + fileController.getSequenceHashMap().get((long) centreNodeID);
-        infoController.updateSeqLabel(newString);
+        SequenceNode node = fileController.getGraph().getNode(centreNodeID);
+        String sequence = fileController.getSequenceHashMap().get((long) centreNodeID);
+        infoController.updateSeqLabel(node.toString(sequence));
     }
 
     /**
@@ -245,9 +223,9 @@ public class MenuController implements Observer {
         int rad = Integer.parseInt(radius);
 
         zoomController.traverseGraphClicked(centreNodeID, rad);
-        String newString = "Sequence: "
-                + fileController.getSequenceHashMap().get((long) centreNodeID);
-        infoController.updateSeqLabel(newString);
+        SequenceNode node = fileController.getGraph().getNode(centreNodeID);
+        String sequence = fileController.getSequenceHashMap().get((long) centreNodeID);
+        infoController.updateSeqLabel(node.toString(sequence));
     }
 
     /**
@@ -425,6 +403,7 @@ public class MenuController implements Observer {
 
     /**
      * Handles pressing the specific genome button.
+     *
      * @throws IOException when something goes wrong with IO.
      */
     @FXML
