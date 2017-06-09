@@ -59,7 +59,7 @@ public class SequenceGraph {
         findLongestPath();
         addDummies();
         this.columns = initColumns();
-        assignSequenceLenghts();
+       assignSequenceLenghts();
 
     }
 
@@ -69,7 +69,7 @@ public class SequenceGraph {
             Map.Entry pair = (Map.Entry) it.next();
             SequenceNode node = (SequenceNode) pair.getValue();
             if (!node.isDummy()) {
-                node.setSequenceLength(sequenceHashMap.get((long) node.getId()).length());
+                node.setSequenceLength((sequenceHashMap.get((long) node.getId())).length());
             }
         }
     }
@@ -385,5 +385,9 @@ public class SequenceGraph {
 
     public int getStartNodeIndex() {
         return startNodeIndex;
+    }
+
+    public HTreeMap<Long, String> getSequenceHashMap() {
+        return sequenceHashMap;
     }
 }

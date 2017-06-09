@@ -3,7 +3,7 @@ package graph;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import parser.GfaParser;
+import org.mapdb.HTreeMap;
 
 import java.io.File;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ public class SequenceGraphTest {
     private int[] parentArray = new int[27];
     private int[] childArray = new int[27];
     private SequenceGraph graph;
-    private HashMap<Long, String> sequenceMap;
+    private HTreeMap<Long, String> sequenceMap;
 
     @Before
     public void setUp() throws Exception {
@@ -42,7 +42,7 @@ public class SequenceGraphTest {
 //        sequenceMap.put((long) 17, "A");
 //        sequenceMap.put((long) 18, "T");
 //        sequenceMap.put((long) 19, "C");
-        graph = new SequenceGraph(parentArray, childArray);
+        graph = new SequenceGraph(parentArray, childArray, sequenceMap);
 
         graph.createSubGraph(1, 27);
     }
@@ -100,7 +100,7 @@ public class SequenceGraphTest {
 
     @Test
     public void extendGraph() throws Exception {
-        graph = new SequenceGraph(parentArray, childArray, null);
+        graph = new SequenceGraph(parentArray, childArray, sequenceMap);
         graph.createSubGraph(1, 1);
         graph.extendGraph(26);
         assertEquals(graph.size(), 27);
@@ -108,7 +108,7 @@ public class SequenceGraphTest {
 
     @Test (expected = IllegalArgumentException.class)
     public void invalidArgument() throws Exception {
-        graph = new SequenceGraph(parentArray, childArray, null);
+        graph = new SequenceGraph(parentArray, childArray, sequenceMap);
         graph.createSubGraph(-1, 1);
     }
 }
