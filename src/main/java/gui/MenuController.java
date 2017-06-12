@@ -112,8 +112,8 @@ public class MenuController implements Observer {
                                                     genome1, genome2, genome3);
 
         ps = new PrintStream(new Console(consoleArea));
-        //System.setErr(ps);
-        //System.setOut(ps);
+        System.setErr(ps);
+        System.setOut(ps);
     }
 
     /**
