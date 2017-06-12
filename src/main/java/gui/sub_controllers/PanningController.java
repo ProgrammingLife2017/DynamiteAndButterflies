@@ -8,7 +8,10 @@ import javafx.animation.Timeline;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Duration;
 
@@ -79,6 +82,30 @@ public class PanningController {
             @Override
             public void handle(MouseEvent event) {
                 timelineLeft.pause();
+            }
+        });
+    }
+
+    public void initializeKeys(Node canvasPanel) {
+        canvasPanel.requestFocus();
+        canvasPanel.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode() == KeyCode.RIGHT) {
+                    timelineRight.play();
+                } else if (event.getCode() == KeyCode.LEFT) {
+                    timelineLeft.play();
+                }
+            }
+        });
+        canvasPanel.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode() == KeyCode.RIGHT) {
+                    timelineRight.stop();
+                } else if (event.getCode() == KeyCode.LEFT) {
+                    timelineLeft.stop();
+                }
             }
         });
     }
