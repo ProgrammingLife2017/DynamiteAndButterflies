@@ -115,7 +115,7 @@ public class MenuController implements Observer {
 
         ps = new PrintStream(new Console(consoleArea));
         //System.setErr(ps);
-        //System.setOut(ps);
+        System.setOut(ps);
     }
 
     /**

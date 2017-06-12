@@ -1,17 +1,17 @@
 package gui.sub_controllers;
 
+import graph.SequenceGraph;
 import gui.GraphDrawer;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Duration;
 
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by Jasper van Tilburg on 29-5-2017.
@@ -27,6 +27,7 @@ public class PanningController {
     private Button leftPannButton;
     private Timeline timelineRight;
     private Timeline timelineLeft;
+    private boolean updating;
 
     public PanningController(GraphDrawer drawer, Button leftPannButton, Button rightPannButton) {
         this.drawer = drawer;
@@ -83,11 +84,30 @@ public class PanningController {
     }
 
     public void pannRight() {
-        if (drawer.getxDifference() + drawer.getZoomLevel() > drawer.getRange()) {
-            drawer.getGraph().createSubGraph(1, drawer.getGraph().getEndNodeIndex() + 100, drawer.getGraph().getPartPath());
-            drawer.initGraph();
+        if (!updating) {
+            if (drawer.getGraph().getEndNodeIndex() < drawer.getGraph().getRightBoundID()) {
+                if (drawer.getxDifference() + drawer.getZoomLevel() + 2000 > drawer.getRange()) {
+                    new Thread(new Task<Integer>() {
+                        @Override
+                        protected Integer call() throws Exception {
+                            updating = true;
+                            System.out.println("getEndNodeIndex: " + drawer.getGraph().getEndNodeIndex() + ", getRightBoundID: " + drawer.getGraph().getRightBoundID());
+                            SequenceGraph newGraph = drawer.getGraph().copy();
+                            newGraph.createSubGraph(1, drawer.getGraph().getEndNodeIndex() + 1000, drawer.getGraph().getPartPath());
+                            drawer.setGraph(newGraph);
+                            drawer.initGraph();
+                            updating = false;
+                            return null;
+                        }
+                    }).start();
+                }
+            }
         }
-        //TODO check for left bound
+        if (drawer.getGraph().getNodes().containsKey(drawer.getGraph().getRightBoundID())) {
+            if (drawer.getxDifference() + drawer.getZoomLevel() > drawer.getColumnWidth(drawer.getGraph().getColumns().size())) {
+                return;
+            }
+        }
         drawer.moveShapes(drawer.getxDifference() + drawer.getZoomLevel() * PANN_FACTOR);
     }
 

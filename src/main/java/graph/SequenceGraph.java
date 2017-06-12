@@ -86,7 +86,7 @@ public class SequenceGraph {
     private int findEndNodeIndex(int centerNodeID, int range) {
         endNodeIndex = range + centerNodeID;
         if (startNodeIndex + range >= parentArray.length) {
-            endNodeIndex = parentArray.length - 1;
+            endNodeIndex = parentArray[parentArray.length - 1];
         }
         return endNodeIndex;
     }
@@ -429,4 +429,17 @@ public class SequenceGraph {
     public String getPartPath() {
         return partPath;
     }
+
+    public int getLeftBoundID() {
+        return parentArray[0];
+    }
+
+    public int getRightBoundID() {
+        return childArray[childArray.length - 1];
+    }
+
+    public SequenceGraph copy() {
+        return new SequenceGraph(parentArray, childArray, sequenceHashMap);
+    }
+
 }
