@@ -70,7 +70,7 @@ public class    DrawableCanvas extends Observable implements Observer {
 
                             int [] parentArray = parser.getParentArray();
                             SequenceGraph graph = new SequenceGraph();
-                            graph.createSubGraph(2, 1000, childArray, parentArray);
+                            graph.createSubGraph(1, 1000, parentArray, childArray);
                             graph.assignSequenceLenghts(parser);
                             GraphDrawer.getInstance().setGraph(graph);
                             GraphDrawer.getInstance().moveShapes(0.0);

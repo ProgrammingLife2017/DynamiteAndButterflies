@@ -96,17 +96,15 @@ public class SequenceGraph {
     }
 
     private void findLongestPath() {
-        for (Object o : this.getNodes().entrySet()) {
+        for (Object o : this.getNodes   ().entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             SequenceNode currentNode = (SequenceNode) pair.getValue();
-            if (currentNode.getColumn() != Integer.MIN_VALUE) {
                 for (int child : currentNode.getChildren()) {
-                    if (this.getNode(child).getColumn() < currentNode.getColumn() + 1) {
                         this.getNode(child).addParent(currentNode.getId());
-                        this.getNode(child).setColumn(currentNode.getColumn() + 1);
+                    if (this.getNode(child).getColumn() < currentNode.getColumn() + 1) {
+                        nodes.get(child).setColumn(currentNode.getColumn() + 1);
                     }
                 }
-            }
         }
     }
 
