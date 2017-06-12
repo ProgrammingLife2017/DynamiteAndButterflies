@@ -119,9 +119,6 @@ public class GfaParser extends Observable implements Runnable {
                     genomesWriter.close();
                     genome = getAllGenomesMap();
                 }
-                else if (header.startsWith("BUILD:Z:VCF2GRAPH")) {
-                    indexedGfaFile = true;
-                }
             }
             if (line.startsWith("S")) {
                 String[] data = line.split(("\t"));
@@ -130,19 +127,19 @@ public class GfaParser extends Observable implements Runnable {
                     if (data[i].startsWith("ORI:Z:")) {
                         String[] genomes = data[i].split(":")[2].split(";");
                         for (int j = 0; j < genomes.length; j++) {
-                            if (indexedGfaFile) {
-                                if (j == genomes.length - 1) {
-                                    genomeWriter.write(genomes[j]);
-                                    genomeWriter.newLine();
-                                } else {
-                                    genomeWriter.write(genomes[j] + ";");
-                                }
-                            } else {
+                            if (genome.get(genomes[j]) != null) {
                                 if (j == genomes.length - 1) {
                                     genomeWriter.write(genome.get(genomes[j]).toString());
                                     genomeWriter.newLine();
                                 } else {
                                     genomeWriter.write(genome.get(genomes[j]) + ";");
+                                }
+                            } else {
+                                if (j == genomes.length - 1) {
+                                    genomeWriter.write(genomes[j]);
+                                    genomeWriter.newLine();
+                                } else {
+                                    genomeWriter.write(genomes[j] + ";");
                                 }
                             }
 
