@@ -84,13 +84,15 @@ public class SequenceNode {
      * black for dummy nodes and blue for sequence nodes.
      *
      * @param gc            The grapicsContext of the screen.
-     * @param selectedGenes A int[] with all the genomeIds that are selected.
+     * @param colourController A controller that chooses colours for the node
      */
-    public void draw(GraphicsContext gc, int[] selectedGenes, ColourController colourController) {
+    public void draw(GraphicsContext gc, ColourController colourController) {
         gc.clearRect(xCoordinate, yCoordinate, width, height);
         gc.setFill(colourController.getColor(genomes));
 
         if (isDummy) {
+            gc.setLineWidth(Math.log(genomes.length)
+                    / Math.log(2 + 1.1));
             gc.strokeLine(xCoordinate, yCoordinate + height / 2,
                     xCoordinate + width, yCoordinate + height / 2);
             return;
