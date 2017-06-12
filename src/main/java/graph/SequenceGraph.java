@@ -86,7 +86,7 @@ public class SequenceGraph {
     private int findEndNodeIndex(int centerNodeID, int range) {
         endNodeIndex = range + centerNodeID;
         if (startNodeIndex + range >= parentArray.length) {
-            endNodeIndex = parentArray[parentArray.length - 1];
+            endNodeIndex = parentArray.length;
         }
         return endNodeIndex;
     }
