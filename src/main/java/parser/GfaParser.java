@@ -15,8 +15,6 @@ import java.util.regex.Pattern;
  * This class contains a parser to parse a .gfa file into our data structure.
  */
 public class GfaParser extends Observable implements Runnable {
-    private String header1;
-    private String header2;
     private HTreeMap<Long, String> sequenceMap;
     private String filePath;
     private String partPath;

@@ -10,6 +10,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.mapdb.HTreeMap;
 import parser.GfaParser;
+import parser.GffParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +29,8 @@ public class FileController implements Observer {
     private SequenceGraph graph;
     private gui.GraphDrawer drawer;
     private HTreeMap<Long, String> sequenceHashMap;
-    private File parDirectory;
+    private File gfaParDirectory;
+    private File gffParDirectory;
     private ProgressBarController progressBarController;
 
     private final int renderRange = 1000;
@@ -58,7 +60,8 @@ public class FileController implements Observer {
      */
     public FileController(ProgressBarController pbc) {
         graph = new SequenceGraph();
-        parDirectory = null;
+        gfaParDirectory = null;
+        gffParDirectory = null;
         progressBarController = pbc;
 
         properties = new CustomProperties();
@@ -70,17 +73,17 @@ public class FileController implements Observer {
      * @param stage The stage on which the fileFinder is shown.
      * @return returns the file that can be loaded.
      */
-    public File chooseFile(Stage stage) {
+    public File chooseGfaFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
 
-        if (parDirectory == null) {
+        if (gfaParDirectory == null) {
             fileChooser.setInitialDirectory(
                     new File(System.getProperty("user.dir")).getParentFile()
             );
         } else {
             fileChooser.setInitialDirectory(
-                    parDirectory
+                    gfaParDirectory
             );
         }
 
@@ -88,7 +91,35 @@ public class FileController implements Observer {
                 new FileChooser.ExtensionFilter("GFA", "*.gfa")
         );
         File res = fileChooser.showOpenDialog(stage);
-        parDirectory = res.getParentFile();
+        gfaParDirectory = res.getParentFile();
+        return res;
+    }
+
+    /**
+     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa.
+     * can be selected and directly be visualised on the screen.
+     * @param stage The stage on which the fileFinder is shown.
+     * @return returns the file that can be loaded.
+     */
+    public File chooseGffFile(Stage stage) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Annotation File");
+
+        if (gffParDirectory == null) {
+            fileChooser.setInitialDirectory(
+                    new File(System.getProperty("user.dir")).getParentFile()
+            );
+        } else {
+            fileChooser.setInitialDirectory(
+                    gffParDirectory
+            );
+        }
+
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("GFF", "*.gff")
+        );
+        File res = fileChooser.showOpenDialog(stage);
+        gffParDirectory = res.getParentFile();
         return res;
     }
 
@@ -102,7 +133,7 @@ public class FileController implements Observer {
      * @throws IOException exception if no file is found
      * @throws InterruptedException Exception if the Thread is interrupted.
      */
-    public void openFileClicked(GraphicsContext gc, String filePath, MenuController mC)
+    public void openGfaFileClicked(GraphicsContext gc, String filePath, MenuController mC)
             throws IOException, InterruptedException {
         this.gc = gc;
         if (parser != null) {
@@ -128,8 +159,12 @@ public class FileController implements Observer {
         }
         this.parseThread = new Thread(parser);
         this.parseThread.start();
-
         progressBarController.run();
+    }
+
+    public void openGffFileClicked(String filePath) {
+        GffParser parser = new GffParser(filePath);
+        parser.parseGff();
     }
 
     private void assignSequenceLenghts() {
@@ -211,4 +246,6 @@ public class FileController implements Observer {
         System.out.println(fileName);
         return fileName;
     }
+
+
 }
