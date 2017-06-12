@@ -19,10 +19,14 @@ public class SequenceGraph {
 
     private HashMap<Integer, SequenceNode> nodes;
     private ArrayList<ArrayList<SequenceNode>> columns;
-    private int startNodeIndex;
-    private int endNodeIndex;
+    private int leftBoundIndex;
+    private int rightBoundIndex;
+
+    private int centerNodeID;
+
     private int[] parentArray;
     private int[] childArray;
+
     private HTreeMap<Long, String> sequenceHashMap;
 
     private int dummyNodeIDCounter = -1;
@@ -62,8 +66,10 @@ public class SequenceGraph {
         this.nodes = new HashMap<Integer, SequenceNode>();
         this.columns = new ArrayList<ArrayList<SequenceNode>>();
 
-        startNodeIndex = findCenterNodeIndex(centerNodeID, parentArray);
-        endNodeIndex = findEndNodeIndex(centerNodeID, range);
+        Boundary boundary = new Boundary(centerNodeID, range, parentArray, childArray);
+        this.centerNodeID = centerNodeID;
+        leftBoundIndex = boundary.getLeftBoundIndex();
+        rightBoundIndex = boundary.getRightBoundIndex();
         initNodes();
         findLongestPath();
         addDummies();
@@ -83,19 +89,11 @@ public class SequenceGraph {
         }
     }
 
-    private int findEndNodeIndex(int centerNodeID, int range) {
-        endNodeIndex = range + centerNodeID;
-        if (startNodeIndex + range >= parentArray.length) {
-            endNodeIndex = parentArray.length;
-        }
-        return endNodeIndex;
-    }
-
     /**
      * Add nodes with children to the nodes hashmap.
      */
     private void initNodes() {
-        for (int i = startNodeIndex; i <= endNodeIndex; i++) {
+        for (int i = leftBoundIndex; i <= rightBoundIndex; i++) {
             int parentID = parentArray[i];
             int childID = childArray[i];
             if (nodes.get(parentID) == null) {
@@ -241,7 +239,7 @@ public class SequenceGraph {
      *
      */
     private void addDummies() {
-        for (int i = startNodeIndex; i <= endNodeIndex; i++) {
+        for (int i = leftBoundIndex; i <= rightBoundIndex; i++) {
             SequenceNode parent = this.getNode(parentArray[i]);
             int size = parent.getChildren().size();
             for (int j = 0; j < size; j++) {
@@ -354,7 +352,7 @@ public class SequenceGraph {
     public SequenceGraph extendGraph(int range) {
         SequenceGraph graphExtension = new SequenceGraph(this.parentArray, this.childArray, this.sequenceHashMap);
         graphExtension.setDummyNodeIDCounter(this.getDummyNodeIDCounter());
-        graphExtension.createSubGraph(this.getEndNodeIndex(), range, this.partPath);
+        graphExtension.createSubGraph(getRightBoundID(), range, this.partPath);
 
 
         HashMap<Integer, SequenceNode> mapExtension = graphExtension.getNodes();
@@ -414,18 +412,6 @@ public class SequenceGraph {
         this.columns = columns;
     }
 
-    /**
-     * getter for EndNodeIndex.
-     * @return - the endNodeIndex.
-     */
-    public int getEndNodeIndex() {
-        return endNodeIndex;
-    }
-
-    public int getStartNodeIndex() {
-        return startNodeIndex;
-    }
-
     public String getPartPath() {
         return partPath;
     }
@@ -441,5 +427,18 @@ public class SequenceGraph {
     public SequenceGraph copy() {
         return new SequenceGraph(parentArray, childArray, sequenceHashMap);
     }
+
+    public int getLeftBoundIndex() {
+        return leftBoundIndex;
+    }
+
+    public int getRightBoundIndex() {
+        return rightBoundIndex;
+    }
+
+    public int getCenterNodeID() {
+        return centerNodeID;
+    }
+
 
 }

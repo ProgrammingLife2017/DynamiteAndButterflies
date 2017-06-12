@@ -114,20 +114,18 @@ public class PanningController {
 
     public void pannRight() {
         if (!updating) {
-            if (drawer.getGraph().getEndNodeIndex() < drawer.getGraph().getRightBoundID()) {
+            if (drawer.getGraph().getRightBoundIndex() < drawer.getGraph().getRightBoundID()) {
                 if (drawer.getxDifference() + drawer.getZoomLevel() + 2000 > drawer.getRange()) {
                     new Thread(new Task<Integer>() {
                         @Override
                         protected Integer call() throws Exception {
                             updating = true;
-                            System.out.println("OLD: getEndNodeIndex: " + drawer.getGraph().getEndNodeIndex() + ", getRightBoundID: " + drawer.getGraph().getRightBoundID());
+                            System.out.println("OLD: getEndNodeIndex: " + drawer.getGraph().getRightBoundIndex() + ", getRightBoundID: " + drawer.getGraph().getRightBoundID());
                             SequenceGraph newGraph = drawer.getGraph().copy();
-                            newGraph.createSubGraph(1,//drawer.getGraph().getStartNodeIndex() + Math.min(1000, drawer.getGraph().getRightBoundID() - drawer.getGraph().getEndNodeIndex()),
-                                    drawer.getGraph().getEndNodeIndex() + Math.min(1000, drawer.getGraph().getRightBoundID() - drawer.getGraph().getEndNodeIndex()),
-                                    drawer.getGraph().getPartPath());
+                            newGraph.createSubGraph(drawer.getGraph().getCenterNodeID() + 1000, 1000, drawer.getGraph().getPartPath());
                             drawer.setGraph(newGraph);
                             drawer.initGraph();
-                            System.out.println("NEW: getEndNodeIndex: " + drawer.getGraph().getEndNodeIndex() + ", getRightBoundID: " + drawer.getGraph().getRightBoundID());
+                            System.out.println("NEW: getEndNodeIndex: " + drawer.getGraph().getRightBoundIndex() + ", getRightBoundID: " + drawer.getGraph().getRightBoundID());
                             updating = false;
                             return null;
                         }
