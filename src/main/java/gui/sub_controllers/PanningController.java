@@ -96,6 +96,7 @@ public class PanningController {
                 } else if (event.getCode() == KeyCode.LEFT) {
                     timelineLeft.play();
                 }
+                event.consume();
             }
         });
         canvasPanel.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
@@ -106,6 +107,7 @@ public class PanningController {
                 } else if (event.getCode() == KeyCode.LEFT) {
                     timelineLeft.stop();
                 }
+                event.consume();
             }
         });
     }
