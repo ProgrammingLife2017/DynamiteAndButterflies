@@ -3,17 +3,19 @@ package gui;
 import graph.SequenceGraph;
 import gui.sub_controllers.FileController;
 import gui.sub_controllers.PanningController;
+import gui.sub_controllers.SpecificGenomeProperties;
 import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
 /**
  * Created by eric on 8-6-17.
  */
-public class DrawableCanvas extends Observable implements Observer {
+public class    DrawableCanvas extends Observable implements Observer {
 
 
     private static DrawableCanvas canvas = new DrawableCanvas();
@@ -21,6 +23,8 @@ public class DrawableCanvas extends Observable implements Observer {
     private GfaParser parser;
 
     private MenuController mc;
+
+    private  SpecificGenomeProperties specificGenomeProperties;
 
 
     private DrawableCanvas() {
@@ -51,6 +55,9 @@ public class DrawableCanvas extends Observable implements Observer {
 //        }
 //    }
 
+    public void setSpecificGenomeProperties(SpecificGenomeProperties sgp) {
+        this.specificGenomeProperties = sgp;
+    }
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof FileController) {
@@ -59,6 +66,7 @@ public class DrawableCanvas extends Observable implements Observer {
                     if ( ( (Integer) arg) == 0) {
                         try {
                             int[] childArray = parser.getChildArray();
+                            HashMap<Integer, String> allGenomes = parser.getAllGenomesMapReversed();
 
                             int [] parentArray = parser.getParentArray();
                             SequenceGraph graph = new SequenceGraph();
@@ -95,5 +103,9 @@ public class DrawableCanvas extends Observable implements Observer {
 
     public GfaParser getParser() {
         return this.parser;
+    }
+
+    public SpecificGenomeProperties getSpecificGenomeProperties() {
+        return this.specificGenomeProperties;
     }
 }

@@ -4,6 +4,7 @@ import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.*;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,23 +17,33 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.mapdb.HTreeMap;
 import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
- *
+ * <p>
  * Controller for the Menu scene. Used to run all functionality
  * in the main screen of the application.
  */
 public class MenuController implements Observer {
 
+    @FXML
+    private Button saveGenomeBut;
+    @FXML
+    private MenuItem genome1;
+    @FXML
+    private MenuItem genome2;
+    @FXML
+    private MenuItem genome3;
     @FXML
     private MenuItem file1;
     @FXML
@@ -77,6 +88,8 @@ public class MenuController implements Observer {
     private InfoController infoController;
     private RecentController recentController;
     private PanningController panningController;
+    private SpecificGenomeProperties specificGenomeProperties;
+
 
     private String filePath;
 
@@ -97,6 +110,12 @@ public class MenuController implements Observer {
         recentController = new RecentController(file1, file2, file3);
         ps = new PrintStream(new Console(consoleArea));
         DrawableCanvas.getInstance().setMenuController(this);
+
+
+        DrawableCanvas.getInstance().setSpecificGenomeProperties(new SpecificGenomeProperties(saveGenomeBut,
+                                                    genome1, genome2, genome3));
+
+
         //System.setErr(ps);
         //System.setOut(ps);
     }
@@ -104,7 +123,8 @@ public class MenuController implements Observer {
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
      * can be selected and directly be visualised on the screen.
-     * @throws IOException if there is no file specified.
+     *
+     * @throws IOException          if there is no file specified.
      * @throws InterruptedException Exception when the Thread is interrupted.
      */
     @FXML
@@ -114,18 +134,15 @@ public class MenuController implements Observer {
         String filePath = file.getAbsolutePath();
         recentController.update(filePath);
         fileController.openFileClicked(filePath);
+        DrawableCanvas.getInstance().getSpecificGenomeProperties().hideSave();
+        DrawableCanvas.getInstance().getSpecificGenomeProperties().hideSave();
     }
 
-    /**
-     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
-     * can be selected and directly be visualised on the screen.
-     * @param filePath the file that should be opened
-     * @throws IOException if there is no file specified.
-     * @throws InterruptedException Exception when the Thread is interrupted.
-     */
-    @FXML
-    public void openFileClicked(String filePath) throws IOException, InterruptedException {
+
+    private void openFileClicked(String filePath) throws IOException, InterruptedException {
         fileController.openFileClicked(filePath);
+        recentController.update(filePath);
+        specificGenomeProperties.hideSave();
     }
 
     private void displayInfo(SequenceGraph graph) {
@@ -135,6 +152,7 @@ public class MenuController implements Observer {
 
     /**
      * ZoomIn Action Handler.
+     *
      * @throws IOException exception.
      */
     @FXML
@@ -146,6 +164,7 @@ public class MenuController implements Observer {
 
     /**
      * ZoomOut Action Handler.
+     *
      * @throws IOException exception.
      */
     @FXML
@@ -157,6 +176,7 @@ public class MenuController implements Observer {
 
     /**
      * Ensures the scroll bar zooms in and out.
+     *
      * @param scrollEvent The scroll.
      * @throws IOException throws exception if column doesn't exist.
      */
@@ -173,6 +193,7 @@ public class MenuController implements Observer {
 
     /**
      * Get the X-Coordinate of the cursor on click.
+     *
      * @param mouseEvent the mouse event.
      */
     @FXML
@@ -201,12 +222,16 @@ public class MenuController implements Observer {
 
             String concat = nodeID + columnString + parentString + childString + newString;
             infoController.updateSeqLabel(concat);
+            String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId());
+            infoController.updateSeqLabel(clicked.toString(sequence));
+            nodeTextField.setText(clicked.getId().toString());
         }
     }
 
     /**
      * Adds a button to traverse the graph with.
      */
+    @FXML
     public void traverseGraphClicked() {
         int centreNodeID = Integer.parseInt(nodeTextField.getText());
         int radius = Integer.parseInt(radiusTextField.getText());
@@ -214,12 +239,14 @@ public class MenuController implements Observer {
         String newString = "ID: " + centreNodeID + "\nSequence: "
                 + DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
         infoController.updateSeqLabel(newString);
+
     }
 
     /**
      * Adds a button to traverse the graph with.
+     *
      * @param centreNode specifies the centre node to be showed
-     * @param radius specifies the radius to be showed
+     * @param radius     specifies the radius to be showed
      */
     private void traverseGraphClicked(String centreNode, String radius) {
         int centreNodeID = Integer.parseInt(centreNode);
@@ -257,6 +284,7 @@ public class MenuController implements Observer {
 
     /**
      * Updates and saves the bookmarks.
+     *
      * @throws IOException Throws expception if it can't find the fxml file.
      */
     @FXML
@@ -267,7 +295,7 @@ public class MenuController implements Observer {
         Parent root = loader.load();
         BookmarkPopUp controller = loader.<BookmarkPopUp>getController();
         controller.initialize(zoomController.getCentreNode(),
-                            zoomController.getRadius(), bookmarkController);
+                zoomController.getRadius(), bookmarkController);
 
         stage = new Stage();
         stage.setScene(new Scene(root));
@@ -278,6 +306,7 @@ public class MenuController implements Observer {
 
     /**
      * Handles pressing the manage bookmark button.
+     *
      * @throws IOException if the fxml file doesn't exist.
      */
     @FXML
@@ -295,6 +324,7 @@ public class MenuController implements Observer {
 
     /**
      * Method used to not duplicate code in working out bookmarks.
+     *
      * @param bookmark the button that specifies the bookmark
      */
     private void bookmarked(MenuItem bookmark) {
@@ -312,6 +342,7 @@ public class MenuController implements Observer {
 
     /**
      * getter for the SequenceMap.
+     *
      * @return The sequenceMap.
      */
     HTreeMap<Long, String> getSequenceHashMap() {
@@ -337,12 +368,14 @@ public class MenuController implements Observer {
                         String offTitle = parts[0];
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
+                        specificGenomeProperties.initialize();
                         panningController =
                                 new PanningController(scrollbar, GraphDrawer.getInstance());
                         zoomController = new ZoomController(GraphDrawer.getInstance().getGraph(),
                                 GraphDrawer.getInstance(), panningController,
                                     nodeTextField, radiusTextField);
                         displayInfo(GraphDrawer.getInstance().getGraph());
+
                     }
                 });
             }
@@ -375,6 +408,7 @@ public class MenuController implements Observer {
 
     /**
      * Method used to not duplicate recentFile presses.
+     *
      * @param file the menuItem that has been pressed
      */
     private void pressedRecent(MenuItem file) {
@@ -396,6 +430,112 @@ public class MenuController implements Observer {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    /**
+     * Handles pressing the specific genome button.
+     *
+     * @throws IOException when something goes wrong with IO.
+     */
+    @FXML
+    public void chooseGenomePress() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/specGenomePopUp.fxml"));
+        Stage stage;
+        Parent root = loader.load();
+        final SpecificGenomeController controller
+                = loader.<SpecificGenomeController>getController();
+
+        HashMap<Integer, String> hashMap;
+
+        hashMap = fileController.getAllGenomes();
+        if (hashMap == null) {
+            try {
+                openFileClicked();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        controller.initialize(hashMap, GraphDrawer.getInstance().getSelected());
+
+        stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Choose a specific genome to view");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setOnHidden(
+                new EventHandler<WindowEvent>() {
+                    @Override
+                    public void handle(WindowEvent event) {
+                        GraphDrawer.getInstance().setSelected(controller.getSelectedGenomes());
+                        GraphDrawer.getInstance().redraw();
+                        specificGenomeProperties.showSave();
+                    }
+                }
+        );
+        stage.showAndWait();
+    }
+
+    /**
+     * Handles pressing the save button.
+     */
+    @FXML
+    public void saveGenomesClick() {
+        specificGenomeProperties.saving(GraphDrawer.getInstance().getSelected());
+    }
+
+    /**
+     * Handles pressing the save button in the menu.
+     */
+    @FXML
+    public void otherSaveGenomeClick() {
+        specificGenomeProperties.saving(GraphDrawer.getInstance().getSelected());
+    }
+
+    /**
+     * Pressing on the first saved genomes.
+     */
+    @FXML
+    public void genome1Click() {
+        genomeBookmarkClicked(genome1);
+    }
+
+    /**
+     * Pressing on the second saved genomes.
+     */
+    @FXML
+    public void genome2Click() {
+        genomeBookmarkClicked(genome2);
+    }
+
+    /**
+     * Pressing on the third saved genomes.
+     */
+    @FXML
+    public void genome3Click() {
+        genomeBookmarkClicked(genome3);
+    }
+
+    /**
+     * Generic genome bookmark function to not duplicate code.
+     * @param bookmark The MenuItem that was pressed.
+     */
+    private void genomeBookmarkClicked(MenuItem bookmark) {
+        if (!bookmark.getText().equals("-")) {
+            String string = bookmark.getText();
+            String[] parts = string.split(" - ");
+            //We skip parts[0] because that is "Genomes".
+            String listOfIds = parts[1];
+
+            parts = listOfIds.split(", ");
+            int[] res = new int[parts.length];
+            for (int i = 0; i < parts.length; i++) {
+                int oneSelected = Integer.parseInt(parts[i]);
+                res[i] = oneSelected;
+            }
+
+            GraphDrawer.getInstance().setSelected(res);
+            GraphDrawer.getInstance().redraw();
         }
     }
 }

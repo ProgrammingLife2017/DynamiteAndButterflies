@@ -1,8 +1,14 @@
 package graph;
 
+import gui.DrawableCanvas;
 import parser.GfaParser;
 
+import java.io.IOException;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Our own Graph Class.
@@ -18,12 +24,15 @@ public class SequenceGraph {
 
     private int dummyNodeIDCounter;
 
+
     /**
      * The constructor initializes the SequenceGraph with it's basic values.
      */
     public SequenceGraph() {
         this.nodes = new HashMap<Integer, SequenceNode>();
     }
+
+
 
     // upperbound in incorrect for TB10, the last node is not the highest one.
 
@@ -33,20 +42,21 @@ public class SequenceGraph {
      * @param range The range to of the subgraph.
      * @param parentArray Array with all the parentID's.
      * @param childArray Array with all the childID's, combined with parentArray is all edges.
+     * @throws IOException for file reading.
      */
-    public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray) {
+    public void createSubGraph(int centerNodeID, int range, int[] parentArray, int[] childArray) throws IOException {
         int centerNodeIndex = findCenterNodeIndex(centerNodeID, parentArray);
         int lastNodeIndex = range + centerNodeID;
         if (centerNodeIndex + range >= parentArray.length) {
             lastNodeIndex = parentArray.length - 1;
         }
-
-
         for (int i = centerNodeIndex; i <= lastNodeIndex; i++) {
             int parentID = parentArray[i];
             int childID = childArray[i];
             if (nodes.get(parentID) == null) {
                 SequenceNode node = new SequenceNode(parentID);
+                int[] genomes = getGenomes(parentID, DrawableCanvas.getInstance().getParser().getPartPath());
+                node.setGenomes(genomes);
                 node.addChild(childID);
                 nodes.put(parentID, node);
             } else {
@@ -54,6 +64,8 @@ public class SequenceGraph {
             }
             if (nodes.get(childID) == null) {
                 SequenceNode node = new SequenceNode(childID);
+                int[] genomes = getGenomes(childID, DrawableCanvas.getInstance().getParser().getPartPath());
+                node.setGenomes(genomes);
                 nodes.put(childID, node);
             }
         }
@@ -64,6 +76,23 @@ public class SequenceGraph {
         createIndex();
         baryCenterAssignment();
 
+    }
+
+    @SuppressWarnings("Since15")
+    private int[] getGenomes(int node, String partPath) throws IOException {
+        try {
+            Stream<String> lines = Files.lines(Paths.get(partPath + "genomes.txt"));
+            String line = lines.skip(node - 1).findFirst().get();
+            String[] text = line.split(";");
+            int[] genomes = new int[text.length];
+            for (int i = 0; i < text.length; i++) {
+                genomes[i] = Integer.parseInt(text[i]);
+            }
+            return genomes;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void findLongestPath() {

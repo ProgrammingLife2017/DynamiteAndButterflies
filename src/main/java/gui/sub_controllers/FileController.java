@@ -40,6 +40,13 @@ public class FileController extends Observable implements Observer {
 
     private PopUpController popUpController;
 
+    private int[] childArray;
+    private int[] parentArray;
+
+    private HashMap<Integer, String> allGenomes;
+    private HashMap<Integer, String> genomes;
+
+
     /**
      * Constructor of the FileController object to control the Files.
      * @param pbc The progressbar.
@@ -125,10 +132,16 @@ public class FileController extends Observable implements Observer {
                 setChanged();
                 notifyObservers(0);
                 setChanged();
+
                 progressBarController.done();
             }
         }
     }
+
+    public HashMap<Integer, String> getAllGenomes() {
+        return allGenomes;
+    }
+
 
     /**
      * Gets the fileName from the filePath.
