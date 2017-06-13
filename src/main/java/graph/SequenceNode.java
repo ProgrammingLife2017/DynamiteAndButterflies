@@ -83,7 +83,7 @@ public class SequenceNode {
      * Draw the node with the color depending on it's status. Orange for highlighted nodes,
      * black for dummy nodes and blue for sequence nodes.
      *
-     * @param gc               The grapicsContext of the screen.
+     * @param gc               The graphicsContext of the screen.
      * @param colourController A controller that chooses colours for the node
      */
     public void draw(GraphicsContext gc, ColourController colourController) {
@@ -99,19 +99,15 @@ public class SequenceNode {
 
         ArrayList<Color> colourMeBby = new ArrayList<>();
         if (highlighted) {
-            colourMeBby.add(Color.BLACK);
+            colourMeBby.add(colourController.getHighlighted());
         } else {
             colourMeBby = colourController.getColors(genomes);
         }
 
         double tempCoordinate = yCoordinate;
         double tempHeight = height / colourMeBby.size();
-        for (int i = 0; i < colourMeBby.size(); i++) {
-            if (highlighted) {
-                gc.setFill(Color.BLACK);
-            } else {
-                gc.setFill(colourMeBby.get(i));
-            }
+        for (Color beamColour : colourMeBby) {
+            gc.setFill(beamColour);
             gc.fillRect(xCoordinate, tempCoordinate, width, tempHeight);
             tempCoordinate += tempHeight;
         }
