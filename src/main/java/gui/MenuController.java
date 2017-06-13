@@ -359,6 +359,7 @@ public class MenuController implements Observer {
                 properties.setProperty("file", filePath);
                 properties.saveProperties();
 
+
                 Platform.runLater(new Runnable() {
                     public void run() {
                         Stage stage = App.getStage();
@@ -370,9 +371,8 @@ public class MenuController implements Observer {
                         bookmarkController.initialize(filePath);
                         specificGenomeProperties.initialize();
                         panningController =
-                                new PanningController(scrollbar, GraphDrawer.getInstance());
-                        zoomController = new ZoomController(GraphDrawer.getInstance().getGraph(),
-                                GraphDrawer.getInstance(), panningController,
+                                new PanningController(scrollbar);
+                        zoomController = new ZoomController(panningController,
                                     nodeTextField, radiusTextField);
                         displayInfo(GraphDrawer.getInstance().getGraph());
 

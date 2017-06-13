@@ -1,6 +1,5 @@
 package gui.sub_controllers;
 
-import graph.SequenceGraph;
 import gui.GraphDrawer;
 import javafx.scene.control.TextField;
 
@@ -18,23 +17,19 @@ public class ZoomController {
     private static final double SCROLL_ZOOM_IN_FACTOR = 0.9;
     private static final double SCROLL_ZOOM_OUT_FACTOR = 1.1;
 
-    private final SequenceGraph graph;
     private final GraphDrawer drawer;
     private final TextField nodeTextField, radiusTextField;
     private final PanningController panningController;
 
     /**
      * Constructor of the Zoom Controller.
-     * @param graph The SequenceGraph we will be drawing.
-     * @param drwr A GraphDrawer that can draw the graph for us.
      * @param panController The panningcontroller.
      * @param nodeField The textField that contains the centre node.
      * @param radField The textField that contains the radius.
      */
-    public ZoomController(SequenceGraph graph, GraphDrawer drwr, PanningController panController,
+    public ZoomController(PanningController panController,
                           TextField nodeField, TextField radField) {
-        this.graph = graph;
-        drawer = drwr;
+        drawer = GraphDrawer.getInstance();
         nodeTextField = nodeField;
         radiusTextField = radField;
         this.panningController = panController;
@@ -68,7 +63,7 @@ public class ZoomController {
      * @param radius The radius to be viewed
      */
     public void traverseGraphClicked(int centreNode, int radius) {
-        int column = graph.getNode(centreNode).getColumn();
+        int column = GraphDrawer.getInstance().getGraph().getNode(centreNode).getColumn();
         drawer.changeZoom(column, radius);
         drawer.highlight(centreNode);
         panningController.setScrollbarSize(drawer.getColumnWidth(column));

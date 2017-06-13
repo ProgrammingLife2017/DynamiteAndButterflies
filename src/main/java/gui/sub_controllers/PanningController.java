@@ -18,17 +18,15 @@ public class PanningController extends Observable {
     public static final int EXTEND_RIGHT = 1;
 
     private final ScrollBar scrollbar;
-    private final GraphDrawer drawer;
+
     private boolean active;
 
     /**
      * Constructor.
      * @param scrollBar Scrollbar.
-     * @param drawer The graphdrawer.
      */
-    public PanningController(ScrollBar scrollBar, GraphDrawer drawer) {
+    public PanningController(ScrollBar scrollBar) {
         this.scrollbar = scrollBar;
-        this.drawer = drawer;
         initialize();
     }
 
@@ -37,20 +35,20 @@ public class PanningController extends Observable {
      * The listener is only active when it is manually changed, not by zooming.
      */
     private void initialize() {
-        scrollbar.setMax(drawer.getZoomLevel());
-        scrollbar.setVisibleAmount(drawer.getZoomLevel());
+        scrollbar.setMax(GraphDrawer.getInstance().getZoomLevel());
+        scrollbar.setVisibleAmount(GraphDrawer.getInstance().getZoomLevel());
         scrollbar.setValue(scrollbar.getMax() / 2);
         scrollbar.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> ov,
                                 Number oldVal, Number newVal) {
                 if (active) {
-                    drawer.moveShapes(drawer.getxDifference()
+                    GraphDrawer.getInstance().moveShapes(GraphDrawer.getInstance().getxDifference()
                             + (newVal.doubleValue() - oldVal.doubleValue()));
                 }
-                if (drawer.getLeftbound() < 0) {
+                if (GraphDrawer.getInstance().getLeftbound() < 0) {
                     setChanged();
                     notifyObservers(EXTEND_LEFT);
-                } else if (drawer.getRightbound() > drawer.getRange()) {
+                } else if (GraphDrawer.getInstance().getRightbound() > GraphDrawer.getInstance().getRange()) {
                     setChanged();
                     notifyObservers(EXTEND_RIGHT);
                 }
@@ -65,7 +63,7 @@ public class PanningController extends Observable {
     public void setScrollbarSize(double column) {
         active = false;
         scrollbar.setValue(column);
-        scrollbar.setVisibleAmount(drawer.getZoomLevel());
+        scrollbar.setVisibleAmount(GraphDrawer.getInstance().getZoomLevel());
         active = true;
     }
 
