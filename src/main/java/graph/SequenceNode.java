@@ -96,7 +96,14 @@ public class SequenceNode {
                     xCoordinate + width, yCoordinate + height / 2);
             return;
         }
-        ArrayList<Color> colourMeBby = colourController.getColors(genomes);
+
+        ArrayList<Color> colourMeBby = new ArrayList<>();
+        if (highlighted) {
+            colourMeBby.add(Color.BLACK);
+        } else {
+            colourMeBby = colourController.getColors(genomes);
+        }
+
         double tempCoordinate = yCoordinate;
         double tempHeight = height / colourMeBby.size();
         for (int i = 0; i < colourMeBby.size(); i++) {
@@ -105,7 +112,7 @@ public class SequenceNode {
             } else {
                 gc.setFill(colourMeBby.get(i));
             }
-            gc.fillRect(xCoordinate, tempCoordinate, width, tempHeight); //, ARC_SIZE, ARC_SIZE);
+            gc.fillRect(xCoordinate, tempCoordinate, width, tempHeight);
             tempCoordinate += tempHeight;
         }
     }

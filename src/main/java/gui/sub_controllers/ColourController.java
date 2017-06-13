@@ -12,17 +12,13 @@ public class ColourController {
     private int[] selectedGenomes;
     private boolean largeSelection;
 
-    private int LOWER;
-    private int LOWMIDDLE;
-    private int HIGHMIDDLE;
-    private int HIGHER;
-
-    private int lowMiddleCounter;
+    private int lowerPart;
+    private int middlePart;
+    private int higherPart;
 
     public ColourController(int[] allSelectedGenomes) {
         selectedGenomes = allSelectedGenomes;
         largeSelection = false;
-        lowMiddleCounter = 0;
         initialize();
     }
 
@@ -35,9 +31,9 @@ public class ColourController {
 
         if (size >= 7) {
             largeSelection = true;
-            LOWER = size / 4;
-            LOWMIDDLE = LOWER * 2;
-            HIGHMIDDLE = LOWER + LOWMIDDLE;
+            lowerPart = size / 4;
+            middlePart = lowerPart * 2;
+            higherPart = lowerPart + middlePart;
         }
     }
 
@@ -72,85 +68,17 @@ public class ColourController {
         }
     }
 
-//    public Color getLower() {
-//        lowerCounter++;
-//        switch (lowerCounter) {
-//            case 1:
-//                return Color.DODGERBLUE;
-//            case 2:
-//                return Color.CADETBLUE;
-//            case 3:
-//                return Color.CORNFLOWERBLUE;
-//            case 4:
-//                return Color.ALICEBLUE;
-//            case 5:
-//                lowerCounter = 0;
-//                return getLower();
-//            default:
-//                return Color.WHITE;
-//        }
-//    }
-
-    public Color getLowMiddle() {
-        lowMiddleCounter++;
-        switch (lowMiddleCounter) {
-            case 1:
-                lowMiddleCounter++;
-                return Color.PALEVIOLETRED;
-            case 2:
-                lowMiddleCounter++;
-                return Color.INDIANRED;
-            case 3:
-                lowMiddleCounter++;
-                return Color.MEDIUMVIOLETRED;
-            case 4:
-                lowMiddleCounter++;
-                return Color.ORANGERED;
-            case 5:
-                lowMiddleCounter = 0;
-                return getLowMiddle();
-            default:
-                return getBase();
+    private Color getLargeSelColour(int length) {
+        if (length < lowerPart) {
+            return Color.color(0.9608, 0.8235, 0.8235);
+        } else if (length < middlePart) {
+            return Color.color(0.9216, 0.6157, 0.6157);
+        } else if (length < higherPart) {
+            return Color.color(0.8824, 0.4039, 0.4039);
+        } else {
+            return Color.color(0.8431, 0.2196, 0.2196);
         }
     }
-
-//    public Color getHighMiddle() {
-//        highMiddleCounter++;
-//        switch (highMiddleCounter) {
-//            case 1:
-//                return Color.YELLOWGREEN;
-//            case 2:
-//                return Color.GREENYELLOW;
-//            case 3:
-//                return Color.LIGHTGOLDENRODYELLOW;
-//            case 4:
-//                return Color.LIGHTYELLOW;
-//            case 5:
-//                highMiddleCounter = 0;
-//                return getHighMiddle();
-//            default:
-//                return Color.WHITE;
-//        }
-//    }
-
-//    public Color getHigher() {
-//        highCounter++;
-//        switch (highCounter) {
-//            case 1:
-//                return Color.DARKSEAGREEN;
-//            case 2:
-//                return Color.FORESTGREEN;
-//            case 3:
-//                return Color.LAWNGREEN;
-//            case 4:
-//                return Color.MEDIUMSEAGREEN;
-//            case 5:
-//                highCounter = 0;
-//                return getHigher();
-//            default:
-//                return Color.WHITE;
-//        }
-//    }
 
     public Color getBase() {
         return Color.gray(0.5098);
@@ -165,7 +93,7 @@ public class ColourController {
         }
 
         if (largeSelection) {
-            res.add(getLowMiddle());
+            res.add(getLargeSelColour(genomes.length));
             return res;
         }
 
