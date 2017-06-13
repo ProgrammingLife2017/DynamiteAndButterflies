@@ -62,8 +62,8 @@ public class App extends Application {
             stage.setTitle("Wow!! DynamiteAndButterflies genome visualiser\t");
             stage.setScene(scene);
             stage.setResizable(true);
-            stage.setMaximized(true);
             stage.show();
+            //stage.setMaximized(true); -> Mac fails to load a setMaximized(true) stage.
             System.out.println(path + " loaded on the stage");
             return loader;
         } catch (IOException e) {
