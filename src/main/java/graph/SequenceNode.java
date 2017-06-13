@@ -88,7 +88,7 @@ public class SequenceNode {
      * @param gc               The graphicsContext of the screen.
      * @param colourController A controller that chooses colours for the node
      */
-    public void draw(GraphicsContext gc, ColourController colourController) {
+    public void draw(GraphicsContext gc, ColourController colourController, ArrayList<Annotation> annotations) {
         gc.clearRect(xCoordinate, yCoordinate, width, height);
 
         if (isDummy) {
@@ -113,6 +113,40 @@ public class SequenceNode {
             gc.fillRect(xCoordinate, tempCoordinate, width, tempHeight);
             tempCoordinate += tempHeight;
         }
+
+        for (int i = 0; i < annotations.size(); i++) {
+            Annotation annotation = annotations.get(i);
+            double startXAnno = xCoordinate;
+            double startYAnno = yCoordinate + height;
+            double annoWidth = width;
+            double annoHeight = height / 4;
+            //if (annotation IS ON GENOME IN genomes)
+            int startOfAnno = annotation.getStart();
+            int endOfAnno = annotation.getEnd();
+            int startCorOfGenome = 0;
+
+            if (genomes.length == offSets.length) {
+                startCorOfGenome = INDEX_OF_THAT_GENOME;
+            }
+
+            if (startOfAnno > (offSets[startCorOfGenome] + sequenceLength)
+                    || endOfAnno < (offSets[startCorOfGenome])) {
+                continue;
+            }
+
+            int emptyAtStart = 0;
+            if (startOfAnno > offSets[startCorOfGenome]) {
+                emptyAtStart = startOfAnno - offSets[startCorOfGenome];
+                annoWidth = (width * (1 - (emptyAtStart / sequenceLength)));
+                startXAnno = startXAnno + (width - annoWidth);
+            } else if (endOfAnno < (offSets[startCorOfGenome] + sequenceLength)) {
+                int emptyAtEnd = offSets[startCorOfGenome] + sequenceLength - endOfAnno;
+                annoWidth = (annoWidth * (1 - (emptyAtEnd / sequenceLength - emptyAtStart)));
+            }
+            gc.setFill(Color.RED);
+            gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
+        }
+
     }
 
     /**

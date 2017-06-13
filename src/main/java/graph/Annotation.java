@@ -18,4 +18,12 @@ public class Annotation {
         this.end = end;
         this.info = info;
     }
+
+    public int getStart() {
+        return start;
+    }
+
+    public int getEnd() {
+        return end;
+    }
 }
