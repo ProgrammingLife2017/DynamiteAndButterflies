@@ -122,6 +122,10 @@ public class SequenceNode {
         return (xEvent > xCoordinate && xEvent < xCoordinate + width);
     }
 
+    public boolean checkBounds() {
+        return (xCoordinate <= 0 && (xCoordinate + width) >= 0);
+    }
+
 
     public double getxCoordinate() {
         return xCoordinate;

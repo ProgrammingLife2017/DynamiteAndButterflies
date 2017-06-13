@@ -19,9 +19,7 @@ public class SequenceGraph {
 
     private HashMap<Integer, SequenceNode> nodes;
     private ArrayList<ArrayList<SequenceNode>> columns;
-    private int leftBoundIndex;
-    private int rightBoundIndex;
-
+    private Boundary boundaries;
     private int centerNodeID;
 
     private int[] parentArray;
@@ -68,8 +66,7 @@ public class SequenceGraph {
 
         Boundary boundary = new Boundary(centerNodeID, range, parentArray, childArray);
         this.centerNodeID = centerNodeID;
-        leftBoundIndex = boundary.getLeftBoundIndex();
-        rightBoundIndex = boundary.getRightBoundIndex();
+        this.boundaries = boundary;
         initNodes();
         findLongestPath();
         addDummies();
@@ -93,7 +90,7 @@ public class SequenceGraph {
      * Add nodes with children to the nodes hashmap.
      */
     private void initNodes() {
-        for (int i = leftBoundIndex; i <= rightBoundIndex; i++) {
+        for (int i = boundaries.getLeftBoundIndex(); i <= boundaries.getRightBoundIndex(); i++) {
             int parentID = parentArray[i];
             int childID = childArray[i];
             if (nodes.get(parentID) == null) {
@@ -239,7 +236,7 @@ public class SequenceGraph {
      *
      */
     private void addDummies() {
-        for (int i = leftBoundIndex; i <= rightBoundIndex; i++) {
+        for (int i = boundaries.getLeftBoundIndex(); i <= boundaries.getRightBoundIndex(); i++) {
             SequenceNode parent = this.getNode(parentArray[i]);
             int size = parent.getChildren().size();
             for (int j = 0; j < size; j++) {
@@ -416,24 +413,32 @@ public class SequenceGraph {
         return partPath;
     }
 
-    public int getLeftBoundID() {
-        return parentArray[0];
+    public int getFullGraphRightBoundIndex() {
+        return parentArray.length - 1;
     }
 
-    public int getRightBoundID() {
-        return childArray[childArray.length - 1];
+    public int getFullGraphLeftBoundIndex() { return 0; }
+
+    public int getFullGraphRightBoundID() { return parentArray[parentArray.length-1]; }
+
+    public int getFullGraphLeftBoundID() { return 1; }
+
+    public int getLeftBoundID() {
+        return boundaries.getLeftBoundID();
     }
+
+    public int getRightBoundID() { return boundaries.getRightBoundID(); }
 
     public SequenceGraph copy() {
         return new SequenceGraph(parentArray, childArray, sequenceHashMap);
     }
 
     public int getLeftBoundIndex() {
-        return leftBoundIndex;
+        return boundaries.getLeftBoundIndex();
     }
 
     public int getRightBoundIndex() {
-        return rightBoundIndex;
+        return boundaries.getRightBoundIndex();
     }
 
     public int getCenterNodeID() {

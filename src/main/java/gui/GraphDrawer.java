@@ -36,7 +36,9 @@ public class GraphDrawer {
     private int[] selected;
     private ColourController colourController;
 
-    /**
+    private SequenceNode mostLeftNode;
+
+     /**
      * Constructor.
      *
      * @param graph The sequencegraph to be drawn to the canvas.
@@ -149,6 +151,9 @@ public class GraphDrawer {
                 height = width;
             }
             node.setCoordinates(x, y, width, height);
+            if (node.checkBounds()) {
+                mostLeftNode = node;
+            }
             node.draw(gc, selected, colourController);
         }
     }
@@ -366,6 +371,10 @@ public class GraphDrawer {
 
     public void setGraph(SequenceGraph graph) {
         this.graph = graph;
+    }
+
+    public SequenceNode getMostLeftNode() {
+        return mostLeftNode;
     }
 }
 

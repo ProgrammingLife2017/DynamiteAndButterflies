@@ -1,6 +1,7 @@
 package gui.sub_controllers;
 
 import graph.SequenceGraph;
+import graph.SequenceNode;
 import gui.GraphDrawer;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -114,18 +115,21 @@ public class PanningController {
 
     public void pannRight() {
         if (!updating) {
-            if (drawer.getGraph().getRightBoundIndex() < drawer.getGraph().getRightBoundID()) {
-                if (drawer.getxDifference() + drawer.getZoomLevel() + 2000 > drawer.getRange()) {
+            if (drawer.getGraph().getRightBoundIndex() < drawer.getGraph().getFullGraphRightBoundIndex()) {
+                if (drawer.getxDifference() + drawer.getZoomLevel() + 100 > drawer.getRange()) {
                     new Thread(new Task<Integer>() {
                         @Override
                         protected Integer call() throws Exception {
                             updating = true;
-                            System.out.println("OLD: getEndNodeIndex: " + drawer.getGraph().getRightBoundIndex() + ", getRightBoundID: " + drawer.getGraph().getRightBoundID());
+                            System.out.println("OLD: getRightBoundIndex: " + drawer.getGraph().getRightBoundIndex() + ", getFullGraphRightBoundIndex: " + drawer.getGraph().getFullGraphRightBoundIndex() + ", getCentreNodeID: " + drawer.getGraph().getCenterNodeID());
+                            int leftMostID = drawer.getMostLeftNode().getId();
                             SequenceGraph newGraph = drawer.getGraph().copy();
-                            newGraph.createSubGraph(drawer.getGraph().getCenterNodeID() + 1000, 1000, drawer.getGraph().getPartPath());
+                            newGraph.createSubGraph(drawer.getGraph().getCenterNodeID() + 50, 50, drawer.getGraph().getPartPath());
                             drawer.setGraph(newGraph);
                             drawer.initGraph();
-                            System.out.println("NEW: getEndNodeIndex: " + drawer.getGraph().getRightBoundIndex() + ", getRightBoundID: " + drawer.getGraph().getRightBoundID());
+                            drawer.setxDifference(drawer.getColumnWidth(drawer.getGraph().getNode(leftMostID).getColumn()));
+                            drawer.moveShapes(drawer.getColumnWidth(drawer.getMostLeftNode().getColumn()));
+                            System.out.println("NEW: getRightBoundIndex: " + drawer.getGraph().getRightBoundIndex() + ", getFullGraphRightBoundIndex: " + drawer.getGraph().getFullGraphRightBoundIndex() + ", getCentreNodeID: " + drawer.getGraph().getCenterNodeID());
                             updating = false;
                             return null;
                         }
@@ -133,7 +137,7 @@ public class PanningController {
                 }
             }
         }
-        if (drawer.getGraph().getNodes().containsKey(drawer.getGraph().getRightBoundID())) {
+        if (drawer.getGraph().getNodes().containsKey(drawer.getGraph().getFullGraphRightBoundID())) {
             if (drawer.getxDifference() + drawer.getZoomLevel() > drawer.getColumnWidth(drawer.getGraph().getColumns().size())) {
                 return;
             }

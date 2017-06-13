@@ -67,4 +67,12 @@ public class Boundary {
     public int getLeftBoundIndex() {
         return leftBoundIndex;
     }
+
+    public int getLeftBoundID() {
+        return leftBoundID;
+    }
+
+    public int getRightBoundID() {
+        return rightBoundID;
+    }
 }
