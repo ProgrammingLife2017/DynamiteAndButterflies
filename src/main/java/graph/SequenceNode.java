@@ -31,7 +31,6 @@ public class SequenceNode {
 
     private ArrayList<Integer> children;
     private ArrayList<Integer> parents;
-    private GraphicsContext gc;
 
     /**
      * Constructor for the sequenceNode.
@@ -87,17 +86,18 @@ public class SequenceNode {
      * @param selectedGenes A int[] with all the genomeIds that are selected.
      */
     public void draw(GraphicsContext gc, int[] selectedGenes, ColourController colourController) {
-        gc.clearRect(xCoordinate, yCoordinate, width, height);
-        gc.setFill(colourController.getColor(genomes));
-
-        if (isDummy) {
-            gc.strokeLine(xCoordinate, yCoordinate + height / 2,
-                    xCoordinate + width, yCoordinate + height / 2);
-            return;
-        } else if (highlighted) {
-            gc.setFill(Color.BLACK);
+        if (inView(gc.getCanvas().getWidth())) {
+            gc.clearRect(xCoordinate, yCoordinate, width, height);
+            gc.setFill(colourController.getColor(genomes));
+            if (isDummy) {
+                gc.strokeLine(xCoordinate, yCoordinate + height / 2,
+                        xCoordinate + width, yCoordinate + height / 2);
+                return;
+            } else if (highlighted) {
+                gc.setFill(Color.BLACK);
+            }
+            gc.fillRoundRect(xCoordinate, yCoordinate, width, height, ARC_SIZE, ARC_SIZE);
         }
-        gc.fillRoundRect(xCoordinate, yCoordinate, width, height, ARC_SIZE, ARC_SIZE);
     }
 
     /**
@@ -126,6 +126,7 @@ public class SequenceNode {
         return (xCoordinate <= 0 && (xCoordinate + width) >= 0);
     }
 
+    public boolean inView(double viewWidth) { return xCoordinate + width > 0 && xCoordinate < viewWidth; }
 
     public double getxCoordinate() {
         return xCoordinate;

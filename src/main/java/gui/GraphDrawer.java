@@ -104,8 +104,8 @@ public class GraphDrawer {
      */
     public void moveShapes(double xDifference) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
-        this.xDifference = xDifference;
         this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
+        setxDifference(xDifference);
         setLineWidth();
         colourController = new ColourController(selected);
         drawNodes();
