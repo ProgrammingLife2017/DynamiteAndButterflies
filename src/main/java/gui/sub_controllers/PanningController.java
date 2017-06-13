@@ -24,11 +24,10 @@ public class PanningController extends Observable {
     /**
      * Constructor.
      * @param scrollBar Scrollbar.
-     * @param drawer The graphdrawer.
      */
-    public PanningController(ScrollBar scrollBar, GraphDrawer drawer) {
+    public PanningController(ScrollBar scrollBar) {
         this.scrollbar = scrollBar;
-        this.drawer = drawer;
+        this.drawer = GraphDrawer.getInstance();
         initialize();
     }
 

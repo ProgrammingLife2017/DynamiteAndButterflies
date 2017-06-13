@@ -94,6 +94,7 @@ public class GfaParser extends Observable implements Runnable {
         this.setChanged();
         this.notifyObservers(1);
         this.setChanged();
+        this.notifyObservers(partPath);
     }
 
     /**
@@ -187,6 +188,7 @@ public class GfaParser extends Observable implements Runnable {
         properties.setProperty(partPath + "childArray.txtsize", Integer.toString(sizeOfFile));
         properties.setProperty(partPath, "true");
         properties.saveProperties();
+
     }
 
     private int[] read(boolean isParent) throws IOException {

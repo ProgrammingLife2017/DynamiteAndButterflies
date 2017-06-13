@@ -15,7 +15,7 @@ import java.util.Observer;
 /**
  * Created by eric on 8-6-17.
  */
-public class    DrawableCanvas extends Observable implements Observer {
+public class DrawableCanvas extends Observable implements Observer {
 
 
     private static DrawableCanvas canvas = new DrawableCanvas();
@@ -77,7 +77,6 @@ public class    DrawableCanvas extends Observable implements Observer {
                             setChanged();
                             notifyObservers(parser.getFilePath());
                             setChanged();
-
                         } catch (IOException e) {
                             e.printStackTrace();
                     }

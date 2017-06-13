@@ -83,7 +83,6 @@
                               <Button layoutX="26.0" layoutY="72.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
                               <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="27.0" layoutY="111.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
                               <Button fx:id="chooseGenome" layoutX="14.0" layoutY="171.0" mnemonicParsing="false" onAction="#chooseGenomePress" prefHeight="25.0" prefWidth="120.0" text="Specific Genome" />
-                              <Button fx:id="saveGenomeBut" layoutX="15.0" layoutY="207.0" mnemonicParsing="false" onAction="#saveGenomesClick" prefHeight="25.0" prefWidth="120.0" text="Save genomes" visible="false" />
                            </children>
                         </AnchorPane>
                       <AnchorPane fx:id="canvasPanel">
