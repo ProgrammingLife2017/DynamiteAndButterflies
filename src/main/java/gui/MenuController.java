@@ -114,8 +114,8 @@ public class MenuController implements Observer {
                                                     genome1, genome2, genome3);
 
         ps = new PrintStream(new Console(consoleArea));
-        System.setErr(ps);
-        System.setOut(ps);
+        //System.setErr(ps);
+        //System.setOut(ps);
     }
 
     /**
@@ -148,6 +148,7 @@ public class MenuController implements Observer {
         Stage stage = App.getStage();
         File file = fileController.chooseGffFile(stage);
         String filePath = file.getAbsolutePath();
+        //TODO: do something with this return value.
         fileController.openGffFileClicked(filePath);
     }
 

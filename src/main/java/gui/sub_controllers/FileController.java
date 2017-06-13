@@ -1,5 +1,6 @@
 package gui.sub_controllers;
 
+import graph.Annotation;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.CustomProperties;
@@ -14,11 +15,7 @@ import parser.GffParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Observer;
-import java.util.Observable;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -162,9 +159,9 @@ public class FileController implements Observer {
         progressBarController.run();
     }
 
-    public void openGffFileClicked(String filePath) {
+    public ArrayList<Annotation> openGffFileClicked(String filePath) throws IOException {
         GffParser parser = new GffParser(filePath);
-        parser.parseGff();
+        return parser.parseGff();
     }
 
     private void assignSequenceLenghts() {
