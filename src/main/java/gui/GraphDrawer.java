@@ -41,6 +41,9 @@ public class GraphDrawer {
     private int[] selected;
     private ColourController colourController;
 
+    private int lowerXBoundID;
+    private int upperXBoundID;
+
 
     public static GraphDrawer getInstance(){
         return drawer;
@@ -152,7 +155,20 @@ public class GraphDrawer {
                 height = width;
             }
             node.setCoordinates(x, y, width, height);
+            getNodeBounds(x, y, node);
+
             node.draw(gc, selected, colourController);
+        }
+    }
+
+    private void getNodeBounds(double x, double width,SequenceNode node) {
+        double nodeLeftBound = x;
+        double nodeRightBound = x + width;
+        if (nodeLeftBound <= canvas.getWidth() && nodeRightBound >= canvas.getWidth()) {
+            upperXBoundID = node.getId();
+        }
+        if (nodeLeftBound <= 0 && nodeRightBound >= 0) {
+            lowerXBoundID = node.getId();
         }
     }
 
