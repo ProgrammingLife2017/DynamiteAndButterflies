@@ -25,9 +25,9 @@ import javafx.util.Duration;
 public class PanningController {
 
     public static final double PANN_FACTOR = 0.005;
-    public static final int RENDER_THRESHOLD = 100;
-    public static final int RENDER_RANGE = 100;
-    public static final int RENDER_SHIFT = 50;
+    public static final int RENDER_THRESHOLD = 1000;
+    public static final int RENDER_RANGE = 2000;
+    public static final int RENDER_SHIFT = 1000;
 
     private GraphDrawer drawer;
     private Button rightPannButton;
