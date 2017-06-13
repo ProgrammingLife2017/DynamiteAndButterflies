@@ -62,7 +62,7 @@ public class ColourController {
             case 5:
                 return Color.color(0, 0.8471, 0);
             case 6:
-                return Color.color(0.6078, 0.2588, 0);
+                return Color.color(0, 0.8471, 0.8471);
             default:
                 return getBase();
         }
