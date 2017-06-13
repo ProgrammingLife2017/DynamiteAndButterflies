@@ -52,8 +52,11 @@ public class SequenceGraph {
             int childID = childArray[i];
             if (nodes.get(parentID) == null) {
                 SequenceNode node = new SequenceNode(parentID);
-                int[] genomes = getGenomes(parentID);
+                String[] text = getGenomes(parentID);
+                int[] genomes = splitOnStringToInt(text[0]);
+                int[] offSets = splitOnStringToInt(text[1]);
                 node.setGenomes(genomes);
+                node.setOffSets(offSets);
                 node.addChild(childID);
                 nodes.put(parentID, node);
             } else {
@@ -61,8 +64,11 @@ public class SequenceGraph {
             }
             if (nodes.get(childID) == null) {
                 SequenceNode node = new SequenceNode(childID);
-                int[] genomes = getGenomes(childID);
+                String[] text = getGenomes(childID);
+                int[] genomes = splitOnStringToInt(text[0]);
+                int[] offSets = splitOnStringToInt(text[1]);
                 node.setGenomes(genomes);
+                node.setOffSets(offSets);
                 nodes.put(childID, node);
             }
         }
@@ -74,17 +80,22 @@ public class SequenceGraph {
         baryCenterAssignment();
     }
 
+    private int[] splitOnStringToInt(String text) {
+        String[] genomesText = text.split(";");
+        int[] genomes = new int[genomesText.length];
+        for (int j = 0; j < genomesText.length; j++) {
+            genomes[j] = Integer.parseInt(genomesText[j]);
+        }
+        return genomes;
+    }
+
     @SuppressWarnings("Since15")
-    private int[] getGenomes(int node) throws IOException {
+    private String[] getGenomes(int node) throws IOException {
         try {
             Stream<String> lines = Files.lines(Paths.get(partPath + "genomes.txt"));
             String line = lines.skip(node - 1).findFirst().get();
-            String[] text = line.split(";");
-            int[] genomes = new int[text.length];
-            for (int i = 0; i < text.length; i++) {
-                genomes[i] = Integer.parseInt(text[i]);
-            }
-            return genomes;
+            String[] text = line.split("-");
+            return text;
         } catch (Exception e) {
             e.printStackTrace();
         }

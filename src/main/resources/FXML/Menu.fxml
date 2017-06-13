@@ -28,7 +28,8 @@
                     <menus>
                       <Menu mnemonicParsing="false" text="File">
                         <items>
-                          <MenuItem mnemonicParsing="false" onAction="#openFileClicked" text="Open gfa file" />
+                          <MenuItem mnemonicParsing="false" onAction="#openGfaFileClicked" text="Open gfa file" />
+                            <MenuItem fx:id="gffItem" mnemonicParsing="false" onAction="#openGffFileClicked" text="Open gff file" disable="true"/>
                             <Menu mnemonicParsing="false" text="Recent">
                                 <items>
                                     <MenuItem fx:id="file1" mnemonicParsing="false" onAction="#file1Press" text="&lt;No recent file&gt;" />
