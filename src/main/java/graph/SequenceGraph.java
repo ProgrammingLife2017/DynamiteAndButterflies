@@ -135,6 +135,7 @@ public class SequenceGraph {
             for (int i = 0; i < text.length; i++) {
                 genomes[i] = Integer.parseInt(text[i]);
             }
+            lines.close();
             return genomes;
         } catch (Exception e) {
             e.printStackTrace();

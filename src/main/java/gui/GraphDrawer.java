@@ -86,8 +86,18 @@ public class GraphDrawer {
      */
     public void changeZoom(int column, int radius) {
         setRadius(radius);
-        setZoomLevel(columnWidths[column + radius + 1] - columnWidths[column - radius]);
-        moveShapes(columnWidths[column - radius]);
+        int widthRight = column + radius + 1;
+        int widthLeft = column - radius;
+
+        if (column + radius + 1 > columnWidths.length-1 ) {
+            widthRight = columnWidths.length - 1;
+        }
+        if (column - radius < 0) {
+            widthLeft = 0;
+        }
+
+        setZoomLevel(columnWidths[widthRight] - columnWidths[widthLeft]);
+        moveShapes(columnWidths[widthLeft]);
     }
 
     /**
