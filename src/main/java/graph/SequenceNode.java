@@ -99,7 +99,12 @@ public class SequenceNode {
         } else if (highlighted) {
             gc.setFill(Color.BLACK);
         }
-        gc.fillRoundRect(xCoordinate, yCoordinate, width, height, ARC_SIZE, ARC_SIZE);
+        double tempCoordinate = yCoordinate;
+        double tempHeight = height / genomes.length;
+        for (int i = 0; i < genomes.length; i++) {
+            gc.fillRect(xCoordinate, tempCoordinate, width, tempHeight); //, ARC_SIZE, ARC_SIZE);
+            tempCoordinate += tempHeight;
+        }
     }
 
     /**
