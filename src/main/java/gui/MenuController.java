@@ -115,7 +115,6 @@ public class MenuController implements Observer {
         DrawableCanvas.getInstance().setSpecificGenomeProperties(new SpecificGenomeProperties(saveGenomeBut,
                                                     genome1, genome2, genome3));
 
-
         //System.setErr(ps);
         //System.setOut(ps);
     }
@@ -142,7 +141,7 @@ public class MenuController implements Observer {
     private void openFileClicked(String filePath) throws IOException, InterruptedException {
         fileController.openFileClicked(filePath);
         recentController.update(filePath);
-        specificGenomeProperties.hideSave();
+//        specificGenomeProperties.hideSave();
     }
 
     private void displayInfo(SequenceGraph graph) {
@@ -369,10 +368,11 @@ public class MenuController implements Observer {
                         String offTitle = parts[0];
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
-                        specificGenomeProperties.initialize();
+//                        specificGenomeProperties.initialize();
                         panningController =
                                 new PanningController(scrollbar);
                         zoomController = new ZoomController(panningController,
+
                                     nodeTextField, radiusTextField);
                         displayInfo(GraphDrawer.getInstance().getGraph());
 
