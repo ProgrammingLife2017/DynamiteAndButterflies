@@ -351,7 +351,7 @@ public class MenuController implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (o instanceof GfaParser) {
+        if (o instanceof DrawableCanvas) {
             if (arg instanceof String) {
                 filePath = (String) arg;
 
