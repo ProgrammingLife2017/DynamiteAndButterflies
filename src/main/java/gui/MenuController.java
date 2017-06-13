@@ -133,8 +133,8 @@ public class MenuController implements Observer {
         String filePath = file.getAbsolutePath();
         recentController.update(filePath);
         fileController.openFileClicked(filePath);
-        DrawableCanvas.getInstance().getSpecificGenomeProperties().hideSave();
-        DrawableCanvas.getInstance().getSpecificGenomeProperties().hideSave();
+//        DrawableCanvas.getInstance().getSpecificGenomeProperties().hideSave();
+//        DrawableCanvas.getInstance().getSpecificGenomeProperties().hideSave();
     }
 
 
