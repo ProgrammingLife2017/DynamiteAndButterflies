@@ -83,12 +83,11 @@ public class SequenceNode {
      * Draw the node with the color depending on it's status. Orange for highlighted nodes,
      * black for dummy nodes and blue for sequence nodes.
      *
-     * @param gc            The grapicsContext of the screen.
+     * @param gc               The grapicsContext of the screen.
      * @param colourController A controller that chooses colours for the node
      */
     public void draw(GraphicsContext gc, ColourController colourController) {
         gc.clearRect(xCoordinate, yCoordinate, width, height);
-        gc.setFill(colourController.getColor(genomes));
 
         if (isDummy) {
             gc.setLineWidth(Math.log(genomes.length)
@@ -96,12 +95,16 @@ public class SequenceNode {
             gc.strokeLine(xCoordinate, yCoordinate + height / 2,
                     xCoordinate + width, yCoordinate + height / 2);
             return;
-        } else if (highlighted) {
-            gc.setFill(Color.BLACK);
         }
+        ArrayList<Color> colourMeBby = colourController.getColors(genomes);
         double tempCoordinate = yCoordinate;
-        double tempHeight = height / genomes.length;
-        for (int i = 0; i < genomes.length; i++) {
+        double tempHeight = height / colourMeBby.size();
+        for (int i = 0; i < colourMeBby.size(); i++) {
+            if (highlighted) {
+                gc.setFill(Color.BLACK);
+            } else {
+                gc.setFill(colourMeBby.get(i));
+            }
             gc.fillRect(xCoordinate, tempCoordinate, width, tempHeight); //, ARC_SIZE, ARC_SIZE);
             tempCoordinate += tempHeight;
         }
@@ -250,6 +253,7 @@ public class SequenceNode {
 
     /**
      * Forms a string of the sequence node.
+     *
      * @param sequence With it's sequence which we do not constantly want in memory
      * @return A string representation of the node.
      */
@@ -264,7 +268,7 @@ public class SequenceNode {
         for (Integer i : parents) {
             str += i.toString() + ", ";
         }
-        str = str.substring(0, str.length() - 2) +  "\n"
+        str = str.substring(0, str.length() - 2) + "\n"
                 + "SequenceLength: ";
         if (isDummy) {
             str += "-\n" + "Sequence: -";
