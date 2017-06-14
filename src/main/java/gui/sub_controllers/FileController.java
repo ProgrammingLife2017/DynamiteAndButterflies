@@ -44,16 +44,11 @@ public class FileController extends Observable implements Observer {
     private int[] childArray;
     private int[] parentArray;
 
-    private HashMap<Integer, String> allGenomes;
-    private HashMap<Integer, String> genomes;
-
-
     /**
      * Constructor of the FileController object to control the Files.
      * @param pbc The progressbar.
      */
     public FileController(ProgressBarController pbc) {
-
         parDirectory = null;
         progressBarController = pbc;
 
@@ -138,10 +133,6 @@ public class FileController extends Observable implements Observer {
                 progressBarController.done();
             }
         }
-    }
-
-    public HashMap<Integer, String> getAllGenomes() {
-        return allGenomes;
     }
 
 

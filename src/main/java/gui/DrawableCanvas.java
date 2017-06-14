@@ -106,4 +106,12 @@ public class DrawableCanvas extends Observable implements Observer {
     public SpecificGenomeProperties getSpecificGenomeProperties() {
         return this.specificGenomeProperties;
     }
+
+    public HashMap<String, Integer> getAllGenomes() throws IOException {
+        return parser.getAllGenomesMap();
+    }
+
+    public HashMap<Integer, String> getAllGenomesReversed() throws IOException {
+        return parser.getAllGenomesMapReversed();
+    }
 }
