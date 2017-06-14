@@ -21,24 +21,22 @@ public class SequenceGraph {
     private ArrayList<ArrayList<SequenceNode>> columns;
     private Boundary boundaries;
     private int centerNodeID;
-
     private int[] parentArray;
     private int[] childArray;
-
     private HTreeMap<Long, String> sequenceHashMap;
-
     private int dummyNodeIDCounter = -1;
-
-
-
     private String partPath;
+
 
     /**
      * The constructor initializes the SequenceGraph with it's basic values.
-     * @param parentArray - the parent array for edges.
-     * @param childArray - the child array for edges.
+     *
+     * @param parentArray     - the parent array for edges.
+     * @param childArray      - the child array for edges.
+     * @param sequenceHashMap - the sequenceHashMap.
      */
-    public SequenceGraph(final int[] parentArray, final int[] childArray, HTreeMap<Long, String> sequenceHashMap) {
+    public SequenceGraph(final int[] parentArray, final int[] childArray,
+                         HTreeMap<Long, String> sequenceHashMap) {
         this.sequenceHashMap = sequenceHashMap;
         this.parentArray = parentArray;
         this.childArray = childArray;
@@ -46,18 +44,22 @@ public class SequenceGraph {
 
     /**
      * size method for nodes.
+     *
      * @return the size of the HashMap
      */
     public int size() {
         return nodes.size();
     }
 
-    public int totalSize() { return parentArray.length; }
+    public int totalSize() {
+        return parentArray.length;
+    }
 
     /**
      * Creates a subgraph.
+     *
      * @param centerNodeID - the node to start rendering at.
-     * @param range - the amount of edges to add to the graph
+     * @param range        - the amount of edges to add to the graph
      */
     public void createSubGraph(int centerNodeID, int range, String partPath) {
         this.partPath = partPath;
@@ -75,6 +77,9 @@ public class SequenceGraph {
 
     }
 
+    /**
+     * Assign the sequence lengths.
+     */
     private void assignSequenceLenghts() {
         Iterator it = nodes.entrySet().iterator();
         while (it.hasNext()) {
@@ -125,7 +130,6 @@ public class SequenceGraph {
     /**
      * Finds the longest path of the graph and sets columns accordingly.
      */
-    @SuppressWarnings("Since15")
     private int[] getGenomes(int node) throws IOException {
         try {
             Stream<String> lines = Files.lines(Paths.get(partPath + "genomes.txt"));
@@ -143,6 +147,9 @@ public class SequenceGraph {
         return null;
     }
 
+    /**
+     * assigns the columns based on the longest path algo.
+     */
     private void findLongestPath() {
         for (Object o : this.getNodes().entrySet()) {
             Map.Entry pair = (Map.Entry) o;
@@ -160,6 +167,7 @@ public class SequenceGraph {
 
     /**
      * Uses barycenter heuristics to approach edge crossing reduction.
+     *
      * @param columns - the columns with nodes, on which the algorithem is applied.
      */
     private void minimiseEdgeCrossings(ArrayList<ArrayList<SequenceNode>> columns) {
@@ -179,6 +187,7 @@ public class SequenceGraph {
 
     /**
      * set amount of incoming edges for children and increase barycenter value by index of parent.
+     *
      * @param previousColumn - the column on which to base the barycenter values.
      */
     private void setBarycenterValues(ArrayList<SequenceNode> previousColumn) {
@@ -192,6 +201,7 @@ public class SequenceGraph {
 
     /**
      * Sorts the columns using barycenter points.
+     *
      * @param currentColumn - the column which to sort.
      */
     private void sortColumns(ArrayList<SequenceNode> currentColumn) {
@@ -218,8 +228,9 @@ public class SequenceGraph {
 
     /**
      * Finds the centerNode index (for in the hashmap).
+     *
      * @param centerNodeID - the node to lookup.
-     * @param parentArray - the array in which to look.
+     * @param parentArray  - the array in which to look.
      * @return - index of centerNode.
      */
     private int findCenterNodeIndex(int centerNodeID, int[] parentArray) {
@@ -234,7 +245,6 @@ public class SequenceGraph {
 
     /**
      * Adds dummy's so that the span is always 1.
-     *
      */
     private void addDummies() {
         for (int i = boundaries.getLeftBoundIndex(); i <= boundaries.getRightBoundIndex(); i++) {
@@ -312,6 +322,7 @@ public class SequenceGraph {
 
     /**
      * Creates a column list for easier crossing reduction.
+     *
      * @return - the column list with solved edge crossings.
      */
     private ArrayList<ArrayList<SequenceNode>> initColumns() {
@@ -350,17 +361,25 @@ public class SequenceGraph {
         return parentArray.length - 1;
     }
 
-    public int getFullGraphLeftBoundIndex() { return 0; }
+    public int getFullGraphLeftBoundIndex() {
+        return 0;
+    }
 
-    public int getFullGraphRightBoundID() { return parentArray[parentArray.length-1]; }
+    public int getFullGraphRightBoundID() {
+        return parentArray[parentArray.length - 1];
+    }
 
-    public int getFullGraphLeftBoundID() { return 1; }
+    public int getFullGraphLeftBoundID() {
+        return 1;
+    }
 
     public int getLeftBoundID() {
         return boundaries.getLeftBoundID();
     }
 
-    public int getRightBoundID() { return boundaries.getRightBoundID(); }
+    public int getRightBoundID() {
+        return boundaries.getRightBoundID();
+    }
 
     public SequenceGraph copy() {
         return new SequenceGraph(parentArray, childArray, sequenceHashMap);
