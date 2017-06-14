@@ -31,17 +31,17 @@ public class PanningController {
     /**
      * The the threshold to update the subGraph.
      */
-    private static final int RENDER_THRESHOLD = 1000;
+    private static final int RENDER_THRESHOLD = 100;
 
     /**
      * The amount of nodes to render.
      */
-    static final int RENDER_RANGE = 2000;
+    static final int RENDER_RANGE = 200;
 
     /**
      * The amount of nodes to shift.
      */
-    private static final int RENDER_SHIFT = 1000;
+    private static final int RENDER_SHIFT = 100;
 
     private GraphDrawer drawer;
     private Button rightPannButton;
