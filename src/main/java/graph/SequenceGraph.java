@@ -73,7 +73,7 @@ public class SequenceGraph {
         addDummies();
         this.columns = initColumns();
         assignSequenceLenghts();
-
+        assignGenomes();
     }
 
     /**
@@ -91,6 +91,33 @@ public class SequenceGraph {
     }
 
     /**
+     * Function to assign the genomes to the nodes in the sequencegraph.
+     */
+    private void assignGenomes() {
+        Iterator it = nodes.entrySet().iterator();
+        try {
+            while (it.hasNext()) {
+                Stream<String> lines = Files.lines(Paths.get(partPath + "genomes.txt"));
+                Map.Entry pair = (Map.Entry) it.next();
+                SequenceNode node = (SequenceNode) pair.getValue();
+                if (!node.isDummy()) {
+                    String line = lines.skip(node.getId() - 1).findFirst().get();
+                    String[] text = line.split(";");
+                    int[] genomes = new int[text.length];
+                    for (int i = 0; i < text.length; i++) {
+                        genomes[i] = Integer.parseInt(text[i]);
+                    }
+                    node.setGenomes(genomes);
+                }
+                lines.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
      * Add nodes with children to the nodes hashmap.
      */
     private void initNodes() {
@@ -99,13 +126,6 @@ public class SequenceGraph {
             int childID = childArray[i];
             if (nodes.get(parentID) == null) {
                 SequenceNode node = new SequenceNode(parentID);
-                int[] genomes = new int[0];
-                try {
-                    genomes = getGenomes(parentID);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                node.setGenomes(genomes);
                 node.addChild(childID);
                 nodes.put(parentID, node);
             } else {
@@ -113,38 +133,13 @@ public class SequenceGraph {
             }
             if (nodes.get(childID) == null) {
                 SequenceNode node = new SequenceNode(childID);
-                int[] genomes = new int[0];
-                try {
-                    genomes = getGenomes(childID);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                node.setGenomes(genomes);
                 nodes.put(childID, node);
             }
         }
 
     }
 
-    /**
-     * Finds the longest path of the graph and sets columns accordingly.
-     */
-    private int[] getGenomes(int node) throws IOException {
-        try {
-            Stream<String> lines = Files.lines(Paths.get(partPath + "genomes.txt"));
-            String line = lines.skip(node - 1).findFirst().get();
-            String[] text = line.split(";");
-            int[] genomes = new int[text.length];
-            for (int i = 0; i < text.length; i++) {
-                genomes[i] = Integer.parseInt(text[i]);
-            }
-            lines.close();
-            return genomes;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+
 
     /**
      * assigns the columns based on the longest path algo.
