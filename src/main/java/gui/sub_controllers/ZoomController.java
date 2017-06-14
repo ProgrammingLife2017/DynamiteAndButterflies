@@ -74,6 +74,7 @@ public class ZoomController {
             newGraph.createSubGraph(centreNode, radius, graph.getPartPath());
             drawer.setGraph(newGraph);
             drawer.initGraph();
+            drawer.setxDifference(0);
             this.graph = newGraph;
         }
         int column = graph.getNode(centreNode).getColumn();
