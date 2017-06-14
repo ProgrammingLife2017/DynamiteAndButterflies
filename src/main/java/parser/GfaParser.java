@@ -1,19 +1,13 @@
 package parser;
 
 import gui.CustomProperties;
-import gui.sub_controllers.PopUpController;
-import javafx.application.Platform;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
 import java.io.*;
-import java.nio.Buffer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Observable;
 import java.util.regex.Pattern;
 
