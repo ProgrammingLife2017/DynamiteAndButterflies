@@ -35,25 +35,7 @@ public class DrawableCanvas extends Observable implements Observer {
     public static DrawableCanvas getInstance() {
         return canvas;
     }
-//            if (o instanceof GfaParser) {
-//        if (arg instanceof Integer) {
-//            try {
-//                childArray = parser.getChildArray();
-//                parentArray = parser.getParentArray();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            System.out.println(nodeId);
-//            System.out.println(renderRange);
-//            graph = new SequenceGraph();
-//            graph.createSubGraph(nodeId, renderRange, parentArray, childArray);
-//            sequenceHashMap = parser.getSequenceHashMap();
-//            assignSequenceLenghts();
-//            drawer = new GraphDrawer(graph, gc);
-//            drawer.moveShapes(0.0);
-//            progressBarController.done();
-//        }
-//    }
+
 
     public void setSpecificGenomeProperties(SpecificGenomeProperties sgp) {
         this.specificGenomeProperties = sgp;
