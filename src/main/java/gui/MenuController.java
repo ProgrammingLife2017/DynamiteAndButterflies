@@ -456,7 +456,7 @@ public class MenuController implements Observer {
 
         HashMap<Integer, String> hashMap;
 
-        hashMap = fileController.getAllGenomes();
+        hashMap = DrawableCanvas.getInstance().getAllGenomesReversed();
         if (hashMap == null) {
             try {
                 openFileClicked();
