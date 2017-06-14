@@ -163,6 +163,8 @@ public class GraphDrawer {
             double width = computeNodeWidth(node) * stepSize * RELATIVE_X_DISTANCE;
             double height = getYSize();
             double x = (columnWidths[node.getColumn()] - xDifference) * stepSize;
+
+            yBase = (int) GraphDrawer.getInstance().canvas.getHeight() / 4;
             double y = yBase + (node.getIndex() * RELATIVE_Y_DISTANCE);
             if (height > width) {
                 y += (height - width) / 2;
