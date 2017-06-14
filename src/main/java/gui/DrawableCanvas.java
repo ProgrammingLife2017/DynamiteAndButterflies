@@ -69,9 +69,8 @@ public class DrawableCanvas extends Observable implements Observer {
                             HashMap<Integer, String> allGenomes = parser.getAllGenomesMapReversed();
 
                             int [] parentArray = parser.getParentArray();
-                            SequenceGraph graph = new SequenceGraph();
-                            graph.createSubGraph(1, 1000, parentArray, childArray   );
-                            graph.assignSequenceLenghts(parser);
+                            SequenceGraph graph = new SequenceGraph(parentArray, childArray, getParser().getSequenceHashMap());
+                            graph.createSubGraph(1, 1000);
                             GraphDrawer.getInstance().setGraph(graph);
                             GraphDrawer.getInstance().moveShapes(0.0);
                             setChanged();

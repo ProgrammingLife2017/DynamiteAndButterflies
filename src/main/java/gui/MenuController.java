@@ -379,7 +379,7 @@ public class MenuController implements Observer {
                         bookmarkController.initialize(filePath);
 //                        specificGenomeProperties.initialize();
                         panningController =
-                                new PanningController(GraphDrawer.getInstance(), leftPannButton, rightPannButton);
+                                new PanningController(leftPannButton, rightPannButton);
                         panningController.initializeKeys(canvasPanel);
                         zoomController = new ZoomController(panningController,
                                 nodeTextField, radiusTextField);

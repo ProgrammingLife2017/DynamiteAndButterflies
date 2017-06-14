@@ -1,5 +1,6 @@
 package graph;
 
+import gui.DrawableCanvas;
 import org.mapdb.HTreeMap;
 
 import java.io.IOException;
@@ -65,8 +66,7 @@ public class SequenceGraph {
      * @param centerNodeID - the node to start rendering at.
      * @param range        - the amount of edges to add to the graph
      */
-    public void createSubGraph(int centerNodeID, int range, String partPath) {
-        this.partPath = partPath;
+    public void createSubGraph(int centerNodeID, int range) {
         this.nodes = new HashMap<Integer, SequenceNode>();
         this.columns = new ArrayList<ArrayList<SequenceNode>>();
 
@@ -139,7 +139,7 @@ public class SequenceGraph {
      */
     private int[] getGenomes(int node) throws IOException {
         try {
-            Stream<String> lines = Files.lines(Paths.get(partPath + "genomes.txt"));
+            Stream<String> lines = Files.lines(Paths.get(DrawableCanvas.getInstance().getParser().getPartPath() + "genomes.txt"));
             String line = lines.skip(node - 1).findFirst().get();
             String[] text = line.split(";");
             int[] genomes = new int[text.length];
@@ -151,6 +151,7 @@ public class SequenceGraph {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         throw new IOException("Node not in genome list");
     }
 

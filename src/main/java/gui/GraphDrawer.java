@@ -47,25 +47,18 @@ public class GraphDrawer {
         return drawer;
     }
 
-
-
-
-    public void initializeDrawer(SequenceGraph graph) {
+    public void setGraph(SequenceGraph graph) {
         this.graph = graph;
-        initGraph();
-        zoomLevel = columnWidths[columns.size()];
-    }
-
-    public void initGraph() {
         columns = graph.getColumns();
         columnWidths = new double[columns.size() +1];
         initializeColumnWidths();
-
+        zoomLevel = columnWidths[columns.size()];
         range = columnWidths[columns.size()];
         radius = columns.size();
         selected = new int[0];
         colourController = new ColourController(selected);
     }
+
 
     public void setCanvas(Canvas canvas) {
         this.canvas = canvas;
@@ -400,9 +393,6 @@ public class GraphDrawer {
         return graph;
     }
 
-    public void setGraph(SequenceGraph graph) {
-        this.graph = graph;
-    }
 
     public SequenceNode getMostLeftNode() {
         return mostLeftNode;

@@ -254,11 +254,5 @@ public class GfaParser extends Observable implements Runnable {
         }
         return genomesMap;
     }
-<<<<<<< HEAD
 
-=======
-    public String getPartPath() {
-        return partPath;
-    }
->>>>>>> master
 }
