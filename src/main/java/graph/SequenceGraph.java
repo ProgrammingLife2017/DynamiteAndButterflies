@@ -78,7 +78,6 @@ public class SequenceGraph {
         addDummies();
         this.columns = initColumns();
         assignSequenceLenghts();
-
     }
 
     /**

@@ -37,7 +37,7 @@ public class GraphDrawer {
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
     private int highlightedNode;
-    private int[] selected;
+    private int[] selected = null;
     private ColourController colourController;
     private SequenceNode mostLeftNode;
 
@@ -56,7 +56,10 @@ public class GraphDrawer {
         }
         range = columnWidths[columns.size()];
         radius = columns.size();
-        selected = new int[0];
+
+        if (selected == null) {
+            selected = new int[0];
+        }
         colourController = new ColourController(selected);
     }
 
