@@ -37,6 +37,7 @@ public class GraphDrawer {
     private ColourController colourController;
 
     private SequenceNode mostLeftNode;
+    private SequenceNode mostRightNode;
 
      /**
      * Constructor.
@@ -161,9 +162,7 @@ public class GraphDrawer {
                 height = width;
             }
             node.setCoordinates(x, y, width, height);
-            if (node.checkBounds()) {
-                mostLeftNode = node;
-            }
+            setExtremeNodes(node);
             node.draw(gc, selected, colourController);
         }
     }
@@ -186,6 +185,11 @@ public class GraphDrawer {
                 }
             }
         }
+    }
+
+    public void setExtremeNodes(SequenceNode node) {
+        if (node.getxCoordinate() <= 0 && node.getxCoordinate() + node.getWidth() > 0) { mostLeftNode = node; }
+        if (node.getxCoordinate() < gc.getCanvas().getWidth() && node.getxCoordinate() + node.getWidth() >= gc.getCanvas().getWidth()) { mostRightNode = node; }
     }
 
     public boolean edgeInView(double startx, double endx) {
@@ -391,6 +395,10 @@ public class GraphDrawer {
 
     public SequenceNode getMostLeftNode() {
         return mostLeftNode;
+    }
+
+    public SequenceNode getMostRightNode() {
+        return mostRightNode;
     }
 }
 

@@ -152,7 +152,8 @@ public class PanningController {
     private void panRight() {
         if (!updating) {
             if (drawer.getGraph().getRightBoundIndex() < drawer.getGraph().getFullGraphRightBoundIndex()) {
-                if (drawer.getxDifference() + drawer.getZoomLevel() + RENDER_THRESHOLD > drawer.getRange()) {
+                if (drawer.getMostRightNode().getId() + RENDER_THRESHOLD > drawer.getGraph().getRightBoundID()) {
+                //if (drawer.getxDifference() + drawer.getZoomLevel() + RENDER_THRESHOLD > drawer.getRange()) {
                     updating = true;
                     new Thread(new Task<Integer>() {
                         @Override
