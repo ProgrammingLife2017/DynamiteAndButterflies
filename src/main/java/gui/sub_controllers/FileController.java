@@ -1,7 +1,6 @@
 package gui.sub_controllers;
 
 import graph.SequenceGraph;
-import graph.SequenceNode;
 import gui.CustomProperties;
 import gui.DrawableCanvas;
 import gui.GraphDrawer;
@@ -15,8 +14,6 @@ import parser.GfaParser;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Observer;
 import java.util.Observable;
 import java.util.regex.Pattern;
@@ -30,6 +27,12 @@ public class FileController extends Observable implements Observer {
     private File parDirectory;
     private ProgressBarController progressBarController;
 
+<<<<<<< HEAD
+=======
+    private final int renderRange = PanningController.RENDER_RANGE;
+    private final int nodeId = 1;
+
+>>>>>>> master
     private Thread parseThread;
 
 
@@ -52,6 +55,10 @@ public class FileController extends Observable implements Observer {
      * @param pbc The progressbar.
      */
     public FileController(ProgressBarController pbc) {
+<<<<<<< HEAD
+=======
+        graph = new SequenceGraph(parentArray, childArray, getSequenceHashMap());
+>>>>>>> master
         parDirectory = null;
         progressBarController = pbc;
 
@@ -124,13 +131,56 @@ public class FileController extends Observable implements Observer {
         progressBarController.run();
     }
 
+<<<<<<< HEAD
+=======
+
+
+    /**
+     * Gets the sequenceHashMap.
+     * @return the sequenceHashMap with all the sequences
+     */
+    public HTreeMap<Long, String> getSequenceHashMap() {
+        return sequenceHashMap;
+    }
+
+    /**
+     * Gets the GraphDrawer.
+     * @return the graphDrawer.
+     */
+    public GraphDrawer getDrawer() {
+        return drawer;
+    }
+
+    /**
+     * Gets the graph.
+     * @return the graph.
+     */
+    public SequenceGraph getGraph() {
+        return graph;
+    }
+>>>>>>> master
 
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof GfaParser) {
             if (arg instanceof Integer) {
+<<<<<<< HEAD
                 setChanged();
                 notifyObservers(0);
+=======
+                try {
+                    childArray = parser.getChildArray();
+                    parentArray = parser.getParentArray();
+                    allGenomes = parser.getAllGenomesMapReversed();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                sequenceHashMap = parser.getSequenceHashMap();
+                graph = new SequenceGraph(parentArray, childArray, sequenceHashMap);
+                graph.createSubGraph(nodeId, renderRange, partPath);
+                drawer = new GraphDrawer(graph, gc);
+                drawer.moveShapes(0.0);
+>>>>>>> master
                 progressBarController.done();
             }
         }

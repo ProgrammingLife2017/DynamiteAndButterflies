@@ -40,21 +40,27 @@ public class GraphDrawer {
     private int highlightedNode;
     private int[] selected;
     private ColourController colourController;
-
-    private int lowerXBoundID;
-    private int upperXBoundID;
+    private SequenceNode mostLeftNode;
 
 
     public static GraphDrawer getInstance(){
         return drawer;
     }
 
-    public void setGraph(SequenceGraph graph) {
+
+
+
+    public void initializeDrawer(SequenceGraph graph) {
         this.graph = graph;
+        initGraph();
+        zoomLevel = columnWidths[columns.size()];
+    }
+
+    public void initGraph() {
         columns = graph.getColumns();
         columnWidths = new double[columns.size() +1];
         initializeColumnWidths();
-        zoomLevel = columnWidths[columns.size()];
+
         range = columnWidths[columns.size()];
         radius = columns.size();
         selected = new int[0];
@@ -90,8 +96,19 @@ public class GraphDrawer {
      */
     public void changeZoom(int column, int radius) {
         setRadius(radius);
-        setZoomLevel(columnWidths[column + radius + 1] - columnWidths[column - radius]);
-        moveShapes(columnWidths[column - radius]);
+
+        int widthRight = column + radius + 1;
+        int widthLeft = column - radius;
+
+        if (column + radius + 1 > columnWidths.length-1 ) {
+            widthRight = columnWidths.length - 1;
+        }
+        if (column - radius < 0) {
+            widthLeft = 0;
+        }
+
+        setZoomLevel(columnWidths[widthRight] - columnWidths[widthLeft]);
+        moveShapes(columnWidths[widthLeft]);
     }
 
     /**
@@ -120,6 +137,7 @@ public class GraphDrawer {
      * Initializes the widths of each column.
      * Using the widest node of each column.
      */
+
     private void initializeColumnWidths() {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
@@ -137,7 +155,8 @@ public class GraphDrawer {
     }
 
     /**
-     * * Gives all nodes the right coordinates on the canvas and draw them.
+
+     * Gives all nodes the right coordinates on the canvas and draw them.
      * It depends on whether the dummy nodes checkbox
      * is checked dummy nodes are either drawn or skipped.
      */
@@ -155,20 +174,10 @@ public class GraphDrawer {
                 height = width;
             }
             node.setCoordinates(x, y, width, height);
-            getNodeBounds(x, y, node);
-
+            if (node.checkBounds()) {
+                mostLeftNode = node;
+            }
             node.draw(gc, selected, colourController);
-        }
-    }
-
-    private void getNodeBounds(double x, double width,SequenceNode node) {
-        double nodeLeftBound = x;
-        double nodeRightBound = x + width;
-        if (nodeLeftBound <= canvas.getWidth() && nodeRightBound >= canvas.getWidth()) {
-            upperXBoundID = node.getId();
-        }
-        if (nodeLeftBound <= 0 && nodeRightBound >= 0) {
-            lowerXBoundID = node.getId();
         }
     }
 
@@ -185,8 +194,7 @@ public class GraphDrawer {
                 double starty = parent.getyCoordinate() + (parent.getHeight() / 2);
                 double endx = child.getxCoordinate();
                 double endy = child.getyCoordinate() + (child.getHeight() / 2);
-                gc.setLineWidth(Math.log(child.getGenomes().length)
-                                / Math.log(LOG_BASE + 1.1));
+                gc.setLineWidth(Math.log(child.getGenomes().length));
                 gc.strokeLine(startx, starty, endx, endy);
             }
         }
@@ -358,9 +366,6 @@ public class GraphDrawer {
         return (int) ((x / stepSize) + xDifference);
     }
 
-    public SequenceGraph getGraph() {
-        return this.graph;
-    }
 
     public void setSelected(int[] newSelection) {
         this.selected = newSelection;
@@ -390,5 +395,17 @@ public class GraphDrawer {
     }
 
 
+
+    public SequenceGraph getGraph() {
+        return graph;
+    }
+
+    public void setGraph(SequenceGraph graph) {
+        this.graph = graph;
+    }
+
+    public SequenceNode getMostLeftNode() {
+        return mostLeftNode;
+    }
 }
 

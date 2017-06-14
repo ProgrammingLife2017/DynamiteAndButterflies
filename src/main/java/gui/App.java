@@ -6,11 +6,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.io.FileWriter;
+import java.io.*;
+
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -65,8 +62,8 @@ public class App extends Application {
             stage.setTitle("Wow!! DynamiteAndButterflies genome visualiser\t");
             stage.setScene(scene);
             stage.setResizable(true);
-            stage.setMaximized(true);
             stage.show();
+            //stage.setMaximized(true); -> Mac fails to load a setMaximized(true) stage.
             System.out.println(path + " loaded on the stage");
             return loader;
         } catch (IOException e) {
@@ -93,13 +90,14 @@ public class App extends Application {
         }
     }
 
+
     @Override
     public void stop() {
         properties.updateProperties();
 
         String stringOfFile = properties.getProperty("file", "def");
         int numOfBookmarks = Integer.parseInt(
-                        properties.getProperty("bookmarkNum" + stringOfFile, "-1"));
+                properties.getProperty("bookmarkNum" + stringOfFile, "-1"));
         properties.setProperty("bookmarkNum" + stringOfFile, Integer.toString(numOfBookmarks));
 
         properties.saveProperties();
