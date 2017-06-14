@@ -106,14 +106,17 @@ public class SequenceGraph {
                 String[] text = new String[0];
                 try {
                     text = getGenomes(parentID);
+                    int[] genomes = splitOnStringToInt(text[0]);
+                    int[] offSets = splitOnStringToInt(text[1]);
+                    node.setGenomes(genomes);
+                    node.setOffSets(offSets);
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
-                int[] genomes = splitOnStringToInt(text[0]);
-                int[] offSets = splitOnStringToInt(text[1]);
 
-                node.setGenomes(genomes);
-                node.setOffSets(offSets);
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    e.printStackTrace();
+                }
+
                 node.addChild(childID);
                 nodes.put(parentID, node);
             } else {
@@ -124,14 +127,14 @@ public class SequenceGraph {
                 String[] text = new String[0];
                 try {
                     text = getGenomes(childID);
+                    int[] genomes = splitOnStringToInt(text[0]);
+                    int[] offSets = splitOnStringToInt(text[1]);
+                    node.setGenomes(genomes);
+                    node.setOffSets(offSets);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                int[] genomes = splitOnStringToInt(text[0]);
-                int[] offSets = splitOnStringToInt(text[1]);
 
-                node.setGenomes(genomes);
-                node.setOffSets(offSets);
                 nodes.put(childID, node);
             }
         }
@@ -152,7 +155,7 @@ public class SequenceGraph {
      */
     private String[] getGenomes(int node) throws IOException {
         try {
-            Stream<String> lines = Files.lines(Paths.get(DrawableCanvas.getInstance().getParser().getPartPath() + "genomes.txt"));
+            Stream<String> lines = Files.lines(Paths.get("" + DrawableCanvas.getInstance().getParser().getPartPath() + "genomes.txt"));
             String line = lines.skip(node - 1).findFirst().get();
             String[] text = line.split("-");
             return text;
