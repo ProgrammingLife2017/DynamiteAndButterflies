@@ -18,7 +18,7 @@ public class ZoomController {
     private static final double SCROLL_ZOOM_IN_FACTOR = 0.9;
     private static final double SCROLL_ZOOM_OUT_FACTOR = 1.1;
 
-    private final SequenceGraph graph;
+    private SequenceGraph graph;
     private final GraphDrawer drawer;
     private final TextField nodeTextField, radiusTextField;
     private final PanningController panningController;
@@ -69,6 +69,13 @@ public class ZoomController {
      * @param radius The radius to be viewed
      */
     public void traverseGraphClicked(int centreNode, int radius) {
+        if (!graph.getNodes().containsKey(centreNode)) {
+            SequenceGraph newGraph = graph.copy();
+            newGraph.createSubGraph(centreNode, radius, graph.getPartPath());
+            drawer.setGraph(newGraph);
+            drawer.initGraph();
+            this.graph = newGraph;
+        }
         int column = graph.getNode(centreNode).getColumn();
         drawer.changeZoom(column, radius);
         drawer.highlight(centreNode);

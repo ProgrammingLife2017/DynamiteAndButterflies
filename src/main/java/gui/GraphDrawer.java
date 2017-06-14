@@ -116,7 +116,6 @@ public class GraphDrawer {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
         setxDifference(xDifference);
-        setLineWidth();
         colourController = new ColourController(selected);
         drawNodes();
         drawEdges();
@@ -180,10 +179,16 @@ public class GraphDrawer {
                 double starty = parent.getyCoordinate() + (parent.getHeight() / 2);
                 double endx = child.getxCoordinate();
                 double endy = child.getyCoordinate() + (child.getHeight() / 2);
-                gc.setLineWidth(Math.log(child.getGenomes().length));
-                gc.strokeLine(startx, starty, endx, endy);
+                setLineWidth(child.getGenomes().length);
+                if (edgeInView(startx, endx)) {
+                    gc.strokeLine(startx, starty, endx, endy);
+                }
             }
         }
+    }
+
+    public boolean edgeInView(double startx, double endx) {
+        return startx < gc.getCanvas().getWidth() && endx > 0;
     }
 
     public double computeNodeWidth(SequenceNode node) {
@@ -243,8 +248,8 @@ public class GraphDrawer {
     /**
      * Set the width of the line depending on the level of zoom.
      */
-    private void setLineWidth() {
-        double width = (Math.log(stepSize + 1) / Math.log(LOG_BASE)) / LINE_WIDTH_FACTOR;
+    private void setLineWidth(int thickness) {
+        double width = ((Math.log(stepSize + 1) / Math.log(LOG_BASE)) ) / LINE_WIDTH_FACTOR;
         gc.setLineWidth(width);
     }
 
