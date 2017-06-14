@@ -1,11 +1,9 @@
 package gui.sub_controllers;
 
 import graph.SequenceGraph;
-import graph.SequenceNode;
 import gui.CustomProperties;
 import gui.GraphDrawer;
 import gui.MenuController;
-import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -15,8 +13,6 @@ import parser.GfaParser;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Observer;
 import java.util.Observable;
 import java.util.regex.Pattern;

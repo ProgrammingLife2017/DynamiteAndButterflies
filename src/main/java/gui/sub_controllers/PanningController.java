@@ -1,7 +1,6 @@
 package gui.sub_controllers;
 
 import graph.SequenceGraph;
-import graph.SequenceNode;
 import gui.GraphDrawer;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -24,10 +23,25 @@ import javafx.util.Duration;
  */
 public class PanningController {
 
-    public static final double PANN_FACTOR = 0.005;
-    public static final int RENDER_THRESHOLD = 1000;
-    public static final int RENDER_RANGE = 2000;
-    public static final int RENDER_SHIFT = 1000;
+    /**
+     * The speed at which to pan.
+     */
+    private static final double PANN_FACTOR = 0.005;
+
+    /**
+     * The the threshold to update the subGraph.
+     */
+    private static final int RENDER_THRESHOLD = 1000;
+
+    /**
+     * The amount of nodes to render.
+     */
+    private static final int RENDER_RANGE = 2000;
+
+    /**
+     * The amount of nodes to shift.
+     */
+    private static final int RENDER_SHIFT = 1000;
 
     private GraphDrawer drawer;
     private Button rightPannButton;
@@ -36,6 +50,12 @@ public class PanningController {
     private Timeline timelineLeft;
     private boolean updating;
 
+    /**
+     * Constructor for the panning controller.
+     * @param drawer - the drawer.
+     * @param leftPannButton - the pan left button.
+     * @param rightPannButton - the pan right button,
+     */
     public PanningController(GraphDrawer drawer, Button leftPannButton, Button rightPannButton) {
         this.drawer = drawer;
         this.leftPannButton = leftPannButton;
@@ -44,11 +64,14 @@ public class PanningController {
         initializeButtons();
     }
 
+    /**
+     * Timer for panning.
+     */
     public void initializeTimer() {
         timelineRight = new Timeline(new KeyFrame(Duration.millis(10), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                pannRight();
+                panRight();
             }
         }));
         timelineRight.setCycleCount(Animation.INDEFINITE);
@@ -56,12 +79,15 @@ public class PanningController {
         timelineLeft = new Timeline(new KeyFrame(Duration.millis(10), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                pannLeft();
+                panLeft();
             }
         }));
         timelineLeft.setCycleCount(Animation.INDEFINITE);
     }
 
+    /**
+     * initialize function for the pan buttons.
+     */
     public void initializeButtons() {
         rightPannButton.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
@@ -90,6 +116,10 @@ public class PanningController {
         });
     }
 
+    /**
+     * listener for key presses.
+     * @param canvasPanel - the canvas which to apply the listener to,
+     */
     public void initializeKeys(Node canvasPanel) {
         canvasPanel.requestFocus();
         canvasPanel.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
@@ -116,7 +146,10 @@ public class PanningController {
         });
     }
 
-    public void pannRight() {
+    /**
+     * Pan right method.
+     */
+    public void panRight() {
         if (!updating) {
             if (drawer.getGraph().getRightBoundIndex() < drawer.getGraph().getFullGraphRightBoundIndex()) {
                 if (drawer.getxDifference() + drawer.getZoomLevel() + RENDER_THRESHOLD > drawer.getRange()) {
@@ -148,7 +181,10 @@ public class PanningController {
         drawer.moveShapes(drawer.getxDifference() + drawer.getZoomLevel() * PANN_FACTOR);
     }
 
-    public void pannLeft() {
+    /**
+     * Pan left method.
+     */
+    public void panLeft() {
         if (!updating) {
             if (drawer.getGraph().getLeftBoundIndex() > drawer.getGraph().getFullGraphLeftBoundIndex()) {
                 if (drawer.getxDifference() - RENDER_THRESHOLD < 0) {
