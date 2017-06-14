@@ -141,7 +141,7 @@ public class SequenceNode {
                 startXAnno = startXAnno + (width - annoWidth);
             } else if (endOfAnno < (offSets[startCorOfGenome] + sequenceLength)) {
                 int emptyAtEnd = offSets[startCorOfGenome] + sequenceLength - endOfAnno;
-                annoWidth = (annoWidth * (1 - (emptyAtEnd / sequenceLength - emptyAtStart)));
+                annoWidth = (annoWidth * (1 - (emptyAtEnd / (sequenceLength - emptyAtStart))));
             }
             gc.setFill(Color.RED);
             gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
