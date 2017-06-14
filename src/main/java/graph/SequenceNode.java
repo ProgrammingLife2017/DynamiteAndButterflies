@@ -85,21 +85,34 @@ public class SequenceNode {
      * Draw the node with the color depending on it's status. Orange for highlighted nodes,
      * black for dummy nodes and blue for sequence nodes.
      *
-     * @param gc            The grapicsContext of the screen.
-     * @param selectedGenes A int[] with all the genomeIds that are selected.
+     * @param gc               The graphicsContext of the screen.
+     * @param colourController A controller that chooses colours for the node
      */
-    public void draw(GraphicsContext gc, int[] selectedGenes, ColourController colourController) {
+    public void draw(GraphicsContext gc, ColourController colourController) {
         gc.clearRect(xCoordinate, yCoordinate, width, height);
-        gc.setFill(colourController.getColor(genomes));
 
         if (isDummy) {
+            gc.setLineWidth(Math.log(genomes.length)
+                    / Math.log(2 + 1.1));
             gc.strokeLine(xCoordinate, yCoordinate + height / 2,
                     xCoordinate + width, yCoordinate + height / 2);
             return;
-        } else if (highlighted) {
-            gc.setFill(Color.BLACK);
         }
-        gc.fillRoundRect(xCoordinate, yCoordinate, width, height, ARC_SIZE, ARC_SIZE);
+
+        ArrayList<Color> colourMeBby = new ArrayList<>();
+        if (highlighted) {
+            colourMeBby.add(colourController.getHighlighted());
+        } else {
+            colourMeBby = colourController.getColors(genomes);
+        }
+
+        double tempCoordinate = yCoordinate;
+        double tempHeight = height / colourMeBby.size();
+        for (Color beamColour : colourMeBby) {
+            gc.setFill(beamColour);
+            gc.fillRect(xCoordinate, tempCoordinate, width, tempHeight);
+            tempCoordinate += tempHeight;
+        }
     }
 
     /**
@@ -110,8 +123,7 @@ public class SequenceNode {
      * @return True if the coordinates of the click event are within borders, false otherwise.
      */
     public boolean checkClick(double xEvent, double yEvent) {
-        return (xEvent > xCoordinate && xEvent < xCoordinate + width
-                && yEvent > yCoordinate && yEvent < yCoordinate + height);
+        return (xEvent > xCoordinate && xEvent < xCoordinate + width && yEvent > yCoordinate && yEvent < yCoordinate + height);
     }
 
 
@@ -123,6 +135,10 @@ public class SequenceNode {
      */
     public boolean checkClickX(double xEvent) {
         return (xEvent > xCoordinate && xEvent < xCoordinate + width);
+    }
+
+    public boolean checkBounds() {
+        return (xCoordinate <= 0 && (xCoordinate + width) >= 0);
     }
 
 
@@ -150,10 +166,9 @@ public class SequenceNode {
         return children.get(id);
     }
 
-    void addChild(Integer id) {
-        if (!this.children.contains(id)) {
+    public void addChild(Integer id) {
+        if(!this.children.contains(id))
             this.children.add(id);
-        }
     }
 
     void removeChild(Integer id) {
@@ -253,31 +268,33 @@ public class SequenceNode {
 
     /**
      * Forms a string of the sequence node.
+     *
      * @param sequence With it's sequence which we do not constantly want in memory
      * @return A string representation of the node.
      */
     public String toString(String sequence) {
-        String str = "Node ID: " + this.id + "\n"
-                + "Column index: " + this.column + "\n"
-                + "Children: ";
+        String str = "Node ID:\t" + this.id + "\n"
+                + "Column index:\t" + this.column + "\n"
+                + "Children:\t";
         for (Integer i : children) {
             str += i.toString() + ", ";
         }
-        str = str.substring(0, str.length() - 2) + "\n" + "Parents: ";
+        str = str.substring(0, str.length() - 2) + "\n" + "Parents:\t";
         for (Integer i : parents) {
             str += i.toString() + ", ";
         }
         str = str.substring(0, str.length() - 2) +  "\n"
-                + "SequenceLength: ";
+                + "SequenceLength:\t";
         if (isDummy) {
-            str += "-\n" + "Sequence: -";
+            str += "-\n" + "Sequence:\t-";
         } else {
-            str += this.sequenceLength + "\n" + "Sequence: " + sequence + "\n";
+            str += this.sequenceLength + "\n" + "Sequence:\t" + sequence + "\n";
             str += "Genomes that go through this:\t";
             for (Integer i : this.getGenomes()) {
-                str += i.toString() + "\t";
+                str += i.toString() + ", ";
             }
         }
+        str = str.substring(0, str.length() - 2);
         return str;
     }
 }
