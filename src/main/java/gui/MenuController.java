@@ -12,6 +12,8 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -77,7 +79,9 @@ public class MenuController implements Observer {
     @FXML
     private TextArea consoleArea;
     @FXML
-    private ScrollBar scrollbar;
+    private Button rightPannButton;
+    @FXML
+    private Button leftPannButton;
 
     private PrintStream ps;
     private GraphicsContext gc;
@@ -90,7 +94,6 @@ public class MenuController implements Observer {
     private PanningController panningController;
     private SpecificGenomeProperties specificGenomeProperties;
 
-    private boolean[] selectedGenomes;
 
     private String filePath;
 
@@ -101,6 +104,7 @@ public class MenuController implements Observer {
     public void initialize() {
         canvas.widthProperty().bind(canvasPanel.widthProperty());
         canvas.heightProperty().bind(canvasPanel.heightProperty());
+        GraphDrawer.getInstance().setCanvas(canvas);
         gc = canvas.getGraphicsContext2D();
         properties = new CustomProperties();
 
@@ -108,11 +112,18 @@ public class MenuController implements Observer {
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
+
         specificGenomeProperties = new SpecificGenomeProperties(saveGenomeBut,
-                                                    genome1, genome2, genome3);
+                genome1, genome2, genome3);
 
         ps = new PrintStream(new Console(consoleArea));
-        System.setErr(ps);
+        DrawableCanvas.getInstance().setMenuController(this);
+
+
+        DrawableCanvas.getInstance().setSpecificGenomeProperties(new SpecificGenomeProperties(saveGenomeBut,
+                                                    genome1, genome2, genome3));
+
+        //System.setErr(ps);
         System.setOut(ps);
     }
 
@@ -129,25 +140,16 @@ public class MenuController implements Observer {
         File file = fileController.chooseFile(stage);
         String filePath = file.getAbsolutePath();
         recentController.update(filePath);
-        fileController.openFileClicked(gc, filePath, this);
-        specificGenomeProperties.hideSave();
-        selectedGenomes = null;
+        fileController.openFileClicked(filePath);
+//        DrawableCanvas.getInstance().getSpecificGenomeProperties().hideSave();
+//        DrawableCanvas.getInstance().getSpecificGenomeProperties().hideSave();
     }
 
-    /**
-     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
-     * can be selected and directly be visualised on the screen.
-     *
-     * @param filePath the file that should be opened
-     * @throws IOException          if there is no file specified.
-     * @throws InterruptedException Exception when the Thread is interrupted.
-     */
-    @FXML
+
     private void openFileClicked(String filePath) throws IOException, InterruptedException {
-        fileController.openFileClicked(gc, filePath, this);
+        fileController.openFileClicked(filePath);
         recentController.update(filePath);
-        specificGenomeProperties.hideSave();
-        selectedGenomes = null;
+//        specificGenomeProperties.hideSave();
     }
 
     private void displayInfo(SequenceGraph graph) {
@@ -163,8 +165,8 @@ public class MenuController implements Observer {
     @FXML
     public void zoomInClicked() throws IOException {
         double xCentre = canvas.getWidth() / 2;
-        zoomController.zoomIn(fileController.getDrawer().mouseLocationColumn(xCentre));
-        nodeTextField.setText(fileController.getDrawer().findColumn(xCentre) + "");
+        zoomController.zoomIn(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
+        nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
     }
 
     /**
@@ -175,8 +177,8 @@ public class MenuController implements Observer {
     @FXML
     public void zoomOutClicked() throws IOException {
         double xCentre = canvas.getWidth() / 2;
-        zoomController.zoomOut(fileController.getDrawer().mouseLocationColumn(xCentre));
-        nodeTextField.setText(fileController.getDrawer().findColumn(xCentre) + "");
+        zoomController.zoomOut(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
+        nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
     }
 
     /**
@@ -187,8 +189,8 @@ public class MenuController implements Observer {
      */
     @FXML
     public void scrollZoom(ScrollEvent scrollEvent) throws IOException {
-        int column = fileController.getDrawer().mouseLocationColumn(scrollEvent.getX());
-        nodeTextField.setText(fileController.getDrawer().findColumn(scrollEvent.getX()) + "");
+        int column = GraphDrawer.getInstance().mouseLocationColumn(scrollEvent.getX());
+        nodeTextField.setText(GraphDrawer.getInstance().findColumn(scrollEvent.getX()) + "");
         if (scrollEvent.getDeltaY() > 0) {
             zoomController.zoomIn(column);
         } else {
@@ -203,11 +205,32 @@ public class MenuController implements Observer {
      */
     @FXML
     public void clickMouse(MouseEvent mouseEvent) {
+        canvasPanel.requestFocus();
         double pressedX = mouseEvent.getX();
         double pressedY = mouseEvent.getY();
-        SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, pressedY);
+        SequenceNode clicked = GraphDrawer.getInstance().clickNode(pressedX, pressedY);
         if (clicked != null) {
-            String sequence = fileController.getSequenceHashMap().get((long) clicked.getId());
+            String newString = "Sequence: "
+                    + DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId()) + "\n";
+
+
+            String childString = "Children: ";
+            for (Integer i: clicked.getChildren()) {
+                childString += i.toString() + "\n";
+            }
+
+            String parentString = "Parents: ";
+            for (Integer i: clicked.getParents()) {
+                parentString += i.toString() + "\n";
+            }
+
+            String nodeID = "Node ID: " + Integer.toString(clicked.getId()) + "\n";
+
+            String columnString = "Column index: " + Integer.toString(clicked.getColumn()) + "\n";
+
+            String concat = nodeID + columnString + parentString + childString + newString;
+            infoController.updateSeqLabel(concat);
+            String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId());
             infoController.updateSeqLabel(clicked.toString(sequence));
             nodeTextField.setText(clicked.getId().toString());
         }
@@ -221,9 +244,10 @@ public class MenuController implements Observer {
         int centreNodeID = Integer.parseInt(nodeTextField.getText());
         int radius = Integer.parseInt(radiusTextField.getText());
         zoomController.traverseGraphClicked(centreNodeID, radius);
-        SequenceNode node = fileController.getGraph().getNode(centreNodeID);
-        String sequence = fileController.getSequenceHashMap().get((long) centreNodeID);
-        infoController.updateSeqLabel(node.toString(sequence));
+        String newString = "ID: " + centreNodeID + "\nSequence: "
+                + DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
+        infoController.updateSeqLabel(newString);
+
     }
 
     /**
@@ -237,9 +261,9 @@ public class MenuController implements Observer {
         int rad = Integer.parseInt(radius);
 
         zoomController.traverseGraphClicked(centreNodeID, rad);
-        SequenceNode node = fileController.getGraph().getNode(centreNodeID);
-        String sequence = fileController.getSequenceHashMap().get((long) centreNodeID);
-        infoController.updateSeqLabel(node.toString(sequence));
+        String newString = "Sequence: "
+                + DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
+        infoController.updateSeqLabel(newString);
     }
 
     /**
@@ -330,18 +354,19 @@ public class MenuController implements Observer {
      * @return The sequenceMap.
      */
     HTreeMap<Long, String> getSequenceHashMap() {
-        return fileController.getSequenceHashMap();
+        return DrawableCanvas.getInstance().getParser().getSequenceHashMap();
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        if (o instanceof GfaParser) {
+        if (o instanceof DrawableCanvas) {
             if (arg instanceof String) {
                 filePath = (String) arg;
 
                 properties.updateProperties();
                 properties.setProperty("file", filePath);
                 properties.saveProperties();
+
 
                 Platform.runLater(new Runnable() {
                     public void run() {
@@ -352,13 +377,13 @@ public class MenuController implements Observer {
                         String offTitle = parts[0];
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
-                        specificGenomeProperties.initialize();
+//                        specificGenomeProperties.initialize();
                         panningController =
-                                new PanningController(scrollbar, fileController.getDrawer());
-                        zoomController = new ZoomController(fileController.getGraph(),
-                                fileController.getDrawer(), panningController,
+                                new PanningController(leftPannButton, rightPannButton);
+                        panningController.initializeKeys(canvasPanel);
+                        zoomController = new ZoomController(panningController,
                                 nodeTextField, radiusTextField);
-                        displayInfo(fileController.getGraph());
+                        displayInfo(GraphDrawer.getInstance().getGraph());
                     }
                 });
             }
@@ -431,7 +456,7 @@ public class MenuController implements Observer {
 
         HashMap<Integer, String> hashMap;
 
-        hashMap = fileController.getAllGenomes();
+        hashMap = DrawableCanvas.getInstance().getAllGenomesReversed();
         if (hashMap == null) {
             try {
                 openFileClicked();
@@ -440,7 +465,7 @@ public class MenuController implements Observer {
             }
         }
 
-        controller.initialize(hashMap, fileController.getDrawer().getSelected());
+        controller.initialize(hashMap, GraphDrawer.getInstance().getSelected());
 
         stage = new Stage();
         stage.setScene(new Scene(root));
@@ -450,8 +475,8 @@ public class MenuController implements Observer {
                 new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent event) {
-                        fileController.getDrawer().setSelected(controller.getSelectedGenomes());
-                        fileController.getDrawer().redraw();
+                        GraphDrawer.getInstance().setSelected(controller.getSelectedGenomes());
+                        GraphDrawer.getInstance().redraw();
                         specificGenomeProperties.showSave();
                     }
                 }
@@ -464,7 +489,7 @@ public class MenuController implements Observer {
      */
     @FXML
     public void saveGenomesClick() {
-        specificGenomeProperties.saving(fileController.getDrawer().getSelected());
+        specificGenomeProperties.saving(GraphDrawer.getInstance().getSelected());
     }
 
     /**
@@ -472,7 +497,7 @@ public class MenuController implements Observer {
      */
     @FXML
     public void otherSaveGenomeClick() {
-        specificGenomeProperties.saving(fileController.getDrawer().getSelected());
+        specificGenomeProperties.saving(GraphDrawer.getInstance().getSelected());
     }
 
     /**
@@ -501,6 +526,7 @@ public class MenuController implements Observer {
 
     /**
      * Generic genome bookmark function to not duplicate code.
+     *
      * @param bookmark The MenuItem that was pressed.
      */
     private void genomeBookmarkClicked(MenuItem bookmark) {
@@ -517,8 +543,8 @@ public class MenuController implements Observer {
                 res[i] = oneSelected;
             }
 
-            fileController.getDrawer().setSelected(res);
-            fileController.getDrawer().redraw();
+            GraphDrawer.getInstance().setSelected(res);
+            GraphDrawer.getInstance().redraw();
         }
     }
 }

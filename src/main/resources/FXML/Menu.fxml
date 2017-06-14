@@ -7,7 +7,6 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
-<?import javafx.scene.control.ScrollBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
@@ -15,10 +14,8 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.Pane?>
 
-<AnchorPane fx:id="anchorPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1030.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MenuController">
+<AnchorPane fx:id="anchorPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MenuController">
    <children>
       <SplitPane dividerPositions="1.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
@@ -77,38 +74,28 @@
                   </MenuBar>
                   <SplitPane dividerPositions="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="32.0">
                     <items>
-                      <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0">
+                      <AnchorPane maxWidth="150.0" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0">
                            <children>
                               <TextField fx:id="nodeTextField" alignment="CENTER" layoutX="27.0" layoutY="30.0" prefHeight="29.0" prefWidth="97.0" promptText="Centre node" />
                               <Button layoutX="26.0" layoutY="72.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
                               <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="27.0" layoutY="111.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
                               <Button fx:id="chooseGenome" layoutX="14.0" layoutY="171.0" mnemonicParsing="false" onAction="#chooseGenomePress" prefHeight="25.0" prefWidth="120.0" text="Specific Genome" />
-                              <Button fx:id="saveGenomeBut" layoutX="15.0" layoutY="207.0" mnemonicParsing="false" onAction="#saveGenomesClick" prefHeight="25.0" prefWidth="120.0" text="Save genomes" visible="false" />
                            </children>
                         </AnchorPane>
-                      <AnchorPane fx:id="canvasPanel">
+                      <AnchorPane fx:id="canvasPanel" focusTraversable="true">
                            <children>
-                              <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <center>
-                                    <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                                       <children>
-                                          <Canvas fx:id="canvas" onMouseClicked="#clickMouse" onScroll="#scrollZoom" />
-                                          <Button layoutX="1721.0" layoutY="4.0" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" />
-                                          <Button layoutX="1721.0" layoutY="42.0" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" />
-                                       </children>
-                                    </Pane>
-                                 </center>
-                                  <bottom>
-                                      <ScrollBar fx:id="scrollbar" value="50.0" visibleAmount="100.0" BorderPane.alignment="CENTER" />
-                                  </bottom>
-                              </BorderPane>
+                              <Canvas fx:id="canvas" onMouseClicked="#clickMouse" onScroll="#scrollZoom" />
+                              <Button mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
+                              <Button mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0" />
+                              <Button fx:id="rightPannButton" mnemonicParsing="false" prefHeight="80.0" prefWidth="200.0" text="Right" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="20.0" />
+                              <Button fx:id="leftPannButton" mnemonicParsing="false" prefHeight="80.0" prefWidth="200.0" text="Left" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="20.0" />
                            </children>
                         </AnchorPane>
                     </items>
                   </SplitPane>
                </children>
             </AnchorPane>
-          <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="400.0">
+          <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="400.0">
                <children>
                   <TabPane tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <tabs>

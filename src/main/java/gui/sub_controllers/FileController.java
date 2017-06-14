@@ -1,8 +1,8 @@
 package gui.sub_controllers;
 
 import graph.SequenceGraph;
-import graph.SequenceNode;
 import gui.CustomProperties;
+import gui.DrawableCanvas;
 import gui.GraphDrawer;
 import gui.MenuController;
 import javafx.scene.canvas.GraphicsContext;
@@ -14,8 +14,6 @@ import parser.GfaParser;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Observer;
 import java.util.Observable;
 import java.util.regex.Pattern;
@@ -23,22 +21,19 @@ import java.util.regex.Pattern;
 /**
  * Controller for opening a file.
  */
-public class FileController implements Observer {
+public class FileController extends Observable implements Observer {
 
-    private SequenceGraph graph;
-    private gui.GraphDrawer drawer;
-    private HTreeMap<Long, String> sequenceHashMap;
+
     private File parDirectory;
     private ProgressBarController progressBarController;
 
-    private final int renderRange = 1000;
+
+    private final int renderRange = PanningController.RENDER_RANGE;
     private final int nodeId = 1;
 
     private Thread parseThread;
 
-    private GraphicsContext gc;
 
-    private GfaParser parser;
 
     private String partPath;
 
@@ -49,15 +44,11 @@ public class FileController implements Observer {
     private int[] childArray;
     private int[] parentArray;
 
-    private HashMap<Integer, String> allGenomes;
-    private HashMap<Integer, String> genomes;
-
     /**
      * Constructor of the FileController object to control the Files.
      * @param pbc The progressbar.
      */
     public FileController(ProgressBarController pbc) {
-        graph = new SequenceGraph();
         parDirectory = null;
         progressBarController = pbc;
 
@@ -96,21 +87,19 @@ public class FileController implements Observer {
     /**
      * When 'open gfa file' is clicked this method opens a filechooser from which a gfa.
      * can be selected and directly be visualised on the screen.
-     * @param gc the graphicscontext we will use.
-     * @param mC the MenuController so it can Observe.
      * @param filePath the filePath of the file.
      * @throws IOException exception if no file is found
      * @throws InterruptedException Exception if the Thread is interrupted.
      */
-    public void openFileClicked(GraphicsContext gc, String filePath, MenuController mC)
+    public void openFileClicked(String filePath)
             throws IOException, InterruptedException {
-        this.gc = gc;
-        if (parser != null) {
-            parser.getDb().close();
+        if (DrawableCanvas.getInstance().getParser() != null) {
+            DrawableCanvas.getInstance().getParser().getDb().close();
         }
-        parser = new GfaParser(filePath);
+        GfaParser parser = new GfaParser(filePath);
+        DrawableCanvas.getInstance().setParser(parser);
         parser.addObserver(this);
-        parser.addObserver(mC);
+        this.addObserver(DrawableCanvas.getInstance());
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         partPath = partPaths[partPaths.length - 1];
@@ -132,70 +121,18 @@ public class FileController implements Observer {
         progressBarController.run();
     }
 
-    private void assignSequenceLenghts() {
-        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
-        Iterator it = nodes.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
-            if (!node.isDummy()) {
-                node.setSequenceLength(sequenceHashMap.get((long) node.getId()).length());
-            }
-        }
-    }
 
-    /**
-     * Gets the sequenceHashMap.
-     * @return the sequenceHashMap with all the sequences
-     */
-    public HTreeMap<Long, String> getSequenceHashMap() {
-        return sequenceHashMap;
-    }
 
-    /**
-     * Gets the GraphDrawer.
-     * @return the graphDrawer.
-     */
-    public GraphDrawer getDrawer() {
-        return drawer;
-    }
-
-    /**
-     * Gets the graph.
-     * @return the graph.
-     */
-    public SequenceGraph getGraph() {
-        return graph;
-    }
 
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof GfaParser) {
             if (arg instanceof Integer) {
-                try {
-                    childArray = parser.getChildArray();
-                    parentArray = parser.getParentArray();
-                    allGenomes = parser.getAllGenomesMapReversed();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                graph = new SequenceGraph();
-                try {
-                    graph.createSubGraph(nodeId, renderRange, parentArray, childArray, partPath);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                sequenceHashMap = parser.getSequenceHashMap();
-                assignSequenceLenghts();
-                drawer = new GraphDrawer(graph, gc);
-                drawer.moveShapes(0.0);
+                setChanged();
+                notifyObservers(0);
                 progressBarController.done();
             }
         }
-    }
-
-    public HashMap<Integer, String> getAllGenomes() {
-        return allGenomes;
     }
 
 
