@@ -2,9 +2,8 @@ package gui;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
-import javafx.fxml.FXML;
-import javafx.scene.canvas.Canvas;
 import gui.sub_controllers.ColourController;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class GraphDrawer {
     private ArrayList<ArrayList<SequenceNode>> columns;
     private SequenceGraph graph;
     private int highlightedNode;
-    private int[] selected;
+    private int[] selected = null;
     private ColourController colourController;
     private SequenceNode mostLeftNode;
 
@@ -57,7 +56,10 @@ public class GraphDrawer {
         }
         range = columnWidths[columns.size()];
         radius = columns.size();
-        selected = new int[0];
+
+        if (selected == null) {
+            selected = new int[0];
+        }
         colourController = new ColourController(selected);
     }
 
@@ -171,10 +173,11 @@ public class GraphDrawer {
                 height = width;
             }
             node.setCoordinates(x, y, width, height);
+
             if (node.checkBounds()) {
                 mostLeftNode = node;
             }
-            node.draw(gc, selected, colourController);
+            node.draw(gc, colourController);
         }
     }
 
@@ -191,7 +194,8 @@ public class GraphDrawer {
                 double starty = parent.getyCoordinate() + (parent.getHeight() / 2);
                 double endx = child.getxCoordinate();
                 double endy = child.getyCoordinate() + (child.getHeight() / 2);
-                gc.setLineWidth(Math.log(child.getGenomes().length));
+                gc.setLineWidth(Math.log(Math.min(child.getGenomes().length, parent.getGenomes().length))
+                        / Math.log(LOG_BASE + 1.1));
                 gc.strokeLine(startx, starty, endx, endy);
             }
         }
@@ -289,10 +293,10 @@ public class GraphDrawer {
     public void highlight(int node) {
         if (highlightedNode != 0) {
             graph.getNode(highlightedNode).lowlight();
-            graph.getNode(highlightedNode).draw(gc, selected, colourController);
+            graph.getNode(highlightedNode).draw(gc, colourController);
         }
         graph.getNode(node).highlight();
-        graph.getNode(node).draw(gc, selected, colourController);
+        graph.getNode(node).draw(gc, colourController);
         highlightedNode = node;
     }
 
