@@ -64,6 +64,7 @@ public class GraphDrawer {
         radius = columns.size();
         selected = new int[0];
         colourController = new ColourController(selected);
+        highlightedNode = 0;
     }
 
     /**
