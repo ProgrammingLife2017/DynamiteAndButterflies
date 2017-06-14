@@ -131,8 +131,6 @@ public class FileController extends Observable implements Observer {
             if (arg instanceof Integer) {
                 setChanged();
                 notifyObservers(0);
-                setChanged();
-
                 progressBarController.done();
             }
         }
