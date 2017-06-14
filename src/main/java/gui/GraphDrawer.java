@@ -2,6 +2,8 @@ package gui;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
+import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
 import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.GraphicsContext;
 
@@ -16,16 +18,19 @@ import java.util.Map;
  */
 public class GraphDrawer {
 
+    private static GraphDrawer drawer = new GraphDrawer();
+
     private static final double RELATIVE_X_DISTANCE = 0.8;
     private static final double RELATIVE_Y_DISTANCE = 50;
     private static final double LINE_WIDTH_FACTOR = 4;
     private static final double Y_SIZE_FACTOR = 3;
     private static final double LOG_BASE = 2;
 
+    private Canvas canvas;
     private int yBase;
-    private double range;
     private double zoomLevel;
     private double radius;
+    private double range;
     private double xDifference;
     private double stepSize;
     private double[] columnWidths;
@@ -35,35 +40,35 @@ public class GraphDrawer {
     private int highlightedNode;
     private int[] selected;
     private ColourController colourController;
-
     private SequenceNode mostLeftNode;
 
-     /**
-     * Constructor.
-     *
-     * @param graph The sequencegraph to be drawn to the canvas.
-     * @param gc    The graphics context used to actually draw shapes.
-     */
-    public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
-        this.gc = gc;
-        this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
-        initializeDrawer(graph);
+
+    public static GraphDrawer getInstance(){
+        return drawer;
     }
 
-    public void initializeDrawer(SequenceGraph graph) {
+    public void setGraph(SequenceGraph graph) {
         this.graph = graph;
-        initGraph();
-        zoomLevel = columnWidths[columns.size()];
-    }
-
-    public void initGraph() {
         columns = graph.getColumns();
-        columnWidths = new double[columns.size() + 1];
+        columnWidths = new double[columns.size() +1];
         initializeColumnWidths();
+        if (zoomLevel == 0) {
+            zoomLevel = columnWidths[columns.size()];
+        }
         range = columnWidths[columns.size()];
         radius = columns.size();
         selected = new int[0];
         colourController = new ColourController(selected);
+    }
+
+
+    public void setCanvas(Canvas canvas) {
+        this.canvas = canvas;
+        this.gc = canvas.getGraphicsContext2D();
+
+//        MAGIC NUMBER
+        this.yBase = (int) (canvas.getHeight() / 4);
+
     }
 
     /**
@@ -86,6 +91,7 @@ public class GraphDrawer {
      */
     public void changeZoom(int column, int radius) {
         setRadius(radius);
+
         int widthRight = column + radius + 1;
         int widthLeft = column - radius;
 
@@ -126,7 +132,8 @@ public class GraphDrawer {
      * Initializes the widths of each column.
      * Using the widest node of each column.
      */
-    public void initializeColumnWidths() {
+
+    private void initializeColumnWidths() {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             double max = 1;
@@ -143,6 +150,7 @@ public class GraphDrawer {
     }
 
     /**
+
      * Gives all nodes the right coordinates on the canvas and draw them.
      * It depends on whether the dummy nodes checkbox
      * is checked dummy nodes are either drawn or skipped.
@@ -155,6 +163,8 @@ public class GraphDrawer {
             double width = computeNodeWidth(node) * stepSize * RELATIVE_X_DISTANCE;
             double height = getYSize();
             double x = (columnWidths[node.getColumn()] - xDifference) * stepSize;
+
+            yBase = (int) GraphDrawer.getInstance().canvas.getHeight() / 4;
             double y = yBase + (node.getIndex() * RELATIVE_Y_DISTANCE);
             if (height > width) {
                 y += (height - width) / 2;
@@ -167,6 +177,7 @@ public class GraphDrawer {
             node.draw(gc, selected, colourController);
         }
     }
+
 
     private void drawEdges() {
         Iterator it = graph.getNodes().entrySet().iterator();
@@ -186,7 +197,7 @@ public class GraphDrawer {
         }
     }
 
-    public double computeNodeWidth(SequenceNode node) {
+    private double computeNodeWidth(SequenceNode node) {
         if (node.isDummy()) {
             return columnWidths[node.getColumn() + 1] - columnWidths[node.getColumn()];
         }
@@ -322,6 +333,10 @@ public class GraphDrawer {
         return radius;
     }
 
+    public double getRange() {
+        return range;
+    }
+
     /**
      * Get function for x difference.
      * @return The x difference.
@@ -334,6 +349,10 @@ public class GraphDrawer {
         return columnWidths[col];
     }
 
+    public double getRightbound() { return xDifference + zoomLevel; }
+
+    public double getLeftbound() { return xDifference; }
+
     /**
      * Return the column the mouse click is in.
      *
@@ -343,6 +362,7 @@ public class GraphDrawer {
     public int mouseLocationColumn(double x) {
         return (int) ((x / stepSize) + xDifference);
     }
+
 
     public void setSelected(int[] newSelection) {
         this.selected = newSelection;
@@ -371,17 +391,12 @@ public class GraphDrawer {
         this.zoomLevel = zoomLevel;
     }
 
-    public double getRange() {
-        return range;
-    }
+
 
     public SequenceGraph getGraph() {
         return graph;
     }
 
-    public void setGraph(SequenceGraph graph) {
-        this.graph = graph;
-    }
 
     public SequenceNode getMostLeftNode() {
         return mostLeftNode;

@@ -1,8 +1,10 @@
 package graph;
 
+import gui.DrawableCanvas;
 import org.mapdb.HTreeMap;
 
 import java.io.IOException;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -19,6 +21,9 @@ public class SequenceGraph {
 
     private HashMap<Integer, SequenceNode> nodes;
     private ArrayList<ArrayList<SequenceNode>> columns;
+
+
+
     private Boundary boundaries;
     private int centerNodeID;
     private int[] parentArray;
@@ -61,8 +66,7 @@ public class SequenceGraph {
      * @param centerNodeID - the node to start rendering at.
      * @param range        - the amount of edges to add to the graph
      */
-    public void createSubGraph(int centerNodeID, int range, String partPath) {
-        this.partPath = partPath;
+    public void createSubGraph(int centerNodeID, int range) {
         this.nodes = new HashMap<Integer, SequenceNode>();
         this.columns = new ArrayList<ArrayList<SequenceNode>>();
 
@@ -100,6 +104,7 @@ public class SequenceGraph {
             int childID = childArray[i];
             if (nodes.get(parentID) == null) {
                 SequenceNode node = new SequenceNode(parentID);
+
                 int[] genomes = new int[0];
                 try {
                     genomes = getGenomes(parentID);
@@ -114,6 +119,7 @@ public class SequenceGraph {
             }
             if (nodes.get(childID) == null) {
                 SequenceNode node = new SequenceNode(childID);
+
                 int[] genomes = new int[0];
                 try {
                     genomes = getGenomes(childID);
@@ -127,12 +133,13 @@ public class SequenceGraph {
 
     }
 
+
     /**
      * Finds the longest path of the graph and sets columns accordingly.
      */
     private int[] getGenomes(int node) throws IOException {
         try {
-            Stream<String> lines = Files.lines(Paths.get(partPath + "genomes.txt"));
+            Stream<String> lines = Files.lines(Paths.get(DrawableCanvas.getInstance().getParser().getPartPath() + "genomes.txt"));
             String line = lines.skip(node - 1).findFirst().get();
             String[] text = line.split(";");
             int[] genomes = new int[text.length];
@@ -144,24 +151,23 @@ public class SequenceGraph {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+
+        throw new IOException("Node not in genome list");
     }
 
     /**
      * assigns the columns based on the longest path algo.
      */
     private void findLongestPath() {
-        for (Object o : this.getNodes().entrySet()) {
+        for (Object o : this.getNodes   ().entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             SequenceNode currentNode = (SequenceNode) pair.getValue();
-            if (currentNode.getColumn() != Integer.MIN_VALUE) {
                 for (int child : currentNode.getChildren()) {
-                    if (this.getNode(child).getColumn() < currentNode.getColumn() + 1) {
                         this.getNode(child).addParent(currentNode.getId());
-                        this.getNode(child).setColumn(currentNode.getColumn() + 1);
+                    if (this.getNode(child).getColumn() < currentNode.getColumn() + 1) {
+                        nodes.get(child).setColumn(currentNode.getColumn() + 1);
                     }
                 }
-            }
         }
     }
 
@@ -396,6 +402,5 @@ public class SequenceGraph {
     public int getCenterNodeID() {
         return centerNodeID;
     }
-
 
 }

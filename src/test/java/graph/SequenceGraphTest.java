@@ -37,7 +37,7 @@ public class SequenceGraphTest {
         }
 
         graph = new SequenceGraph(parentArray, childArray, map);
-        graph.createSubGraph(1, 27, null);
+        graph.createSubGraph(1, 27);
     }
 
     @Test
@@ -94,6 +94,6 @@ public class SequenceGraphTest {
     @Test (expected = IllegalArgumentException.class)
     public void invalidArgument() throws Exception {
         graph = new SequenceGraph(parentArray, childArray, null);
-        graph.createSubGraph(-1, 1, null);
+        graph.createSubGraph(-1, 1);
     }
 }
