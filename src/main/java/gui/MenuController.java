@@ -12,6 +12,8 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -77,7 +79,9 @@ public class MenuController implements Observer {
     @FXML
     private TextArea consoleArea;
     @FXML
-    private ScrollBar scrollbar;
+    private Button rightPannButton;
+    @FXML
+    private Button leftPannButton;
 
     private PrintStream ps;
     private GraphicsContext gc;
@@ -109,10 +113,10 @@ public class MenuController implements Observer {
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
         specificGenomeProperties = new SpecificGenomeProperties(saveGenomeBut,
-                                                    genome1, genome2, genome3);
+                genome1, genome2, genome3);
 
         ps = new PrintStream(new Console(consoleArea));
-        System.setErr(ps);
+        //System.setErr(ps);
         System.setOut(ps);
     }
 
@@ -203,6 +207,7 @@ public class MenuController implements Observer {
      */
     @FXML
     public void clickMouse(MouseEvent mouseEvent) {
+        canvasPanel.requestFocus();
         double pressedX = mouseEvent.getX();
         double pressedY = mouseEvent.getY();
         SequenceNode clicked = fileController.getDrawer().clickNode(pressedX, pressedY);
@@ -354,7 +359,8 @@ public class MenuController implements Observer {
                         bookmarkController.initialize(filePath);
                         specificGenomeProperties.initialize();
                         panningController =
-                                new PanningController(scrollbar, fileController.getDrawer());
+                                new PanningController(fileController.getDrawer(), leftPannButton, rightPannButton);
+                        panningController.initializeKeys(canvasPanel);
                         zoomController = new ZoomController(fileController.getGraph(),
                                 fileController.getDrawer(), panningController,
                                 nodeTextField, radiusTextField);
@@ -501,6 +507,7 @@ public class MenuController implements Observer {
 
     /**
      * Generic genome bookmark function to not duplicate code.
+     *
      * @param bookmark The MenuItem that was pressed.
      */
     private void genomeBookmarkClicked(MenuItem bookmark) {

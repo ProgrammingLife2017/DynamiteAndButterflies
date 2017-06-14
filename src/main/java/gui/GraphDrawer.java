@@ -23,6 +23,7 @@ public class GraphDrawer {
     private static final double LOG_BASE = 2;
 
     private int yBase;
+    private double range;
     private double zoomLevel;
     private double radius;
     private double xDifference;
@@ -35,7 +36,9 @@ public class GraphDrawer {
     private int[] selected;
     private ColourController colourController;
 
-    /**
+    private SequenceNode mostLeftNode;
+
+     /**
      * Constructor.
      *
      * @param graph The sequencegraph to be drawn to the canvas.
@@ -43,12 +46,21 @@ public class GraphDrawer {
      */
     public GraphDrawer(final SequenceGraph graph, final GraphicsContext gc) {
         this.gc = gc;
-        this.graph = graph;
         this.yBase = (int) (gc.getCanvas().getHeight() / 4); //TODO explain magic number
+        initializeDrawer(graph);
+    }
+
+    public void initializeDrawer(SequenceGraph graph) {
+        this.graph = graph;
+        initGraph();
+        zoomLevel = columnWidths[columns.size()];
+    }
+
+    public void initGraph() {
         columns = graph.getColumns();
         columnWidths = new double[columns.size() + 1];
         initializeColumnWidths();
-        zoomLevel = columnWidths[columns.size()];
+        range = columnWidths[columns.size()];
         radius = columns.size();
         selected = new int[0];
         colourController = new ColourController(selected);
@@ -61,11 +73,8 @@ public class GraphDrawer {
      * @param column The Column that has to be in the centre.
      */
     public void zoom(final double factor, final int column) {
-        if ((factor < 1 && radius < 1) || (factor > 1 && radius >= columns.size())) {
-            return;
-        }
-        this.zoomLevel = zoomLevel * factor;
-        this.radius = radius * factor;
+        setZoomLevel(zoomLevel * factor);
+        setRadius(radius * factor);
         moveShapes(column - ((column - xDifference) * factor));
     }
 
@@ -76,9 +85,19 @@ public class GraphDrawer {
      * @param column  The new Column to be in the centre.
      */
     public void changeZoom(int column, int radius) {
-        this.radius = radius + radius + 1;
-        zoomLevel = columnWidths[column + radius + 1] - columnWidths[column - radius];
-        moveShapes(columnWidths[column - radius]);
+        setRadius(radius);
+        int widthRight = column + radius + 1;
+        int widthLeft = column - radius;
+
+        if (column + radius + 1 > columnWidths.length-1 ) {
+            widthRight = columnWidths.length - 1;
+        }
+        if (column - radius < 0) {
+            widthLeft = 0;
+        }
+
+        setZoomLevel(columnWidths[widthRight] - columnWidths[widthLeft]);
+        moveShapes(columnWidths[widthLeft]);
     }
 
     /**
@@ -104,29 +123,6 @@ public class GraphDrawer {
     }
 
     /**
-     * Gives all nodes the right coordinates on the canvas and draw them.
-     * It depends on whether the dummy nodes checkbox
-     * is checked dummy nodes are either drawn or skipped.
-     */
-    private void drawNodes() {
-        Iterator it = graph.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
-            double width = computeNodeWidth(node) * stepSize * RELATIVE_X_DISTANCE;
-            double height = getYSize();
-            double x = (columnWidths[node.getColumn()] - xDifference) * stepSize;
-            double y = yBase + (node.getIndex() * RELATIVE_Y_DISTANCE);
-            if (height > width) {
-                y += (height - width) / 2;
-                height = width;
-            }
-            node.setCoordinates(x, y, width, height);
-            node.draw(gc, selected, colourController);
-        }
-    }
-
-    /**
      * Initializes the widths of each column.
      * Using the widest node of each column.
      */
@@ -146,6 +142,32 @@ public class GraphDrawer {
         }
     }
 
+    /**
+     * Gives all nodes the right coordinates on the canvas and draw them.
+     * It depends on whether the dummy nodes checkbox
+     * is checked dummy nodes are either drawn or skipped.
+     */
+    private void drawNodes() {
+        Iterator it = graph.getNodes().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            double width = computeNodeWidth(node) * stepSize * RELATIVE_X_DISTANCE;
+            double height = getYSize();
+            double x = (columnWidths[node.getColumn()] - xDifference) * stepSize;
+            double y = yBase + (node.getIndex() * RELATIVE_Y_DISTANCE);
+            if (height > width) {
+                y += (height - width) / 2;
+                height = width;
+            }
+            node.setCoordinates(x, y, width, height);
+            if (node.checkBounds()) {
+                mostLeftNode = node;
+            }
+            node.draw(gc, selected, colourController);
+        }
+    }
+
     private void drawEdges() {
         Iterator it = graph.getNodes().entrySet().iterator();
         while (it.hasNext()) {
@@ -158,8 +180,7 @@ public class GraphDrawer {
                 double starty = parent.getyCoordinate() + (parent.getHeight() / 2);
                 double endx = child.getxCoordinate();
                 double endy = child.getyCoordinate() + (child.getHeight() / 2);
-                gc.setLineWidth(Math.log(child.getGenomes().length)
-                                / Math.log(LOG_BASE + 1.1));
+                gc.setLineWidth(Math.log(child.getGenomes().length));
                 gc.strokeLine(startx, starty, endx, endy);
             }
         }
@@ -330,6 +351,40 @@ public class GraphDrawer {
 
     public int[] getSelected() {
         return selected;
+    }
+
+    public void setxDifference(double xDifference) {
+        if (xDifference < 0) { xDifference = 0; }
+        if (xDifference + zoomLevel > range) { xDifference = range - zoomLevel; }
+        this.xDifference = xDifference;
+    }
+
+    public void setRadius(double radius) {
+        if (radius < 1) { radius = 1; }
+        if (radius > range) { radius = range; }
+        this.radius = radius;
+    }
+
+    public void setZoomLevel(double zoomLevel) {
+        if (zoomLevel < 1) { zoomLevel = 1; }
+        if (zoomLevel > range) { zoomLevel = range; }
+        this.zoomLevel = zoomLevel;
+    }
+
+    public double getRange() {
+        return range;
+    }
+
+    public SequenceGraph getGraph() {
+        return graph;
+    }
+
+    public void setGraph(SequenceGraph graph) {
+        this.graph = graph;
+    }
+
+    public SequenceNode getMostLeftNode() {
+        return mostLeftNode;
     }
 }
 

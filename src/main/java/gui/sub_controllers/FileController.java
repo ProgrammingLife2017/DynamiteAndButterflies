@@ -1,7 +1,6 @@
 package gui.sub_controllers;
 
 import graph.SequenceGraph;
-import graph.SequenceNode;
 import gui.CustomProperties;
 import gui.GraphDrawer;
 import gui.MenuController;
@@ -14,8 +13,6 @@ import parser.GfaParser;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Observer;
 import java.util.Observable;
 import java.util.regex.Pattern;
@@ -31,7 +28,7 @@ public class FileController implements Observer {
     private File parDirectory;
     private ProgressBarController progressBarController;
 
-    private final int renderRange = 1000;
+    private final int renderRange = PanningController.RENDER_RANGE;
     private final int nodeId = 1;
 
     private Thread parseThread;
@@ -57,7 +54,7 @@ public class FileController implements Observer {
      * @param pbc The progressbar.
      */
     public FileController(ProgressBarController pbc) {
-        graph = new SequenceGraph();
+        graph = new SequenceGraph(parentArray, childArray, getSequenceHashMap());
         parDirectory = null;
         progressBarController = pbc;
 
@@ -132,17 +129,7 @@ public class FileController implements Observer {
         progressBarController.run();
     }
 
-    private void assignSequenceLenghts() {
-        HashMap<Integer, SequenceNode> nodes = graph.getNodes();
-        Iterator it = nodes.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
-            if (!node.isDummy()) {
-                node.setSequenceLength(sequenceHashMap.get((long) node.getId()).length());
-            }
-        }
-    }
+
 
     /**
      * Gets the sequenceHashMap.
@@ -179,14 +166,9 @@ public class FileController implements Observer {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                graph = new SequenceGraph();
-                try {
-                    graph.createSubGraph(nodeId, renderRange, parentArray, childArray, partPath);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 sequenceHashMap = parser.getSequenceHashMap();
-                assignSequenceLenghts();
+                graph = new SequenceGraph(parentArray, childArray, sequenceHashMap);
+                graph.createSubGraph(nodeId, renderRange, partPath);
                 drawer = new GraphDrawer(graph, gc);
                 drawer.moveShapes(0.0);
                 progressBarController.done();
