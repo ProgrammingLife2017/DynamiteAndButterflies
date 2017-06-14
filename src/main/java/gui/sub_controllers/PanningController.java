@@ -157,15 +157,17 @@ public class PanningController {
                     new Thread(new Task<Integer>() {
                         @Override
                         protected Integer call() throws Exception {
-                            System.out.println("OLD: getRightBoundID: " + drawer.getGraph().getRightBoundID() + ", getFullGraphRightBoundID: " + drawer.getGraph().getFullGraphRightBoundID() + ", getCentreNodeID: " + drawer.getGraph().getCenterNodeID());
+                            //System.out.println("OLD: getRightBoundID: " + drawer.getGraph().getRightBoundID() + ", getFullGraphRightBoundID: " + drawer.getGraph().getFullGraphRightBoundID() + ", getCentreNodeID: " + drawer.getGraph().getCenterNodeID());
+                            long start = System.currentTimeMillis();
                             SequenceGraph newGraph = drawer.getGraph().copy();
                             newGraph.createSubGraph(drawer.getGraph().getCenterNodeID() + RENDER_SHIFT, RENDER_RANGE, drawer.getGraph().getPartPath());
                             int leftMostID = drawer.getMostLeftNode().getId();
                             drawer.setGraph(newGraph);
                             drawer.initGraph();
-                            //drawer.setxDifference(drawer.getColumnWidth(drawer.getGraph().getNode(leftMostID).getColumn()));
-                            drawer.moveShapes(drawer.getColumnWidth(drawer.getGraph().getNode(leftMostID).getColumn()));
-                            System.out.println("NEW: getRightBoundID: " + drawer.getGraph().getRightBoundID() + ", getFullGraphRightBoundID: " + drawer.getGraph().getFullGraphRightBoundID() + ", getCentreNodeID: " + drawer.getGraph().getCenterNodeID());
+                            drawer.setxDifference(drawer.getColumnWidth(drawer.getGraph().getNode(leftMostID).getColumn()));
+                            long end = System.currentTimeMillis();
+                            System.out.println("Runtime: " + (end - start));
+                            //System.out.println("NEW: getRightBoundID: " + drawer.getGraph().getRightBoundID() + ", getFullGraphRightBoundID: " + drawer.getGraph().getFullGraphRightBoundID() + ", getCentreNodeID: " + drawer.getGraph().getCenterNodeID());
                             updating = false;
                             return null;
                         }
