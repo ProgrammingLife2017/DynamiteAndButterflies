@@ -17,7 +17,6 @@ public class ZoomController {
     private static final double SCROLL_ZOOM_IN_FACTOR = 0.9;
     private static final double SCROLL_ZOOM_OUT_FACTOR = 1.1;
 
-    private final GraphDrawer drawer;
     private final TextField nodeTextField, radiusTextField;
     private final PanningController panningController;
 
@@ -29,7 +28,6 @@ public class ZoomController {
      */
     public ZoomController(PanningController panController,
                           TextField nodeField, TextField radField) {
-        drawer = GraphDrawer.getInstance();
         nodeTextField = nodeField;
         radiusTextField = radField;
         this.panningController = panController;
@@ -41,9 +39,9 @@ public class ZoomController {
      * @throws IOException thrown if can't find
      */
     public void zoomIn(int column) throws IOException {
-        drawer.zoom(SCROLL_ZOOM_IN_FACTOR, column);
+        GraphDrawer.getInstance().zoom(SCROLL_ZOOM_IN_FACTOR, column);
         panningController.setScrollbarSize(column);
-        updateRadius((int) Math.ceil(drawer.getRadius()) + "");
+        updateRadius((int) Math.ceil(GraphDrawer.getInstance().getRadius()) + "");
     }
 
     /**
@@ -52,9 +50,9 @@ public class ZoomController {
      * @throws IOException thrown if can't find
      */
     public void zoomOut(int column) throws IOException {
-        drawer.zoom(SCROLL_ZOOM_OUT_FACTOR, column);
+        GraphDrawer.getInstance().zoom(SCROLL_ZOOM_OUT_FACTOR, column);
         panningController.setScrollbarSize(column);
-        updateRadius((int) Math.ceil(drawer.getRadius()) + "");
+        updateRadius((int) Math.ceil(GraphDrawer.getInstance().getRadius()) + "");
     }
 
     /**
@@ -64,17 +62,17 @@ public class ZoomController {
      */
     public void traverseGraphClicked(int centreNode, int radius) {
         int column = GraphDrawer.getInstance().getGraph().getNode(centreNode).getColumn();
-        drawer.changeZoom(column, radius);
-        drawer.highlight(centreNode);
-        panningController.setScrollbarSize(drawer.getColumnWidth(column));
+        GraphDrawer.getInstance().changegZoom(column, radius);
+        GraphDrawer.getInstance().highlight(centreNode);
+        panningController.setScrollbarSize(GraphDrawer.getInstance().getColumnWidth(column));
     }
 
     /**
      * Displays the centre node and radius of the current view.
      */
     public void displayInfo() {
-        nodeTextField.setText(drawer.getRealCentreNode().getId() + "");
-        radiusTextField.setText((int) Math.ceil(drawer.getRadius()) + "");
+        nodeTextField.setText(GraphDrawer.getInstance().getRealCentreNode().getId() + "");
+        radiusTextField.setText((int) Math.ceil(GraphDrawer.getInstance().getRadius()) + "");
     }
 
     /**
