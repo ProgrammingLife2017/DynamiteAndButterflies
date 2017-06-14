@@ -36,7 +36,7 @@ public class PanningController {
     /**
      * The amount of nodes to render.
      */
-    private static final int RENDER_RANGE = 2000;
+    static final int RENDER_RANGE = 2000;
 
     /**
      * The amount of nodes to shift.
