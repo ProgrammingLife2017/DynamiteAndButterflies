@@ -2,11 +2,9 @@ package gui;
 
 import graph.SequenceGraph;
 import gui.sub_controllers.FileController;
-import gui.sub_controllers.PanningController;
 import gui.sub_controllers.SpecificGenomeProperties;
 import parser.GfaParser;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Observable;
@@ -30,7 +28,6 @@ public class DrawableCanvas extends Observable implements Observer {
     private DrawableCanvas() {
 
     }
-
 
     public static DrawableCanvas getInstance() {
         return canvas;
@@ -66,11 +63,7 @@ public class DrawableCanvas extends Observable implements Observer {
                 }
             }
         }
-
-
-
     }
-
 
     public void setMenuController(MenuController mc) {
         this.mc = mc;
