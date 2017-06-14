@@ -67,7 +67,7 @@ public class PanningController {
     /**
      * Timer for panning.
      */
-    public void initializeTimer() {
+    private void initializeTimer() {
         timelineRight = new Timeline(new KeyFrame(Duration.millis(10), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -88,7 +88,7 @@ public class PanningController {
     /**
      * initialize function for the pan buttons.
      */
-    public void initializeButtons() {
+    private void initializeButtons() {
         rightPannButton.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -149,7 +149,7 @@ public class PanningController {
     /**
      * Pan right method.
      */
-    public void panRight() {
+    private void panRight() {
         if (!updating) {
             if (drawer.getGraph().getRightBoundIndex() < drawer.getGraph().getFullGraphRightBoundIndex()) {
                 if (drawer.getxDifference() + drawer.getZoomLevel() + RENDER_THRESHOLD > drawer.getRange()) {
@@ -184,7 +184,7 @@ public class PanningController {
     /**
      * Pan left method.
      */
-    public void panLeft() {
+    private void panLeft() {
         if (!updating) {
             if (drawer.getGraph().getLeftBoundIndex() > drawer.getGraph().getFullGraphLeftBoundIndex()) {
                 if (drawer.getxDifference() - RENDER_THRESHOLD < 0) {
