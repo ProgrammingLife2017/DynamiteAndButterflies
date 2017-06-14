@@ -52,7 +52,9 @@ public class GraphDrawer {
         columns = graph.getColumns();
         columnWidths = new double[columns.size() +1];
         initializeColumnWidths();
-        zoomLevel = columnWidths[columns.size()];
+        if (zoomLevel == 0) {
+            zoomLevel = columnWidths[columns.size()];
+        }
         range = columnWidths[columns.size()];
         radius = columns.size();
         selected = new int[0];
