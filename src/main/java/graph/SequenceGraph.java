@@ -16,8 +16,7 @@ import java.util.stream.Stream;
  */
 public class SequenceGraph {
 
-
-    private HashMap<Integer, SequenceNode> nodes;
+    private TreeMap<Integer, SequenceNode> nodes;
     private ArrayList<ArrayList<SequenceNode>> columns;
     private Boundary boundaries;
     private int centerNodeID;
@@ -63,7 +62,7 @@ public class SequenceGraph {
      */
     public void createSubGraph(int centerNodeID, int range, String partPath) {
         this.partPath = partPath;
-        this.nodes = new HashMap<Integer, SequenceNode>();
+        this.nodes = new TreeMap<Integer, SequenceNode>();
         this.columns = new ArrayList<ArrayList<SequenceNode>>();
 
         Boundary boundary = new Boundary(centerNodeID, range, parentArray, childArray);
@@ -226,22 +225,6 @@ public class SequenceGraph {
         });
     }
 
-    /**
-     * Finds the centerNode index (for in the hashmap).
-     *
-     * @param centerNodeID - the node to lookup.
-     * @param parentArray  - the array in which to look.
-     * @return - index of centerNode.
-     */
-    private int findCenterNodeIndex(int centerNodeID, int[] parentArray) {
-        for (int i = 0; i < parentArray.length; i++) {
-            if (parentArray[i] == centerNodeID) {
-                return i;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
 
     /**
      * Adds dummy's so that the span is always 1.
@@ -316,7 +299,7 @@ public class SequenceGraph {
      *
      * @return A HashMap of all nodes and their IDs contained in the graph.
      */
-    public HashMap<Integer, SequenceNode> getNodes() {
+    public TreeMap<Integer, SequenceNode> getNodes() {
         return this.nodes;
     }
 
