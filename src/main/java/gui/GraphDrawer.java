@@ -51,12 +51,11 @@ public class GraphDrawer {
         columns = graph.getColumns();
         columnWidths = new double[columns.size() +1];
         initializeColumnWidths();
+        range = columnWidths[columns.size()];
+        radius = columns.size();
         if (zoomLevel == 0) {
             setZoomLevel(columnWidths[columns.size()]);
         }
-        range = columnWidths[columns.size()];
-        radius = columns.size();
-
         if (selected == null) {
             selected = new int[0];
         }
@@ -99,13 +98,13 @@ public class GraphDrawer {
      */
     public void changeZoom(int column, int radius) {
         setRadius(radius);
-        int widthRight = column + radius / 2;
-        int widthLeft = column - radius / 2;
+        int widthRight = column + radius + 1;
+        int widthLeft = column - radius;
 
-        if (column + radius / 2 > columnWidths.length-1 ) {
+        if (column + radius + 1 > columnWidths.length-1 ) {
             widthRight = columnWidths.length - 1;
         }
-        if (column - radius / 2 < 0) {
+        if (column - radius < 0) {
             widthLeft = 0;
         }
 

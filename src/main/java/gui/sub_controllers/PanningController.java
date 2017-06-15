@@ -26,28 +26,25 @@ import java.util.Observable;
  */
 public class PanningController extends Observable {
 
-    public static final int EXTEND_LEFT = 0;
-    public static final int EXTEND_RIGHT = 1;
-
     /**
      * The speed at which to pan.
      */
-    private static final double PANN_FACTOR = 0.01;
+    public static final double PANN_FACTOR = 0.01;
 
     /**
      * The the threshold to update the subGraph.
      */
-    private static final int RENDER_THRESHOLD = 500;
+    public static final int RENDER_THRESHOLD = 500;
 
     /**
      * The amount of nodes to render.
      */
-    static final int RENDER_RANGE = 2000;
+    public static final int RENDER_RANGE = 2000;
 
     /**
      * The amount of nodes to shift.
      */
-    private static final int RENDER_SHIFT = 1000;
+    public static final int RENDER_SHIFT = 1000;
 
     private Button rightPannButton;
     private Button leftPannButton;

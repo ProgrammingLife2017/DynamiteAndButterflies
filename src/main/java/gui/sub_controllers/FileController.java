@@ -28,8 +28,8 @@ public class FileController extends Observable implements Observer {
     private ProgressBarController progressBarController;
 
 
-    private final int renderRange = PanningController.RENDER_RANGE;
-    private final int nodeId = PanningController.RENDER_RANGE;
+    //private final int renderRange = PanningController.RENDER_RANGE;
+    //private final int nodeId = PanningController.RENDER_RANGE;
 
     private Thread parseThread;
 
