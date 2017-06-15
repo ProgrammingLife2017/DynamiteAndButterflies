@@ -1,5 +1,6 @@
 package gui;
 
+import graph.Annotation;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.ColourController;
@@ -39,6 +40,7 @@ public class GraphDrawer {
     private int highlightedNode;
     private int[] selected = null;
     private ColourController colourController;
+    private ArrayList<Annotation> annotations;
     private SequenceNode mostLeftNode;
 
 
@@ -61,6 +63,7 @@ public class GraphDrawer {
             selected = new int[0];
         }
         colourController = new ColourController(selected);
+        annotations = new ArrayList<Annotation>();
     }
 
 
@@ -177,7 +180,7 @@ public class GraphDrawer {
             if (node.checkBounds()) {
                 mostLeftNode = node;
             }
-            node.draw(gc, colourController);
+            node.draw(gc, colourController, annotations);
         }
     }
 
@@ -293,10 +296,10 @@ public class GraphDrawer {
     public void highlight(int node) {
         if (highlightedNode != 0) {
             graph.getNode(highlightedNode).lowlight();
-            graph.getNode(highlightedNode).draw(gc, colourController);
+            graph.getNode(highlightedNode).draw(gc, colourController, annotations);
         }
         graph.getNode(node).highlight();
-        graph.getNode(node).draw(gc, colourController);
+        graph.getNode(node).draw(gc, colourController, annotations);
         highlightedNode = node;
     }
 
@@ -377,6 +380,10 @@ public class GraphDrawer {
         return selected;
     }
 
+    public void setAnnotations(ArrayList<Annotation> newAnnotations) {
+        annotations = newAnnotations;
+    }
+
     public void setxDifference(double xDifference) {
         if (xDifference < 0) { xDifference = 0; }
         if (xDifference + zoomLevel > range) { xDifference = range - zoomLevel; }
@@ -394,8 +401,6 @@ public class GraphDrawer {
         if (zoomLevel > range) { zoomLevel = range; }
         this.zoomLevel = zoomLevel;
     }
-
-
 
     public SequenceGraph getGraph() {
         return graph;

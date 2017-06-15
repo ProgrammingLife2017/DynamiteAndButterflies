@@ -26,4 +26,8 @@ public class Annotation {
     public int getEnd() {
         return end;
     }
+
+    public String getId() {
+        return id;
+    }
 }

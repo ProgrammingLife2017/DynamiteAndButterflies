@@ -71,7 +71,7 @@ public class ColourController {
      * @param genome the int we are looking for in the checkset
      * @return returns the position of genome in the checkset.
      */
-    private int containsPos(int[] checkSet, int genome) {
+    public int containsPos(int[] checkSet, int genome) {
         for (int i = 0; i < checkSet.length; i++) {
             int check = checkSet[i];
             if (check == genome) {
@@ -185,7 +185,7 @@ public class ColourController {
      * @param genome The genome to see if it is in the check set.
      * @return a boolean true if it is in the set or false if it is not.
      */
-    private boolean contains(int[] checkSet, int genome) {
+    public boolean contains(int[] checkSet, int genome) {
         for (int check : checkSet) {
             if (check == genome) {
                 return true;

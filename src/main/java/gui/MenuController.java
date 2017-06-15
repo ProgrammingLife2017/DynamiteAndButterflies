@@ -307,7 +307,6 @@ public class MenuController implements Observer {
      */
     @FXML
     public void newSaveBookmarkPress() throws IOException {
-
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/bookmarkPopUp.fxml"));
         Stage stage;
         Parent root = loader.load();
