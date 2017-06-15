@@ -160,8 +160,8 @@ public class MenuController implements Observer {
         File file = fileController.chooseGffFile(stage);
         String filePath = file.getAbsolutePath();
         //TODO: do something with this return value.
-        GraphDrawer.getInstance().setAnnotations(fileController.openGffFileClicked(filePath));
-        GraphDrawer.getInstance().redraw();
+        GraphDrawer.getInstance().setAllAnnotations(fileController.openGffFileClicked(filePath));
+        annoBut.setDisable(false);
     }
 
     private void displayInfo(SequenceGraph graph) {
@@ -550,7 +550,7 @@ public class MenuController implements Observer {
                 = loader.<AnnotationTableController>getController();
 
         ArrayList<Annotation> allAnnotations;
-        allAnnotations = GraphDrawer.getInstance().getAnnotations();
+        allAnnotations = GraphDrawer.getInstance().getAllAnnotations();
         if (allAnnotations.size() == 0) {
             try {
                 openGffFileClicked();
@@ -569,7 +569,8 @@ public class MenuController implements Observer {
                 new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent event) {
-                        GraphDrawer.getInstance().setAnnotations(annotationTableController.getSelection());
+                        GraphDrawer.getInstance().setSelectedAnnotations(annotationTableController.getSelection());
+                        GraphDrawer.getInstance().redraw();
                     }
                 }
         );

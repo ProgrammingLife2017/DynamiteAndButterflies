@@ -39,8 +39,8 @@ public class Annotation {
         return info.get();
     }
 
-    public boolean getSelected() {
-        return selected.get();
+    public SimpleBooleanProperty getSelected() {
+        return selected;
     }
 
     public void setSelected(boolean selected) {

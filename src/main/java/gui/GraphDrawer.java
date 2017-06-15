@@ -40,7 +40,8 @@ public class GraphDrawer {
     private int highlightedNode;
     private int[] selected = null;
     private ColourController colourController;
-    private ArrayList<Annotation> annotations;
+    private ArrayList<Annotation> allAnnotations;
+    private ArrayList<Annotation> selectedAnnotations;
     private SequenceNode mostLeftNode;
     private SequenceNode mostRightNode;
 
@@ -65,8 +66,10 @@ public class GraphDrawer {
             mostRightNode = graph.getNode(graph.getRightBoundID());
         }
         colourController = new ColourController(selected);
-        annotations = new ArrayList<Annotation>();
         highlightedNode = 0;
+
+        allAnnotations = new ArrayList<Annotation>();
+        selectedAnnotations = new ArrayList<Annotation>();
     }
 
 
@@ -180,7 +183,7 @@ public class GraphDrawer {
             }
             node.setCoordinates(x, y, width, height);
             setExtremeNodes(node);
-            node.draw(gc, colourController, annotations);
+            node.draw(gc, colourController, selectedAnnotations);
         }
     }
 
@@ -308,10 +311,10 @@ public class GraphDrawer {
     public void highlight(int node) {
         if (highlightedNode != 0) {
             graph.getNode(highlightedNode).lowlight();
-            graph.getNode(highlightedNode).draw(gc, colourController, annotations);
+            graph.getNode(highlightedNode).draw(gc, colourController, selectedAnnotations);
         }
         graph.getNode(node).highlight();
-        graph.getNode(node).draw(gc, colourController, annotations);
+        graph.getNode(node).draw(gc, colourController, selectedAnnotations);
         highlightedNode = node;
     }
 
@@ -392,8 +395,12 @@ public class GraphDrawer {
         return selected;
     }
 
-    public void setAnnotations(ArrayList<Annotation> newAnnotations) {
-        annotations = newAnnotations;
+    public void setSelectedAnnotations(ArrayList<Annotation> newAnnotations) {
+        this.selectedAnnotations = newAnnotations;
+    }
+
+    public void setAllAnnotations(ArrayList<Annotation> newAnnotations) {
+        this.allAnnotations = newAnnotations;
     }
 
     public void setxDifference(double xDifference) {
@@ -423,8 +430,12 @@ public class GraphDrawer {
         return mostLeftNode;
     }
 
-    public ArrayList<Annotation> getAnnotations() {
-        return annotations;
+    public ArrayList<Annotation> getAllAnnotations() {
+        return allAnnotations;
+    }
+
+    public ArrayList<Annotation> getSelectedAnnotations() {
+        return selectedAnnotations;
     }
 
     public SequenceNode getMostRightNode() {
