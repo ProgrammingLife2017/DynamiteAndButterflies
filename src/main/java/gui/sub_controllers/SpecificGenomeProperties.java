@@ -1,7 +1,6 @@
 package gui.sub_controllers;
 
 import gui.CustomProperties;
-import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 
 
@@ -11,8 +10,6 @@ import javafx.scene.control.MenuItem;
  * This class handles the menu part of saving bookmarks about the genome views.
  */
 public class SpecificGenomeProperties {
-
-    private Button saveButton;
 
     private MenuItem genomes1;
     private MenuItem genomes2;
@@ -28,13 +25,11 @@ public class SpecificGenomeProperties {
 
     /**
      * Constructor of the genomeproperties.
-     * @param saveButtonArg The save button.
      * @param g1 The first menui=Item
      * @param g2 the second menuItem
      * @param g3 the third menuItem
      */
-    public SpecificGenomeProperties(Button saveButtonArg, MenuItem g1, MenuItem g2, MenuItem g3) {
-        saveButton = saveButtonArg;
+    public SpecificGenomeProperties(MenuItem g1, MenuItem g2, MenuItem g3) {
         genomes1 = g1;
         genomes2 = g2;
         genomes3 = g3;
@@ -77,20 +72,6 @@ public class SpecificGenomeProperties {
         genomes2.setText(properties.getProperty(PROP_TWO + filePath, EMPTY));
         genomes3.setText(properties.getProperty(PROP_THREE + filePath, EMPTY));
         properties.saveProperties();
-    }
-
-    /**
-     * Shows the save button.
-     */
-    public void showSave() {
-        saveButton.setVisible(true);
-    }
-
-    /**
-     * Hides the save button.
-     */
-    public void hideSave() {
-        saveButton.setVisible(false);
     }
 
     /**

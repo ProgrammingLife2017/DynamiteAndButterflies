@@ -110,15 +110,12 @@ public class MenuController implements Observer {
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
 
-        specificGenomeProperties = new SpecificGenomeProperties(saveGenomeBut,
-                genome1, genome2, genome3);
+        specificGenomeProperties = new SpecificGenomeProperties(genome1, genome2, genome3);
 
         ps = new PrintStream(new Console(consoleArea));
         DrawableCanvas.getInstance().setMenuController(this);
 
-
-        DrawableCanvas.getInstance().setSpecificGenomeProperties(new SpecificGenomeProperties(saveGenomeBut,
-                                                    genome1, genome2, genome3));
+        DrawableCanvas.getInstance().setSpecificGenomeProperties(specificGenomeProperties);
 
         //System.setErr(ps);
         System.setOut(ps);
@@ -388,7 +385,7 @@ public class MenuController implements Observer {
                         String offTitle = parts[0];
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
-//                        specificGenomeProperties.initialize();
+                        specificGenomeProperties.initialize();
                         panningController =
                                 new PanningController(leftPannButton, rightPannButton);
                         panningController.initializeKeys(canvasPanel);
@@ -488,27 +485,10 @@ public class MenuController implements Observer {
                     public void handle(WindowEvent event) {
                         GraphDrawer.getInstance().setSelected(controller.getSelectedGenomes());
                         GraphDrawer.getInstance().redraw();
-                        specificGenomeProperties.showSave();
                     }
                 }
         );
         stage.showAndWait();
-    }
-
-    /**
-     * Handles pressing the save button.
-     */
-    @FXML
-    public void saveGenomesClick() {
-        specificGenomeProperties.saving(GraphDrawer.getInstance().getSelected());
-    }
-
-    /**
-     * Handles pressing the save button in the menu.
-     */
-    @FXML
-    public void otherSaveGenomeClick() {
-        specificGenomeProperties.saving(GraphDrawer.getInstance().getSelected());
     }
 
     /**

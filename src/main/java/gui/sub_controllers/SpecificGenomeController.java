@@ -1,6 +1,7 @@
 package gui.sub_controllers;
 
 import graph.Genome;
+import gui.DrawableCanvas;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -118,6 +119,8 @@ public class SpecificGenomeController {
         for (int i = 0; i < selectedGenomes.length; i++) {
             selectedGenomes[i] = temp.get(i);
         }
+
+        DrawableCanvas.getInstance().getSpecificGenomeProperties().saving(selectedGenomes);
     }
 
     /**
