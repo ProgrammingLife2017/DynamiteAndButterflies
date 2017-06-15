@@ -2,6 +2,7 @@ package gui;
 
 import graph.SequenceGraph;
 import gui.sub_controllers.FileController;
+import gui.sub_controllers.PanningController;
 import gui.sub_controllers.SpecificGenomeProperties;
 import parser.GfaParser;
 
@@ -15,6 +16,7 @@ import java.util.Observer;
  */
 public class DrawableCanvas extends Observable implements Observer {
 
+    public static final int START_NODE_ID = 1000;
 
     private static DrawableCanvas canvas = new DrawableCanvas();
 
@@ -49,7 +51,7 @@ public class DrawableCanvas extends Observable implements Observer {
 
                             int [] parentArray = parser.getParentArray();
                             SequenceGraph graph = new SequenceGraph(parentArray, childArray, getParser().getSequenceHashMap());
-                            graph.createSubGraph(1, 1000);
+                            graph.createSubGraph(START_NODE_ID, PanningController.RENDER_RANGE);
                             GraphDrawer.getInstance().setGraph(graph);
                             GraphDrawer.getInstance().moveShapes(0.0);
                             setChanged();
@@ -82,11 +84,11 @@ public class DrawableCanvas extends Observable implements Observer {
         return this.specificGenomeProperties;
     }
 
-    public HashMap<String, Integer> getAllGenomes() throws IOException {
+    public HashMap<String, Integer> getAllGenomes() {
         return parser.getAllGenomesMap();
     }
 
-    public HashMap<Integer, String> getAllGenomesReversed() throws IOException {
+    public HashMap<Integer, String> getAllGenomesReversed() {
         return parser.getAllGenomesMapReversed();
     }
 }

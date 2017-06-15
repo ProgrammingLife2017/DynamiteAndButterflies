@@ -12,6 +12,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -52,42 +53,32 @@ public class SpecificGenomeController {
             Genome genome = new Genome(i, hashMap.get(i));
             for (int hasBeenSelected : alreadyChosen) {
                 if (i == hasBeenSelected) {
-                    genome.setSelected("true");
+                    genome.setSelected(true);
                     break;
                 }
             }
             realData.add(genome);
         }
         final ObservableList<Genome> data = FXCollections.observableArrayList(realData);
-
-        Callback<TableColumn, TableCell> cellFactory =
-                new Callback<TableColumn, TableCell>() {
-                    public TableCell call(TableColumn p) {
-                        return new EditingCell();
-                    }
-                };
+        table.setItems(data);
 
         idCol.setCellValueFactory(new PropertyValueFactory<Genome, Integer>("id"));
         nameCol.setCellValueFactory(new PropertyValueFactory<Genome, String>("name"));
-        highlightCol.setCellValueFactory(new PropertyValueFactory<Genome, String>("selected"));
-        highlightCol.setCellFactory(cellFactory);
+        highlightCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Genome,Boolean>,ObservableValue<Boolean>>()
+        {
+            @Override
+            public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Genome, Boolean> param)
+            {
+                return param.getValue().selectedProperty();
+            }
+        });
+        highlightCol.setCellFactory(CheckBoxTableCell.forTableColumn(highlightCol));
 
         table.setEditable(true);
         idCol.setEditable(false);
         nameCol.setEditable(false);
         highlightCol.setEditable(true);
 
-        highlightCol.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Genome, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Genome, String> t) {
-                        ((Genome) t.getTableView().getItems().get(
-                                t.getTablePosition().getRow())
-                        ).setSelected(t.getNewValue());
-                    }
-                }
-        );
-        table.getItems().setAll(data);
     }
 
     /**
@@ -110,7 +101,7 @@ public class SpecificGenomeController {
 
         for (int i = 0; i < table.getItems().size(); i++) {
             Genome genome = table.getItems().get(i);
-            if (Boolean.parseBoolean(genome.getSelected())) {
+            if (genome.isSelected()) {
                 temp.add(genome.getId());
             }
         }
@@ -120,6 +111,7 @@ public class SpecificGenomeController {
             selectedGenomes[i] = temp.get(i);
         }
 
+        close();
         DrawableCanvas.getInstance().getSpecificGenomeProperties().saving(selectedGenomes);
     }
 
@@ -140,76 +132,3 @@ public class SpecificGenomeController {
     }
 }
 
-/**
- * A class taken from.
- * http://docs.oracle.com/javafx/2/ui_controls/table-view.htm
- * Handles editing a cell
- */
-class EditingCell extends TableCell<Genome, String> {
-
-    private TextField textField;
-
-    /**
-     * Constructor.
-     */
-    EditingCell() {
-    }
-
-    @Override
-    public void startEdit() {
-        if (!isEmpty()) {
-            super.startEdit();
-            createTextField();
-            setText(null);
-            setGraphic(textField);
-            textField.selectAll();
-        }
-    }
-
-    @Override
-    public void cancelEdit() {
-        super.cancelEdit();
-
-        setText((String) getItem());
-        setGraphic(null);
-    }
-
-    @Override
-    public void updateItem(String item, boolean empty) {
-        super.updateItem(item, empty);
-
-        if (empty) {
-            setText(null);
-            setGraphic(null);
-        } else {
-            if (isEditing()) {
-                if (textField != null) {
-                    textField.setText(getString());
-                }
-                setText(null);
-                setGraphic(textField);
-            } else {
-                setText(getString());
-                setGraphic(null);
-            }
-        }
-    }
-
-    private void createTextField() {
-        textField = new TextField(getString());
-        textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
-        textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> arg0,
-                                Boolean arg1, Boolean arg2) {
-                if (!arg2) {
-                    commitEdit(textField.getText());
-                }
-            }
-        });
-    }
-
-    private String getString() {
-        return getItem() == null ? "" : getItem();
-    }
-}

@@ -251,10 +251,9 @@ public class MenuController implements Observer {
         int centreNodeID = Integer.parseInt(nodeTextField.getText());
         int radius = Integer.parseInt(radiusTextField.getText());
         zoomController.traverseGraphClicked(centreNodeID, radius);
-        String newString = "ID: " + centreNodeID + "\nSequence: "
-                + DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
-        infoController.updateSeqLabel(newString);
-
+        SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
+        String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
+        infoController.updateSeqLabel(node.toString(sequence));
     }
 
     /**

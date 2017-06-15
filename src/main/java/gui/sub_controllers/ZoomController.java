@@ -1,5 +1,6 @@
 package gui.sub_controllers;
 
+import graph.SequenceGraph;
 import gui.GraphDrawer;
 import javafx.scene.control.TextField;
 
@@ -48,11 +49,10 @@ public class ZoomController {
      * @throws IOException thrown if can't find
      */
     public void zoomOut(int column) throws IOException {
-        if (GraphDrawer.getInstance().getxDifference() + GraphDrawer.getInstance().getZoomLevel() >
-                GraphDrawer.getInstance().getRange()) {
-            GraphDrawer.getInstance().getGraph().createSubGraph(1, GraphDrawer.getInstance().getGraph().getRightBoundID() + 100);
-            // init graph?
-        }
+//        if (GraphDrawer.getInstance().getxDifference() + GraphDrawer.getInstance().getZoomLevel() >
+//                GraphDrawer.getInstance().getRange()) {
+//            GraphDrawer.getInstance().getGraph().createSubGraph(1, GraphDrawer.getInstance().getGraph().getRightBoundID() + 100);
+//        }
         GraphDrawer.getInstance().zoom(SCROLL_ZOOM_OUT_FACTOR, column);
         updateRadius((int) Math.ceil(GraphDrawer.getInstance().getRadius()) + "");
     }
@@ -63,6 +63,12 @@ public class ZoomController {
      * @param radius The radius to be viewed
      */
     public void traverseGraphClicked(int centreNode, int radius) {
+        if (!GraphDrawer.getInstance().getGraph().getNodes().containsKey(centreNode)) {
+            SequenceGraph newGraph = GraphDrawer.getInstance().getGraph().copy();
+            newGraph.createSubGraph(centreNode, radius);
+            GraphDrawer.getInstance().setGraph(newGraph);
+            GraphDrawer.getInstance().setxDifference(0);
+        }
         int column = GraphDrawer.getInstance().getGraph().getNode(centreNode).getColumn();
         GraphDrawer.getInstance().changeZoom(column, radius);
         GraphDrawer.getInstance().highlight(centreNode);
