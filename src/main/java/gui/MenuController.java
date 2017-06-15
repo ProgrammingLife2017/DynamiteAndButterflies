@@ -60,8 +60,6 @@ public class MenuController implements Observer {
     @FXML
     private Label sequenceInfo;
     @FXML
-    private MenuItem saveBookmark;
-    @FXML
     private TextField nodeTextField;
     @FXML
     private TextField radiusTextField;
@@ -75,6 +73,8 @@ public class MenuController implements Observer {
     private Label numEdgesLabel;
     @FXML
     private TextArea consoleArea;
+    @FXML
+    private MenuItem gffItem;
     @FXML
     private Button rightPannButton;
     @FXML
@@ -129,17 +129,34 @@ public class MenuController implements Observer {
      * @throws InterruptedException Exception when the Thread is interrupted.
      */
     @FXML
-    public void openFileClicked() throws IOException, InterruptedException {
+    public void openGfaFileClicked() throws IOException, InterruptedException {
         Stage stage = App.getStage();
-        File file = fileController.chooseFile(stage);
+        File file = fileController.chooseGfaFile(stage);
         String filePath = file.getAbsolutePath();
         recentController.update(filePath);
-        fileController.openFileClicked(filePath);
+        fileController.openGfaFileClicked(filePath);
     }
 
-    private void openFileClicked(String filePath) throws IOException, InterruptedException {
-        fileController.openFileClicked(filePath);
+    private void openGfaFileClicked(String filePath) throws IOException, InterruptedException {
+        fileController.openGfaFileClicked(filePath);
         recentController.update(filePath);
+    }
+
+
+    /**
+     * When 'open gff file' is clicked this method opens a filechooser from which a gff
+     * can be selected and directly be visualised on the screen.
+     *
+     * @throws IOException          if there is no file specified.
+     * @throws InterruptedException Exception when the Thread is interrupted.
+     */
+    @FXML
+    public void openGffFileClicked() throws IOException, InterruptedException {
+        Stage stage = App.getStage();
+        File file = fileController.chooseGffFile(stage);
+        String filePath = file.getAbsolutePath();
+        //TODO: do something with this return value.
+        fileController.openGffFileClicked(filePath);
     }
 
     private void displayInfo(SequenceGraph graph) {
@@ -357,6 +374,7 @@ public class MenuController implements Observer {
                 properties.setProperty("file", filePath);
                 properties.saveProperties();
 
+                gffItem.setDisable(false);
 
                 Platform.runLater(new Runnable() {
                     public void run() {
@@ -414,7 +432,7 @@ public class MenuController implements Observer {
 
         if (filePath == null) {
             try {
-                openFileClicked();
+                openGfaFileClicked();
             } catch (IOException e1) {
                 e1.printStackTrace();
             } catch (InterruptedException e) {
@@ -422,7 +440,7 @@ public class MenuController implements Observer {
             }
         } else {
             try {
-                openFileClicked(filePath);
+                openGfaFileClicked(filePath);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
@@ -449,7 +467,7 @@ public class MenuController implements Observer {
         hashMap = DrawableCanvas.getInstance().getAllGenomesReversed();
         if (hashMap == null) {
             try {
-                openFileClicked();
+                openGfaFileClicked();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

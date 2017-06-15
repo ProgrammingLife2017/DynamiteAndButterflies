@@ -16,6 +16,7 @@ public class SequenceNode {
 
     private int id;
     private int[] genomes;
+    private int[] offSets;
     private int index;
     private int column;
     private int sequenceLength;
@@ -48,6 +49,7 @@ public class SequenceNode {
         this.children = new ArrayList<Integer>();
         this.isDummy = false;
         this.genomes = new int[0];
+        this.offSets = new int[0];
     }
 
     /**
@@ -223,6 +225,14 @@ public class SequenceNode {
 
     public void setGenomes(int[] genomesArg) {
         this.genomes = genomesArg;
+    }
+
+    public void setOffSets(int[] offSets) {
+        this.offSets = offSets;
+    }
+
+    public int[] getOffsets() {
+        return this.offSets;
     }
 
     /**
