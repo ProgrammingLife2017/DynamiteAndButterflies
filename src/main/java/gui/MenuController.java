@@ -115,8 +115,7 @@ public class MenuController implements Observer {
         ps = new PrintStream(new Console(consoleArea));
         DrawableCanvas.getInstance().setMenuController(this);
 
-
-        DrawableCanvas.getInstance().setSpecificGenomeProperties(new SpecificGenomeProperties(genome1, genome2, genome3));
+        DrawableCanvas.getInstance().setSpecificGenomeProperties(specificGenomeProperties);
 
         //System.setErr(ps);
         System.setOut(ps);
@@ -136,15 +135,11 @@ public class MenuController implements Observer {
         String filePath = file.getAbsolutePath();
         recentController.update(filePath);
         fileController.openFileClicked(filePath);
-//        DrawableCanvas.getInstance().getSpecificGenomeProperties().hideSave();
-//        DrawableCanvas.getInstance().getSpecificGenomeProperties().hideSave();
     }
-
 
     private void openFileClicked(String filePath) throws IOException, InterruptedException {
         fileController.openFileClicked(filePath);
         recentController.update(filePath);
-//        specificGenomeProperties.hideSave();
     }
 
     private void displayInfo(SequenceGraph graph) {
@@ -372,7 +367,7 @@ public class MenuController implements Observer {
                         String offTitle = parts[0];
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
-//                        specificGenomeProperties.initialize();
+                        specificGenomeProperties.initialize();
                         panningController =
                                 new PanningController(leftPannButton, rightPannButton);
                         panningController.initializeKeys(canvasPanel);
@@ -476,14 +471,6 @@ public class MenuController implements Observer {
                 }
         );
         stage.showAndWait();
-    }
-
-    /**
-     * Handles pressing the save button in the menu.
-     */
-    @FXML
-    public void otherSaveGenomeClick() {
-        specificGenomeProperties.saving(GraphDrawer.getInstance().getSelected());
     }
 
     /**
