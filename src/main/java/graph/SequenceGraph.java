@@ -74,10 +74,37 @@ public class SequenceGraph {
         this.centerNodeID = centerNodeID;
         this.boundaries = boundary;
         initNodes();
+        long startTime = System.currentTimeMillis();
+        initGenomes();
+        long endTime = System.currentTimeMillis();
+        System.out.println(endTime - startTime);
         findLongestPath();
         addDummies();
         this.columns = initColumns();
         assignSequenceLenghts();
+    }
+
+    private void initGenomes() {
+        long startTime = System.currentTimeMillis();
+        try {
+            String[] genomeData = getGenomes();
+            int counter = 0;
+            Iterator it = nodes.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                SequenceNode node = (SequenceNode) pair.getValue();
+
+                String[] specificGenomeData = genomeData[counter].split("-");
+                node.setGenomes(splitOnStringToInt(specificGenomeData[0]));
+                node.setOffSets(splitOnStringToInt(specificGenomeData[1]));
+                counter++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        long endTime = System.currentTimeMillis();
+        System.out.println(endTime - startTime);
+
     }
 
     /**
@@ -103,20 +130,6 @@ public class SequenceGraph {
             int childID = childArray[i];
             if (nodes.get(parentID) == null) {
                 SequenceNode node = new SequenceNode(parentID);
-                String[] text = new String[0];
-                try {
-                    text = getGenomes(parentID);
-                    int[] genomes = splitOnStringToInt(text[0]);
-                    int[] offSets = splitOnStringToInt(text[1]);
-                    node.setGenomes(genomes);
-                    node.setOffSets(offSets);
-                } catch (IOException e) {
-                    e.printStackTrace();
-
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    e.printStackTrace();
-                }
-
                 node.addChild(childID);
                 nodes.put(parentID, node);
             } else {
@@ -124,21 +137,9 @@ public class SequenceGraph {
             }
             if (nodes.get(childID) == null) {
                 SequenceNode node = new SequenceNode(childID);
-                String[] text = new String[0];
-                try {
-                    text = getGenomes(childID);
-                    int[] genomes = splitOnStringToInt(text[0]);
-                    int[] offSets = splitOnStringToInt(text[1]);
-                    node.setGenomes(genomes);
-                    node.setOffSets(offSets);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
                 nodes.put(childID, node);
             }
         }
-
     }
 
     private int[] splitOnStringToInt(String text) {
@@ -153,13 +154,11 @@ public class SequenceGraph {
     /**
      * Finds the longest path of the graph and sets columns accordingly.
      */
-    private String[] getGenomes(int node) throws IOException {
+    private String[] getGenomes() throws IOException {
         try {
             Stream<String> lines = Files.lines(Paths.get("" + DrawableCanvas.getInstance().getParser().getPartPath() + "genomes.txt"));
-            String line = lines.skip(node - 1).findFirst().get();
-            String[] text = line.split("-");
-            return text;
-
+            Stream<String>  line = lines.skip(boundaries.getLeftBoundID() - 1).limit(boundaries.getRightBoundID() + 100);
+            return line.toArray(String[]::new);
         } catch (Exception e) {
             e.printStackTrace();
         }
