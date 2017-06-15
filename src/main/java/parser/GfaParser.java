@@ -81,18 +81,40 @@ public class GfaParser extends Observable implements Runnable {
             sequenceMap = db.hashMap(partPath + ".sequence.db").
                             keySerializer(Serializer.LONG).
                             valueSerializer(Serializer.STRING).createOrOpen();
+            parseHeaders();
         } else {
             properties.setProperty(partPath, "false");
             properties.saveProperties();
             sequenceMap = db.hashMap(partPath + ".sequence.db").
                                     keySerializer(Serializer.LONG).
                                     valueSerializer(Serializer.STRING).createOrOpen();
+            parseHeaders();
             parseSpecific(filePath);
         }
         this.setChanged();
         this.notifyObservers(1);
         this.setChanged();
         this.notifyObservers(partPath);
+    }
+
+    private void parseHeaders() throws IOException {
+        InputStream in = new FileInputStream(filePath);
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+        String line;
+        while ((line = br.readLine()) != null) {
+            if (line.startsWith("H")) {
+                String header = line.split("\t")[1];
+                if (header.startsWith("ORI:Z:")) {
+                    String allGenomes = header.split(":")[2];
+                    setAllGenomesMap(allGenomes);
+                }
+            }
+            if (line.startsWith("S")) {
+                break;
+            }
+        }
+        in.close();
+        br.close();
     }
 
     /**
@@ -119,17 +141,7 @@ public class GfaParser extends Observable implements Runnable {
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line;
         int sizeOfFile = 0;
-        int[] genomesCounter = null;
         while ((line = br.readLine()) != null) {
-            if (line.startsWith("H")) {
-                String header = line.split("\t")[1];
-                if (header.startsWith("ORI:Z:")) {
-                    String allGenomes = header.split(":")[2];
-                    setAllGenomesMap(allGenomes);
-                    genomesCounter = new int[genomesMap.size()];
-                    Arrays.fill(genomesCounter, 1);
-                }
-            }
             if (line.startsWith("S")) {
                 String[] data = line.split(("\t"));
                 int id = Integer.parseInt(data[1]);
