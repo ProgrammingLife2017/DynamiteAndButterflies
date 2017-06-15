@@ -159,7 +159,8 @@ public class MenuController implements Observer {
         File file = fileController.chooseGffFile(stage);
         String filePath = file.getAbsolutePath();
         //TODO: do something with this return value.
-        fileController.openGffFileClicked(filePath);
+        GraphDrawer.getInstance().setAnnotations(fileController.openGffFileClicked(filePath));
+        GraphDrawer.getInstance().redraw();
     }
 
     private void displayInfo(SequenceGraph graph) {

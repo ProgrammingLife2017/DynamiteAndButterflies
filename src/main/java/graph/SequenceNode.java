@@ -1,13 +1,10 @@
 package graph;
 
-import gui.DrawableCanvas;
 import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Class Node2, which represents sequences of DNA. A sequence is a part of a genome.
@@ -141,12 +138,13 @@ public class SequenceNode {
                     continue;
                 }
 
-                int emptyAtStart = 0;
+                double emptyAtStart = 0.0;
                 if (startOfAnno > offSets[startCorOfGenome]) {
                     emptyAtStart = startOfAnno - offSets[startCorOfGenome];
-                    annoWidth = (width * (1 - (emptyAtStart / sequenceLength)));
+                    annoWidth = (annoWidth * (1 - (emptyAtStart / sequenceLength)));
                     startXAnno = startXAnno + (width - annoWidth);
-                } else if (endOfAnno < (offSets[startCorOfGenome] + sequenceLength)) {
+                }
+                if (endOfAnno < (offSets[startCorOfGenome] + sequenceLength)) {
                     int emptyAtEnd = offSets[startCorOfGenome] + sequenceLength - endOfAnno;
                     annoWidth = (annoWidth * (1 - (emptyAtEnd / (sequenceLength - emptyAtStart))));
                 }

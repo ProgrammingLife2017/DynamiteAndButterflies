@@ -1,6 +1,7 @@
 package parser;
 
 import graph.Annotation;
+import gui.DrawableCanvas;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class GffParser {
         String line;
         while ((line = br.readLine()) != null) {
             String[] data = line.split("\t");
+            String nameGenome = data[0].split("\\.")[0];
             ArrayList<String> info = new ArrayList<>();
             String[] infoArray = data[8].split(";");
             for(int i = 0; i < infoArray.length; i++) {
@@ -38,7 +40,7 @@ public class GffParser {
             }
             int start = Integer.parseInt(data[3]);
             int end = Integer.parseInt(data[4]);
-            Annotation anno = new Annotation(data[0], start, end, info);
+            Annotation anno = new Annotation(DrawableCanvas.getInstance().getAllGenomes().get(nameGenome), start, end, info);
             annotationList.add(anno);
         }
         return annotationList;

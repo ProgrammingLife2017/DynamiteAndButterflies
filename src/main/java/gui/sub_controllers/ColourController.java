@@ -89,11 +89,11 @@ public class ColourController {
     public Color getSingle(int combo) {
         switch (combo) {
             case 0:
-                return Color.color(0.8471, 0, 0);
+                return Color.color(0.8471, 0.8471, 0);
             case 1:
                 return Color.color(0, 0, 0.8471);
             case 2:
-                return Color.color(0.8471, 0.8471, 0);
+                return Color.color(0.8471, 0, 0);
             case 3:
                 return Color.color(0.8471, 0, 0.8471);
             case 4:
