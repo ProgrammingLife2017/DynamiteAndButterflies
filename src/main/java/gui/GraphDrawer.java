@@ -268,10 +268,10 @@ public class GraphDrawer {
     /**
      * Set the width of the line depending on the level of zoom.
      */
-    public void setLineWidth(int thickness) {
-        double zoomWidth = ((Math.log(stepSize + 1) / Math.log(LOG_BASE)) ) / LINE_WIDTH_FACTOR;
+    public void setLineWidth(double thickness) {
+        double zoomWidth = (Math.log(stepSize + 1) / Math.log(LOG_BASE)) / LINE_WIDTH_FACTOR;
         double genomeWidth = Math.log(thickness + 1) / Math.log(LOG_BASE);
-        gc.setLineWidth(zoomWidth * genomeWidth);
+        gc.setLineWidth(genomeWidth * zoomWidth);
     }
 
     /**

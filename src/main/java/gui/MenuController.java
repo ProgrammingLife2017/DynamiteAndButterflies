@@ -12,8 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -21,7 +19,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.mapdb.HTreeMap;
-import parser.GfaParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,8 +60,6 @@ public class MenuController implements Observer {
     @FXML
     private Label sequenceInfo;
     @FXML
-    private MenuItem saveBookmark;
-    @FXML
     private TextField nodeTextField;
     @FXML
     private TextField radiusTextField;
@@ -78,6 +73,8 @@ public class MenuController implements Observer {
     private Label numEdgesLabel;
     @FXML
     private TextArea consoleArea;
+    @FXML
+    private MenuItem gffItem;
     @FXML
     private Button rightPannButton;
     @FXML
@@ -113,15 +110,12 @@ public class MenuController implements Observer {
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
 
-        specificGenomeProperties = new SpecificGenomeProperties(saveGenomeBut,
-                genome1, genome2, genome3);
+        specificGenomeProperties = new SpecificGenomeProperties(genome1, genome2, genome3);
 
         ps = new PrintStream(new Console(consoleArea));
         DrawableCanvas.getInstance().setMenuController(this);
 
-
-        DrawableCanvas.getInstance().setSpecificGenomeProperties(new SpecificGenomeProperties(saveGenomeBut,
-                                                    genome1, genome2, genome3));
+        DrawableCanvas.getInstance().setSpecificGenomeProperties(specificGenomeProperties);
 
         //System.setErr(ps);
         System.setOut(ps);
@@ -135,21 +129,34 @@ public class MenuController implements Observer {
      * @throws InterruptedException Exception when the Thread is interrupted.
      */
     @FXML
-    public void openFileClicked() throws IOException, InterruptedException {
+    public void openGfaFileClicked() throws IOException, InterruptedException {
         Stage stage = App.getStage();
-        File file = fileController.chooseFile(stage);
+        File file = fileController.chooseGfaFile(stage);
         String filePath = file.getAbsolutePath();
         recentController.update(filePath);
-        fileController.openFileClicked(filePath);
-//        DrawableCanvas.getInstance().getSpecificGenomeProperties().hideSave();
-//        DrawableCanvas.getInstance().getSpecificGenomeProperties().hideSave();
+        fileController.openGfaFileClicked(filePath);
+    }
+
+    private void openGfaFileClicked(String filePath) throws IOException, InterruptedException {
+        fileController.openGfaFileClicked(filePath);
+        recentController.update(filePath);
     }
 
 
-    private void openFileClicked(String filePath) throws IOException, InterruptedException {
-        fileController.openFileClicked(filePath);
-        recentController.update(filePath);
-//        specificGenomeProperties.hideSave();
+    /**
+     * When 'open gff file' is clicked this method opens a filechooser from which a gff
+     * can be selected and directly be visualised on the screen.
+     *
+     * @throws IOException          if there is no file specified.
+     * @throws InterruptedException Exception when the Thread is interrupted.
+     */
+    @FXML
+    public void openGffFileClicked() throws IOException, InterruptedException {
+        Stage stage = App.getStage();
+        File file = fileController.chooseGffFile(stage);
+        String filePath = file.getAbsolutePath();
+        //TODO: do something with this return value.
+        fileController.openGffFileClicked(filePath);
     }
 
     private void displayInfo(SequenceGraph graph) {
@@ -366,6 +373,7 @@ public class MenuController implements Observer {
                 properties.setProperty("file", filePath);
                 properties.saveProperties();
 
+                gffItem.setDisable(false);
 
                 Platform.runLater(new Runnable() {
                     public void run() {
@@ -376,7 +384,7 @@ public class MenuController implements Observer {
                         String offTitle = parts[0];
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
-//                        specificGenomeProperties.initialize();
+                        specificGenomeProperties.initialize();
                         panningController =
                                 new PanningController(leftPannButton, rightPannButton);
                         panningController.initializeKeys(canvasPanel);
@@ -423,7 +431,7 @@ public class MenuController implements Observer {
 
         if (filePath == null) {
             try {
-                openFileClicked();
+                openGfaFileClicked();
             } catch (IOException e1) {
                 e1.printStackTrace();
             } catch (InterruptedException e) {
@@ -431,7 +439,7 @@ public class MenuController implements Observer {
             }
         } else {
             try {
-                openFileClicked(filePath);
+                openGfaFileClicked(filePath);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
@@ -458,7 +466,7 @@ public class MenuController implements Observer {
         hashMap = DrawableCanvas.getInstance().getAllGenomesReversed();
         if (hashMap == null) {
             try {
-                openFileClicked();
+                openGfaFileClicked();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -476,27 +484,10 @@ public class MenuController implements Observer {
                     public void handle(WindowEvent event) {
                         GraphDrawer.getInstance().setSelected(controller.getSelectedGenomes());
                         GraphDrawer.getInstance().redraw();
-                        specificGenomeProperties.showSave();
                     }
                 }
         );
         stage.showAndWait();
-    }
-
-    /**
-     * Handles pressing the save button.
-     */
-    @FXML
-    public void saveGenomesClick() {
-        specificGenomeProperties.saving(GraphDrawer.getInstance().getSelected());
-    }
-
-    /**
-     * Handles pressing the save button in the menu.
-     */
-    @FXML
-    public void otherSaveGenomeClick() {
-        specificGenomeProperties.saving(GraphDrawer.getInstance().getSelected());
     }
 
     /**
