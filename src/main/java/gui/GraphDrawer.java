@@ -194,9 +194,7 @@ public class GraphDrawer {
                 double starty = parent.getyCoordinate() + (parent.getHeight() / 2);
                 double endx = child.getxCoordinate();
                 double endy = child.getyCoordinate() + (child.getHeight() / 2);
-                //setLineWidth(child.getGenomes().length);
-                gc.setLineWidth(Math.log(Math.min(child.getGenomes().length, parent.getGenomes().length))
-                        / Math.log(LOG_BASE + 1.1));
+                setLineWidth(Math.min(child.getGenomes().length, parent.getGenomes().length));
                 if (edgeInView(startx, endx)) {
                     gc.strokeLine(startx, starty, endx, endy);
                 }
@@ -270,9 +268,10 @@ public class GraphDrawer {
     /**
      * Set the width of the line depending on the level of zoom.
      */
-    private void setLineWidth(int thickness) {
-        double width = ((Math.log(stepSize + 1) / Math.log(LOG_BASE)) ) / LINE_WIDTH_FACTOR;
-        gc.setLineWidth(width);
+    public void setLineWidth(int thickness) {
+        double zoomWidth = ((Math.log(stepSize + 1) / Math.log(LOG_BASE)) ) / LINE_WIDTH_FACTOR;
+        double genomeWidth = Math.log(thickness + 1) / Math.log(LOG_BASE);
+        gc.setLineWidth(zoomWidth * genomeWidth);
     }
 
     /**

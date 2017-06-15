@@ -1,5 +1,6 @@
 package graph;
 
+import gui.GraphDrawer;
 import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -89,8 +90,7 @@ public class SequenceNode {
         if (inView(gc.getCanvas().getWidth())) {
             gc.clearRect(xCoordinate, yCoordinate, width, height);
             if (isDummy) {
-                gc.setLineWidth(Math.log(genomes.length)
-                        / Math.log(2 + 1.1));
+                GraphDrawer.getInstance().setLineWidth(genomes.length);
                 gc.strokeLine(xCoordinate, yCoordinate + height / 2,
                         xCoordinate + width, yCoordinate + height / 2);
                 return;
@@ -277,15 +277,16 @@ public class SequenceNode {
             str += i.toString() + ", ";
         }
         str = str.substring(0, str.length() - 2) + "\n"
-                + "SequenceLength:\t";
+                + "SequenceLength:\t" + this.sequenceLength + "\n"
+                + "Sequence:\t";
         if (isDummy) {
-            str += "-\n" + "Sequence:\t-";
+            str += "-\n";
         } else {
-            str += this.sequenceLength + "\n" + "Sequence:\t" + sequence + "\n";
-            str += "Genomes that go through this:\t";
-            for (Integer i : this.getGenomes()) {
-                str += i.toString() + ", ";
-            }
+            str += sequence + "\n";
+        }
+        str += "Genomes that go through this:\t";
+        for (Integer i : this.getGenomes()) {
+            str += i.toString() + ", ";
         }
         str = str.substring(0, str.length() - 2);
         return str;
