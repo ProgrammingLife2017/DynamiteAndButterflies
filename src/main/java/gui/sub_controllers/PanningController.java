@@ -26,12 +26,12 @@ public class PanningController {
     /**
      * The speed at which to pan.
      */
-    private static final double PANN_FACTOR = 0.005;
+    private static final double PANN_FACTOR = 0.01;
 
     /**
      * The the threshold to update the subGraph.
      */
-    private static final int RENDER_THRESHOLD = 100;
+    private static final int RENDER_THRESHOLD = 50;
 
     /**
      * The amount of nodes to render.
@@ -195,15 +195,17 @@ public class PanningController {
                     new Thread(new Task<Integer>() {
                         @Override
                         protected Integer call() throws Exception {
-                            System.out.println("OLD: getLeftBoundID: " + drawer.getGraph().getLeftBoundID() + ", getFullGraphLeftBoundID: " + drawer.getGraph().getFullGraphLeftBoundID() + ", getCentreNodeID: " + drawer.getGraph().getCenterNodeID());
+                            //System.out.println("OLD: getLeftBoundID: " + drawer.getGraph().getLeftBoundID() + ", getFullGraphLeftBoundID: " + drawer.getGraph().getFullGraphLeftBoundID() + ", getCentreNodeID: " + drawer.getGraph().getCenterNodeID());
+                            long start = System.currentTimeMillis();
                             SequenceGraph newGraph = drawer.getGraph().copy();
                             newGraph.createSubGraph(drawer.getGraph().getCenterNodeID() - RENDER_SHIFT, RENDER_RANGE, drawer.getGraph().getPartPath());
                             int leftMostID = drawer.getMostLeftNode().getId();
                             drawer.setGraph(newGraph);
                             drawer.initGraph();
-                            //drawer.setxDifference(drawer.getColumnWidth(drawer.getGraph().getNode(leftMostID).getColumn()));
-                            drawer.moveShapes(drawer.getColumnWidth(drawer.getGraph().getNode(leftMostID).getColumn()));
-                            System.out.println("NEW: getLeftBoundID: " + drawer.getGraph().getLeftBoundID() + ", getFullGraphLeftBoundID: " + drawer.getGraph().getFullGraphLeftBoundID() + ", getCentreNodeID: " + drawer.getGraph().getCenterNodeID());
+                            drawer.setxDifference(drawer.getColumnWidth(drawer.getGraph().getNode(leftMostID).getColumn()));
+                            long end = System.currentTimeMillis();
+                            System.out.println("Runtime: " + (end - start));
+                            //System.out.println("NEW: getLeftBoundID: " + drawer.getGraph().getLeftBoundID() + ", getFullGraphLeftBoundID: " + drawer.getGraph().getFullGraphLeftBoundID() + ", getCentreNodeID: " + drawer.getGraph().getCenterNodeID());
                             updating = false;
                             return null;
                         }

@@ -54,7 +54,8 @@ public class GraphDrawer {
     public void initializeDrawer(SequenceGraph graph) {
         this.graph = graph;
         initGraph();
-        zoomLevel = columnWidths[columns.size()];
+        setZoomLevel(columnWidths[columns.size()]);
+        mostRightNode = graph.getNode(graph.getRightBoundID());
     }
 
     public void initGraph() {
@@ -77,7 +78,9 @@ public class GraphDrawer {
     public void zoom(final double factor, final int column) {
         setZoomLevel(zoomLevel * factor);
         setRadius(radius * factor);
-        moveShapes(column - ((column - xDifference) * factor));
+        if (zoomLevel != range / 2) {
+            moveShapes(column - ((column - xDifference) * factor));
+        }
     }
 
     /**
@@ -88,13 +91,13 @@ public class GraphDrawer {
      */
     public void changeZoom(int column, int radius) {
         setRadius(radius);
-        int widthRight = column + radius + 1;
-        int widthLeft = column - radius;
+        int widthRight = column + radius / 2;
+        int widthLeft = column - radius / 2;
 
-        if (column + radius + 1 > columnWidths.length-1 ) {
+        if (column + radius / 2 > columnWidths.length-1 ) {
             widthRight = columnWidths.length - 1;
         }
-        if (column - radius < 0) {
+        if (column - radius / 2 < 0) {
             widthLeft = 0;
         }
 
@@ -377,7 +380,7 @@ public class GraphDrawer {
 
     public void setZoomLevel(double zoomLevel) {
         if (zoomLevel < 1) { zoomLevel = 1; }
-        if (zoomLevel > range) { zoomLevel = range; }
+        if (zoomLevel > range / 2) { zoomLevel = range / 2; }
         this.zoomLevel = zoomLevel;
     }
 

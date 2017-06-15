@@ -29,7 +29,7 @@ public class FileController implements Observer {
     private ProgressBarController progressBarController;
 
     private final int renderRange = PanningController.RENDER_RANGE;
-    private final int nodeId = 1;
+    private final int nodeId = PanningController.RENDER_RANGE;
 
     private Thread parseThread;
 
