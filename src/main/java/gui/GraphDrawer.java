@@ -340,11 +340,10 @@ public class GraphDrawer {
     public void highlight(int node) {
         if (highlightedNode != 0) {
             graph.getNode(highlightedNode).lowlight();
-            graph.getNode(highlightedNode).draw(gc, colourController, selectedAnnotations);
         }
         graph.getNode(node).highlight();
-        graph.getNode(node).draw(gc, colourController, selectedAnnotations);
         highlightedNode = node;
+        redraw();
     }
 
     //TODO: Loop over the  nodes in the graph (O(n*m) > O(k))

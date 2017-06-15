@@ -222,26 +222,6 @@ public class MenuController implements Observer {
         double pressedY = mouseEvent.getY();
         SequenceNode clicked = GraphDrawer.getInstance().clickNode(pressedX, pressedY);
         if (clicked != null) {
-            String newString = "Sequence: "
-                    + DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId()) + "\n";
-
-
-            String childString = "Children: ";
-            for (Integer i: clicked.getChildren()) {
-                childString += i.toString() + "\n";
-            }
-
-            String parentString = "Parents: ";
-            for (Integer i: clicked.getParents()) {
-                parentString += i.toString() + "\n";
-            }
-
-            String nodeID = "Node ID: " + Integer.toString(clicked.getId()) + "\n";
-
-            String columnString = "Column index: " + Integer.toString(clicked.getColumn()) + "\n";
-
-            String concat = nodeID + columnString + parentString + childString + newString;
-            infoController.updateSeqLabel(concat);
             String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId());
             infoController.updateSeqLabel(clicked.toString(sequence));
             nodeTextField.setText(clicked.getId().toString());
