@@ -7,9 +7,7 @@ import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
@@ -54,6 +52,10 @@ public class GraphDrawer {
         columns = graph.getColumns();
         columnWidths = new double[columns.size() + 1];
         initializeColumnWidths();
+        long start = System.currentTimeMillis();
+        initializeDummyWidths();
+        long end = System.currentTimeMillis();
+        System.out.println(start - end);
         range = columnWidths[columns.size()];
         radius = columns.size();
         if (zoomLevel == 0) {
@@ -157,6 +159,33 @@ public class GraphDrawer {
                 }
             }
             columnWidths[j + 1] = columnWidths[j] + max;
+        }
+    }
+
+    public void initializeDummyWidths() {
+        HashMap<Integer, String> genomes;
+        Iterator it = graph.getNodes().entrySet().iterator();
+        while (it.hasNext()) {
+            genomes = new HashMap<>(DrawableCanvas.getInstance().getAllGenomesReversed());
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            if (node.isDummy()) {
+                for (SequenceNode i : columns.get(node.getColumn())) {
+                    if (!i.isDummy()) {
+                        for (int j : i.getGenomes()) {
+                            genomes.remove(j);
+                        }
+                    }
+                }
+                int[] result = new int[genomes.size()];
+                int i = 0;
+                Iterator itt = genomes.entrySet().iterator();
+                while(itt.hasNext()) {
+                    result[i] = (int) ((Map.Entry) itt.next()).getKey();
+                    i++;
+                }
+                node.setGenomes(result);
+            }
         }
     }
 

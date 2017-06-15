@@ -73,10 +73,7 @@ public class SequenceGraph {
         this.centerNodeID = centerNodeID;
         this.boundaries = boundary;
         initNodes();
-        long startTime = System.currentTimeMillis();
         initGenomes();
-        long endTime = System.currentTimeMillis();
-        System.out.println(endTime - startTime);
         findLongestPath();
         addDummies();
         this.columns = initColumns();
@@ -84,7 +81,6 @@ public class SequenceGraph {
     }
 
     private void initGenomes() {
-        long startTime = System.currentTimeMillis();
         try {
             String[] genomeData = getGenomes();
             int counter = 0;
@@ -92,7 +88,6 @@ public class SequenceGraph {
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
                 SequenceNode node = (SequenceNode) pair.getValue();
-
                 String[] specificGenomeData = genomeData[counter].split("-");
                 node.setGenomes(splitOnStringToInt(specificGenomeData[0]));
                 node.setOffSets(splitOnStringToInt(specificGenomeData[1]));
@@ -101,8 +96,6 @@ public class SequenceGraph {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        long endTime = System.currentTimeMillis();
-        System.out.println(endTime - startTime);
 
     }
 
@@ -305,13 +298,6 @@ public class SequenceGraph {
             parentNode.addChild(dummy.getId());
             dummy.addChild(target);
             dummy.setColumn(parentNode.getColumn() + 1);
-
-            if (parentNode.getGenomes().length > targetNode.getGenomes().length) {
-                dummy.setGenomes(parentNode.getGenomes());
-            } else {
-                dummy.setGenomes(targetNode.getGenomes());
-            }
-            
             this.addNode(dummy);
             --span;
             addDummyHelper(span, dummy.getId(), target);
