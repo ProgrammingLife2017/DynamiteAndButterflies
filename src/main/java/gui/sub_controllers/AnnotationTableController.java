@@ -10,6 +10,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
 import java.util.ArrayList;
 
@@ -18,7 +19,7 @@ import java.util.ArrayList;
  * View-Controller for the genome table.
  *
  * @author Marco Jakob -> from http://code.makery.ch/blog/javafx-8-tableview-sorting-filtering/
- * Changed to view and change annotations by Jip Rietveld
+ *         Changed to view and change annotations by Jip Rietveld
  */
 public class AnnotationTableController {
 
@@ -35,9 +36,12 @@ public class AnnotationTableController {
     @FXML
     public TableColumn<Annotation, String> infoColumn;
     @FXML
-    public TableColumn<Annotation, String> highlightColumn;
+    public TableColumn<Annotation, Boolean> highlightColumn;
 
     private ObservableList<Annotation> masterData = FXCollections.observableArrayList();
+    private SortedList<Annotation> sortedData;
+    private ArrayList<Annotation> selection;
+    private boolean allSelected;
 
     /**
      * Just add some sample data in the constructor.
@@ -57,11 +61,13 @@ public class AnnotationTableController {
     /**
      * Initializes the controller class. This method is automatically called
      * after the fxml file has been loaded.
-     *
+     * <p>
      * Initializes the table columns and sets up sorting and filtering.
      */
     @FXML
     public void initialize(ArrayList<Annotation> annotations) {
+        allSelected = false;
+        selection = new ArrayList<Annotation>();
         masterData = FXCollections.observableArrayList(annotations);
 
         // 0. Initialize the columns.
@@ -69,9 +75,8 @@ public class AnnotationTableController {
         startColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("start"));
         endColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("end"));
         infoColumn.setCellValueFactory(new PropertyValueFactory<Annotation, String>("info"));
-
-        //TODO Change this shit up.
-        highlightColumn.setCellValueFactory(new PropertyValueFactory<Annotation, String>("id"));
+        highlightColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Boolean>("selected"));
+        //TODO Change this shit up. -> Into boxes
 
         // 1. Wrap the ObservableList in a FilteredList (initially display all data).
         FilteredList<Annotation> filteredData = new FilteredList<>(masterData, p -> true);
@@ -87,16 +92,12 @@ public class AnnotationTableController {
                 // Compare first name and last name of every person with filter text.
                 String lowerCaseFilter = newValue.toLowerCase();
 
-                //TODO split this info.
-                if (annotation.getInfo().toLowerCase().contains(lowerCaseFilter)) {
-                    return true; // Filter matches first name.
-                }
-                return false; // Does not match.
+                return annotation.getInfo().toLowerCase().contains(lowerCaseFilter);
             });
         });
 
         // 3. Wrap the FilteredList in a SortedList.
-        SortedList<Annotation> sortedData = new SortedList<Annotation>(filteredData);
+        sortedData = new SortedList<Annotation>(filteredData);
 
         // 4. Bind the SortedList comparator to the TableView comparator.
         sortedData.comparatorProperty().bind(annotationTable.comparatorProperty());
@@ -105,7 +106,45 @@ public class AnnotationTableController {
         annotationTable.setItems(sortedData);
     }
 
-//    public ArrayList<Annotation> getAllAnnotations() {
-//        return allAnnotations;
-//    }
+    public ArrayList<Annotation> getSelection() {
+        return selection;
+    }
+
+    @FXML
+    public void saveButtonClicked() {
+        ArrayList<Annotation> res = new ArrayList<Annotation>();
+
+        for (int i = 0; i < annotationTable.getItems().size(); i++) {
+            Annotation annotation = annotationTable.getItems().get(i);
+            if (annotation.getSelected()) {
+                res.add(annotation);
+            }
+        }
+        selection = res;
+    }
+
+    public void cancelButtonClicked() {
+        close();
+    }
+
+    /**
+     * A general function that closes the stage.
+     */
+    private void close() {
+        Stage stage = (Stage) annotationTable.getScene().getWindow();
+        stage.close();
+    }
+
+    @FXML
+    public void selectAllFiltered() {
+        for (Annotation annotation : sortedData) {
+            if (allSelected) {
+                annotation.setSelected(false);
+            } else {
+                annotation.setSelected(true);
+            }
+        }
+        annotationTable.setItems(sortedData);
+        allSelected = !allSelected;
+    }
 }

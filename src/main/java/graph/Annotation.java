@@ -1,5 +1,6 @@
 package graph;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -11,6 +12,7 @@ public class Annotation {
     private SimpleIntegerProperty start = new SimpleIntegerProperty();
     private SimpleIntegerProperty end = new SimpleIntegerProperty();
     private SimpleStringProperty info = new SimpleStringProperty();
+    private SimpleBooleanProperty selected  = new SimpleBooleanProperty();
 
 
     public Annotation(int idArg, int startArg, int endArg, String infoArg) {
@@ -18,6 +20,7 @@ public class Annotation {
         start.set(startArg);
         end.set(endArg);
         info.set(infoArg);
+        selected.set(false);
     }
 
     public int getStart() {
@@ -34,5 +37,13 @@ public class Annotation {
 
     public String getInfo() {
         return info.get();
+    }
+
+    public boolean getSelected() {
+        return selected.get();
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected.set(selected);
     }
 }

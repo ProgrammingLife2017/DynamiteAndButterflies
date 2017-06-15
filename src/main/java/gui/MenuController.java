@@ -165,7 +165,6 @@ public class MenuController implements Observer {
         //TODO: do something with this return value.
         GraphDrawer.getInstance().setAnnotations(fileController.openGffFileClicked(filePath));
         GraphDrawer.getInstance().redraw();
-        System.out.println("Klaar met annotations tekenen");
     }
 
     private void displayInfo(SequenceGraph graph) {
@@ -591,7 +590,7 @@ public class MenuController implements Observer {
                 new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent event) {
-                        //TODO add stuff here.
+                        GraphDrawer.getInstance().setAnnotations(annotationTableController.getSelection());
                     }
                 }
         );
