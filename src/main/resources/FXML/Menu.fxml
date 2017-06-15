@@ -67,7 +67,6 @@
                                     <MenuItem fx:id="genome3" mnemonicParsing="false" onAction="#genome3Click" text="-" />
                                 </items>
                               </Menu>
-                            <MenuItem mnemonicParsing="false" onAction="#otherSaveGenomeClick" text="saveGenomeMenu" />
                           </items>
                         </Menu>
                     </menus>
