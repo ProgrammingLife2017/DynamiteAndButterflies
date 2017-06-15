@@ -17,7 +17,9 @@ import java.util.regex.Pattern;
  */
 public class GfaParser extends Observable implements Runnable {
     private HTreeMap<Long, String> sequenceMap;
+
     private String filePath;
+
     private String partPath;
     private CustomProperties properties = new CustomProperties();
 
@@ -32,6 +34,10 @@ public class GfaParser extends Observable implements Runnable {
         filePath = absolutePath;
     }
 
+    public String getPartPath() {
+        return this.partPath;
+    }
+
     @Override
     public void run() {
         try {
@@ -39,6 +45,10 @@ public class GfaParser extends Observable implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getFilePath() {
+        return filePath;
     }
 
     /**
@@ -79,13 +89,13 @@ public class GfaParser extends Observable implements Runnable {
         this.setChanged();
         this.notifyObservers(1);
         this.setChanged();
-        this.notifyObservers(filePath);
+        this.notifyObservers(partPath);
     }
 
     /**
      * Getter for the sequenceHashMap.
      * @return The HashMap.
-     */
+         */
     public synchronized HTreeMap<Long, String> getSequenceHashMap() {
         return sequenceMap;
     }
@@ -95,7 +105,6 @@ public class GfaParser extends Observable implements Runnable {
      * @param filePath The file to parse/
      * @throws IOException Reader.
      */
-    @SuppressWarnings("Since15")
     private synchronized void parseSpecific(String filePath) throws IOException {
         BufferedWriter parentWriter =
                 new BufferedWriter(new FileWriter(partPath + "parentArray.txt"));
@@ -174,6 +183,7 @@ public class GfaParser extends Observable implements Runnable {
         properties.setProperty(partPath + "childArray.txtsize", Integer.toString(sizeOfFile));
         properties.setProperty(partPath, "true");
         properties.saveProperties();
+
     }
 
     private int[] read(boolean isParent) throws IOException {
@@ -236,4 +246,5 @@ public class GfaParser extends Observable implements Runnable {
         }
         return genomesMap;
     }
+
 }
