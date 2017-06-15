@@ -1,5 +1,6 @@
 package parser;
 
+import graph.SequenceNode;
 import gui.CustomProperties;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -7,9 +8,12 @@ import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * This class contains a parser to parse a .gfa file into our data structure.
@@ -18,6 +22,8 @@ public class GfaParser extends Observable implements Runnable {
     private String header1;
     private String header2;
     private HTreeMap<Long, String> sequenceMap;
+
+
     private String filePath;
 
 
@@ -36,6 +42,10 @@ public class GfaParser extends Observable implements Runnable {
         filePath = absolutePath;
     }
 
+    public String getPartPath() {
+        return this.partPath;
+    }
+
     @Override
     public void run() {
         try {
@@ -43,6 +53,10 @@ public class GfaParser extends Observable implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getFilePath() {
+        return filePath;
     }
 
     /**
@@ -83,13 +97,13 @@ public class GfaParser extends Observable implements Runnable {
         this.setChanged();
         this.notifyObservers(1);
         this.setChanged();
-        this.notifyObservers(filePath);
+        this.notifyObservers(partPath);
     }
 
     /**
      * Getter for the sequenceHashMap.
      * @return The HashMap.
-     */
+         */
     public synchronized HTreeMap<Long, String> getSequenceHashMap() {
         return sequenceMap;
     }
@@ -177,6 +191,7 @@ public class GfaParser extends Observable implements Runnable {
         properties.setProperty(partPath + "childArray.txtsize", Integer.toString(sizeOfFile));
         properties.setProperty(partPath, "true");
         properties.saveProperties();
+
     }
 
     private int[] read(boolean isParent) throws IOException {
@@ -239,7 +254,5 @@ public class GfaParser extends Observable implements Runnable {
         }
         return genomesMap;
     }
-    public String getPartPath() {
-        return partPath;
-    }
+
 }

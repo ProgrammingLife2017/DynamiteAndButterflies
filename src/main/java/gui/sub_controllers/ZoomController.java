@@ -18,25 +18,19 @@ public class ZoomController {
     private static final double SCROLL_ZOOM_IN_FACTOR = 0.9;
     private static final double SCROLL_ZOOM_OUT_FACTOR = 1.1;
 
-    private SequenceGraph graph;
-    private final GraphDrawer drawer;
     private final TextField nodeTextField, radiusTextField;
     private final PanningController panningController;
 
     /**
      * Constructor of the Zoom Controller.
-     * @param drwr A GraphDrawer that can draw the graph for us.
-     * @param panningController The panningcontroller.
+     * @param panController The panningcontroller.
      * @param nodeField The textField that contains the centre node.
      * @param radField The textField that contains the radius.
      */
-    public ZoomController(SequenceGraph graph, GraphDrawer drwr, PanningController panningController,
-                          TextField nodeField, TextField radField) {
-        this.graph = graph;
-        drawer = drwr;
+    public ZoomController(PanningController panController, TextField nodeField, TextField radField) {
         nodeTextField = nodeField;
         radiusTextField = radField;
-        this.panningController = panningController;
+        this.panningController = panController;
     }
 
     /**
@@ -45,8 +39,8 @@ public class ZoomController {
      * @throws IOException thrown if can't find
      */
     public void zoomIn(int column) throws IOException {
-        drawer.zoom(SCROLL_ZOOM_IN_FACTOR, column);
-        updateRadius((int) Math.ceil(drawer.getRadius()) + "");
+        GraphDrawer.getInstance().zoom(SCROLL_ZOOM_IN_FACTOR, column);
+        updateRadius((int) Math.ceil(GraphDrawer.getInstance().getRadius()) + "");
     }
 
     /**
@@ -55,12 +49,12 @@ public class ZoomController {
      * @throws IOException thrown if can't find
      */
     public void zoomOut(int column) throws IOException {
-//        if (drawer.getxDifference() + drawer.getZoomLevel() > drawer.getRange()) {
-//            drawer.getGraph().createSubGraph(1, drawer.getGraph().getRightBoundID()+ 100, drawer.getGraph().getPartPath());
-//            drawer.initGraph();
+//        if (GraphDrawer.getInstance().getxDifference() + GraphDrawer.getInstance().getZoomLevel() >
+//                GraphDrawer.getInstance().getRange()) {
+//            GraphDrawer.getInstance().getGraph().createSubGraph(1, GraphDrawer.getInstance().getGraph().getRightBoundID() + 100);
 //        }
-        drawer.zoom(SCROLL_ZOOM_OUT_FACTOR, column);
-        updateRadius((int) Math.ceil(drawer.getRadius()) + "");
+        GraphDrawer.getInstance().zoom(SCROLL_ZOOM_OUT_FACTOR, column);
+        updateRadius((int) Math.ceil(GraphDrawer.getInstance().getRadius()) + "");
     }
 
     /**
@@ -69,26 +63,23 @@ public class ZoomController {
      * @param radius The radius to be viewed
      */
     public void traverseGraphClicked(int centreNode, int radius) {
-        if (!graph.getNodes().containsKey(centreNode)) {
-            SequenceGraph newGraph = graph.copy();
-            newGraph.createSubGraph(centreNode, radius, graph.getPartPath());
-            drawer.setGraph(newGraph);
-            drawer.initGraph();
-            drawer.setxDifference(0);
-            this.graph = newGraph;
+        if (!GraphDrawer.getInstance().getGraph().getNodes().containsKey(centreNode)) {
+            SequenceGraph newGraph = GraphDrawer.getInstance().getGraph().copy();
+            newGraph.createSubGraph(centreNode, radius);
+            GraphDrawer.getInstance().setGraph(newGraph);
+            GraphDrawer.getInstance().setxDifference(0);
         }
-        int column = graph.getNode(centreNode).getColumn();
-        drawer.changeZoom(column, radius);
-        drawer.highlight(centreNode);
+        int column = GraphDrawer.getInstance().getGraph().getNode(centreNode).getColumn();
+        GraphDrawer.getInstance().changeZoom(column, radius);
+        GraphDrawer.getInstance().highlight(centreNode);
     }
 
     /**
      * Displays the centre node and radius of the current view.
      */
     public void displayInfo() {
-        // commented out becaus it glitches out the graph drawer, drawing graphs on eachother.
-        //nodeTextField.setText(drawer.getRealCentreNode().getId() + "");
-        //radiusTextField.setText((int) Math.ceil(drawer.getRadius()) + "");
+        //nodeTextField.setText(GraphDrawer.getInstance().getRealCentreNode().getId() + "");
+        //radiusTextField.setText((int) Math.ceil(GraphDrawer.getInstance().getRadius()) + "");
     }
 
     /**
