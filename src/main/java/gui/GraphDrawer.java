@@ -21,7 +21,7 @@ public class GraphDrawer {
 
     private static final double RELATIVE_X_DISTANCE = 0.8;
     private static final double RELATIVE_Y_DISTANCE = 50;
-    private static final double LINE_WIDTH_FACTOR = 4;
+    private static final double LINE_WIDTH_FACTOR = 0.1;
     private static final double Y_SIZE_FACTOR = 3;
     private static final double LOG_BASE = 2;
 
@@ -269,8 +269,9 @@ public class GraphDrawer {
      * Set the width of the line depending on the level of zoom.
      */
     public void setLineWidth(double thickness) {
-        double zoomWidth = (Math.log(stepSize + 1) / Math.log(LOG_BASE)) / LINE_WIDTH_FACTOR;
-        double genomeWidth = Math.log(thickness + 1) / Math.log(LOG_BASE);
+        double zoomWidth = Math.log(stepSize + 1) / Math.log(LOG_BASE) * LINE_WIDTH_FACTOR;
+        double relativeSize = 100 * (thickness / (double) DrawableCanvas.getInstance().getAllGenomes().size());
+        double genomeWidth = Math.log(relativeSize + 1) / Math.log(LOG_BASE);
         gc.setLineWidth(genomeWidth * zoomWidth);
     }
 
