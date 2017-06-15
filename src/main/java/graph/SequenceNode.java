@@ -83,21 +83,34 @@ public class SequenceNode {
      * Draw the node with the color depending on it's status. Orange for highlighted nodes,
      * black for dummy nodes and blue for sequence nodes.
      *
-     * @param gc            The grapicsContext of the screen.
-     * @param selectedGenes A int[] with all the genomeIds that are selected.
+     * @param gc               The graphicsContext of the screen.
+     * @param colourController A controller that chooses colours for the node
      */
-    public void draw(GraphicsContext gc, int[] selectedGenes, ColourController colourController) {
+    public void draw(GraphicsContext gc, ColourController colourController) {
         gc.clearRect(xCoordinate, yCoordinate, width, height);
-        gc.setFill(colourController.getColor(genomes));
 
         if (isDummy) {
+            gc.setLineWidth(Math.log(genomes.length)
+                    / Math.log(2 + 1.1));
             gc.strokeLine(xCoordinate, yCoordinate + height / 2,
                     xCoordinate + width, yCoordinate + height / 2);
             return;
-        } else if (highlighted) {
-            gc.setFill(Color.BLACK);
         }
-        gc.fillRoundRect(xCoordinate, yCoordinate, width, height, ARC_SIZE, ARC_SIZE);
+
+        ArrayList<Color> colourMeBby = new ArrayList<>();
+        if (highlighted) {
+            colourMeBby.add(colourController.getHighlighted());
+        } else {
+            colourMeBby = colourController.getColors(genomes);
+        }
+
+        double tempCoordinate = yCoordinate;
+        double tempHeight = height / colourMeBby.size();
+        for (Color beamColour : colourMeBby) {
+            gc.setFill(beamColour);
+            gc.fillRect(xCoordinate, tempCoordinate, width, tempHeight);
+            tempCoordinate += tempHeight;
+        }
     }
 
     /**
@@ -245,6 +258,7 @@ public class SequenceNode {
 
     /**
      * Forms a string of the sequence node.
+     *
      * @param sequence With it's sequence which we do not constantly want in memory
      * @return A string representation of the node.
      */

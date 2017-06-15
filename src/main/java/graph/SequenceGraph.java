@@ -78,7 +78,6 @@ public class SequenceGraph {
         addDummies();
         this.columns = initColumns();
         assignSequenceLenghts();
-
     }
 
     /**
@@ -275,13 +274,23 @@ public class SequenceGraph {
      * @param target - the target node
      */
     private void addDummyHelper(int span, int parent, int target) {
+        SequenceNode parentNode = this.getNode(parent);
+        SequenceNode targetNode = this.getNode(target);
+
         if (span > 1) {
             SequenceNode dummy = new SequenceNode(dummyNodeIDCounter--);
             dummy.setDummy(true);
-            this.getNode(parent).removeChild(target);
-            this.getNode(parent).addChild(dummy.getId());
+            parentNode.removeChild(target);
+            parentNode.addChild(dummy.getId());
             dummy.addChild(target);
-            dummy.setColumn(this.getNode(parent).getColumn() + 1);
+            dummy.setColumn(parentNode.getColumn() + 1);
+
+            if (parentNode.getGenomes().length > targetNode.getGenomes().length) {
+                dummy.setGenomes(parentNode.getGenomes());
+            } else {
+                dummy.setGenomes(targetNode.getGenomes());
+            }
+            
             this.addNode(dummy);
             --span;
             addDummyHelper(span, dummy.getId(), target);
