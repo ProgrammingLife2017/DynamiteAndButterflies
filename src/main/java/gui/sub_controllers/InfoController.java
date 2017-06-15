@@ -29,8 +29,7 @@ public class InfoController {
      * @param graph The SequenceGraph being shown.
      */
     public void displayInfo(SequenceGraph graph) {
-//        nodeLabel.setText(graph.getNodes().size() + "");
-//        Fix this by implementing counter when adding children to nodes.
+        nodeLabel.setText(graph.getFullGraphRightBoundID() + "");
         edgeLabel.setText(graph.totalSize() + "");
     }
 

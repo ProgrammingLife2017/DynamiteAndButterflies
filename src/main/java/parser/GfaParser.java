@@ -233,7 +233,7 @@ public class GfaParser extends Observable implements Runnable {
         }
     }
 
-    public HashMap<String, Integer> getAllGenomesMap() throws IOException {
+    public HashMap<String, Integer> getAllGenomesMap() {
         return genomesMap;
     }
 
@@ -242,7 +242,7 @@ public class GfaParser extends Observable implements Runnable {
      * @return The map with the genomes.
      * @throws IOException For reading a file.
      */
-    public HashMap<Integer, String> getAllGenomesMapReversed() throws  IOException {
+    public HashMap<Integer, String> getAllGenomesMapReversed() {
         return reversedGenomesMap;
     }
 

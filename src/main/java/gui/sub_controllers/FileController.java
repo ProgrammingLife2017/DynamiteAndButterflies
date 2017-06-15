@@ -24,9 +24,6 @@ public class FileController extends Observable implements Observer {
 
     private ProgressBarController progressBarController;
 
-    private final int renderRange = PanningController.RENDER_RANGE;
-    private final int nodeId = 1;
-
     private Thread parseThread;
 
     private String partPath;

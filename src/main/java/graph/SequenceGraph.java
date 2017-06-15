@@ -18,8 +18,7 @@ import java.util.stream.Stream;
  */
 public class SequenceGraph {
 
-
-    private HashMap<Integer, SequenceNode> nodes;
+    private TreeMap<Integer, SequenceNode> nodes;
     private ArrayList<ArrayList<SequenceNode>> columns;
 
 
@@ -67,7 +66,7 @@ public class SequenceGraph {
      * @param range        - the amount of edges to add to the graph
      */
     public void createSubGraph(int centerNodeID, int range) {
-        this.nodes = new HashMap<Integer, SequenceNode>();
+        this.nodes = new TreeMap<Integer, SequenceNode>();
         this.columns = new ArrayList<ArrayList<SequenceNode>>();
 
         Boundary boundary = new Boundary(centerNodeID, range, parentArray, childArray);
@@ -119,6 +118,33 @@ public class SequenceGraph {
                 node.setSequenceLength(sequenceHashMap.get((long) node.getId()).length());
             }
         }
+    }
+
+    /**
+     * Function to assign the genomes to the nodes in the sequencegraph.
+     */
+    private void assignGenomes() {
+        Iterator it = nodes.entrySet().iterator();
+        try {
+            while (it.hasNext()) {
+                Stream<String> lines = Files.lines(Paths.get(partPath + "genomes.txt"));
+                Map.Entry pair = (Map.Entry) it.next();
+                SequenceNode node = (SequenceNode) pair.getValue();
+                if (!node.isDummy()) {
+                    String line = lines.skip(node.getId() - 1).findFirst().get();
+                    String[] text = line.split(";");
+                    int[] genomes = new int[text.length];
+                    for (int i = 0; i < text.length; i++) {
+                        genomes[i] = Integer.parseInt(text[i]);
+                    }
+                    node.setGenomes(genomes);
+                }
+                lines.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -242,22 +268,6 @@ public class SequenceGraph {
         });
     }
 
-    /**
-     * Finds the centerNode index (for in the hashmap).
-     *
-     * @param centerNodeID - the node to lookup.
-     * @param parentArray  - the array in which to look.
-     * @return - index of centerNode.
-     */
-    private int findCenterNodeIndex(int centerNodeID, int[] parentArray) {
-        for (int i = 0; i < parentArray.length; i++) {
-            if (parentArray[i] == centerNodeID) {
-                return i;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
 
     /**
      * Adds dummy's so that the span is always 1.
@@ -342,7 +352,7 @@ public class SequenceGraph {
      *
      * @return A HashMap of all nodes and their IDs contained in the graph.
      */
-    public HashMap<Integer, SequenceNode> getNodes() {
+    public TreeMap<Integer, SequenceNode> getNodes() {
         return this.nodes;
     }
 

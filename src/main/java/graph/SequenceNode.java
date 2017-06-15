@@ -1,5 +1,6 @@
 package graph;
 
+import gui.GraphDrawer;
 import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -32,7 +33,6 @@ public class SequenceNode {
 
     private ArrayList<Integer> children;
     private ArrayList<Integer> parents;
-    private GraphicsContext gc;
 
     /**
      * Constructor for the sequenceNode.
@@ -89,29 +89,28 @@ public class SequenceNode {
      * @param colourController A controller that chooses colours for the node
      */
     public void draw(GraphicsContext gc, ColourController colourController, ArrayList<Annotation> annotations) {
-        gc.clearRect(xCoordinate, yCoordinate, width, height);
+        if (inView(gc.getCanvas().getWidth())) {
+            gc.clearRect(xCoordinate, yCoordinate, width, height);
+            if (isDummy) {
+                GraphDrawer.getInstance().setLineWidth(genomes.length);
+                gc.strokeLine(xCoordinate, yCoordinate + height / 2,
+                        xCoordinate + width, yCoordinate + height / 2);
+                return;
+            }
 
-        if (isDummy) {
-            gc.setLineWidth(Math.log(genomes.length)
-                    / Math.log(2 + 1.1));
-            gc.strokeLine(xCoordinate, yCoordinate + height / 2,
-                    xCoordinate + width, yCoordinate + height / 2);
-            return;
-        }
-
-        ArrayList<Color> colourMeBby = new ArrayList<>();
-        if (highlighted) {
-            colourMeBby.add(colourController.getHighlighted());
-        } else {
-            colourMeBby = colourController.getColors(genomes);
-        }
-
-        double tempCoordinate = yCoordinate;
-        double tempHeight = height / colourMeBby.size();
-        for (Color beamColour : colourMeBby) {
-            gc.setFill(beamColour);
-            gc.fillRect(xCoordinate, tempCoordinate, width, tempHeight);
-            tempCoordinate += tempHeight;
+            ArrayList<Color> colourMeBby = new ArrayList<>();
+            if (highlighted) {
+                colourMeBby.add(colourController.getHighlighted());
+            } else {
+                colourMeBby = colourController.getColors(genomes);
+            }
+            double tempCoordinate = yCoordinate;
+            double tempHeight = height / colourMeBby.size();
+            for (Color beamColour : colourMeBby) {
+                gc.setFill(beamColour);
+                gc.fillRect(xCoordinate, tempCoordinate, width, tempHeight);
+                tempCoordinate += tempHeight;
+            }
         }
 
         for (int i = 0; i < annotations.size(); i++) {
@@ -181,6 +180,9 @@ public class SequenceNode {
         return (xCoordinate <= 0 && (xCoordinate + width) >= 0);
     }
 
+    public boolean inView(double viewWidth) {
+        return xCoordinate + width > 0 && xCoordinate < viewWidth;
+    }
 
     public double getxCoordinate() {
         return xCoordinate;
@@ -324,15 +326,16 @@ public class SequenceNode {
             str += i.toString() + ", ";
         }
         str = str.substring(0, str.length() - 2) + "\n"
-                + "SequenceLength:\t";
+                + "SequenceLength:\t" + this.sequenceLength + "\n"
+                + "Sequence:\t";
         if (isDummy) {
-            str += "-\n" + "Sequence:\t-";
+            str += "-\n";
         } else {
-            str += this.sequenceLength + "\n" + "Sequence:\t" + sequence + "\n";
-            str += "Genomes that go through this:\t";
-            for (Integer i : this.getGenomes()) {
-                str += i.toString() + ", ";
-            }
+            str += sequence + "\n";
+        }
+        str += "Genomes that go through this:\t";
+        for (Integer i : this.getGenomes()) {
+            str += i.toString() + ", ";
         }
         str = str.substring(0, str.length() - 2);
         return str;
