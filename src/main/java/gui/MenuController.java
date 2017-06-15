@@ -542,6 +542,10 @@ public class MenuController implements Observer {
         }
     }
 
+    /**
+     * Handles choosing Annotations.
+     * @throws IOException if something goes wrong.
+     */
     public void chooseAnnoClicked() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/AnnotationTable.fxml"));
         Stage stage;
@@ -569,7 +573,8 @@ public class MenuController implements Observer {
                 new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent event) {
-                        GraphDrawer.getInstance().setSelectedAnnotations(annotationTableController.getSelection());
+                        GraphDrawer.getInstance().
+                                setSelectedAnnotations(annotationTableController.getSelection());
                         GraphDrawer.getInstance().redraw();
                     }
                 }

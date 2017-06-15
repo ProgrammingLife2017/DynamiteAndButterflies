@@ -49,23 +49,13 @@ public class AnnotationTableController {
     /**
      * Just add some sample data in the constructor.
      */
-    public AnnotationTableController() {
-//        masterData.add(new Person("Hans", "Muster"));
-//        masterData.add(new Person("Ruth", "Mueller"));
-//        masterData.add(new Person("Heinz", "Kurz"));
-//        masterData.add(new Person("Cornelia", "Meier"));
-//        masterData.add(new Person("Werner", "Meyer"));
-//        masterData.add(new Person("Lydia", "Kunz"));
-//        masterData.add(new Person("Anna", "Best"));
-//        masterData.add(new Person("Stefan", "Meier"));
-//        masterData.add(new Person("Martin", "Mueller"));
-    }
+    public AnnotationTableController() { }
 
     /**
-     * Initializes the controller class. This method is automatically called
-     * after the fxml file has been loaded.
-     * <p>
+     * Initializes the controller class.
+     * Needs to be called manually to get the data.
      * Initializes the table columns and sets up sorting and filtering.
+     * @param annotations the annotations to load into the table.
      */
     @FXML
     public void initialize(ArrayList<Annotation> annotations) {
@@ -78,9 +68,12 @@ public class AnnotationTableController {
         startColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("start"));
         endColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("end"));
         infoColumn.setCellValueFactory(new PropertyValueFactory<Annotation, String>("info"));
-        highlightColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Annotation, Boolean>, ObservableValue<Boolean>>() {
+        highlightColumn.setCellValueFactory(
+                new Callback<TableColumn.
+                        CellDataFeatures<Annotation, Boolean>, ObservableValue<Boolean>>() {
             @Override
-            public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Annotation, Boolean> param) {
+            public ObservableValue<Boolean> call(
+                    TableColumn.CellDataFeatures<Annotation, Boolean> param) {
                 return param.getValue().getSelected();
             }
         });
@@ -99,15 +92,16 @@ public class AnnotationTableController {
         // 2. Set the filter Predicate whenever the filter changes.
         filterField.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(annotation -> {
-                // If filter text is empty, display all persons.
+                // If filter text is empty, display all annotations.
                 if (newValue == null || newValue.isEmpty()) {
                     return true;
                 }
-
-                // Compare first name and last name of every person with filter text.
                 String lowerCaseFilter = newValue.toLowerCase();
 
-                return annotation.getInfo().toLowerCase().contains(lowerCaseFilter);
+                //Check the info, but also co-ordinates.
+                return annotation.getInfo().toLowerCase().contains(lowerCaseFilter)
+                        || Integer.toString(annotation.getStart()).contains(lowerCaseFilter)
+                        || Integer.toString(annotation.getEnd()).contains(lowerCaseFilter);
             });
         });
 
@@ -125,6 +119,9 @@ public class AnnotationTableController {
         return selection;
     }
 
+    /**
+     * Handles pressing the save button.
+     */
     @FXML
     public void saveButtonClicked() {
         ArrayList<Annotation> res = new ArrayList<Annotation>();
@@ -139,6 +136,9 @@ public class AnnotationTableController {
         close();
     }
 
+    /**
+     * Handles pressing the cancel button.
+     */
     public void cancelButtonClicked() {
         close();
     }
@@ -151,6 +151,9 @@ public class AnnotationTableController {
         stage.close();
     }
 
+    /**
+     * Can select/deselect the entire sortedData at the same time.
+     */
     @FXML
     public void selectAllFiltered() {
         for (Annotation annotation : sortedData) {

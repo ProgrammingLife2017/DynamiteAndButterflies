@@ -333,6 +333,11 @@ public class SequenceNode {
         for (Integer i : this.getGenomes()) {
             str += i.toString() + ", ";
         }
+        str += "\nCo-Ordinates of the genomes that go through this";
+        for (int offSet : offSets) {
+            str += offSet + ", ";
+        }
+
         str = str.substring(0, str.length() - 2);
         return str;
     }
