@@ -88,7 +88,7 @@ public class SequenceNode {
      * @param gc               The graphicsContext of the screen.
      * @param colourController A controller that chooses colours for the node
      */
-    public void draw(GraphicsContext gc, ColourController colourController) {
+    public void draw(GraphicsContext gc, ColourController colourController, ArrayList<Annotation> annotations) {
         gc.clearRect(xCoordinate, yCoordinate, width, height);
 
         if (isDummy) {
@@ -113,6 +113,46 @@ public class SequenceNode {
             gc.fillRect(xCoordinate, tempCoordinate, width, tempHeight);
             tempCoordinate += tempHeight;
         }
+
+        for (int i = 0; i < annotations.size(); i++) {
+            Annotation annotation = annotations.get(i);
+            int annoID = annotation.getId();
+            double startXAnno = xCoordinate;
+            double startYAnno = yCoordinate + height;
+            double annoWidth = width;
+            double annoHeight = height / 4;
+            int indexOfGenome = colourController.containsPos(genomes, annoID);
+            if (indexOfGenome == -1) {
+                continue;
+            } else {
+                int startOfAnno = annotation.getStart();
+                int endOfAnno = annotation.getEnd();
+                int startCorOfGenome = 0;
+
+                if (genomes.length == offSets.length) {
+                    startCorOfGenome = indexOfGenome;
+                }
+
+                if (startOfAnno > (offSets[startCorOfGenome] + sequenceLength)
+                        || endOfAnno < (offSets[startCorOfGenome])) {
+                    continue;
+                }
+
+                double emptyAtStart = 0.0;
+                if (startOfAnno > offSets[startCorOfGenome]) {
+                    emptyAtStart = startOfAnno - offSets[startCorOfGenome];
+                    annoWidth = (annoWidth * (1 - (emptyAtStart / sequenceLength)));
+                    startXAnno = startXAnno + (width - annoWidth);
+                }
+                if (endOfAnno < (offSets[startCorOfGenome] + sequenceLength)) {
+                    int emptyAtEnd = offSets[startCorOfGenome] + sequenceLength - endOfAnno;
+                    annoWidth = (annoWidth * (1 - (emptyAtEnd / (sequenceLength - emptyAtStart))));
+                }
+                gc.setFill(Color.RED);
+                gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
+            }
+        }
+
     }
 
     /**
@@ -167,7 +207,7 @@ public class SequenceNode {
     }
 
     public void addChild(Integer id) {
-        if(!this.children.contains(id))
+        if (!this.children.contains(id))
             this.children.add(id);
     }
 
@@ -283,7 +323,7 @@ public class SequenceNode {
         for (Integer i : parents) {
             str += i.toString() + ", ";
         }
-        str = str.substring(0, str.length() - 2) +  "\n"
+        str = str.substring(0, str.length() - 2) + "\n"
                 + "SequenceLength:\t";
         if (isDummy) {
             str += "-\n" + "Sequence:\t-";

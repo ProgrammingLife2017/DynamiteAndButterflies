@@ -156,7 +156,8 @@ public class MenuController implements Observer {
         File file = fileController.chooseGffFile(stage);
         String filePath = file.getAbsolutePath();
         //TODO: do something with this return value.
-        fileController.openGffFileClicked(filePath);
+        GraphDrawer.getInstance().setAnnotations(fileController.openGffFileClicked(filePath));
+        GraphDrawer.getInstance().redraw();
     }
 
     private void displayInfo(SequenceGraph graph) {
@@ -304,7 +305,6 @@ public class MenuController implements Observer {
      */
     @FXML
     public void newSaveBookmarkPress() throws IOException {
-
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/bookmarkPopUp.fxml"));
         Stage stage;
         Parent root = loader.load();
