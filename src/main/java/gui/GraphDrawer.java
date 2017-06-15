@@ -51,7 +51,7 @@ public class GraphDrawer {
     public void setGraph(SequenceGraph graph) {
         this.graph = graph;
         columns = graph.getColumns();
-        columnWidths = new double[columns.size() +1];
+        columnWidths = new double[columns.size() + 1];
         initializeColumnWidths();
         if (zoomLevel == 0) {
             zoomLevel = columnWidths[columns.size()];
@@ -409,6 +409,10 @@ public class GraphDrawer {
 
     public SequenceNode getMostLeftNode() {
         return mostLeftNode;
+    }
+
+    public ArrayList<Annotation> getAnnotations() {
+        return annotations;
     }
 }
 

@@ -33,11 +33,7 @@ public class GffParser {
         while ((line = br.readLine()) != null) {
             String[] data = line.split("\t");
             String nameGenome = data[0].split("\\.")[0];
-            ArrayList<String> info = new ArrayList<>();
-            String[] infoArray = data[8].split(";");
-            for(int i = 0; i < infoArray.length; i++) {
-                info.add(infoArray[i]);
-            }
+            String info = data[8].replace(";", "\t");
             int start = Integer.parseInt(data[3]);
             int end = Integer.parseInt(data[4]);
             Annotation anno = new Annotation(DrawableCanvas.getInstance().getAllGenomes().get(nameGenome), start, end, info);

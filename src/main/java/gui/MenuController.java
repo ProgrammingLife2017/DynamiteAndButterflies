@@ -1,5 +1,6 @@
 package gui;
 
+import graph.Annotation;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.*;
@@ -23,6 +24,7 @@ import org.mapdb.HTreeMap;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
@@ -35,6 +37,8 @@ import java.util.Observer;
  */
 public class MenuController implements Observer {
 
+    @FXML
+    public Button annoBut;
     @FXML
     private Button saveGenomeBut;
     @FXML
@@ -161,6 +165,7 @@ public class MenuController implements Observer {
         //TODO: do something with this return value.
         GraphDrawer.getInstance().setAnnotations(fileController.openGffFileClicked(filePath));
         GraphDrawer.getInstance().redraw();
+        System.out.println("Klaar met annotations tekenen");
     }
 
     private void displayInfo(SequenceGraph graph) {
@@ -557,5 +562,39 @@ public class MenuController implements Observer {
             GraphDrawer.getInstance().setSelected(res);
             GraphDrawer.getInstance().redraw();
         }
+    }
+
+    public void chooseAnnoClicked() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/AnnotationTable.fxml"));
+        Stage stage;
+        Parent root = loader.load();
+        final AnnotationTableController annotationTableController
+                = loader.<AnnotationTableController>getController();
+
+        ArrayList<Annotation> allAnnotations;
+        allAnnotations = GraphDrawer.getInstance().getAnnotations();
+        if (allAnnotations.size() == 0) {
+            try {
+                openGffFileClicked();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        annotationTableController.initialize(allAnnotations);
+
+        stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Search for annotations to view");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setOnHidden(
+                new EventHandler<WindowEvent>() {
+                    @Override
+                    public void handle(WindowEvent event) {
+                        //TODO add stuff here.
+                    }
+                }
+        );
+        stage.showAndWait();
     }
 }

@@ -43,7 +43,6 @@ public class SpecificGenomeController {
      * @param alreadyChosen data on what genomes want to be viewed.
      */
     public void initialize(HashMap<Integer, String> hashMap, int[] alreadyChosen) {
-
         selectedGenomes = alreadyChosen;
 
         ArrayList<Genome> realData = new ArrayList<Genome>();

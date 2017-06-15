@@ -1,33 +1,38 @@
 package graph;
 
-import java.util.ArrayList;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 
 /**
  * Created by lex_b on 13/06/2017.
  */
 public class Annotation {
-    private int id;
-    private int start;
-    private int end;
-    private ArrayList<String> info;
+    private SimpleIntegerProperty id = new SimpleIntegerProperty();
+    private SimpleIntegerProperty start = new SimpleIntegerProperty();
+    private SimpleIntegerProperty end = new SimpleIntegerProperty();
+    private SimpleStringProperty info = new SimpleStringProperty();
 
 
-    public Annotation(int id, int start, int end, ArrayList<String> info) {
-        this.id = id;
-        this.start = start;
-        this.end = end;
-        this.info = info;
+    public Annotation(int idArg, int startArg, int endArg, String infoArg) {
+        id.set(idArg);
+        start.set(startArg);
+        end.set(endArg);
+        info.set(infoArg);
     }
 
     public int getStart() {
-        return start;
+        return start.get();
     }
 
     public int getEnd() {
-        return end;
+        return end.get();
     }
 
     public int getId() {
-        return id;
+        return id.get();
+    }
+
+    public String getInfo() {
+        return info.get();
     }
 }
