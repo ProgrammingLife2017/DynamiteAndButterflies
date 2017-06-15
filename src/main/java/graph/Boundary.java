@@ -56,7 +56,7 @@ public class Boundary {
      * @return returns the index of the rightBoundNode.
      */
     private int findRightBoundIndex(int rightBoundID, int[] parentArray) {
-        for (int i = 0; i < parentArray.length; i++) {
+        for (int i = parentArray.length-1; i >= 0; i--) {
             if (parentArray[i] == rightBoundID) {
                 if (parentArray[i + 1] != rightBoundID) {
                     return i;
