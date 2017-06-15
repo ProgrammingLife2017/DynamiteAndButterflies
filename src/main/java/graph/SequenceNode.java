@@ -13,8 +13,6 @@ import java.util.ArrayList;
  */
 public class SequenceNode {
 
-    private static final int ARC_SIZE = 10;
-
     private int id;
     private int[] genomes;
     private int[] offSets;
@@ -90,7 +88,6 @@ public class SequenceNode {
      */
     public void draw(GraphicsContext gc, ColourController colourController) {
         if (inView(gc.getCanvas().getWidth())) {
-            gc.clearRect(xCoordinate, yCoordinate, width, height);
             if (isDummy) {
                 GraphDrawer.getInstance().setLineWidth(genomes.length);
                 gc.strokeLine(xCoordinate, yCoordinate + height / 2,
@@ -100,10 +97,10 @@ public class SequenceNode {
 
             ArrayList<Color> colourMeBby = new ArrayList<>();
             if (highlighted) {
-                colourMeBby.add(colourController.getHighlighted());
-            } else {
-                colourMeBby = colourController.getColors(genomes);
+                gc.setLineWidth(6);
+                gc.strokeRect(xCoordinate, yCoordinate, width, height);
             }
+            colourMeBby = colourController.getColors(genomes);
 
             double tempCoordinate = yCoordinate;
             double tempHeight = height / colourMeBby.size();
