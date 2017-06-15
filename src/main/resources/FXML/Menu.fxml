@@ -82,7 +82,7 @@
                               <Button fx:id="chooseGenome" layoutX="14.0" layoutY="171.0" mnemonicParsing="false" onAction="#chooseGenomePress" prefHeight="25.0" prefWidth="120.0" text="Specific Genome" />
                            </children>
                         </AnchorPane>
-                      <AnchorPane fx:id="canvasPanel" focusTraversable="true">
+                      <AnchorPane fx:id="canvasPanel" focusTraversable="true" style="-fx-background-color: WHITE;">
                            <children>
                               <Canvas fx:id="canvas" onMouseClicked="#clickMouse" onScroll="#scrollZoom" />
                               <Button mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
