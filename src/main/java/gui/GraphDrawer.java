@@ -6,6 +6,7 @@ import graph.SequenceNode;
 import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 import java.util.*;
 
@@ -136,6 +137,7 @@ public class GraphDrawer {
         colourController = new ColourController(selected);
         drawNodes();
         drawEdges();
+        drawMinimap();
     }
 
     /**
@@ -193,6 +195,7 @@ public class GraphDrawer {
      * is checked dummy nodes are either drawn or skipped.
      */
     private void drawNodes() {
+        gc.setStroke(Color.BLACK);
         Iterator it = graph.getNodes().entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
@@ -232,6 +235,12 @@ public class GraphDrawer {
                 }
             }
         }
+    }
+
+    public void drawMinimap() {
+        Minimap.getInstance().setValue(mostLeftNode.getId());
+        Minimap.getInstance().setAmountVisible(mostRightNode.getId() - mostLeftNode.getId());
+        Minimap.getInstance().draw(gc);
     }
 
     public void setExtremeNodes(SequenceNode node) {
