@@ -185,12 +185,36 @@ public class SequenceGraph {
     }
 
     /**
+     * Creates a column list for easier crossing reduction.
+     *
+     * @return - the column list with solved edge crossings.
+     */
+    private ArrayList<ArrayList<SequenceNode>> initColumns() {
+        ArrayList<ArrayList<SequenceNode>> columns = new ArrayList<ArrayList<SequenceNode>>();
+
+        for (Object o : nodes.entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
+            SequenceNode node = (SequenceNode) pair.getValue();
+            while (columns.size() <= node.getColumn()) {
+                columns.add(new ArrayList<SequenceNode>());
+            }
+            columns.get(node.getColumn()).add(node);
+            node.setIndex(node.getColumn());
+        }
+
+        minimiseEdgeCrossings(columns);
+        return columns;
+    }
+
+    /**
      * assigns the columns based on the longest path algo.
      */
     private void findLongestPath() {
+
         for (Object o : this.getNodes   ().entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             SequenceNode currentNode = (SequenceNode) pair.getValue();
+
                 for (int child : currentNode.getChildren()) {
                         this.getNode(child).addParent(currentNode.getId());
                     if (this.getNode(child).getColumn() < currentNode.getColumn() + 1) {
@@ -342,38 +366,6 @@ public class SequenceGraph {
         return this.nodes;
     }
 
-    /**
-     * Creates a column list for easier crossing reduction.
-     *
-     * @return - the column list with solved edge crossings.
-     */
-    private ArrayList<ArrayList<SequenceNode>> initColumns() {
-        ArrayList<ArrayList<SequenceNode>> columns = new ArrayList<ArrayList<SequenceNode>>();
-
-        for (Object o : nodes.entrySet()) {
-            Map.Entry pair = (Map.Entry) o;
-            SequenceNode node = (SequenceNode) pair.getValue();
-            while (columns.size() <= node.getColumn()) {
-                columns.add(new ArrayList<SequenceNode>());
-            }
-            columns.get(node.getColumn()).add(node);
-        }
-        createIndex(columns);
-        minimiseEdgeCrossings(columns);
-        return columns;
-    }
-
-    /**
-     * assigns indices to all nodes in the column list.
-     */
-    private void createIndex(ArrayList<ArrayList<SequenceNode>> columns) {
-        for (ArrayList<SequenceNode> column : columns) {
-            for (int j = 0; j < column.size(); j++) {
-                column.get(j).setIndex(j);
-            }
-        }
-
-    }
 
     public String getPartPath() {
         return partPath;
