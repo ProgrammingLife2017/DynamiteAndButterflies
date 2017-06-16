@@ -358,7 +358,7 @@ public class SequenceGraph {
     public HashMap<Integer, SequenceNode> getNodes() {
         return this.nodes;
     }
-    
+
 
     public String getPartPath() {
         return partPath;
