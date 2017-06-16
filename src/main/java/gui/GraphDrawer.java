@@ -38,8 +38,8 @@ public class GraphDrawer {
     private int highlightedNode;
     private int[] selected = null;
     private ColourController colourController;
-    private ArrayList<Annotation> allAnnotations;
-    private ArrayList<Annotation> selectedAnnotations;
+    private ArrayList<Annotation> allAnnotations = new ArrayList<Annotation>();
+    private ArrayList<Annotation> selectedAnnotations = new ArrayList<Annotation>();
     private SequenceNode mostLeftNode;
     private SequenceNode mostRightNode;
 
@@ -69,9 +69,6 @@ public class GraphDrawer {
         }
         colourController = new ColourController(selected);
         highlightedNode = 0;
-
-        allAnnotations = new ArrayList<Annotation>();
-        selectedAnnotations = new ArrayList<Annotation>();
     }
 
 
