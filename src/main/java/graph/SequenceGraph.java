@@ -165,7 +165,7 @@ public class SequenceGraph {
         for (Object o : nodes.entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             SequenceNode node = (SequenceNode) pair.getValue();
-            while (columns.size() <= node.getColumn() + 1) {
+            while (columns.size() <= node.getColumn()) {
                 columns.add(new ArrayList<SequenceNode>());
             }
             columns.get(node.getColumn()).add(node);
