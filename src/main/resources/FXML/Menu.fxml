@@ -25,7 +25,8 @@
                     <menus>
                       <Menu mnemonicParsing="false" text="File">
                         <items>
-                          <MenuItem mnemonicParsing="false" onAction="#openFileClicked" text="Open gfa file" />
+                          <MenuItem mnemonicParsing="false" onAction="#openGfaFileClicked" text="Open gfa file" />
+                            <MenuItem fx:id="gffItem" disable="true" mnemonicParsing="false" onAction="#openGffFileClicked" text="Open gff file" />
                             <Menu mnemonicParsing="false" text="Recent">
                                 <items>
                                     <MenuItem fx:id="file1" mnemonicParsing="false" onAction="#file1Press" text="&lt;No recent file&gt;" />
@@ -67,7 +68,6 @@
                                     <MenuItem fx:id="genome3" mnemonicParsing="false" onAction="#genome3Click" text="-" />
                                 </items>
                               </Menu>
-                            <MenuItem mnemonicParsing="false" onAction="#otherSaveGenomeClick" text="saveGenomeMenu" />
                           </items>
                         </Menu>
                     </menus>
@@ -80,9 +80,10 @@
                               <Button layoutX="26.0" layoutY="72.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
                               <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="27.0" layoutY="111.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
                               <Button fx:id="chooseGenome" layoutX="14.0" layoutY="171.0" mnemonicParsing="false" onAction="#chooseGenomePress" prefHeight="25.0" prefWidth="120.0" text="Specific Genome" />
+                              <Button fx:id="annoBut" disable="true" layoutX="12.0" layoutY="208.0" mnemonicParsing="false" onAction="#chooseAnnoClicked" prefHeight="25.0" prefWidth="120.0" text="Choose Annotation" />
                            </children>
                         </AnchorPane>
-                      <AnchorPane fx:id="canvasPanel" focusTraversable="true">
+                      <AnchorPane fx:id="canvasPanel" focusTraversable="true" style="-fx-background-color: WHITE;">
                            <children>
                               <Canvas fx:id="canvas" onMouseClicked="#clickMouse" onScroll="#scrollZoom" />
                               <Button mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
@@ -107,9 +108,9 @@
                                     <Label layoutX="24.0" layoutY="43.0" text="Edges:" />
                                     <Label fx:id="numNodesLabel" layoutX="85.0" layoutY="11.0" text="0" />
                                     <Label fx:id="numEdgesLabel" layoutX="85.0" layoutY="43.0" text="0" />
-                                    <ScrollPane layoutX="152.0" layoutY="-1.0" prefHeight="173.0" prefWidth="1767.0">
+                                    <ScrollPane layoutX="205.0" layoutY="-1.0" prefHeight="173.0" prefWidth="1714.0">
                                        <content>
-                                          <Label fx:id="sequenceInfo" text="Select a Node" />
+                                          <Label fx:id="sequenceInfo" layoutX="20.0" layoutY="30.0" text="Select a Node" />
                                        </content>
                                     </ScrollPane>
                                     <ProgressBar fx:id="progressBar" layoutX="-8.0" layoutY="146.0" prefHeight="32.0" prefWidth="1934.0" progress="0.0" visible="false" />

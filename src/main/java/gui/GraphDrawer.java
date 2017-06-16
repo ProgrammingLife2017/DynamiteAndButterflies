@@ -1,14 +1,13 @@
 package gui;
 
+import graph.Annotation;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
@@ -21,7 +20,7 @@ public class GraphDrawer {
 
     private static final double RELATIVE_X_DISTANCE = 0.8;
     private static final double RELATIVE_Y_DISTANCE = 50;
-    private static final double LINE_WIDTH_FACTOR = 4;
+    private static final double LINE_WIDTH_FACTOR = 0.1;
     private static final double Y_SIZE_FACTOR = 3;
     private static final double LOG_BASE = 2;
 
@@ -39,8 +38,10 @@ public class GraphDrawer {
     private int highlightedNode;
     private int[] selected = null;
     private ColourController colourController;
+    private ArrayList<Annotation> allAnnotations = new ArrayList<Annotation>();
+    private ArrayList<Annotation> selectedAnnotations = new ArrayList<Annotation>();
     private SequenceNode mostLeftNode;
-
+    private SequenceNode mostRightNode;
 
     public static GraphDrawer getInstance(){
         return drawer;
@@ -49,18 +50,25 @@ public class GraphDrawer {
     public void setGraph(SequenceGraph graph) {
         this.graph = graph;
         columns = graph.getColumns();
-        columnWidths = new double[columns.size() +1];
+        columnWidths = new double[columns.size() + 1];
         initializeColumnWidths();
-        if (zoomLevel == 0) {
-            zoomLevel = columnWidths[columns.size()];
-        }
+        long start = System.currentTimeMillis();
+        initializeDummyWidths();
+        long end = System.currentTimeMillis();
+        System.out.println(start - end);
         range = columnWidths[columns.size()];
         radius = columns.size();
-
+        if (zoomLevel == 0) {
+            setZoomLevel(columnWidths[columns.size()]);
+        }
         if (selected == null) {
             selected = new int[0];
         }
+        if (mostRightNode == null) {
+            mostRightNode = graph.getNode(graph.getRightBoundID());
+        }
         colourController = new ColourController(selected);
+        highlightedNode = 0;
     }
 
 
@@ -82,7 +90,9 @@ public class GraphDrawer {
     public void zoom(final double factor, final int column) {
         setZoomLevel(zoomLevel * factor);
         setRadius(radius * factor);
-        moveShapes(column - ((column - xDifference) * factor));
+        if (zoomLevel != range / 2) {
+            moveShapes(column - ((column - xDifference) * factor));
+        }
     }
 
     /**
@@ -93,7 +103,6 @@ public class GraphDrawer {
      */
     public void changeZoom(int column, int radius) {
         setRadius(radius);
-
         int widthRight = column + radius + 1;
         int widthLeft = column - radius;
 
@@ -122,9 +131,8 @@ public class GraphDrawer {
      */
     public void moveShapes(double xDifference) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
-        this.xDifference = xDifference;
         this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
-        setLineWidth();
+        setxDifference(xDifference);
         colourController = new ColourController(selected);
         drawNodes();
         drawEdges();
@@ -151,6 +159,33 @@ public class GraphDrawer {
         }
     }
 
+    public void initializeDummyWidths() {
+        HashMap<Integer, String> genomes;
+        Iterator it = graph.getNodes().entrySet().iterator();
+        while (it.hasNext()) {
+            genomes = new HashMap<>(DrawableCanvas.getInstance().getAllGenomesReversed());
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            if (node.isDummy()) {
+                for (SequenceNode i : columns.get(node.getColumn())) {
+                    if (!i.isDummy()) {
+                        for (int j : i.getGenomes()) {
+                            genomes.remove(j);
+                        }
+                    }
+                }
+                int[] result = new int[genomes.size()];
+                int i = 0;
+                Iterator itt = genomes.entrySet().iterator();
+                while(itt.hasNext()) {
+                    result[i] = (int) ((Map.Entry) itt.next()).getKey();
+                    i++;
+                }
+                node.setGenomes(result);
+            }
+        }
+    }
+
     /**
 
      * Gives all nodes the right coordinates on the canvas and draw them.
@@ -173,11 +208,8 @@ public class GraphDrawer {
                 height = width;
             }
             node.setCoordinates(x, y, width, height);
-
-            if (node.checkBounds()) {
-                mostLeftNode = node;
-            }
-            node.draw(gc, colourController);
+            setExtremeNodes(node);
+            node.draw(gc, colourController, selectedAnnotations);
         }
     }
 
@@ -194,11 +226,21 @@ public class GraphDrawer {
                 double starty = parent.getyCoordinate() + (parent.getHeight() / 2);
                 double endx = child.getxCoordinate();
                 double endy = child.getyCoordinate() + (child.getHeight() / 2);
-                gc.setLineWidth(Math.log(Math.min(child.getGenomes().length, parent.getGenomes().length))
-                        / Math.log(LOG_BASE + 1.1));
-                gc.strokeLine(startx, starty, endx, endy);
+                setLineWidth(Math.min(child.getGenomes().length, parent.getGenomes().length));
+                if (edgeInView(startx, endx)) {
+                    gc.strokeLine(startx, starty, endx, endy);
+                }
             }
         }
+    }
+
+    public void setExtremeNodes(SequenceNode node) {
+        if (node.getxCoordinate() <= 0 && node.getxCoordinate() + node.getWidth() > 0) { mostLeftNode = node; }
+        if (node.getxCoordinate() < gc.getCanvas().getWidth() && node.getxCoordinate() + node.getWidth() >= gc.getCanvas().getWidth()) { mostRightNode = node; }
+    }
+
+    public boolean edgeInView(double startx, double endx) {
+        return startx < gc.getCanvas().getWidth() && endx > 0;
     }
 
     private double computeNodeWidth(SequenceNode node) {
@@ -258,9 +300,11 @@ public class GraphDrawer {
     /**
      * Set the width of the line depending on the level of zoom.
      */
-    private void setLineWidth() {
-        double width = (Math.log(stepSize + 1) / Math.log(LOG_BASE)) / LINE_WIDTH_FACTOR;
-        gc.setLineWidth(width);
+    public void setLineWidth(double thickness) {
+        double zoomWidth = Math.log(stepSize + 1) / Math.log(LOG_BASE) * LINE_WIDTH_FACTOR;
+        double relativeSize = 100 * (thickness / (double) DrawableCanvas.getInstance().getAllGenomes().size());
+        double genomeWidth = Math.log(relativeSize + 1) / Math.log(LOG_BASE);
+        gc.setLineWidth(genomeWidth * zoomWidth);
     }
 
     /**
@@ -293,11 +337,10 @@ public class GraphDrawer {
     public void highlight(int node) {
         if (highlightedNode != 0) {
             graph.getNode(highlightedNode).lowlight();
-            graph.getNode(highlightedNode).draw(gc, colourController);
         }
         graph.getNode(node).highlight();
-        graph.getNode(node).draw(gc, colourController);
         highlightedNode = node;
+        redraw();
     }
 
     //TODO: Loop over the  nodes in the graph (O(n*m) > O(k))
@@ -377,6 +420,14 @@ public class GraphDrawer {
         return selected;
     }
 
+    public void setSelectedAnnotations(ArrayList<Annotation> newAnnotations) {
+        this.selectedAnnotations = newAnnotations;
+    }
+
+    public void setAllAnnotations(ArrayList<Annotation> newAnnotations) {
+        this.allAnnotations = newAnnotations;
+    }
+
     public void setxDifference(double xDifference) {
         if (xDifference < 0) { xDifference = 0; }
         if (xDifference + zoomLevel > range) { xDifference = range - zoomLevel; }
@@ -391,11 +442,9 @@ public class GraphDrawer {
 
     public void setZoomLevel(double zoomLevel) {
         if (zoomLevel < 1) { zoomLevel = 1; }
-        if (zoomLevel > range) { zoomLevel = range; }
+        if (zoomLevel > range / 2) { zoomLevel = range / 2; }
         this.zoomLevel = zoomLevel;
     }
-
-
 
     public SequenceGraph getGraph() {
         return graph;
@@ -404,6 +453,18 @@ public class GraphDrawer {
 
     public SequenceNode getMostLeftNode() {
         return mostLeftNode;
+    }
+
+    public ArrayList<Annotation> getAllAnnotations() {
+        return allAnnotations;
+    }
+
+    public ArrayList<Annotation> getSelectedAnnotations() {
+        return selectedAnnotations;
+    }
+
+    public SequenceNode getMostRightNode() {
+        return mostRightNode;
     }
 }
 

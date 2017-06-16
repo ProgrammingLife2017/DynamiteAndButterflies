@@ -18,8 +18,7 @@ import java.util.stream.Stream;
  */
 public class SequenceGraph {
 
-
-    private HashMap<Integer, SequenceNode> nodes;
+    private TreeMap<Integer, SequenceNode> nodes;
     private ArrayList<ArrayList<SequenceNode>> columns;
 
 
@@ -67,17 +66,37 @@ public class SequenceGraph {
      * @param range        - the amount of edges to add to the graph
      */
     public void createSubGraph(int centerNodeID, int range) {
-        this.nodes = new HashMap<Integer, SequenceNode>();
+        this.nodes = new TreeMap<Integer, SequenceNode>();
         this.columns = new ArrayList<ArrayList<SequenceNode>>();
 
         Boundary boundary = new Boundary(centerNodeID, range, parentArray, childArray);
         this.centerNodeID = centerNodeID;
         this.boundaries = boundary;
         initNodes();
+        initGenomes();
         findLongestPath();
         addDummies();
         this.columns = initColumns();
         assignSequenceLenghts();
+    }
+
+    private void initGenomes() {
+        try {
+            String[] genomeData = getGenomes();
+            int counter = 0;
+            Iterator it = nodes.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                SequenceNode node = (SequenceNode) pair.getValue();
+                String[] specificGenomeData = genomeData[counter].split("-");
+                node.setGenomes(splitOnStringToInt(specificGenomeData[0]));
+                node.setOffSets(splitOnStringToInt(specificGenomeData[1]));
+                counter++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -95,6 +114,33 @@ public class SequenceGraph {
     }
 
     /**
+     * Function to assign the genomes to the nodes in the sequencegraph.
+     */
+    private void assignGenomes() {
+        Iterator it = nodes.entrySet().iterator();
+        try {
+            while (it.hasNext()) {
+                Stream<String> lines = Files.lines(Paths.get(partPath + "genomes.txt"));
+                Map.Entry pair = (Map.Entry) it.next();
+                SequenceNode node = (SequenceNode) pair.getValue();
+                if (!node.isDummy()) {
+                    String line = lines.skip(node.getId() - 1).findFirst().get();
+                    String[] text = line.split(";");
+                    int[] genomes = new int[text.length];
+                    for (int i = 0; i < text.length; i++) {
+                        genomes[i] = Integer.parseInt(text[i]);
+                    }
+                    node.setGenomes(genomes);
+                }
+                lines.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
      * Add nodes with children to the nodes hashmap.
      */
     private void initNodes() {
@@ -103,14 +149,6 @@ public class SequenceGraph {
             int childID = childArray[i];
             if (nodes.get(parentID) == null) {
                 SequenceNode node = new SequenceNode(parentID);
-
-                int[] genomes = new int[0];
-                try {
-                    genomes = getGenomes(parentID);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                node.setGenomes(genomes);
                 node.addChild(childID);
                 nodes.put(parentID, node);
             } else {
@@ -118,39 +156,31 @@ public class SequenceGraph {
             }
             if (nodes.get(childID) == null) {
                 SequenceNode node = new SequenceNode(childID);
-
-                int[] genomes = new int[0];
-                try {
-                    genomes = getGenomes(childID);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                node.setGenomes(genomes);
                 nodes.put(childID, node);
             }
         }
-
     }
 
+    private int[] splitOnStringToInt(String text) {
+        String[] genomesText = text.split(";");
+        int[] genomes = new int[genomesText.length];
+        for (int j = 0; j < genomesText.length; j++) {
+            genomes[j] = Integer.parseInt(genomesText[j]);
+        }
+        return genomes;
+    }
 
     /**
      * Finds the longest path of the graph and sets columns accordingly.
      */
-    private int[] getGenomes(int node) throws IOException {
+    private String[] getGenomes() throws IOException {
         try {
-            Stream<String> lines = Files.lines(Paths.get(DrawableCanvas.getInstance().getParser().getPartPath() + "genomes.txt"));
-            String line = lines.skip(node - 1).findFirst().get();
-            String[] text = line.split(";");
-            int[] genomes = new int[text.length];
-            for (int i = 0; i < text.length; i++) {
-                genomes[i] = Integer.parseInt(text[i]);
-            }
-            lines.close();
-            return genomes;
+            Stream<String> lines = Files.lines(Paths.get("" + DrawableCanvas.getInstance().getParser().getPartPath() + "genomes.txt"));
+            Stream<String>  line = lines.skip(boundaries.getLeftBoundID() - 1).limit(boundaries.getRightBoundID() + 100);
+            return line.toArray(String[]::new);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         throw new IOException("Node not in genome list");
     }
 
@@ -255,22 +285,6 @@ public class SequenceGraph {
         });
     }
 
-    /**
-     * Finds the centerNode index (for in the hashmap).
-     *
-     * @param centerNodeID - the node to lookup.
-     * @param parentArray  - the array in which to look.
-     * @return - index of centerNode.
-     */
-    private int findCenterNodeIndex(int centerNodeID, int[] parentArray) {
-        for (int i = 0; i < parentArray.length; i++) {
-            if (parentArray[i] == centerNodeID) {
-                return i;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
 
     /**
      * Adds dummy's so that the span is always 1.
@@ -308,13 +322,6 @@ public class SequenceGraph {
             parentNode.addChild(dummy.getId());
             dummy.addChild(target);
             dummy.setColumn(parentNode.getColumn() + 1);
-
-            if (parentNode.getGenomes().length > targetNode.getGenomes().length) {
-                dummy.setGenomes(parentNode.getGenomes());
-            } else {
-                dummy.setGenomes(targetNode.getGenomes());
-            }
-            
             this.addNode(dummy);
             --span;
             addDummyHelper(span, dummy.getId(), target);
@@ -355,7 +362,7 @@ public class SequenceGraph {
      *
      * @return A HashMap of all nodes and their IDs contained in the graph.
      */
-    public HashMap<Integer, SequenceNode> getNodes() {
+    public TreeMap<Integer, SequenceNode> getNodes() {
         return this.nodes;
     }
 

@@ -1,21 +1,17 @@
 package gui.sub_controllers;
 
-import graph.SequenceGraph;
+import graph.Annotation;
 import gui.CustomProperties;
 import gui.DrawableCanvas;
-import gui.GraphDrawer;
-import gui.MenuController;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.mapdb.HTreeMap;
 import parser.GfaParser;
-
+import parser.GffParser;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Observer;
+import java.util.ArrayList;
 import java.util.Observable;
+import java.util.Observer;
 import java.util.regex.Pattern;
 
 /**
@@ -23,17 +19,12 @@ import java.util.regex.Pattern;
  */
 public class FileController extends Observable implements Observer {
 
+    private File gfaParDirectory;
+    private File gffParDirectory;
 
-    private File parDirectory;
     private ProgressBarController progressBarController;
 
-
-    private final int renderRange = PanningController.RENDER_RANGE;
-    private final int nodeId = 1;
-
     private Thread parseThread;
-
-
 
     private String partPath;
 
@@ -49,7 +40,8 @@ public class FileController extends Observable implements Observer {
      * @param pbc The progressbar.
      */
     public FileController(ProgressBarController pbc) {
-        parDirectory = null;
+        gfaParDirectory = null;
+        gffParDirectory = null;
         progressBarController = pbc;
 
         properties = new CustomProperties();
@@ -61,17 +53,17 @@ public class FileController extends Observable implements Observer {
      * @param stage The stage on which the fileFinder is shown.
      * @return returns the file that can be loaded.
      */
-    public File chooseFile(Stage stage) {
+    public File chooseGfaFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
 
-        if (parDirectory == null) {
+        if (gfaParDirectory == null) {
             fileChooser.setInitialDirectory(
                     new File(System.getProperty("user.dir")).getParentFile()
             );
         } else {
             fileChooser.setInitialDirectory(
-                    parDirectory
+                    gfaParDirectory
             );
         }
 
@@ -79,7 +71,35 @@ public class FileController extends Observable implements Observer {
                 new FileChooser.ExtensionFilter("GFA", "*.gfa")
         );
         File res = fileChooser.showOpenDialog(stage);
-        parDirectory = res.getParentFile();
+        gfaParDirectory = res.getParentFile();
+        return res;
+    }
+
+    /**
+     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa.
+     * can be selected and directly be visualised on the screen.
+     * @param stage The stage on which the fileFinder is shown.
+     * @return returns the file that can be loaded.
+     */
+    public File chooseGffFile(Stage stage) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Annotation File");
+
+        if (gffParDirectory == null) {
+            fileChooser.setInitialDirectory(
+                    new File(System.getProperty("user.dir")).getParentFile()
+            );
+        } else {
+            fileChooser.setInitialDirectory(
+                    gffParDirectory
+            );
+        }
+
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("GFF", "*.gff")
+        );
+        File res = fileChooser.showOpenDialog(stage);
+        gffParDirectory = res.getParentFile();
         return res;
     }
 
@@ -91,7 +111,7 @@ public class FileController extends Observable implements Observer {
      * @throws IOException exception if no file is found
      * @throws InterruptedException Exception if the Thread is interrupted.
      */
-    public void openFileClicked(String filePath)
+    public void openGfaFileClicked(String filePath)
             throws IOException, InterruptedException {
         if (DrawableCanvas.getInstance().getParser() != null) {
             DrawableCanvas.getInstance().getParser().getDb().close();
@@ -117,12 +137,13 @@ public class FileController extends Observable implements Observer {
         }
         this.parseThread = new Thread(parser);
         this.parseThread.start();
-
         progressBarController.run();
     }
 
-
-
+    public ArrayList<Annotation> openGffFileClicked(String filePath) throws IOException {
+        GffParser parser = new GffParser(filePath);
+        return parser.parseGff();
+    }
 
     @Override
     public void update(Observable o, Object arg) {
@@ -148,4 +169,6 @@ public class FileController extends Observable implements Observer {
         System.out.println(fileName);
         return fileName;
     }
+
+
 }
