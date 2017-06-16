@@ -1,5 +1,6 @@
 package gui;
 
+import graph.Annotation;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.ColourController;
@@ -37,6 +38,8 @@ public class GraphDrawer {
     private int highlightedNode;
     private int[] selected = null;
     private ColourController colourController;
+    private ArrayList<Annotation> allAnnotations;
+    private ArrayList<Annotation> selectedAnnotations;
     private SequenceNode mostLeftNode;
     private SequenceNode mostRightNode;
 
@@ -47,7 +50,7 @@ public class GraphDrawer {
     public void setGraph(SequenceGraph graph) {
         this.graph = graph;
         columns = graph.getColumns();
-        columnWidths = new double[columns.size() +1];
+        columnWidths = new double[columns.size() + 1];
         initializeColumnWidths();
         long start = System.currentTimeMillis();
         initializeDummyWidths();
@@ -66,6 +69,9 @@ public class GraphDrawer {
         }
         colourController = new ColourController(selected);
         highlightedNode = 0;
+
+        allAnnotations = new ArrayList<Annotation>();
+        selectedAnnotations = new ArrayList<Annotation>();
     }
 
 
@@ -206,7 +212,7 @@ public class GraphDrawer {
             }
             node.setCoordinates(x, y, width, height);
             setExtremeNodes(node);
-            node.draw(gc, colourController);
+            node.draw(gc, colourController, selectedAnnotations);
         }
     }
 
@@ -417,6 +423,14 @@ public class GraphDrawer {
         return selected;
     }
 
+    public void setSelectedAnnotations(ArrayList<Annotation> newAnnotations) {
+        this.selectedAnnotations = newAnnotations;
+    }
+
+    public void setAllAnnotations(ArrayList<Annotation> newAnnotations) {
+        this.allAnnotations = newAnnotations;
+    }
+
     public void setxDifference(double xDifference) {
         if (xDifference < 0) { xDifference = 0; }
         if (xDifference + zoomLevel > range) { xDifference = range - zoomLevel; }
@@ -435,8 +449,6 @@ public class GraphDrawer {
         this.zoomLevel = zoomLevel;
     }
 
-
-
     public SequenceGraph getGraph() {
         return graph;
     }
@@ -444,6 +456,14 @@ public class GraphDrawer {
 
     public SequenceNode getMostLeftNode() {
         return mostLeftNode;
+    }
+
+    public ArrayList<Annotation> getAllAnnotations() {
+        return allAnnotations;
+    }
+
+    public ArrayList<Annotation> getSelectedAnnotations() {
+        return selectedAnnotations;
     }
 
     public SequenceNode getMostRightNode() {

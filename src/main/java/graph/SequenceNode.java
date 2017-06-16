@@ -86,7 +86,7 @@ public class SequenceNode {
      * @param gc               The graphicsContext of the screen.
      * @param colourController A controller that chooses colours for the node
      */
-    public void draw(GraphicsContext gc, ColourController colourController) {
+    public void draw(GraphicsContext gc, ColourController colourController, ArrayList<Annotation> annotations) {
         if (inView(gc.getCanvas().getWidth())) {
             if (isDummy) {
                 GraphDrawer.getInstance().setLineWidth(genomes.length);
@@ -100,14 +100,50 @@ public class SequenceNode {
                 gc.setLineWidth(6);
                 gc.strokeRect(xCoordinate, yCoordinate, width, height);
             }
-            colourMeBby = colourController.getColors(genomes);
-
+            
+           colourMeBby = colourController.getColors(genomes);
             double tempCoordinate = yCoordinate;
             double tempHeight = height / colourMeBby.size();
             for (Color beamColour : colourMeBby) {
                 gc.setFill(beamColour);
                 gc.fillRect(xCoordinate, tempCoordinate, width, tempHeight);
                 tempCoordinate += tempHeight;
+            }
+            for (int i = 0; i < annotations.size(); i++) {
+                Annotation annotation = annotations.get(i);
+                int annoID = annotation.getId();
+                double startXAnno = xCoordinate;
+                double startYAnno = yCoordinate + height;
+                double annoWidth = width;
+                double annoHeight = height / 2;
+                int indexOfGenome = colourController.containsPos(genomes, annoID);
+                if (indexOfGenome != -1) {
+                    int startOfAnno = annotation.getStart();
+                    int endOfAnno = annotation.getEnd();
+                    int startCorOfGenome = 0;
+
+                    if (genomes.length == offSets.length) {
+                        startCorOfGenome = indexOfGenome;
+                    }
+
+                    if (startOfAnno > (offSets[startCorOfGenome] + sequenceLength)
+                            || endOfAnno < (offSets[startCorOfGenome])) {
+                        continue;
+                    }
+
+                    double emptyAtStart = 0.0;
+                    if (startOfAnno > offSets[startCorOfGenome]) {
+                        emptyAtStart = startOfAnno - offSets[startCorOfGenome];
+                        annoWidth = (annoWidth * (1 - (emptyAtStart / sequenceLength)));
+                        startXAnno = startXAnno + (width - annoWidth);
+                    }
+                    if (endOfAnno < (offSets[startCorOfGenome] + sequenceLength)) {
+                        int emptyAtEnd = offSets[startCorOfGenome] + sequenceLength - endOfAnno;
+                        annoWidth = (annoWidth * (1 - (emptyAtEnd / (sequenceLength - emptyAtStart))));
+                    }
+                    gc.setFill(Color.RED);
+                    gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
+                }
             }
         }
     }
@@ -295,6 +331,11 @@ public class SequenceNode {
         for (Integer i : this.getGenomes()) {
             str += i.toString() + ", ";
         }
+        str += "\nCo-Ordinates of the genomes that go through this";
+        for (int offSet : offSets) {
+            str += offSet + ", ";
+        }
+
         str = str.substring(0, str.length() - 2);
         return str;
     }

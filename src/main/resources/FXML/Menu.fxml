@@ -15,7 +15,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="anchorPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1030.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MenuController">
+<AnchorPane fx:id="anchorPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MenuController">
    <children>
       <SplitPane dividerPositions="1.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
@@ -26,7 +26,7 @@
                       <Menu mnemonicParsing="false" text="File">
                         <items>
                           <MenuItem mnemonicParsing="false" onAction="#openGfaFileClicked" text="Open gfa file" />
-                            <MenuItem fx:id="gffItem" mnemonicParsing="false" onAction="#openGffFileClicked" text="Open gff file" disable="true"/>
+                            <MenuItem fx:id="gffItem" disable="true" mnemonicParsing="false" onAction="#openGffFileClicked" text="Open gff file" />
                             <Menu mnemonicParsing="false" text="Recent">
                                 <items>
                                     <MenuItem fx:id="file1" mnemonicParsing="false" onAction="#file1Press" text="&lt;No recent file&gt;" />
@@ -80,6 +80,7 @@
                               <Button layoutX="26.0" layoutY="72.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
                               <TextField fx:id="radiusTextField" alignment="CENTER" layoutX="27.0" layoutY="111.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
                               <Button fx:id="chooseGenome" layoutX="14.0" layoutY="171.0" mnemonicParsing="false" onAction="#chooseGenomePress" prefHeight="25.0" prefWidth="120.0" text="Specific Genome" />
+                              <Button fx:id="annoBut" disable="true" layoutX="12.0" layoutY="208.0" mnemonicParsing="false" onAction="#chooseAnnoClicked" prefHeight="25.0" prefWidth="120.0" text="Choose Annotation" />
                            </children>
                         </AnchorPane>
                       <AnchorPane fx:id="canvasPanel" focusTraversable="true" style="-fx-background-color: WHITE;">
