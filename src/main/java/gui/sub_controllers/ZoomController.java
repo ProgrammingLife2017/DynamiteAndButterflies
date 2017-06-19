@@ -49,10 +49,6 @@ public class ZoomController {
      * @throws IOException thrown if can't find
      */
     public void zoomOut(int column) throws IOException {
-//        if (GraphDrawer.getInstance().getxDifference() + GraphDrawer.getInstance().getZoomLevel() >
-//                GraphDrawer.getInstance().getRange()) {
-//            GraphDrawer.getInstance().getGraph().createSubGraph(1, GraphDrawer.getInstance().getGraph().getRightBoundID() + 100);
-//        }
         GraphDrawer.getInstance().zoom(SCROLL_ZOOM_OUT_FACTOR, column);
         updateRadius((int) Math.ceil(GraphDrawer.getInstance().getRadius()) + "");
     }

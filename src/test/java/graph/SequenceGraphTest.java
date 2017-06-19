@@ -58,7 +58,6 @@ public class SequenceGraphTest {
 
     @Test
     public void getColumns() throws Exception {
-        // column size == longes path length
         assertTrue(graph.getColumns().size() == 15);
     }
 

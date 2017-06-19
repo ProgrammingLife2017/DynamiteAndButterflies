@@ -1,6 +1,5 @@
 package gui.sub_controllers;
 
-import com.sun.corba.se.impl.orbutil.graph.Graph;
 import graph.SequenceGraph;
 import gui.GraphDrawer;
 import javafx.animation.Animation;
