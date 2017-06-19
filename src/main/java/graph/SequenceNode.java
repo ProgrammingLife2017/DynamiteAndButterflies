@@ -318,9 +318,9 @@ public class SequenceNode {
         appendChildren(stringBuilder);
         appendParents(stringBuilder);
         stringBuilder.append("SequenceLength:\t").append(this.sequenceLength).append("\n");
-        appendSequence(sequence, stringBuilder);
         appendGenomes(stringBuilder);
         appendGenomeCoords(stringBuilder);
+        appendSequence(sequence, stringBuilder);
         return stringBuilder.toString();
     }
 

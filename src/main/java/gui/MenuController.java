@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -62,7 +63,9 @@ public class MenuController implements Observer {
     @FXML
     private MenuItem bookmark3;
     @FXML
-    private Label sequenceInfo;
+    private TextArea sequenceInfo;
+    @FXML
+    private TextArea sequenceInfoAlt;
     @FXML
     private TextField nodeTextField;
     @FXML
@@ -110,7 +113,7 @@ public class MenuController implements Observer {
         properties = new CustomProperties();
 
         fileController = new FileController(new ProgressBarController(progressBar));
-        infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
+        infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo, sequenceInfoAlt);
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
 
@@ -144,6 +147,8 @@ public class MenuController implements Observer {
     private void openGfaFileClicked(String filePath) throws IOException, InterruptedException {
         fileController.openGfaFileClicked(filePath);
         recentController.update(filePath);
+        infoController.updateSeqLabel("Node info <click>");
+        infoController.updateSeqAltLabel("Node info <ctrl click>");
     }
 
 
@@ -223,8 +228,15 @@ public class MenuController implements Observer {
         SequenceNode clicked = GraphDrawer.getInstance().clickNode(pressedX, pressedY);
         if (clicked != null) {
             String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId());
-            infoController.updateSeqLabel(clicked.toString(sequence));
-            nodeTextField.setText(clicked.getId().toString());
+            if (!mouseEvent.isControlDown()) {
+                infoController.updateSeqLabel(clicked.toString(sequence));
+                nodeTextField.setText(clicked.getId().toString());
+            }
+            else {
+                infoController.updateSeqAltLabel(clicked.toString(sequence));
+            }
+
+
         }
     }
 
