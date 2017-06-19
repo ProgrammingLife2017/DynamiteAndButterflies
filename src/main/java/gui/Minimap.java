@@ -1,5 +1,6 @@
 package gui;
 
+import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -10,13 +11,13 @@ import javafx.scene.text.Font;
  */
 public class Minimap {
 
-    private static final int MINIMAP_Y = 700;
-    private static final int MINIMAP_HEIGHT = 20;
-    private static final int TEXT_Y = 740;
-    private static final int TEXT_END_Y = 695;
-    private static final int TEXT_SIZE = 10;
-    private static final int DIVISION_LINE_HEIGHT = 715;
-    private static final int CHAR_WIDTH = 3;
+    public static final int MINIMAP_Y = 100;
+    public static final int MINIMAP_HEIGHT = 20;
+    public static final int TEXT_Y = 40;
+    public static final int TEXT_END_Y = 5;
+    public static final int TEXT_SIZE = 10;
+    public static final int DIVISION_LINE_HEIGHT = 15;
+    public static final int CHAR_WIDTH = 3;
 
     private static Minimap minimap = new Minimap();
 
@@ -70,9 +71,10 @@ public class Minimap {
      */
     private void drawMapBox(GraphicsContext gc) {
         double x = gc.getCanvas().getWidth() / 2 - width / 2;
-        gc.strokeRect(x, MINIMAP_Y, width, MINIMAP_HEIGHT);
-        gc.strokeText("0", x, TEXT_Y);
-        gc.strokeText(size + "", x + width - Integer.toString(size).length() * CHAR_WIDTH, TEXT_END_Y);
+        double y = gc.getCanvas().getHeight() - MINIMAP_Y;
+        gc.strokeRect(x, y, width, MINIMAP_HEIGHT);
+        gc.strokeText("0", x, y + TEXT_Y);
+        gc.strokeText(size + "", x + width - Integer.toString(size).length() * CHAR_WIDTH, y - TEXT_END_Y);
     }
 
     /**
@@ -81,10 +83,11 @@ public class Minimap {
      */
     private void drawDivisionLines(GraphicsContext gc) {
         double x = gc.getCanvas().getWidth() / 2 - width / 2;
+        double y = gc.getCanvas().getHeight() - MINIMAP_Y;
         for (int i = stepSize; i < size; i += stepSize) {
             double division = x + valueToXCoordinate(i);
-            gc.strokeLine(division, DIVISION_LINE_HEIGHT, division, MINIMAP_Y + MINIMAP_HEIGHT);
-            gc.strokeText(i + "", division - Integer.toString(i).length() * CHAR_WIDTH, TEXT_Y);
+            gc.strokeLine(division, y + DIVISION_LINE_HEIGHT, division, y + MINIMAP_HEIGHT);
+            gc.strokeText(i + "", division - Integer.toString(i).length() * CHAR_WIDTH, y + TEXT_Y);
         }
     }
 
@@ -94,8 +97,9 @@ public class Minimap {
      */
     private void drawViewBox(GraphicsContext gc) {
         double x = gc.getCanvas().getWidth() / 2 - width / 2;
+        double y = gc.getCanvas().getHeight() - MINIMAP_Y;
         gc.setStroke(Color.RED);
-        gc.strokeRect(x + valueToXCoordinate(value), MINIMAP_Y, valueToXCoordinate(amountVisible), MINIMAP_HEIGHT);
+        gc.strokeRect(x + valueToXCoordinate(value), y, valueToXCoordinate(amountVisible), MINIMAP_HEIGHT);
     }
 
     /**
