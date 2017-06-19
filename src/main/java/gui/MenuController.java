@@ -40,7 +40,7 @@ public class MenuController implements Observer {
     @FXML
     public Button annoBut;
     @FXML
-    private Button saveGenomeBut;
+    public Button chooseGenome;
     @FXML
     private MenuItem genome1;
     @FXML
@@ -113,6 +113,7 @@ public class MenuController implements Observer {
         infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
+        zoomController = null;
 
         specificGenomeProperties = new SpecificGenomeProperties(genome1, genome2, genome3);
 
@@ -137,13 +138,13 @@ public class MenuController implements Observer {
         Stage stage = App.getStage();
         File file = fileController.chooseGfaFile(stage);
         String filePath = file.getAbsolutePath();
-        recentController.update(filePath);
-        fileController.openGfaFileClicked(filePath);
+        openGfaFileClicked(filePath);
     }
 
     private void openGfaFileClicked(String filePath) throws IOException, InterruptedException {
         fileController.openGfaFileClicked(filePath);
         recentController.update(filePath);
+        chooseGenome.setDisable(false);
     }
 
 
@@ -176,9 +177,11 @@ public class MenuController implements Observer {
      */
     @FXML
     public void zoomInClicked() throws IOException {
-        double xCentre = canvas.getWidth() / 2;
-        zoomController.zoomIn(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
-        nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
+        if (zoomController != null) {
+            double xCentre = canvas.getWidth() / 2;
+            zoomController.zoomIn(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
+            nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
+        }
     }
 
     /**
@@ -188,9 +191,11 @@ public class MenuController implements Observer {
      */
     @FXML
     public void zoomOutClicked() throws IOException {
-        double xCentre = canvas.getWidth() / 2;
-        zoomController.zoomOut(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
-        nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
+        if (zoomController != null) {
+            double xCentre = canvas.getWidth() / 2;
+            zoomController.zoomOut(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
+            nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
+        }
     }
 
     /**
@@ -220,7 +225,13 @@ public class MenuController implements Observer {
         canvasPanel.requestFocus();
         double pressedX = mouseEvent.getX();
         double pressedY = mouseEvent.getY();
-        SequenceNode clicked = GraphDrawer.getInstance().clickNode(pressedX, pressedY);
+        SequenceNode clicked = null;
+        try {
+            clicked = GraphDrawer.getInstance().clickNode(pressedX, pressedY);
+        } catch (NullPointerException e) {
+            System.out.println("The graph is not yet loaded!");
+            e.printStackTrace();
+        }
         if (clicked != null) {
             String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId());
             infoController.updateSeqLabel(clicked.toString(sequence));
@@ -233,12 +244,14 @@ public class MenuController implements Observer {
      */
     @FXML
     public void traverseGraphClicked() {
-        int centreNodeID = Integer.parseInt(nodeTextField.getText());
-        int radius = Integer.parseInt(radiusTextField.getText());
-        zoomController.traverseGraphClicked(centreNodeID, radius);
-        SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
-        String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
-        infoController.updateSeqLabel(node.toString(sequence));
+        if (!nodeTextField.getText().equals("") && !radiusTextField.getText().equals("")) {
+            int centreNodeID = Integer.parseInt(nodeTextField.getText());
+            int radius = Integer.parseInt(radiusTextField.getText());
+            zoomController.traverseGraphClicked(centreNodeID, radius);
+            SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
+            String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
+            infoController.updateSeqLabel(node.toString(sequence));
+        }
     }
 
     /**
@@ -344,7 +357,12 @@ public class MenuController implements Observer {
      * @return The sequenceMap.
      */
     HTreeMap<Long, String> getSequenceHashMap() {
-        return DrawableCanvas.getInstance().getParser().getSequenceHashMap();
+        try {
+            return DrawableCanvas.getInstance().getParser().getSequenceHashMap();
+        } catch (NullPointerException e) {
+            System.out.println("No graph was loaded so no sequenceHashMap to get");
+        }
+        return null;
     }
 
     @Override
@@ -524,6 +542,7 @@ public class MenuController implements Observer {
 
     /**
      * Handles choosing Annotations.
+     *
      * @throws IOException if something goes wrong.
      */
     public void chooseAnnoClicked() throws IOException {
