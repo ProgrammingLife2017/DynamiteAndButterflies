@@ -8,7 +8,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
@@ -44,6 +47,7 @@ public class GraphDrawer {
     private SequenceNode mostLeftNode;
     private SequenceNode mostRightNode;
     private HashMap<Integer, double[]> coordinates;
+    private boolean rainbowView = true;
 
     public static GraphDrawer getInstance(){
         return drawer;
@@ -78,7 +82,7 @@ public class GraphDrawer {
         if (mostRightNode == null) {
             mostRightNode = graph.getNode(graph.getRightBoundID());
         }
-        colourController = new ColourController(selected);
+        colourController = new ColourController(selected, rainbowView);
         highlightedNode = 0;
     }
 
@@ -144,7 +148,7 @@ public class GraphDrawer {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
         setxDifference(xDifference);
-        colourController = new ColourController(selected);
+        colourController = new ColourController(selected, rainbowView);
         drawNodes();
         drawMinimap();
     }
@@ -386,14 +390,19 @@ public class GraphDrawer {
      */
     public SequenceNode clickNode(double xEvent, double yEvent) {
         SequenceNode click = null;
-        Iterator it = graph.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
-            if (checkClick(node, xEvent, yEvent)) {
-                click = graph.getNode(node.getId());
-                highlight(node.getId());
+
+        try {
+            Iterator it = graph.getNodes().entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                SequenceNode node = (SequenceNode) pair.getValue();
+                if (checkClick(node, xEvent, yEvent)) {
+                    click = graph.getNode(node.getId());
+                    highlight(node.getId());
+                }
             }
+        } catch (NullPointerException e) {
+            System.out.println("Graph not yet intialized");
         }
         return click;
     }
@@ -416,14 +425,19 @@ public class GraphDrawer {
      * @return The column id of the column the x coordinate is in.
      */
     public int findColumn(double xEvent) {
-        Iterator it = graph.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
-            int nodeID = (Integer) pair.getKey();
-            if (checkClickX(node, xEvent)) {
-                return graph.getNode(nodeID).getId();
+
+        try {
+            Iterator it = graph.getNodes().entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                SequenceNode node = (SequenceNode) pair.getValue();
+                int nodeID = (Integer) pair.getKey();
+                if (checkClickX(node, xEvent)) {
+                    return graph.getNode(nodeID).getId();
+                }
             }
+        } catch (NullPointerException e) {
+            System.out.println("No graph has been loaded.");
         }
         return -1;
     }
@@ -562,7 +576,7 @@ public class GraphDrawer {
 
     public void setSelected(int[] newSelection) {
         this.selected = newSelection;
-        this.colourController = new ColourController(selected);
+        this.colourController = new ColourController(selected, rainbowView);
     }
 
     public int[] getSelected() {
@@ -614,6 +628,11 @@ public class GraphDrawer {
 
     public SequenceNode getMostRightNode() {
         return mostRightNode;
+    }
+
+    public void setRainbowView(boolean rainbowView) {
+        this.rainbowView = rainbowView;
+        this.colourController = new ColourController(selected, rainbowView);
     }
 }
 
