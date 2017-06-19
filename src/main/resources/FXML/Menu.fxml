@@ -23,13 +23,13 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="anchorPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MenuController">
+<AnchorPane maxHeight="1080.0" maxWidth="1920.0" prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MenuController">
    <children>
-      <BorderPane prefHeight="768.0" prefWidth="1366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane maxHeight="1080.0" maxWidth="1920.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <bottom>
-          <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="CENTER">
+          <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
                <children>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="150.0">
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="150.0" style="-fx-background-color: white;">
                      <children>
                         <Label layoutX="14.0" layoutY="14.0" text="Nodes:" />
                         <Label layoutX="14.0" layoutY="43.0" text="Edges:" />
@@ -37,18 +37,13 @@
                         <Label fx:id="numEdgesLabel" layoutX="63.0" layoutY="43.0" text="0" />
                      </children>
                   </AnchorPane>
-              <AnchorPane layoutX="150.0" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="1150.0" style="-fx-background-color: white;">
-                     <children>
-                        <HBox>
-                           <children>
-                              <TextArea fx:id="sequenceInfo" editable="false" layoutX="150.0" prefHeight="162.0" prefWidth="400.0" style="-fx-background-color: transparent; -fx-background-insets: 0px;" text="Node info &lt;click&gt;" wrapText="true" />
-                              <TextArea fx:id="sequenceInfoAlt" editable="false" layoutX="150.0" prefHeight="162.0" prefWidth="400.0" style="-fx-background-color: transparent; fx-background-insets: 0px;" text="Node info &lt;ctrl click&gt;" wrapText="true" />
-                              <TextArea fx:id="consoleArea" prefHeight="162.0" prefWidth="362.0" />
-                           </children>
-                        </HBox>
-                        <ProgressBar fx:id="progressBar" layoutY="120.0" prefHeight="40.0" prefWidth="1166.0" progress="0.0" visible="false" />
-                     </children>
-                  </AnchorPane>
+                  <SplitPane dividerPositions="0.5" layoutX="150.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <items>
+                        <TextArea fx:id="sequenceInfo" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="162.0" style="-fx-background-color: transparent; -fx-background-insets: 0px;" text="Node info &lt;click&gt;" wrapText="true" />
+                        <TextArea fx:id="sequenceInfoAlt" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="162.0" style="-fx-background-color: transparent; fx-background-insets: 0px;" text="Node info &lt;ctrl click&gt;" wrapText="true" />
+                     </items>
+                  </SplitPane>
+                  <ProgressBar fx:id="progressBar" prefHeight="40.0" prefWidth="1366.0" progress="0.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
                </children>
             </AnchorPane>
          </bottom>

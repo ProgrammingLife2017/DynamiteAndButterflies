@@ -119,13 +119,13 @@ public class MenuController implements Observer {
 
         specificGenomeProperties = new SpecificGenomeProperties(genome1, genome2, genome3);
 
-        ps = new PrintStream(new Console(consoleArea));
+        //ps = new PrintStream(new Console(consoleArea));
         DrawableCanvas.getInstance().setMenuController(this);
 
         DrawableCanvas.getInstance().setSpecificGenomeProperties(specificGenomeProperties);
 
         //System.setErr(ps);
-        System.setOut(ps);
+        //System.setOut(ps);
     }
 
     /**
