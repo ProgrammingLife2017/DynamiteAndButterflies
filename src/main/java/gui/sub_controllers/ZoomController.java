@@ -16,8 +16,8 @@ public class ZoomController {
     private static ZoomController zoomController = new ZoomController();
     private MenuController menuController;
 
-    private static final double SCROLL_ZOOM_IN_FACTOR = 0.8;
-    private static final double SCROLL_ZOOM_OUT_FACTOR = 1.25;
+    private static final double SCROLL_ZOOM_IN_FACTOR = 0.9;
+    private static final double SCROLL_ZOOM_OUT_FACTOR = 1.1;
 
     /**
      * Constructor of the Zoom Controller.
