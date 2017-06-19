@@ -88,8 +88,8 @@
                               <Canvas fx:id="canvas" onMouseClicked="#clickMouse" onScroll="#scrollZoom" />
                               <Button mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
                               <Button mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0" />
-                              <Button fx:id="rightPanButton" mnemonicParsing="false" prefHeight="80.0" prefWidth="200.0" text="Right" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="20.0" />
-                              <Button fx:id="leftPanButton" mnemonicParsing="false" prefHeight="80.0" prefWidth="200.0" text="Left" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="20.0" />
+                              <Button fx:id="rightPannButton" mnemonicParsing="false" prefHeight="80.0" prefWidth="200.0" text="Right" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="20.0" />
+                              <Button fx:id="leftPannButton" mnemonicParsing="false" prefHeight="80.0" prefWidth="200.0" text="Left" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="20.0" />
                            </children>
                         </AnchorPane>
                     </items>
