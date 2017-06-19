@@ -66,8 +66,8 @@ public class SequenceGraph {
      * @param range        - the amount of edges to add to the graph
      */
     public void createSubGraph(int centerNodeID, int range) {
-        this.nodes = new TreeMap<Integer, SequenceNode>();
-        this.columns = new ArrayList<ArrayList<SequenceNode>>();
+        this.nodes = new TreeMap<>();
+        this.columns = new ArrayList<>();
 
         initBoundary(centerNodeID, range);
         initNodes();
