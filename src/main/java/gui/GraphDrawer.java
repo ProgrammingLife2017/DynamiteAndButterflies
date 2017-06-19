@@ -190,6 +190,9 @@ public class GraphDrawer {
         }
     }
 
+    public boolean inView(double[] coordinates) {
+        return coordinates[0] + coordinates[2] > 0 && coordinates[0] < gc.getCanvas().getWidth();
+    }
 
     /**
      * Computes the coordinates for the given node
