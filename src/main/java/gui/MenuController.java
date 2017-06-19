@@ -44,6 +44,12 @@ public class MenuController implements Observer {
     @FXML
     public CheckBox rainbowBut;
     @FXML
+    public Button zoomInBut;
+    @FXML
+    public Button zoomOutBut;
+    @FXML
+    public Button goToNodeBut;
+    @FXML
     private MenuItem genome1;
     @FXML
     private MenuItem genome2;
@@ -394,12 +400,26 @@ public class MenuController implements Observer {
                         zoomController = new ZoomController(panningController,
                                 nodeTextField, radiusTextField);
                         displayInfo(GraphDrawer.getInstance().getGraph());
-                        chooseGenome.setDisable(false);
-                        rainbowBut.setDisable(false);
+                        enableGuiElements();
                     }
                 });
             }
         }
+    }
+
+    /**
+     * Enables all the buttons and textfields a user could need to view the graph.
+     */
+    private void enableGuiElements() {
+        zoomInBut.setDisable(false);
+        zoomOutBut.setDisable(false);
+        leftPannButton.setDisable(false);
+        rightPannButton.setDisable(false);
+        nodeTextField.setDisable(false);
+        radiusTextField.setDisable(false);
+        goToNodeBut.setDisable(false);
+        chooseGenome.setDisable(false);
+        rainbowBut.setDisable(false);
     }
 
     /**
