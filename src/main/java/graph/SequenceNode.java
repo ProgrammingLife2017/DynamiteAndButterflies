@@ -1,5 +1,6 @@
 package graph;
 
+import gui.DrawableCanvas;
 import gui.GraphDrawer;
 import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.GraphicsContext;
@@ -345,7 +346,7 @@ public class SequenceNode {
         int[] sortedGenomes = this.getGenomes();
         Arrays.sort(sortedGenomes);
         for (Integer i: sortedGenomes) {
-            stringBuilder.append(i).append(" ");
+            stringBuilder.append(DrawableCanvas.getInstance().getAllGenomesReversed().get(i)).append(" ");
         }
         stringBuilder.append("\n");
     }
