@@ -86,25 +86,10 @@ public class ColourController {
      * @param combo an integer representing it's position in the selectedGenomes array
      * @return A color.
      */
-    public Color getSingle(int combo) {
-        switch (combo) {
-            case 0:
-                return Color.color(0.8471, 0.8471, 0);
-            case 1:
-                return Color.color(0, 0, 0.8471);
-            case 2:
-                return Color.color(0.8471, 0, 0);
-            case 3:
-                return Color.color(0.8471, 0, 0.8471);
-            case 4:
-                return Color.color(1, 0.6039, 0);
-            case 5:
-                return Color.color(0, 0.8471, 0);
-            case 6:
-                return Color.color(0, 0.8471, 0.8471);
-            default:
-                return getBase();
-        }
+    public Color getSingle(int positionInSelection) {
+        double hue = (360 / selectedGenomes.length) * positionInSelection;
+        double brightness = 0.8 + (0.2 / selectedGenomes.length) * positionInSelection;
+        return Color.hsb(hue, 1, brightness);
     }
 
     /**
