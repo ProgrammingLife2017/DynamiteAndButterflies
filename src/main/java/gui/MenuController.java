@@ -168,8 +168,7 @@ public class MenuController implements Observer {
     }
 
     public void updateRadius() {
-        int radius = GraphDrawer.getInstance().getMostRightNode().getId() - GraphDrawer.getInstance().getMostLeftNode().getId();
-        radiusTextField.setText(radius + "");
+        radiusTextField.setText(GraphDrawer.getInstance().getRadius() + "");
     }
 
     /**
@@ -360,6 +359,7 @@ public class MenuController implements Observer {
                                 new PanningController(leftPannButton, rightPannButton);
                         panningController.initializeKeys(canvasPanel);
                         displayInfo(GraphDrawer.getInstance().getGraph());
+                        updateRadius();
                     }
                 });
             }
@@ -551,4 +551,5 @@ public class MenuController implements Observer {
         GraphDrawer.getInstance().setRainbowView(rainbowBut.isSelected());
         GraphDrawer.getInstance().redraw();
     }
+
 }

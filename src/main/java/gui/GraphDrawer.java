@@ -222,10 +222,8 @@ public class GraphDrawer {
     }
 
     public void setExtremeNodes(SequenceNode node) {
-        if (node.getxCoordinate() <= 0 && node.getxCoordinate() + node.getWidth() > 0) {
-            mostLeftNode = node; }
-        if (node.getxCoordinate() <= gc.getCanvas().getWidth() && node.getxCoordinate() + node.getWidth() >= gc.getCanvas().getWidth()) {
-            mostRightNode = node; }
+        if (node.getxCoordinate() <= 0 && node.getxCoordinate() + node.getWidth() / RELATIVE_X_DISTANCE > 0) { mostLeftNode = node; }
+        if (node.getxCoordinate() <= gc.getCanvas().getWidth() && node.getxCoordinate() + node.getWidth() / RELATIVE_X_DISTANCE >= gc.getCanvas().getWidth()) { mostRightNode = node; }
     }
 
     public boolean edgeInView(double startx, double endx) {
@@ -418,6 +416,10 @@ public class GraphDrawer {
         if (zoomLevel < 1) { zoomLevel = 1; }
         if (zoomLevel > range / 2) { zoomLevel = range / 2; }
         this.zoomLevel = zoomLevel;
+    }
+
+    public int getRadius() {
+        return mostRightNode.getId() - mostLeftNode.getId();
     }
 
     public SequenceGraph getGraph() {

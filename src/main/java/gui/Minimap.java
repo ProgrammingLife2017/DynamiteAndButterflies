@@ -131,9 +131,11 @@ public class Minimap {
 
     public void clickMinimap(double pressedX, double pressedY) {
         if (checkClick(pressedX, pressedY)) {
+            int test = GraphDrawer.getInstance().getRadius();
             double xLoc = (pressedX - xCoordinate) / width;
             int node = (int) (GraphDrawer.getInstance().getGraph().getFullGraphRightBoundID() * xLoc);
             ZoomController.getInstance().traverseGraphClicked(node, GraphDrawer.getInstance().getZoomLevel());
+            menuController.updateRadius();
         }
     }
 
