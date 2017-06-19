@@ -19,10 +19,6 @@ public class SequenceNode {
     private int index;
     private int column;
     private int sequenceLength;
-    private double xCoordinate;
-    private double yCoordinate;
-    private double width;
-    private double height;
     private boolean highlighted;
     private boolean isDummy;
     private float baryCenterValue;
@@ -51,21 +47,6 @@ public class SequenceNode {
     }
 
     /**
-     * Setter for the location of a node.
-     *
-     * @param x      XLocation.
-     * @param y      YLocation.
-     * @param width  Width.
-     * @param height Height.
-     */
-    public void setCoordinates(double x, double y, double width, double height) {
-        this.xCoordinate = x;
-        this.yCoordinate = y;
-        this.width = width;
-        this.height = height;
-    }
-
-    /**
      * Draw the node highlighted.
      */
     public void highlight() {
@@ -79,117 +60,8 @@ public class SequenceNode {
         this.highlighted = false;
     }
 
-    /**
-     * Draw the node with the color depending on it's status. Orange for highlighted nodes,
-     * black for dummy nodes and blue for sequence nodes.
-     *
-     * @param gc               The graphicsContext of the screen.
-     * @param colourController A controller that chooses colours for the node
-     */
-    public void draw(GraphicsContext gc, ColourController colourController, ArrayList<Annotation> annotations) {
-        if (inView(gc.getCanvas().getWidth())) {
-            if (isDummy) {
-                GraphDrawer.getInstance().setLineWidth(genomes.length);
-                gc.strokeLine(xCoordinate, yCoordinate + height / 2,
-                        xCoordinate + width, yCoordinate + height / 2);
-                return;
-            }
+    public boolean isHighlighted() {return this.highlighted;}
 
-            ArrayList<Color> colourMeBby = new ArrayList<>();
-            if (highlighted) {
-                gc.setLineWidth(6);
-                gc.strokeRect(xCoordinate, yCoordinate, width, height);
-            }
-
-           colourMeBby = colourController.getColors(genomes);
-            double tempCoordinate = yCoordinate;
-            double tempHeight = height / colourMeBby.size();
-            for (Color beamColour : colourMeBby) {
-                gc.setFill(beamColour);
-                gc.fillRect(xCoordinate, tempCoordinate, width, tempHeight);
-                tempCoordinate += tempHeight;
-            }
-            for (int i = 0; i < annotations.size(); i++) {
-                Annotation annotation = annotations.get(i);
-                int annoID = annotation.getId();
-                double startXAnno = xCoordinate;
-                double startYAnno = yCoordinate + height;
-                double annoWidth = width;
-                double annoHeight = height / 2;
-                int indexOfGenome = colourController.containsPos(genomes, annoID);
-                if (indexOfGenome != -1) {
-                    int startOfAnno = annotation.getStart();
-                    int endOfAnno = annotation.getEnd();
-                    int startCorOfGenome = 0;
-
-                    if (genomes.length == offSets.length) {
-                        startCorOfGenome = indexOfGenome;
-                    }
-
-                    if (startOfAnno > (offSets[startCorOfGenome] + sequenceLength)
-                            || endOfAnno < (offSets[startCorOfGenome])) {
-                        continue;
-                    }
-
-                    double emptyAtStart = 0.0;
-                    if (startOfAnno > offSets[startCorOfGenome]) {
-                        emptyAtStart = startOfAnno - offSets[startCorOfGenome];
-                        annoWidth = (annoWidth * (1 - (emptyAtStart / sequenceLength)));
-                        startXAnno = startXAnno + (width - annoWidth);
-                    }
-                    if (endOfAnno < (offSets[startCorOfGenome] + sequenceLength)) {
-                        int emptyAtEnd = offSets[startCorOfGenome] + sequenceLength - endOfAnno;
-                        annoWidth = (annoWidth * (1 - (emptyAtEnd / (sequenceLength - emptyAtStart))));
-                    }
-                    gc.setFill(Color.RED);
-                    gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
-                }
-            }
-        }
-    }
-
-    /**
-     * Check if a click event is within the borders of this node.
-     *
-     * @param xEvent x coordinate of the click event
-     * @param yEvent y coordinate of the click event
-     * @return True if the coordinates of the click event are within borders, false otherwise.
-     */
-    public boolean checkClick(double xEvent, double yEvent) {
-        return (xEvent > xCoordinate && xEvent < xCoordinate + width && yEvent > yCoordinate && yEvent < yCoordinate + height);
-    }
-
-
-    /**
-     * Check if a click event is within the borders of this node.
-     *
-     * @param xEvent x coordinate of the click event
-     * @return True if the coordinates of the click event are within borders, false otherwise.
-     */
-    public boolean checkClickX(double xEvent) {
-        return (xEvent > xCoordinate && xEvent < xCoordinate + width);
-    }
-
-    public boolean checkBounds() {
-        return (xCoordinate <= 0 && (xCoordinate + width) >= 0);
-    }
-
-
-    public double getxCoordinate() {
-        return xCoordinate;
-    }
-
-    public double getyCoordinate() {
-        return yCoordinate;
-    }
-
-    public double getWidth() {
-        return width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
 
     public Integer getId() {
         return id;
