@@ -3,6 +3,7 @@ package gui.sub_controllers;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Jip on 8-6-2017.
@@ -148,35 +149,49 @@ public class ColourController {
      * @param genomes The genomes in the node.
      * @return The list of colours the node should be.
      */
-    public ArrayList<Color> getColors(int[] genomes) {
-        ArrayList<Color> res = new ArrayList<Color>();
+    public List<Color> getColors(int[] genomes) {
+        List<Color> res = new ArrayList<Color>();
         //If there is no selection, it should only be the base colour.
         if (selectedGenomes.length == 0) {
             res.add(getBase());
             return res;
         }
         //If it is a large selection we have a different choice to make.
-        if (largeSelection) {
-            int length = 0;
-            for (int genome : genomes) {
-                if (contains(selectedGenomes, genome)) {
-                    length++;
-                }
-            }
-            res.add(getLargeSelColour(length));
-            return res;
-        }
+        if (largeSelection(genomes, res)) return res;
         //If it is a small selection we get the specific colours.
+        smallSelection(genomes, res);
+        if (res.isEmpty()) {
+            res.add(getBase());
+        }
+        return res;
+    }
+
+    private void smallSelection(int[] genomes, List<Color> res) {
         for (int genome : genomes) {
             int check = containsPos(selectedGenomes, genome);
             if (check != -1) {
                 res.add(getSingle(check));
             }
         }
-        if (res.isEmpty()) {
-            res.add(getBase());
+    }
+
+    private boolean largeSelection(int[] genomes, List<Color> res) {
+        if (largeSelection) {
+            int length = getGenomeLength(genomes);
+            res.add(getLargeSelColour(length));
+            return true;
         }
-        return res;
+        return false;
+    }
+
+    private int getGenomeLength(int[] genomes) {
+        int length = 0;
+        for (int genome : genomes) {
+            if (contains(selectedGenomes, genome)) {
+                length++;
+            }
+        }
+        return length;
     }
 
     /**

@@ -10,13 +10,13 @@ import javafx.scene.text.Font;
  */
 public class Minimap {
 
-    public static final int MINIMAP_Y = 700;
-    public static final int MINIMAP_HEIGHT = 20;
-    public static final int TEXT_Y = 740;
-    public static final int TEXT_END_Y = 695;
-    public static final int TEXT_SIZE = 10;
-    public static final int DIVISION_LINE_HEIGHT = 715;
-    public static final int CHAR_WIDTH = 3;
+    private static final int MINIMAP_Y = 700;
+    private static final int MINIMAP_HEIGHT = 20;
+    private static final int TEXT_Y = 740;
+    private static final int TEXT_END_Y = 695;
+    private static final int TEXT_SIZE = 10;
+    private static final int DIVISION_LINE_HEIGHT = 715;
+    private static final int CHAR_WIDTH = 3;
 
     private static Minimap minimap = new Minimap();
 

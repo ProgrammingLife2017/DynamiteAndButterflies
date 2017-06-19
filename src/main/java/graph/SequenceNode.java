@@ -6,6 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class Node2, which represents sequences of DNA. A sequence is a part of a genome.
@@ -95,7 +96,7 @@ public class SequenceNode {
                 return;
             }
 
-            ArrayList<Color> colourMeBby = new ArrayList<>();
+            List<Color> colourMeBby;
             if (highlighted) {
                 gc.setLineWidth(6);
                 gc.strokeRect(xCoordinate, yCoordinate, width, height);

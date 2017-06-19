@@ -69,24 +69,36 @@ public class SequenceGraph {
         this.nodes = new TreeMap<Integer, SequenceNode>();
         this.columns = new ArrayList<ArrayList<SequenceNode>>();
 
-        Boundary boundary = new Boundary(centerNodeID, range, parentArray, childArray);
-        this.centerNodeID = centerNodeID;
-        this.boundaries = boundary;
+        initBoundary(centerNodeID, range);
         initNodes();
         initGenomes();
         findLongestPath();
         addDummies();
         this.columns = initColumns();
-        assignSequenceLenghts();
+        assignSequenceLength();
     }
 
+    /**
+     * Creates a boundary for the sub-graph.
+     *
+     * @param centerNodeID - the center-node around which we form a boundary.
+     * @param range - range of the bounds to the center-node.
+     */
+    private void initBoundary(int centerNodeID, int range) {
+        Boundary boundary = new Boundary(centerNodeID, range, parentArray, childArray);
+        this.centerNodeID = centerNodeID;
+        this.boundaries = boundary;
+    }
+
+    /**
+     * Sets the genomes on the nodes.
+     */
     private void initGenomes() {
         try {
             String[] genomeData = getGenomes();
             int counter = 0;
-            Iterator it = nodes.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry) it.next();
+            for (Object o : nodes.entrySet()) {
+                Map.Entry pair = (Map.Entry) o;
                 SequenceNode node = (SequenceNode) pair.getValue();
                 String[] specificGenomeData = genomeData[counter].split("-");
                 node.setGenomes(splitOnStringToInt(specificGenomeData[0]));
@@ -102,42 +114,18 @@ public class SequenceGraph {
     /**
      * Assign the sequence lengths.
      */
-    private void assignSequenceLenghts() {
-        Iterator it = nodes.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
+    private void assignSequenceLength() {
+        for (Object o : nodes.entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
             SequenceNode node = (SequenceNode) pair.getValue();
-            if (!node.isDummy()) {
+            if (!node.isDummy()) try {
                 node.setSequenceLength(sequenceHashMap.get((long) node.getId()).length());
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                System.out.println("Sequence node length is null, database not properly loaded.");
+
             }
         }
-    }
-
-    /**
-     * Function to assign the genomes to the nodes in the sequencegraph.
-     */
-    private void assignGenomes() {
-        Iterator it = nodes.entrySet().iterator();
-        try {
-            while (it.hasNext()) {
-                Stream<String> lines = Files.lines(Paths.get(partPath + "genomes.txt"));
-                Map.Entry pair = (Map.Entry) it.next();
-                SequenceNode node = (SequenceNode) pair.getValue();
-                if (!node.isDummy()) {
-                    String line = lines.skip(node.getId() - 1).findFirst().get();
-                    String[] text = line.split(";");
-                    int[] genomes = new int[text.length];
-                    for (int i = 0; i < text.length; i++) {
-                        genomes[i] = Integer.parseInt(text[i]);
-                    }
-                    node.setGenomes(genomes);
-                }
-                lines.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     /**
@@ -190,13 +178,13 @@ public class SequenceGraph {
      * @return - the column list with solved edge crossings.
      */
     private ArrayList<ArrayList<SequenceNode>> initColumns() {
-        ArrayList<ArrayList<SequenceNode>> columns = new ArrayList<ArrayList<SequenceNode>>();
+        ArrayList<ArrayList<SequenceNode>> columns = new ArrayList<>();
 
         for (Object o : nodes.entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             SequenceNode node = (SequenceNode) pair.getValue();
             while (columns.size() <= node.getColumn()) {
-                columns.add(new ArrayList<SequenceNode>());
+                columns.add(new ArrayList<>());
             }
             columns.get(node.getColumn()).add(node);
             node.setIndex(node.getColumn());
@@ -210,7 +198,6 @@ public class SequenceGraph {
      * assigns the columns based on the longest path algo.
      */
     private void findLongestPath() {
-
         for (Object o : this.getNodes   ().entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             SequenceNode currentNode = (SequenceNode) pair.getValue();
@@ -227,7 +214,7 @@ public class SequenceGraph {
     /**
      * Uses barycenter heuristics to approach edge crossing reduction.
      *
-     * @param columns - the columns with nodes, on which the algorithem is applied.
+     * @param columns - the columns with nodes, on which the algorithm is applied.
      */
     private void minimiseEdgeCrossings(ArrayList<ArrayList<SequenceNode>> columns) {
         for (int i = 1; i < columns.size(); i++) {
@@ -249,7 +236,7 @@ public class SequenceGraph {
      *
      * @param previousColumn - the column on which to base the barycenter values.
      */
-    private void setBarycenterValues(ArrayList<SequenceNode> previousColumn) {
+    private void setBarycenterValues(List<SequenceNode> previousColumn) {
         for (SequenceNode node : previousColumn) {
             for (int child : node.getChildren()) {
                 this.nodes.get(child).incrementInDegree();
@@ -263,25 +250,23 @@ public class SequenceGraph {
      *
      * @param currentColumn - the column which to sort.
      */
-    private void sortColumns(ArrayList<SequenceNode> currentColumn) {
-        // sort childlayer based on barycenter values.
-        Collections.sort(currentColumn, new Comparator<SequenceNode>() {
-            public int compare(SequenceNode o1, SequenceNode o2) {
-                float baryVal1 = nodes.get(o1.getId()).getBaryCenterValue();
-                float baryVal2 = nodes.get(o2.getId()).getBaryCenterValue();
-                if (baryVal1 > baryVal2) {
+    private void sortColumns(List<SequenceNode> currentColumn) {
+        // sort child layer based on barycenter values.
+        currentColumn.sort((o1, o2) -> {
+            float baryVal1 = nodes.get(o1.getId()).getBaryCenterValue();
+            float baryVal2 = nodes.get(o2.getId()).getBaryCenterValue();
+            if (baryVal1 > baryVal2) {
+                return 1;
+            } else if (baryVal1 < baryVal2) {
+                return -1;
+            } else if (baryVal1 == baryVal2) {
+                if (nodes.get(o1.getId()).isDummy()) {
                     return 1;
-                } else if (baryVal1 < baryVal2) {
+                } else {
                     return -1;
-                } else if (baryVal1 == baryVal2) {
-                    if (nodes.get(o1.getId()).isDummy()) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
                 }
-                return 0;
             }
+            return 0;
         });
     }
 
