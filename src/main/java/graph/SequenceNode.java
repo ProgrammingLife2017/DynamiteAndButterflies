@@ -100,7 +100,7 @@ public class SequenceNode {
                 gc.setLineWidth(6);
                 gc.strokeRect(xCoordinate, yCoordinate, width, height);
             }
-            
+
            colourMeBby = colourController.getColors(genomes);
             double tempCoordinate = yCoordinate;
             double tempHeight = height / colourMeBby.size();
@@ -174,9 +174,6 @@ public class SequenceNode {
         return (xCoordinate <= 0 && (xCoordinate + width) >= 0);
     }
 
-    public boolean inView(double viewWidth) {
-        return xCoordinate + width > 0 && xCoordinate < viewWidth;
-    }
 
     public double getxCoordinate() {
         return xCoordinate;
