@@ -1,7 +1,9 @@
 package parser;
 
-import structures.Annotation;
 import gui.DrawableCanvas;
+import structures.Annotation;
+import structures.BinaryTree;
+import structures.TreeNode;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -27,6 +29,8 @@ public class GffParser {
      */
     public ArrayList<Annotation> parseGff() throws IOException {
         ArrayList<Annotation> annotationList = new ArrayList<>();
+        BinaryTree tree = new BinaryTree();
+        TreeNode root = null;
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line;
@@ -37,6 +41,7 @@ public class GffParser {
             int start = Integer.parseInt(data[3]);
             int end = Integer.parseInt(data[4]);
             Annotation anno = new Annotation(DrawableCanvas.getInstance().getAllGenomes().get(nameGenome), start, end, info);
+            root = tree.addNode(root, anno);
             annotationList.add(anno);
         }
         return annotationList;
