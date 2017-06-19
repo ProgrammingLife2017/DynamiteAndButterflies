@@ -146,7 +146,6 @@ public class MenuController implements Observer {
     private void openGfaFileClicked(String filePath) throws IOException, InterruptedException {
         fileController.openGfaFileClicked(filePath);
         recentController.update(filePath);
-        chooseGenome.setDisable(false);
     }
 
 
@@ -395,6 +394,8 @@ public class MenuController implements Observer {
                         zoomController = new ZoomController(panningController,
                                 nodeTextField, radiusTextField);
                         displayInfo(GraphDrawer.getInstance().getGraph());
+                        chooseGenome.setDisable(false);
+                        rainbowBut.setDisable(false);
                     }
                 });
             }
