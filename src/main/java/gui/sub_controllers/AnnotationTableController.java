@@ -1,6 +1,6 @@
 package gui.sub_controllers;
 
-import graph.Annotation;
+import structures.Annotation;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

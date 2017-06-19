@@ -1,6 +1,6 @@
 package parser;
 
-import graph.Annotation;
+import structures.Annotation;
 import gui.DrawableCanvas;
 
 import java.io.*;

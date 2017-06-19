@@ -1,6 +1,6 @@
 package gui.sub_controllers;
 
-import graph.Annotation;
+import structures.Annotation;
 import gui.CustomProperties;
 import gui.DrawableCanvas;
 import javafx.stage.FileChooser;

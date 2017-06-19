@@ -1,6 +1,6 @@
 package gui;
 
-import graph.Annotation;
+import structures.Annotation;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.*;
