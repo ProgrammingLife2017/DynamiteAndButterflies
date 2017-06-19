@@ -46,6 +46,7 @@ public class GraphDrawer {
     private ArrayList<Annotation> selectedAnnotations = new ArrayList<Annotation>();
     private SequenceNode mostLeftNode;
     private SequenceNode mostRightNode;
+    private boolean rainbowView = true;
 
     public static GraphDrawer getInstance(){
         return drawer;
@@ -71,7 +72,7 @@ public class GraphDrawer {
         if (mostRightNode == null) {
             mostRightNode = graph.getNode(graph.getRightBoundID());
         }
-        colourController = new ColourController(selected);
+        colourController = new ColourController(selected, rainbowView);
         highlightedNode = 0;
     }
 
@@ -137,7 +138,7 @@ public class GraphDrawer {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
         setxDifference(xDifference);
-        colourController = new ColourController(selected);
+        colourController = new ColourController(selected, rainbowView);
         drawNodes();
         drawEdges();
         drawMinimap();
@@ -433,7 +434,7 @@ public class GraphDrawer {
 
     public void setSelected(int[] newSelection) {
         this.selected = newSelection;
-        this.colourController = new ColourController(selected);
+        this.colourController = new ColourController(selected, rainbowView);
     }
 
     public int[] getSelected() {
@@ -485,6 +486,11 @@ public class GraphDrawer {
 
     public SequenceNode getMostRightNode() {
         return mostRightNode;
+    }
+
+    public void setRainbowView(boolean rainbowView) {
+        this.rainbowView = rainbowView;
+        this.colourController = new ColourController(selected, rainbowView);
     }
 }
 

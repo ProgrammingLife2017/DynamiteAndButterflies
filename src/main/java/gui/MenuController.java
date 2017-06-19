@@ -42,6 +42,8 @@ public class MenuController implements Observer {
     @FXML
     public Button chooseGenome;
     @FXML
+    public CheckBox rainbowBut;
+    @FXML
     private MenuItem genome1;
     @FXML
     private MenuItem genome2;
@@ -579,5 +581,10 @@ public class MenuController implements Observer {
                 }
         );
         stage.showAndWait();
+    }
+
+    public void rainbowButtonClicked() {
+        GraphDrawer.getInstance().setRainbowView(rainbowBut.isSelected());
+        GraphDrawer.getInstance().redraw();
     }
 }
