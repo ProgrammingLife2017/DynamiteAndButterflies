@@ -161,6 +161,8 @@ public class GraphDrawer {
         }
     }
 
+
+
     public void initializeDummyWidths() {
         HashMap<Integer, String> genomes;
         Iterator it = graph.getNodes().entrySet().iterator();
@@ -188,6 +190,22 @@ public class GraphDrawer {
         }
     }
 
+
+    /**
+     * Computes the coordinates for the given node
+     * [x,y,width,height]
+     * @param node
+     * @return
+     */
+    private double[] computeCoordinates(SequenceNode node) {
+        double[] coordinates = new double[4];
+        coordinates[0] = (columnWidths[node.getColumn()] - xDifference) * stepSize;
+        coordinates[1] =  yBase + (node.getIndex() * RELATIVE_Y_DISTANCE);
+        coordinates[2] = computeNodeWidth(node) * stepSize * RELATIVE_X_DISTANCE;
+        coordinates[3] = getYSize();
+        return coordinates;
+
+    }
     /**
 
      * Gives all nodes the right coordinates on the canvas and draw them.
@@ -214,6 +232,66 @@ public class GraphDrawer {
             setExtremeNodes(node);
             node.draw(gc, colourController, selectedAnnotations);
         }
+//            if (inView(gc.getCanvas().getWidth())) {
+//                if (isDummy) {
+//                    GraphDrawer.getInstance().setLineWidth(genomes.length);
+//                    gc.strokeLine(xCoordinate, yCoordinate + height / 2,
+//                            xCoordinate + width, yCoordinate + height / 2);
+//                    return;
+//                }
+//
+//                ArrayList<Color> colourMeBby = new ArrayList<>();
+//                if (highlighted) {
+//                    gc.setLineWidth(6);
+//                    gc.strokeRect(xCoordinate, yCoordinate, width, height);
+//                }
+//
+//                colourMeBby = colourController.getColors(genomes);
+//                double tempCoordinate = yCoordinate;
+//                double tempHeight = height / colourMeBby.size();
+//                for (Color beamColour : colourMeBby) {
+//                    gc.setFill(beamColour);
+//                    gc.fillRect(xCoordinate, tempCoordinate, width, tempHeight);
+//                    tempCoordinate += tempHeight;
+//                }
+//                for (int i = 0; i < annotations.size(); i++) {
+//                    Annotation annotation = annotations.get(i);
+//                    int annoID = annotation.getId();
+//                    double startXAnno = xCoordinate;
+//                    double startYAnno = yCoordinate + height;
+//                    double annoWidth = width;
+//                    double annoHeight = height / 2;
+//                    int indexOfGenome = colourController.containsPos(genomes, annoID);
+//                    if (indexOfGenome != -1) {
+//                        int startOfAnno = annotation.getStart();
+//                        int endOfAnno = annotation.getEnd();
+//                        int startCorOfGenome = 0;
+//
+//                        if (genomes.length == offSets.length) {
+//                            startCorOfGenome = indexOfGenome;
+//                        }
+//
+//                        if (startOfAnno > (offSets[startCorOfGenome] + sequenceLength)
+//                                || endOfAnno < (offSets[startCorOfGenome])) {
+//                            continue;
+//                        }
+//
+//                        double emptyAtStart = 0.0;
+//                        if (startOfAnno > offSets[startCorOfGenome]) {
+//                            emptyAtStart = startOfAnno - offSets[startCorOfGenome];
+//                            annoWidth = (annoWidth * (1 - (emptyAtStart / sequenceLength)));
+//                            startXAnno = startXAnno + (width - annoWidth);
+//                        }
+//                        if (endOfAnno < (offSets[startCorOfGenome] + sequenceLength)) {
+//                            int emptyAtEnd = offSets[startCorOfGenome] + sequenceLength - endOfAnno;
+//                            annoWidth = (annoWidth * (1 - (emptyAtEnd / (sequenceLength - emptyAtStart))));
+//                        }
+//                        gc.setFill(Color.RED);
+//                        gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
+//                    }
+//                }
+//            }
+//        }
     }
 
 
@@ -237,7 +315,7 @@ public class GraphDrawer {
         }
     }
 
-    public void drawMinimap() {
+    public void     drawMinimap() {
         Minimap.getInstance().setValue(mostLeftNode.getId());
         Minimap.getInstance().setAmountVisible(mostRightNode.getId() - mostLeftNode.getId());
         Minimap.getInstance().draw(gc);
