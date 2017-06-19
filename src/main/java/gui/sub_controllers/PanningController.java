@@ -67,20 +67,10 @@ public class PanningController extends Observable {
      * Timer for panning.
      */
     private void initializeTimer() {
-        timelineRight = new Timeline(new KeyFrame(Duration.millis(10), new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                panRight();
-            }
-        }));
+        timelineRight = new Timeline(new KeyFrame(Duration.millis(10), event -> panRight()));
         timelineRight.setCycleCount(Animation.INDEFINITE);
 
-        timelineLeft = new Timeline(new KeyFrame(Duration.millis(10), new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                panLeft();
-            }
-        }));
+        timelineLeft = new Timeline(new KeyFrame(Duration.millis(10), event -> panLeft()));
         timelineLeft.setCycleCount(Animation.INDEFINITE);
     }
 
@@ -88,31 +78,11 @@ public class PanningController extends Observable {
      * initialize function for the pan buttons.
      */
     private void initializeButtons() {
-        rightPannButton.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                timelineRight.play();
-            }
-        });
-        rightPannButton.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                timelineRight.pause();
-            }
-        });
+        rightPannButton.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> timelineRight.play());
+        rightPannButton.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> timelineRight.pause());
 
-        leftPannButton.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                timelineLeft.play();
-            }
-        });
-        leftPannButton.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                timelineLeft.pause();
-            }
-        });
+        leftPannButton.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> timelineLeft.play());
+        leftPannButton.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> timelineLeft.pause());
     }
 
     /**
@@ -122,27 +92,21 @@ public class PanningController extends Observable {
 
     public void initializeKeys(Node canvasPanel) {
         canvasPanel.requestFocus();
-        canvasPanel.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                if (event.getCode() == KeyCode.RIGHT) {
-                    timelineRight.play();
-                } else if (event.getCode() == KeyCode.LEFT) {
-                    timelineLeft.play();
-                }
-                event.consume();
+        canvasPanel.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.RIGHT) {
+                timelineRight.play();
+            } else if (event.getCode() == KeyCode.LEFT) {
+                timelineLeft.play();
             }
+            event.consume();
         });
-        canvasPanel.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                if (event.getCode() == KeyCode.RIGHT) {
-                    timelineRight.stop();
-                } else if (event.getCode() == KeyCode.LEFT) {
-                    timelineLeft.stop();
-                }
-                event.consume();
+        canvasPanel.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+            if (event.getCode() == KeyCode.RIGHT) {
+                timelineRight.stop();
+            } else if (event.getCode() == KeyCode.LEFT) {
+                timelineLeft.stop();
             }
+            event.consume();
         });
     }
 
