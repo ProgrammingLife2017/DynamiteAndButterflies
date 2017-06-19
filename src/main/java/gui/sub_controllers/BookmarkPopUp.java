@@ -23,12 +23,12 @@ public class BookmarkPopUp {
     /**
      * Intializes the pop up.
      * @param centreNode The centre node already filled in in the main application
-     * @param radius The radius already filled in in the main application
+     * @param zoomLevel The radius already filled in in the main application
      * @param bookmarkControllerArg The bookmark controller linked to the main application.
      */
-    public void initialize(int centreNode, int radius, BookmarkController bookmarkControllerArg) {
+    public void initialize(int centreNode, double zoomLevel, BookmarkController bookmarkControllerArg) {
         centreNodeBook.setText(Integer.toString(centreNode));
-        radiusBook.setText(Integer.toString(radius));
+        radiusBook.setText(Double.toString(zoomLevel));
 
         bookmarkController = bookmarkControllerArg;
     }

@@ -1,5 +1,6 @@
 package gui.sub_controllers;
 
+import com.sun.corba.se.impl.orbutil.graph.Graph;
 import graph.SequenceGraph;
 import gui.GraphDrawer;
 import javafx.scene.control.TextField;
@@ -13,10 +14,8 @@ import java.io.IOException;
  */
 public class ZoomController {
 
-    private static final double BUTTON_ZOOM_IN_FACTOR = 0.8;
-    private static final double BUTTON_ZOOM_OUT_FACTOR = 1.25;
-    private static final double SCROLL_ZOOM_IN_FACTOR = 0.9;
-    private static final double SCROLL_ZOOM_OUT_FACTOR = 1.1;
+    private static final double SCROLL_ZOOM_IN_FACTOR = 0.8;
+    private static final double SCROLL_ZOOM_OUT_FACTOR = 1.25;
 
     private final TextField nodeTextField, radiusTextField;
     private final PanningController panningController;
@@ -40,7 +39,7 @@ public class ZoomController {
      */
     public void zoomIn(int column) throws IOException {
         GraphDrawer.getInstance().zoom(SCROLL_ZOOM_IN_FACTOR, column);
-        updateRadius((int) Math.ceil(GraphDrawer.getInstance().getRadius()) + "");
+        updateRadius();
     }
 
     /**
@@ -49,28 +48,25 @@ public class ZoomController {
      * @throws IOException thrown if can't find
      */
     public void zoomOut(int column) throws IOException {
-//        if (GraphDrawer.getInstance().getxDifference() + GraphDrawer.getInstance().getZoomLevel() >
-//                GraphDrawer.getInstance().getRange()) {
-//            GraphDrawer.getInstance().getGraph().createSubGraph(1, GraphDrawer.getInstance().getGraph().getRightBoundID() + 100);
-//        }
         GraphDrawer.getInstance().zoom(SCROLL_ZOOM_OUT_FACTOR, column);
-        updateRadius((int) Math.ceil(GraphDrawer.getInstance().getRadius()) + "");
+        updateRadius();
     }
 
     /**
      * Traverses the graph loaded to a specified destination.
      * @param centreNode The centre node to move to
-     * @param radius The radius to be viewed
      */
-    public void traverseGraphClicked(int centreNode, int radius) {
+    public void traverseGraphClicked(int centreNode, double zoom) {
         if (!GraphDrawer.getInstance().getGraph().getNodes().containsKey(centreNode)) {
             SequenceGraph newGraph = GraphDrawer.getInstance().getGraph().copy();
-            newGraph.createSubGraph(centreNode, radius);
+            newGraph.createSubGraph(centreNode, PanningController.RENDER_RANGE);
             GraphDrawer.getInstance().setGraph(newGraph);
             GraphDrawer.getInstance().setxDifference(0);
         }
-        int column = GraphDrawer.getInstance().getGraph().getNode(centreNode).getColumn();
-        GraphDrawer.getInstance().changeZoom(column, radius);
+        GraphDrawer drawer = GraphDrawer.getInstance();
+        double xDiff = drawer.getColumnWidth(drawer.getGraph().getNode(centreNode).getColumn()) - drawer.getZoomLevel() / 2;
+        GraphDrawer.getInstance().setZoomLevel(zoom);
+        GraphDrawer.getInstance().moveShapes(xDiff);
         GraphDrawer.getInstance().highlight(centreNode);
     }
 
@@ -108,10 +104,10 @@ public class ZoomController {
 
     /**
      * Updates the radius.
-     * @param newRadius the new radius.
      */
-    private void updateRadius(String newRadius) {
-        radiusTextField.setText(newRadius);
+    private void updateRadius() {
+        int radius = GraphDrawer.getInstance().getMostRightNode().getId() - GraphDrawer.getInstance().getMostLeftNode().getId();
+        radiusTextField.setText(radius + "");
     }
 
     /**
@@ -120,14 +116,6 @@ public class ZoomController {
      */
     public void setNodeTextField(String newCentreNode) {
         nodeTextField.setText(newCentreNode);
-    }
-
-    /**
-     * Setter for the radius textfield.
-     * @param newRadius the new radius.
-     */
-    public void setRadiusTextField(String newRadius) {
-        radiusTextField.setText(newRadius);
     }
 
 }

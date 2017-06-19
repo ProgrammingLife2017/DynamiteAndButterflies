@@ -411,4 +411,5 @@ public class SequenceGraph {
         return centerNodeID;
     }
 
+    public int getRange() { return boundaries.getRange(); }
 }

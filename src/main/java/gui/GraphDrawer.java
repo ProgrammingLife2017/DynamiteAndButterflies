@@ -28,7 +28,6 @@ public class GraphDrawer {
     private Canvas canvas;
     private int yBase;
     private double zoomLevel;
-    private double radius;
     private double range;
     private double xDifference;
     private double stepSize;
@@ -59,7 +58,6 @@ public class GraphDrawer {
         long end = System.currentTimeMillis();
         System.out.println(start - end);
         range = columnWidths[columns.size()];
-        radius = columns.size();
         if (zoomLevel == 0) {
             setZoomLevel(columnWidths[columns.size()]);
         }
@@ -91,33 +89,12 @@ public class GraphDrawer {
      */
     public void zoom(final double factor, final int column) {
         setZoomLevel(zoomLevel * factor);
-        setRadius(radius * factor);
         if (zoomLevel != range / 2) {
             moveShapes(column - ((column - xDifference) * factor));
         }
     }
 
-    /**
-     * Change the zoom (invoked by user by clicking on "Go to this Node".
-     *
-     * @param radius The new radius.
-     * @param column  The new Column to be in the centre.
-     */
-    public void changeZoom(int column, int radius) {
-        setRadius(radius);
-        int widthRight = column + radius + 1;
-        int widthLeft = column - radius;
 
-        if (column + radius + 1 > columnWidths.length-1 ) {
-            widthRight = columnWidths.length - 1;
-        }
-        if (column - radius < 0) {
-            widthLeft = 0;
-        }
-
-        setZoomLevel(columnWidths[widthRight] - columnWidths[widthLeft]);
-        moveShapes(columnWidths[widthLeft]);
-    }
 
     /**
      * Redraw all nodes with the same coordinates.
@@ -245,8 +222,10 @@ public class GraphDrawer {
     }
 
     public void setExtremeNodes(SequenceNode node) {
-        if (node.getxCoordinate() <= 0 && node.getxCoordinate() + node.getWidth() > 0) { mostLeftNode = node; }
-        if (node.getxCoordinate() < gc.getCanvas().getWidth() && node.getxCoordinate() + node.getWidth() >= gc.getCanvas().getWidth()) { mostRightNode = node; }
+        if (node.getxCoordinate() <= 0 && node.getxCoordinate() + node.getWidth() > 0) {
+            mostLeftNode = node; }
+        if (node.getxCoordinate() <= gc.getCanvas().getWidth() && node.getxCoordinate() + node.getWidth() >= gc.getCanvas().getWidth()) {
+            mostRightNode = node; }
     }
 
     public boolean edgeInView(double startx, double endx) {
@@ -381,15 +360,6 @@ public class GraphDrawer {
         return zoomLevel;
     }
 
-    /**
-     * Get function for the radius.
-     *
-     * @return the double representing the radius.
-     */
-    public double getRadius() {
-        return radius;
-    }
-
     public double getRange() {
         return range;
     }
@@ -442,12 +412,6 @@ public class GraphDrawer {
         if (xDifference < 0) { xDifference = 0; }
         if (xDifference + zoomLevel > range) { xDifference = range - zoomLevel; }
         this.xDifference = xDifference;
-    }
-
-    public void setRadius(double radius) {
-        if (radius < 1) { radius = 1; }
-        if (radius > range) { radius = range; }
-        this.radius = radius;
     }
 
     public void setZoomLevel(double zoomLevel) {

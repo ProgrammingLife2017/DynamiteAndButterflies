@@ -219,10 +219,12 @@ public class MenuController implements Observer {
      */
     @FXML
     public void clickMouse(MouseEvent mouseEvent) {
+        System.out.println("Clickec on: " + mouseEvent.getX());
         canvasPanel.requestFocus();
         double pressedX = mouseEvent.getX();
         double pressedY = mouseEvent.getY();
         SequenceNode clicked = GraphDrawer.getInstance().clickNode(pressedX, pressedY);
+        Minimap.getInstance().clickMinimap(pressedX, pressedY);
         if (clicked != null) {
             String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId());
             infoController.updateSeqLabel(clicked.toString(sequence));
@@ -236,8 +238,7 @@ public class MenuController implements Observer {
     @FXML
     public void traverseGraphClicked() {
         int centreNodeID = Integer.parseInt(nodeTextField.getText());
-        int radius = Integer.parseInt(radiusTextField.getText());
-        zoomController.traverseGraphClicked(centreNodeID, radius);
+        zoomController.traverseGraphClicked(centreNodeID, GraphDrawer.getInstance().getZoomLevel());
         SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
         String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
         infoController.updateSeqLabel(node.toString(sequence));
@@ -247,13 +248,11 @@ public class MenuController implements Observer {
      * Adds a button to traverse the graph with.
      *
      * @param centreNode specifies the centre node to be showed
-     * @param radius     specifies the radius to be showed
      */
-    private void traverseGraphClicked(String centreNode, String radius) {
+    private void traverseGraphClicked(String centreNode, String zoomLevel) {
         int centreNodeID = Integer.parseInt(centreNode);
-        int rad = Integer.parseInt(radius);
-
-        zoomController.traverseGraphClicked(centreNodeID, rad);
+        double zoom = Double.parseDouble(zoomLevel);
+        zoomController.traverseGraphClicked(centreNodeID, zoom);
         String newString = "Sequence: "
                 + DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
         infoController.updateSeqLabel(newString);
@@ -295,7 +294,7 @@ public class MenuController implements Observer {
         Parent root = loader.load();
         BookmarkPopUp controller = loader.<BookmarkPopUp>getController();
         controller.initialize(zoomController.getCentreNode(),
-                zoomController.getRadius(), bookmarkController);
+                GraphDrawer.getInstance().getZoomLevel(), bookmarkController);
 
         stage = new Stage();
         stage.setScene(new Scene(root));
@@ -333,10 +332,9 @@ public class MenuController implements Observer {
             String[] parts = string.split(" - ");
             //We skip parts[0] because that is the note.
             String centre = parts[1];
-            String radius = parts[2];
-            traverseGraphClicked(centre, radius);
+            String zoomLevel = parts[2];
+            traverseGraphClicked(centre, zoomLevel);
             zoomController.setNodeTextField(centre);
-            zoomController.setRadiusTextField(radius);
         }
     }
 
