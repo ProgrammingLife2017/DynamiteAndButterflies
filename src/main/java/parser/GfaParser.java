@@ -23,7 +23,6 @@ public class GfaParser extends Observable implements Runnable {
     private String partPath;
     private CustomProperties properties = new CustomProperties();
 
-    Boolean indexedGfaFile = false;
     private DB db;
 
     private HashMap<String, Integer> genomesMap;

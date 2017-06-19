@@ -39,6 +39,8 @@ public class GffParser {
             Annotation anno = new Annotation(DrawableCanvas.getInstance().getAllGenomes().get(nameGenome), start, end, info);
             annotationList.add(anno);
         }
+        in.close();
+        br.close();
         return annotationList;
     }
 }
