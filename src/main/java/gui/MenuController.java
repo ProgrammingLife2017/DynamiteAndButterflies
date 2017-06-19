@@ -40,9 +40,15 @@ public class MenuController implements Observer {
     @FXML
     public Button annoBut;
     @FXML
+    public Button chooseGenome;
+    @FXML
     public CheckBox rainbowBut;
     @FXML
-    private Button saveGenomeBut;
+    public Button zoomInBut;
+    @FXML
+    public Button zoomOutBut;
+    @FXML
+    public Button goToNodeBut;
     @FXML
     private MenuItem genome1;
     @FXML
@@ -135,8 +141,7 @@ public class MenuController implements Observer {
         Stage stage = App.getStage();
         File file = fileController.chooseGfaFile(stage);
         String filePath = file.getAbsolutePath();
-        recentController.update(filePath);
-        fileController.openGfaFileClicked(filePath);
+        openGfaFileClicked(filePath);
     }
 
     private void openGfaFileClicked(String filePath) throws IOException, InterruptedException {
@@ -223,8 +228,14 @@ public class MenuController implements Observer {
         canvasPanel.requestFocus();
         double pressedX = mouseEvent.getX();
         double pressedY = mouseEvent.getY();
-        SequenceNode clicked = GraphDrawer.getInstance().clickNode(pressedX, pressedY);
         Minimap.getInstance().clickMinimap(pressedX, pressedY);
+        SequenceNode clicked = null;
+        try {
+            clicked = GraphDrawer.getInstance().clickNode(pressedX, pressedY);
+        } catch (NullPointerException e) {
+            System.out.println("The graph is not yet loaded!");
+            e.printStackTrace();
+        }
         if (clicked != null) {
             String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId());
             sequenceInfo.setText(clicked.toString(sequence));
@@ -237,11 +248,13 @@ public class MenuController implements Observer {
      */
     @FXML
     public void traverseGraphClicked() {
-        int centreNodeID = Integer.parseInt(nodeTextField.getText());
-        ZoomController.getInstance().traverseGraphClicked(centreNodeID, GraphDrawer.getInstance().getZoomLevel());
-        SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
-        String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
-        sequenceInfo.setText(node.toString(sequence));
+        if (!nodeTextField.getText().equals("")) {
+            int centreNodeID = Integer.parseInt(nodeTextField.getText());
+            ZoomController.getInstance().traverseGraphClicked(centreNodeID, GraphDrawer.getInstance().getZoomLevel());
+            SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
+            String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
+            sequenceInfo.setText(node.toString(sequence));
+        }
     }
 
     /**
@@ -330,7 +343,12 @@ public class MenuController implements Observer {
      * @return The sequenceMap.
      */
     HTreeMap<Long, String> getSequenceHashMap() {
-        return DrawableCanvas.getInstance().getParser().getSequenceHashMap();
+        try {
+            return DrawableCanvas.getInstance().getParser().getSequenceHashMap();
+        } catch (NullPointerException e) {
+            System.out.println("No graph was loaded so no sequenceHashMap to get");
+        }
+        return null;
     }
 
     @Override
@@ -360,10 +378,26 @@ public class MenuController implements Observer {
                         panningController.initializeKeys(canvasPanel);
                         displayInfo(GraphDrawer.getInstance().getGraph());
                         updateRadius();
+                        enableGuiElements();
                     }
                 });
             }
         }
+    }
+
+    /**
+     * Enables all the buttons and textfields a user could need to view the graph.
+     */
+    private void enableGuiElements() {
+        zoomInBut.setDisable(false);
+        zoomOutBut.setDisable(false);
+        leftPannButton.setDisable(false);
+        rightPannButton.setDisable(false);
+        nodeTextField.setDisable(false);
+        radiusTextField.setDisable(false);
+        goToNodeBut.setDisable(false);
+        chooseGenome.setDisable(false);
+        rainbowBut.setDisable(false);
     }
 
     /**
@@ -509,6 +543,7 @@ public class MenuController implements Observer {
 
     /**
      * Handles choosing Annotations.
+     *
      * @throws IOException if something goes wrong.
      */
     public void chooseAnnoClicked() throws IOException {

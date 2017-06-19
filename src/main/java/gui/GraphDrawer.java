@@ -8,7 +8,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
@@ -42,10 +45,20 @@ public class GraphDrawer {
     private ArrayList<Annotation> selectedAnnotations = new ArrayList<Annotation>();
     private SequenceNode mostLeftNode;
     private SequenceNode mostRightNode;
+    private HashMap<Integer, double[]> coordinates;
     private boolean rainbowView = true;
 
     public static GraphDrawer getInstance(){
         return drawer;
+    }
+
+
+    public void setEmptyCoordinates() {
+        this.coordinates = new HashMap<>();
+    }
+
+    public HashMap<Integer, double[]> getCoordinates() {
+        return this.coordinates;
     }
 
     public void setGraph(SequenceGraph graph) {
@@ -114,7 +127,6 @@ public class GraphDrawer {
         setxDifference(xDifference);
         colourController = new ColourController(selected, rainbowView);
         drawNodes();
-        drawEdges();
         drawMinimap();
     }
 
@@ -138,6 +150,8 @@ public class GraphDrawer {
             columnWidths[j + 1] = columnWidths[j] + max;
         }
     }
+
+
 
     public void initializeDummyWidths() {
         HashMap<Integer, String> genomes;
@@ -166,64 +180,169 @@ public class GraphDrawer {
         }
     }
 
-    /**
+    public boolean inView(double[] coordinates) {
+        return coordinates[0] + coordinates[2] > 0 && coordinates[0] < gc.getCanvas().getWidth();
+    }
 
+    /**
+     * Computes the coordinates for the given node
+     * [x,y,width,height]
+     * @param node
+     * @return
+     */
+    private double[] computeCoordinates(SequenceNode node) {
+        double[] coordinates = new double[4];
+        yBase = (int) GraphDrawer.getInstance().canvas.getHeight() / 4;
+        double width = computeNodeWidth(node) * stepSize * RELATIVE_X_DISTANCE;
+        double height = getYSize();
+        double x = (columnWidths[node.getColumn()] - xDifference) * stepSize;
+        double y = yBase + (node.getIndex() * RELATIVE_Y_DISTANCE);
+        if (height > width) {
+            y += (height - width) / 2;
+            height = width;
+        }
+
+        coordinates[0] = x;
+        coordinates[1] =  y;
+        coordinates[2] = width;
+        coordinates[3] = height;
+
+        return coordinates;
+
+    }
+
+    /**
      * Gives all nodes the right coordinates on the canvas and draw them.
      * It depends on whether the dummy nodes checkbox
      * is checked dummy nodes are either drawn or skipped.
      */
     private void drawNodes() {
+        setEmptyCoordinates();
         gc.setStroke(Color.BLACK);
         Iterator it = graph.getNodes().entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             SequenceNode node = (SequenceNode) pair.getValue();
-            double width = computeNodeWidth(node) * stepSize * RELATIVE_X_DISTANCE;
-            double height = getYSize();
-            double x = (columnWidths[node.getColumn()] - xDifference) * stepSize;
+            checkExtremeNode(node);
+            drawNode(node);
+            drawEdges(node);
 
-            yBase = (int) GraphDrawer.getInstance().canvas.getHeight() / 4;
-            double y = yBase + (node.getIndex() * RELATIVE_Y_DISTANCE);
-            if (height > width) {
-                y += (height - width) / 2;
-                height = width;
-            }
-            node.setCoordinates(x, y, width, height);
-            setExtremeNodes(node);
-            node.draw(gc, colourController, selectedAnnotations);
         }
     }
 
+    private void drawAnnotations(SequenceNode node, double[] coordinates) {
+        for (int i = 0; i < selectedAnnotations.size(); i++) {
+            Annotation annotation = selectedAnnotations.get(i);
+            int annoID = annotation.getId();
+            double startXAnno = coordinates[0];
+            double startYAnno = coordinates[1] + coordinates[3];
+            double annoWidth = coordinates[2];
+            double annoHeight = coordinates[3] / 2;
+            int indexOfGenome = colourController.containsPos(node.getGenomes(), annoID);
+            if (indexOfGenome != -1) {
+                int startOfAnno = annotation.getStart();
+                int endOfAnno = annotation.getEnd();
+                int startCorOfGenome = 0;
 
-    private void drawEdges() {
-        Iterator it = graph.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            int nodeID = (Integer) pair.getKey();
-            SequenceNode parent = graph.getNode(nodeID);
-            for (int j = 0; j < parent.getChildren().size(); j++) {
-                SequenceNode child = graph.getNode(parent.getChild(j));
-                double startx = parent.getxCoordinate() + parent.getWidth();
-                double starty = parent.getyCoordinate() + (parent.getHeight() / 2);
-                double endx = child.getxCoordinate();
-                double endy = child.getyCoordinate() + (child.getHeight() / 2);
-                setLineWidth(Math.min(child.getGenomes().length, parent.getGenomes().length));
-                if (edgeInView(startx, endx)) {
-                    gc.strokeLine(startx, starty, endx, endy);
+                if (node.getGenomes().length == node.getOffsets().length) {
+                    startCorOfGenome = indexOfGenome;
                 }
+
+                if (startOfAnno > (node.getOffsets()[startCorOfGenome] + node.getSequenceLength())
+                        || endOfAnno < (node.getOffsets()[startCorOfGenome])) {
+                    continue;
+                }
+
+                double emptyAtStart = 0.0;
+                if (startOfAnno > node.getOffsets()[startCorOfGenome]) {
+                    emptyAtStart = startOfAnno - node.getOffsets()[startCorOfGenome];
+                    annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
+                    startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                }
+                if (endOfAnno < (node.getOffsets()[startCorOfGenome] + node.getSequenceLength())) {
+                    int emptyAtEnd = node.getOffsets()[startCorOfGenome] + node.getSequenceLength() - endOfAnno;
+                    annoWidth = (annoWidth * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
+                }
+                gc.setFill(Color.RED);
+                gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
             }
         }
     }
+
+    private void checkExtremeNode(SequenceNode node) {
+        double[] coordinates = getCoordinates(node);
+        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] > 0) { mostLeftNode = node; }
+        if (coordinates[0] < gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] >= gc.getCanvas().getWidth()) { mostRightNode = node; }
+
+    }
+
+    private void drawNode(SequenceNode node) {
+        double[] coordinates = this.getCoordinates().get(node.getId());
+        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE > 0) { mostLeftNode = node; }
+        if (coordinates[0] <= gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE >= gc.getCanvas().getWidth()) { mostRightNode = node; }
+
+        if (inView(coordinates)) {
+            if (node.isDummy()) {
+                this.setLineWidth(node.getGenomes().length);
+                gc.strokeLine(coordinates[0], coordinates[1] + coordinates[3] / 2,
+                        coordinates[0] + coordinates[2], coordinates[1] + coordinates[3] /2);
+            }
+
+            drawColour(node, coordinates);
+            drawAnnotations(node, coordinates);
+        }
+    }
+
+    private void drawColour(SequenceNode node, double[] coordinates) {
+        ArrayList<Color> colourMeBby;
+        if (node.isHighlighted()) {
+            gc.setLineWidth(6);
+            gc.strokeRect(coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
+        }
+
+        colourMeBby = colourController.getColors(node.getGenomes());
+        double tempCoordinate = coordinates[1];
+        double tempHeight = coordinates[3] / colourMeBby.size();
+        for (Color beamColour : colourMeBby) {
+            gc.setFill(beamColour);
+            gc.fillRect(coordinates[0], tempCoordinate, coordinates[2], tempHeight);
+            tempCoordinate += tempHeight;
+        }
+    }
+
+    private double[] getCoordinates(SequenceNode node) {
+        if (this.getCoordinates().containsKey(node.getId())) {
+            return this.getCoordinates().get(node.getId());
+        } else {
+            this.getCoordinates().put(node.getId(), computeCoordinates(node));
+            return this.getCoordinates().get(node.getId());
+        }
+    }
+
+
+    private void drawEdges(SequenceNode node) {
+        int nodeID = node.getId();
+        SequenceNode parent = graph.getNode(nodeID);
+        double[] coordinatesParent = getCoordinates(node);
+        for (int j = 0; j < parent.getChildren().size(); j++) {
+            SequenceNode child = graph.getNode(parent.getChild(j));
+            double[] coordinatesChild = getCoordinates(child);
+            double startx = coordinatesParent[0] + coordinatesParent[2];
+            double starty = coordinatesParent[1] + (coordinatesParent[3] / 2);
+            double endx = coordinatesChild[0];
+            double endy = coordinatesChild[1] + (coordinatesChild[3] / 2);
+            setLineWidth(Math.min(child.getGenomes().length, parent.getGenomes().length));
+            if (edgeInView(startx, endx)) {
+                gc.strokeLine(startx, starty, endx, endy);
+            }
+        }
+    }
+
 
     public void drawMinimap() {
         Minimap.getInstance().setValue(mostLeftNode.getId());
         Minimap.getInstance().setAmountVisible(mostRightNode.getId() - mostLeftNode.getId());
         Minimap.getInstance().draw(gc);
-    }
-
-    public void setExtremeNodes(SequenceNode node) {
-        if (node.getxCoordinate() <= 0 && node.getxCoordinate() + node.getWidth() / RELATIVE_X_DISTANCE > 0) { mostLeftNode = node; }
-        if (node.getxCoordinate() <= gc.getCanvas().getWidth() && node.getxCoordinate() + node.getWidth() / RELATIVE_X_DISTANCE >= gc.getCanvas().getWidth()) { mostRightNode = node; }
     }
 
     public boolean edgeInView(double startx, double endx) {
@@ -247,16 +366,33 @@ public class GraphDrawer {
      */
     public SequenceNode clickNode(double xEvent, double yEvent) {
         SequenceNode click = null;
-        Iterator it = graph.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
-            if (node.checkClick(xEvent, yEvent)) {
-                click = graph.getNode(node.getId());
-                highlight(node.getId());
+
+        try {
+            Iterator it = graph.getNodes().entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                SequenceNode node = (SequenceNode) pair.getValue();
+                if (checkClick(node, xEvent, yEvent)) {
+                    click = graph.getNode(node.getId());
+                    highlight(node.getId());
+                }
             }
+        } catch (NullPointerException e) {
+            System.out.println("Graph not yet intialized");
         }
         return click;
+    }
+
+    /**
+     * Check if a click event is within the borders of this node.
+     *
+     * @param xEvent x coordinate of the click event
+     * @param yEvent y coordinate of the click event
+     * @return True if the coordinates of the click event are within borders, false otherwise.
+     */
+    public boolean checkClick(SequenceNode node, double xEvent, double yEvent) {
+        double[] coordinates = getCoordinates(node);
+        return (xEvent > coordinates[0] && xEvent < coordinates[0] + coordinates[2] && yEvent > coordinates[1] && yEvent < coordinates[1] + coordinates[3]);
     }
 
     /**
@@ -265,16 +401,32 @@ public class GraphDrawer {
      * @return The column id of the column the x coordinate is in.
      */
     public int findColumn(double xEvent) {
-        Iterator it = graph.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
-            int nodeID = (Integer) pair.getKey();
-            if (graph.getNode(nodeID).checkClickX(xEvent)) {
-                return graph.getNode(nodeID).getId();
+
+        try {
+            Iterator it = graph.getNodes().entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                SequenceNode node = (SequenceNode) pair.getValue();
+                int nodeID = (Integer) pair.getKey();
+                if (checkClickX(node, xEvent)) {
+                    return graph.getNode(nodeID).getId();
+                }
             }
+        } catch (NullPointerException e) {
+            System.out.println("No graph has been loaded.");
         }
         return -1;
+    }
+
+    /**
+     * Check if a click event is within the borders of this node.
+     *
+     * @param xEvent x coordinate of the click event
+     * @return True if the coordinates of the click event are within borders, false otherwise.
+     */
+    public boolean checkClickX(SequenceNode node, double xEvent) {
+        double[] coordinates = getCoordinates(node);
+        return (xEvent > coordinates[0] && xEvent < coordinates[0] + coordinates[2]);
     }
 
     /**
