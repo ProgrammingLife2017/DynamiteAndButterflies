@@ -1,7 +1,6 @@
 package gui;
 
-import graph.SequenceGraph;
-import javafx.geometry.VPos;
+import gui.sub_controllers.ZoomController;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -21,6 +20,7 @@ public class Minimap {
     public static final int CHAR_WIDTH = 3;
 
     private static Minimap minimap = new Minimap();
+    private MenuController menuController;
 
     private int size;
     private int stepSize;
@@ -133,16 +133,7 @@ public class Minimap {
         if (checkClick(pressedX, pressedY)) {
             double xLoc = (pressedX - xCoordinate) / width;
             int node = (int) (GraphDrawer.getInstance().getGraph().getFullGraphRightBoundID() * xLoc);
-            if (!GraphDrawer.getInstance().getGraph().getNodes().containsKey(node)) {
-                SequenceGraph newGraph = GraphDrawer.getInstance().getGraph().copy();
-                newGraph.createSubGraph(node, GraphDrawer.getInstance().getGraph().getRange());
-                GraphDrawer.getInstance().setGraph(newGraph);
-                GraphDrawer.getInstance().setxDifference(0);
-            }
-            int column = GraphDrawer.getInstance().getGraph().getNode(node).getColumn();
-            //GraphDrawer.getInstance().changeZoom(column, GraphDrawer.getInstance().getGraph().getRange());
-            GraphDrawer.getInstance().highlight(node);
-            GraphDrawer.getInstance().redraw();
+            ZoomController.getInstance().traverseGraphClicked(node, GraphDrawer.getInstance().getZoomLevel());
         }
     }
 
@@ -169,4 +160,7 @@ public class Minimap {
         this.value = value;
     }
 
+    public void setMenuController(MenuController menuController) {
+        this.menuController = menuController;
+    }
 }

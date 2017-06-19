@@ -91,13 +91,9 @@ public class MenuController implements Observer {
     private CustomProperties properties;
     private BookmarkController bookmarkController;
     private FileController fileController;
-    private ZoomController zoomController;
-    private InfoController infoController;
     private RecentController recentController;
     private PanningController panningController;
     private SpecificGenomeProperties specificGenomeProperties;
-
-
     private String filePath;
 
     /**
@@ -112,7 +108,6 @@ public class MenuController implements Observer {
         properties = new CustomProperties();
 
         fileController = new FileController(new ProgressBarController(progressBar));
-        infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
 
@@ -120,8 +115,9 @@ public class MenuController implements Observer {
 
         ps = new PrintStream(new Console(consoleArea));
         DrawableCanvas.getInstance().setMenuController(this);
-
         DrawableCanvas.getInstance().setSpecificGenomeProperties(specificGenomeProperties);
+        ZoomController.getInstance().setMenuController(this);
+        Minimap.getInstance().setMenuController(this);
 
         //System.setErr(ps);
         System.setOut(ps);
@@ -167,8 +163,13 @@ public class MenuController implements Observer {
     }
 
     private void displayInfo(SequenceGraph graph) {
-        infoController.displayInfo(graph);
-        zoomController.displayInfo();
+        numNodesLabel.setText(graph.getFullGraphRightBoundID() + "");
+        numEdgesLabel.setText(graph.totalSize() + "");
+    }
+
+    public void updateRadius() {
+        int radius = GraphDrawer.getInstance().getMostRightNode().getId() - GraphDrawer.getInstance().getMostLeftNode().getId();
+        radiusTextField.setText(radius + "");
     }
 
     /**
@@ -179,7 +180,7 @@ public class MenuController implements Observer {
     @FXML
     public void zoomInClicked() throws IOException {
         double xCentre = canvas.getWidth() / 2;
-        zoomController.zoomIn(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
+        ZoomController.getInstance().zoomIn(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
         nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
     }
 
@@ -191,7 +192,7 @@ public class MenuController implements Observer {
     @FXML
     public void zoomOutClicked() throws IOException {
         double xCentre = canvas.getWidth() / 2;
-        zoomController.zoomOut(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
+        ZoomController.getInstance().zoomOut(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
         nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
     }
 
@@ -206,9 +207,9 @@ public class MenuController implements Observer {
         int column = GraphDrawer.getInstance().mouseLocationColumn(scrollEvent.getX());
         nodeTextField.setText(GraphDrawer.getInstance().findColumn(scrollEvent.getX()) + "");
         if (scrollEvent.getDeltaY() > 0) {
-            zoomController.zoomIn(column);
+            ZoomController.getInstance().zoomIn(column);
         } else {
-            zoomController.zoomOut(column);
+            ZoomController.getInstance().zoomOut(column);
         }
     }
 
@@ -227,7 +228,7 @@ public class MenuController implements Observer {
         Minimap.getInstance().clickMinimap(pressedX, pressedY);
         if (clicked != null) {
             String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId());
-            infoController.updateSeqLabel(clicked.toString(sequence));
+            sequenceInfo.setText(clicked.toString(sequence));
             nodeTextField.setText(clicked.getId().toString());
         }
     }
@@ -238,24 +239,10 @@ public class MenuController implements Observer {
     @FXML
     public void traverseGraphClicked() {
         int centreNodeID = Integer.parseInt(nodeTextField.getText());
-        zoomController.traverseGraphClicked(centreNodeID, GraphDrawer.getInstance().getZoomLevel());
+        ZoomController.getInstance().traverseGraphClicked(centreNodeID, GraphDrawer.getInstance().getZoomLevel());
         SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
         String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
-        infoController.updateSeqLabel(node.toString(sequence));
-    }
-
-    /**
-     * Adds a button to traverse the graph with.
-     *
-     * @param centreNode specifies the centre node to be showed
-     */
-    private void traverseGraphClicked(String centreNode, String zoomLevel) {
-        int centreNodeID = Integer.parseInt(centreNode);
-        double zoom = Double.parseDouble(zoomLevel);
-        zoomController.traverseGraphClicked(centreNodeID, zoom);
-        String newString = "Sequence: "
-                + DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
-        infoController.updateSeqLabel(newString);
+        sequenceInfo.setText(node.toString(sequence));
     }
 
     /**
@@ -293,7 +280,7 @@ public class MenuController implements Observer {
         Stage stage;
         Parent root = loader.load();
         BookmarkPopUp controller = loader.<BookmarkPopUp>getController();
-        controller.initialize(zoomController.getCentreNode(),
+        controller.initialize(Integer.parseInt(nodeTextField.getText()),
                 GraphDrawer.getInstance().getZoomLevel(), bookmarkController);
 
         stage = new Stage();
@@ -331,10 +318,10 @@ public class MenuController implements Observer {
             String string = bookmark.getText();
             String[] parts = string.split(" - ");
             //We skip parts[0] because that is the note.
-            String centre = parts[1];
-            String zoomLevel = parts[2];
-            traverseGraphClicked(centre, zoomLevel);
-            zoomController.setNodeTextField(centre);
+            int centre = Integer.parseInt(parts[1]);
+            double zoomLevel = Double.parseDouble(parts[2]);
+            ZoomController.getInstance().traverseGraphClicked(centre, zoomLevel);
+            nodeTextField.setText(centre + "");
         }
     }
 
@@ -372,8 +359,6 @@ public class MenuController implements Observer {
                         panningController =
                                 new PanningController(leftPannButton, rightPannButton);
                         panningController.initializeKeys(canvasPanel);
-                        zoomController = new ZoomController(panningController,
-                                nodeTextField, radiusTextField);
                         displayInfo(GraphDrawer.getInstance().getGraph());
                     }
                 });

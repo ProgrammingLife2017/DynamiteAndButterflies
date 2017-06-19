@@ -1,9 +1,8 @@
 package gui.sub_controllers;
 
-import com.sun.corba.se.impl.orbutil.graph.Graph;
 import graph.SequenceGraph;
 import gui.GraphDrawer;
-import javafx.scene.control.TextField;
+import gui.MenuController;
 
 import java.io.IOException;
 
@@ -14,22 +13,20 @@ import java.io.IOException;
  */
 public class ZoomController {
 
+    private static ZoomController zoomController = new ZoomController();
+    private MenuController menuController;
+
     private static final double SCROLL_ZOOM_IN_FACTOR = 0.8;
     private static final double SCROLL_ZOOM_OUT_FACTOR = 1.25;
 
-    private final TextField nodeTextField, radiusTextField;
-    private final PanningController panningController;
-
     /**
      * Constructor of the Zoom Controller.
-     * @param panController The panningcontroller.
-     * @param nodeField The textField that contains the centre node.
-     * @param radField The textField that contains the radius.
      */
-    public ZoomController(PanningController panController, TextField nodeField, TextField radField) {
-        nodeTextField = nodeField;
-        radiusTextField = radField;
-        this.panningController = panController;
+    public ZoomController() {
+    }
+
+    public static ZoomController getInstance() {
+        return zoomController;
     }
 
     /**
@@ -39,7 +36,7 @@ public class ZoomController {
      */
     public void zoomIn(int column) throws IOException {
         GraphDrawer.getInstance().zoom(SCROLL_ZOOM_IN_FACTOR, column);
-        updateRadius();
+        menuController.updateRadius();
     }
 
     /**
@@ -49,7 +46,7 @@ public class ZoomController {
      */
     public void zoomOut(int column) throws IOException {
         GraphDrawer.getInstance().zoom(SCROLL_ZOOM_OUT_FACTOR, column);
-        updateRadius();
+        menuController.updateRadius();
     }
 
     /**
@@ -70,52 +67,7 @@ public class ZoomController {
         GraphDrawer.getInstance().highlight(centreNode);
     }
 
-    /**
-     * Displays the centre node and radius of the current view.
-     */
-    public void displayInfo() {
-        //nodeTextField.setText(GraphDrawer.getInstance().getRealCentreNode().getId() + "");
-        //radiusTextField.setText((int) Math.ceil(GraphDrawer.getInstance().getRadius()) + "");
+    public void setMenuController(MenuController menuController) {
+        this.menuController = menuController;
     }
-
-    /**
-     * Getter for the centreNode.
-     * @return the ID of the centre node.
-     */
-    public int getCentreNodeID() {
-        return Integer.parseInt(nodeTextField.getText());
-    }
-
-    /**
-     * Getter for the radius.
-     * @return the radius.
-     */
-    public int getRadius() {
-        return (int) Double.parseDouble(radiusTextField.getText());
-    }
-
-    /**
-     * Getter for the centre node.
-     * @return the centre node.
-     */
-    public int getCentreNode() {
-        return Integer.parseInt(nodeTextField.getText());
-    }
-
-    /**
-     * Updates the radius.
-     */
-    private void updateRadius() {
-        int radius = GraphDrawer.getInstance().getMostRightNode().getId() - GraphDrawer.getInstance().getMostLeftNode().getId();
-        radiusTextField.setText(radius + "");
-    }
-
-    /**
-     * Setter for the Node textfield.
-     * @param newCentreNode the new centre node.
-     */
-    public void setNodeTextField(String newCentreNode) {
-        nodeTextField.setText(newCentreNode);
-    }
-
 }
