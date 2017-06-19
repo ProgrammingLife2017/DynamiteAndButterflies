@@ -8,7 +8,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
@@ -270,14 +273,18 @@ public class GraphDrawer {
      */
     public SequenceNode clickNode(double xEvent, double yEvent) {
         SequenceNode click = null;
-        Iterator it = graph.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
-            if (node.checkClick(xEvent, yEvent)) {
-                click = graph.getNode(node.getId());
-                highlight(node.getId());
+        try {
+            Iterator it = graph.getNodes().entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                SequenceNode node = (SequenceNode) pair.getValue();
+                if (node.checkClick(xEvent, yEvent)) {
+                    click = graph.getNode(node.getId());
+                    highlight(node.getId());
+                }
             }
+        } catch (NullPointerException e) {
+            System.out.println("Graph not yet intialized");
         }
         return click;
     }
@@ -288,14 +295,18 @@ public class GraphDrawer {
      * @return The column id of the column the x coordinate is in.
      */
     public int findColumn(double xEvent) {
-        Iterator it = graph.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
-            int nodeID = (Integer) pair.getKey();
-            if (graph.getNode(nodeID).checkClickX(xEvent)) {
-                return graph.getNode(nodeID).getId();
+        try {
+            Iterator it = graph.getNodes().entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                SequenceNode node = (SequenceNode) pair.getValue();
+                int nodeID = (Integer) pair.getKey();
+                if (graph.getNode(nodeID).checkClickX(xEvent)) {
+                    return graph.getNode(nodeID).getId();
+                }
             }
+        } catch (NullPointerException e) {
+            System.out.println("No graph has been loaded.");
         }
         return -1;
     }
