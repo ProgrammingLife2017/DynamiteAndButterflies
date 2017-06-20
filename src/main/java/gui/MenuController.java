@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
+import exceptions.NotInRangeException;
+
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
  * <p>
@@ -247,14 +249,14 @@ public class MenuController implements Observer {
      */
     @FXML
     public void traverseGraphClicked() {
-        if (!nodeTextField.getText().equals("")) {
-            int centreNodeID = Integer.parseInt(nodeTextField.getText());
+            int centreNodeID = getCentreNodeID();
             int radius = getRadius();
-            ZoomController.getInstance().traverseGraphClicked(centreNodeID, radius);
-            SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
-            String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
-            sequenceInfo.setText(node.toString(sequence));
-        }
+            if (centreNodeID != -1 && radius != -1) {
+                ZoomController.getInstance().traverseGraphClicked(centreNodeID, radius);
+                SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
+                String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
+                sequenceInfo.setText(node.toString(sequence));
+            }
     }
 
     /**
@@ -588,7 +590,35 @@ public class MenuController implements Observer {
     }
 
     public int getRadius() {
-        return Integer.parseInt(radiusTextField.getText());
+        int radius = -1;
+        try {
+            int value = Integer.parseInt(radiusTextField.getText());
+            if (value < 1 || value > PanningController.RENDER_RANGE) {
+                throw new NotInRangeException();
+            }
+            radius = value;
+        } catch (NumberFormatException e) {
+            System.err.println("The given radius is not a number");
+        } catch (NotInRangeException e) {
+            System.err.println("The given radius is out of bounds");
+        }
+        return radius;
+    }
+
+    public int getCentreNodeID() {
+        int centreNode = -1;
+        try {
+            int value = Integer.parseInt(nodeTextField.getText());
+            if (value < 1 || value > GraphDrawer.getInstance().getGraph().getFullGraphRightBoundID()) {
+                throw new NotInRangeException();
+            }
+            centreNode = value;
+        } catch (NumberFormatException e) {
+            System.err.println("The given node ID is not a number");
+        } catch (NotInRangeException e) {
+            System.err.println("The given node ID is out of bounds");
+        }
+        return centreNode;
     }
 
 }
