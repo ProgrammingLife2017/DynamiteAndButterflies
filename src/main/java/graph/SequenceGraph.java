@@ -386,7 +386,7 @@ public class SequenceGraph {
     }
 
     public int getFullGraphRightBoundID() {
-        return parentArray[parentArray.length - 1];
+        return parentArray[parentArray.length - 1] + 1;
     }
 
     public int getFullGraphLeftBoundID() {
@@ -420,4 +420,6 @@ public class SequenceGraph {
     public int getMaxColumnSize() {
         return maxColumnSize;
     }
+
+    public int getRange() { return boundaries.getRange(); }
 }

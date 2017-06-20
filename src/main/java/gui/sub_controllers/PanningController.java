@@ -130,6 +130,8 @@ public class PanningController extends Observable {
                     timelineRight.play();
                 } else if (event.getCode() == KeyCode.LEFT) {
                     timelineLeft.play();
+                } else if (event.getCode() == KeyCode.ALT) {
+
                 }
                 event.consume();
             }

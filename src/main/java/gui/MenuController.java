@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
+import exceptions.NotInRangeException;
+
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
  * <p>
@@ -99,13 +101,9 @@ public class MenuController implements Observer {
     private CustomProperties properties;
     private BookmarkController bookmarkController;
     private FileController fileController;
-    private ZoomController zoomController;
-    private InfoController infoController;
     private RecentController recentController;
     private PanningController panningController;
     private SpecificGenomeProperties specificGenomeProperties;
-
-
     private String filePath;
 
     /**
@@ -120,18 +118,17 @@ public class MenuController implements Observer {
         properties = new CustomProperties();
 
         fileController = new FileController(new ProgressBarController(progressBar));
-        infoController = new InfoController(numNodesLabel, numEdgesLabel, sequenceInfo);
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
-        zoomController = null;
 
         specificGenomeProperties = new SpecificGenomeProperties(genome1, genome2, genome3);
 
         ps = new PrintStream(new Console(consoleArea));
         DrawableCanvas.getInstance().setMenuController(this);
-
         DrawableCanvas.getInstance().setSpecificGenomeProperties(specificGenomeProperties);
         ScrollbarController.getInstance().setScrollBar(scrollBar);
+        ZoomController.getInstance().setMenuController(this);
+        Minimap.getInstance().setMenuController(this);
 
         //System.setErr(ps);
         System.setOut(ps);
@@ -212,8 +209,12 @@ public class MenuController implements Observer {
     }
 
     private void displayInfo(SequenceGraph graph) {
-        infoController.displayInfo(graph);
-        zoomController.displayInfo();
+        numNodesLabel.setText(graph.getFullGraphRightBoundID() + "");
+        numEdgesLabel.setText(graph.totalSize() + "");
+    }
+
+    public void updateRadius() {
+        radiusTextField.setText(GraphDrawer.getInstance().getRadius() + "");
     }
 
     /**
@@ -223,11 +224,9 @@ public class MenuController implements Observer {
      */
     @FXML
     public void zoomInClicked() throws IOException {
-        if (zoomController != null) {
-            double xCentre = canvas.getWidth() / 2;
-            zoomController.zoomIn(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
-            nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
-        }
+        double xCentre = canvas.getWidth() / 2;
+        ZoomController.getInstance().zoomIn(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
+        nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
     }
 
     /**
@@ -237,11 +236,9 @@ public class MenuController implements Observer {
      */
     @FXML
     public void zoomOutClicked() throws IOException {
-        if (zoomController != null) {
-            double xCentre = canvas.getWidth() / 2;
-            zoomController.zoomOut(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
-            nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
-        }
+        double xCentre = canvas.getWidth() / 2;
+        ZoomController.getInstance().zoomOut(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
+        nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
     }
 
     /**
@@ -255,9 +252,9 @@ public class MenuController implements Observer {
         int column = GraphDrawer.getInstance().mouseLocationColumn(scrollEvent.getX());
         nodeTextField.setText(GraphDrawer.getInstance().findColumn(scrollEvent.getX()) + "");
         if (scrollEvent.getDeltaY() > 0) {
-            zoomController.zoomIn(column);
+            ZoomController.getInstance().zoomIn(column);
         } else {
-            zoomController.zoomOut(column);
+            ZoomController.getInstance().zoomOut(column);
         }
     }
 
@@ -271,6 +268,7 @@ public class MenuController implements Observer {
         canvasPanel.requestFocus();
         double pressedX = mouseEvent.getX();
         double pressedY = mouseEvent.getY();
+        Minimap.getInstance().clickMinimap(pressedX, pressedY);
         SequenceNode clicked = null;
         try {
             clicked = GraphDrawer.getInstance().clickNode(pressedX, pressedY);
@@ -280,7 +278,7 @@ public class MenuController implements Observer {
         }
         if (clicked != null) {
             String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId());
-            infoController.updateSeqLabel(clicked.toString(sequence));
+            sequenceInfo.setText(clicked.toString(sequence));
             nodeTextField.setText(clicked.getId().toString());
         }
     }
@@ -290,30 +288,14 @@ public class MenuController implements Observer {
      */
     @FXML
     public void traverseGraphClicked() {
-        if (!nodeTextField.getText().equals("") && !radiusTextField.getText().equals("")) {
-            int centreNodeID = Integer.parseInt(nodeTextField.getText());
-            int radius = Integer.parseInt(radiusTextField.getText());
-            zoomController.traverseGraphClicked(centreNodeID, radius);
-            SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
-            String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
-            infoController.updateSeqLabel(node.toString(sequence));
-        }
-    }
-
-    /**
-     * Adds a button to traverse the graph with.
-     *
-     * @param centreNode specifies the centre node to be showed
-     * @param radius     specifies the radius to be showed
-     */
-    private void traverseGraphClicked(String centreNode, String radius) {
-        int centreNodeID = Integer.parseInt(centreNode);
-        int rad = Integer.parseInt(radius);
-
-        zoomController.traverseGraphClicked(centreNodeID, rad);
-        String newString = "Sequence: "
-                + DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
-        infoController.updateSeqLabel(newString);
+            int centreNodeID = getCentreNodeID();
+            int radius = getRadius();
+            if (centreNodeID != -1 && radius != -1) {
+                ZoomController.getInstance().traverseGraphClicked(centreNodeID, radius);
+                SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
+                String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
+                sequenceInfo.setText(node.toString(sequence));
+            }
     }
 
     /**
@@ -351,8 +333,8 @@ public class MenuController implements Observer {
         Stage stage;
         Parent root = loader.load();
         BookmarkPopUp controller = loader.<BookmarkPopUp>getController();
-        controller.initialize(zoomController.getCentreNode(),
-                zoomController.getRadius(), bookmarkController);
+        controller.initialize(Integer.parseInt(nodeTextField.getText()),
+                GraphDrawer.getInstance().getZoomLevel(), bookmarkController);
 
         stage = new Stage();
         stage.setScene(new Scene(root));
@@ -389,11 +371,10 @@ public class MenuController implements Observer {
             String string = bookmark.getText();
             String[] parts = string.split(" - ");
             //We skip parts[0] because that is the note.
-            String centre = parts[1];
-            String radius = parts[2];
-            traverseGraphClicked(centre, radius);
-            zoomController.setNodeTextField(centre);
-            zoomController.setRadiusTextField(radius);
+            int centre = Integer.parseInt(parts[1]);
+            int radius = Integer.parseInt(parts[2]);
+            ZoomController.getInstance().traverseGraphClicked(centre, radius);
+            nodeTextField.setText(centre + "");
         }
     }
 
@@ -436,9 +417,8 @@ public class MenuController implements Observer {
                         panningController =
                                 new PanningController(leftPannButton, rightPannButton);
                         panningController.initializeKeys(canvasPanel);
-                        zoomController = new ZoomController(panningController,
-                                nodeTextField, radiusTextField);
                         displayInfo(GraphDrawer.getInstance().getGraph());
+                        updateRadius();
                         enableGuiElements();
                     }
                 });
@@ -647,4 +627,37 @@ public class MenuController implements Observer {
         GraphDrawer.getInstance().setRainbowView(rainbowBut.isSelected());
         GraphDrawer.getInstance().redraw();
     }
+
+    public int getRadius() {
+        int radius = -1;
+        try {
+            int value = Integer.parseInt(radiusTextField.getText());
+            if (value < 1 || value > PanningController.RENDER_RANGE) {
+                throw new NotInRangeException();
+            }
+            radius = value;
+        } catch (NumberFormatException e) {
+            System.err.println("The given radius is not a number");
+        } catch (NotInRangeException e) {
+            System.err.println("The given radius is out of bounds");
+        }
+        return radius;
+    }
+
+    public int getCentreNodeID() {
+        int centreNode = -1;
+        try {
+            int value = Integer.parseInt(nodeTextField.getText());
+            if (value < 1 || value > GraphDrawer.getInstance().getGraph().getFullGraphRightBoundID()) {
+                throw new NotInRangeException();
+            }
+            centreNode = value;
+        } catch (NumberFormatException e) {
+            System.err.println("The given node ID is not a number");
+        } catch (NotInRangeException e) {
+            System.err.println("The given node ID is out of bounds");
+        }
+        return centreNode;
+    }
+
 }
