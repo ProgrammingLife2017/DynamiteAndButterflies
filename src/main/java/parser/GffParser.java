@@ -2,13 +2,9 @@ package parser;
 
 import gui.DrawableCanvas;
 import structures.Annotation;
-import structures.BinaryTree;
-import structures.TreeNode;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Vector;
 
 /**
  * Created by lex_b on 12/06/2017.
@@ -31,8 +27,6 @@ public class GffParser {
      */
     public ArrayList<Annotation> parseGff() throws IOException {
         ArrayList<Annotation> annotationList = new ArrayList<>();
-        Vector<TreeNode> annotations = new Vector<>();
-        BinaryTree tree = new BinaryTree();
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line;
@@ -43,21 +37,8 @@ public class GffParser {
             int start = Integer.parseInt(data[3]);
             int end = Integer.parseInt(data[4]);
             Annotation anno = new Annotation(DrawableCanvas.getInstance().getAllGenomes().get(nameGenome), start, end, info);
-            annotations.add(TreeNode.newNode(anno));
             annotationList.add(anno);
         }
-        annotations.sort(new Comparator<TreeNode>() {
-            @Override
-            public int compare(TreeNode a1, TreeNode a2) {
-                if (a1.getAnnotation().getStart() < a2.getAnnotation().getStart()) {
-                    return -1;
-                } else if (a1.getAnnotation().getStart() > a2.getAnnotation().getStart()) {
-                    return 1;
-                }
-                return 0;
-            }
-        });
-        TreeNode root = tree.buildTreeUtil(annotations, 0, annotations.size() - 1);
         return annotationList;
     }
 }

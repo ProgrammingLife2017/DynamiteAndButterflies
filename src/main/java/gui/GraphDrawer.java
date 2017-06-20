@@ -48,6 +48,7 @@ public class GraphDrawer {
     private SequenceNode mostRightNode;
     private HashMap<Integer, double[]> coordinates;
     private boolean rainbowView = true;
+    private HashMap<Integer, ArrayList<Annotation>> smartAnnotations = new HashMap<>();
 
     public static GraphDrawer getInstance(){
         return drawer;
@@ -157,7 +158,6 @@ public class GraphDrawer {
      * Initializes the widths of each column.
      * Using the widest node of each column.
      */
-
     private void initializeColumnWidths() {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
@@ -173,8 +173,6 @@ public class GraphDrawer {
             columnWidths[j + 1] = columnWidths[j] + max;
         }
     }
-
-
 
     public void initializeDummyWidths() {
         HashMap<Integer, String> genomes;
@@ -249,45 +247,51 @@ public class GraphDrawer {
             checkExtremeNode(node);
             drawNode(node);
             drawEdges(node);
-
         }
     }
 
     private void drawAnnotations(SequenceNode node, double[] coordinates) {
-        for (int i = 0; i < selectedAnnotations.size(); i++) {
-            Annotation annotation = selectedAnnotations.get(i);
-            int annoID = annotation.getId();
-            double startXAnno = coordinates[0];
-            double startYAnno = coordinates[1] + coordinates[3];
-            double annoWidth = coordinates[2];
-            double annoHeight = coordinates[3] / 2;
-            int indexOfGenome = colourController.containsPos(node.getGenomes(), annoID);
-            if (indexOfGenome != -1) {
-                int startOfAnno = annotation.getStart();
-                int endOfAnno = annotation.getEnd();
-                int startCorOfGenome = 0;
+        ArrayList<Annotation> drawThese = smartAnnotations.get(node.getId());
+        if (drawThese != null) {
+            for (int i = 0; i < drawThese.size(); i++) {
+                Annotation annotation = drawThese.get(i);
+                //TODO Ook dit gaat messed up.
+                int annoID = annotation.getId();
+                double startXAnno = coordinates[0];
+                double startYAnno = coordinates[1] + coordinates[3];
+                double annoWidth = coordinates[2];
+                double annoHeight = coordinates[3] / 2;
+                int indexOfGenome = colourController.containsPos(node.getGenomes(), annoID);
+                if (indexOfGenome != -1) {
+                    int startOfAnno = annotation.getStart();
+                    int endOfAnno = annotation.getEnd();
+                    int placeOfAnnotatedGenome = 0;
 
-                if (node.getGenomes().length == node.getOffsets().length) {
-                    startCorOfGenome = indexOfGenome;
-                }
+                    if (node.getGenomes().length == node.getOffsets().length) {
+                        placeOfAnnotatedGenome = indexOfGenome;
+                    }
 
-                if (startOfAnno > (node.getOffsets()[startCorOfGenome] + node.getSequenceLength())
-                        || endOfAnno < (node.getOffsets()[startCorOfGenome])) {
-                    continue;
-                }
+                    int startCorNode = node.getOffsets()[placeOfAnnotatedGenome];
+                    int endCorNode = startCorNode + node.getSequenceLength();
 
-                double emptyAtStart = 0.0;
-                if (startOfAnno > node.getOffsets()[startCorOfGenome]) {
-                    emptyAtStart = startOfAnno - node.getOffsets()[startCorOfGenome];
-                    annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
-                    startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                    if (startOfAnno > endCorNode || endOfAnno < startCorNode) {
+                        continue;
+                    }
+
+                    double emptyAtStart = 0.0;
+                    if (startOfAnno > startCorNode) {
+                        emptyAtStart = startOfAnno - startCorNode;
+                        annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
+                        startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                    }
+                    if (endOfAnno < endCorNode) {
+                        int emptyAtEnd = endCorNode - endOfAnno;
+                        annoWidth = (annoWidth
+                                * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
+                    }
+                    gc.setFill(Color.RED);
+                    gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
                 }
-                if (endOfAnno < (node.getOffsets()[startCorOfGenome] + node.getSequenceLength())) {
-                    int emptyAtEnd = node.getOffsets()[startCorOfGenome] + node.getSequenceLength() - endOfAnno;
-                    annoWidth = (annoWidth * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
-                }
-                gc.setFill(Color.RED);
-                gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
             }
         }
     }
@@ -308,11 +312,12 @@ public class GraphDrawer {
             if (node.isDummy()) {
                 this.setLineWidth(node.getGenomes().length);
                 gc.strokeLine(coordinates[0], coordinates[1] + coordinates[3] / 2,
-                        coordinates[0] + coordinates[2], coordinates[1] + coordinates[3] /2);
+                        coordinates[0] + coordinates[2], coordinates[1] + coordinates[3] / 2);
             }
-
-            drawColour(node, coordinates);
-            drawAnnotations(node, coordinates);
+            else {
+                drawColour(node, coordinates);
+                drawAnnotations(node, coordinates);
+            }
         }
     }
 
@@ -342,7 +347,6 @@ public class GraphDrawer {
         }
     }
 
-
     private void drawEdges(SequenceNode node) {
         int nodeID = node.getId();
         SequenceNode parent = graph.getNode(nodeID);
@@ -360,7 +364,6 @@ public class GraphDrawer {
             }
         }
     }
-
 
     public void drawMinimap() {
         Minimap.getInstance().setValue(mostLeftNode.getId());
@@ -507,7 +510,6 @@ public class GraphDrawer {
     }
 
     //TODO: Loop over the  nodes in the graph (O(n*m) > O(k))
-
     /**
      * Returns the ColumnId of a Node at the users Choice.
      *
@@ -585,6 +587,7 @@ public class GraphDrawer {
 
     public void setSelectedAnnotations(ArrayList<Annotation> newAnnotations) {
         this.selectedAnnotations = newAnnotations;
+        this.smartAnnotations = intializeAnnotationsOnNodes();
     }
 
     public void setAllAnnotations(ArrayList<Annotation> newAnnotations) {
@@ -633,6 +636,54 @@ public class GraphDrawer {
     public void setRainbowView(boolean rainbowView) {
         this.rainbowView = rainbowView;
         this.colourController = new ColourController(selected, rainbowView);
+    }
+
+    public HashMap<Integer, ArrayList<Annotation>> intializeAnnotationsOnNodes() {
+        HashMap<Integer, ArrayList<Annotation>> res = new HashMap<>();
+
+        Iterator it = graph.getNodes().entrySet().iterator();
+        while (it.hasNext()) {
+            ArrayList<Annotation> annotationsOnThisNode = new ArrayList<Annotation>();
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+
+            if (!node.isDummy()) {
+                if (node.getId() == 3) {
+                    System.out.println("NU ZIJN WE HIER");
+                }
+                for (int i = 0; i < selectedAnnotations.size(); i++) {
+                    Annotation annotation = selectedAnnotations.get(i);
+                    //TODO, wordt gek met merge van master, alles dezelfde ID uit DrawableCanvas getten.
+                    int annoID = annotation.getId();
+                    int indexOfGenome = colourController.containsPos(node.getGenomes(), annoID);
+                    if (indexOfGenome != -1) {
+                        int startOfAnno = annotation.getStart();
+                        int endOfAnno = annotation.getEnd();
+                        int placeOfAnnotatedGenome = 0;
+
+                        if (node.getGenomes().length == node.getOffsets().length) {
+                            placeOfAnnotatedGenome = indexOfGenome;
+                        }
+
+                        int startCorNode = node.getOffsets()[placeOfAnnotatedGenome];
+                        int endCorNode = startCorNode + node.getSequenceLength();
+
+                        if (startOfAnno > endCorNode || endOfAnno <= startCorNode) {
+                            continue;
+                        }
+
+                        if (startOfAnno >= startCorNode || endOfAnno < endCorNode
+                                || (startOfAnno < startCorNode && endOfAnno > endCorNode)) {
+                            annotationsOnThisNode.add(annotation);
+                        }
+                    }
+                }
+                if (annotationsOnThisNode.size() != 0) {
+                    res.put(node.getId(), annotationsOnThisNode);
+                }
+            }
+        }
+        return res;
     }
 }
 
