@@ -61,6 +61,11 @@ public class AnnotationTableController {
     public void initialize(ArrayList<Annotation> annotations) {
         allSelected = false;
         selection = new ArrayList<Annotation>();
+        for (Annotation annotation : annotations) {
+            if (annotation.getSelected().getValue()) {
+                selection.add(annotation);
+            }
+        }
         masterData = FXCollections.observableArrayList(annotations);
 
         // 0. Initialize the columns.
