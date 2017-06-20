@@ -6,22 +6,29 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ScrollBar;
 
 /**
- * Created by TUDelft SID on 20-6-2017.
+ * Created by Jasper van Tilburg SID on 20-6-2017.
  */
 public class ScrollbarController {
 
     public static ScrollbarController scrollbarController = new ScrollbarController();
 
-
     private ScrollBar scrollBar;
-
-    public static ScrollbarController getInstance() {
-        return scrollbarController;
-    }
 
     public ScrollbarController() {
     }
 
+    /**
+     * Getter for the singleton ScrollbarController.
+     * @return the scrollbar controller
+     */
+    public static ScrollbarController getInstance() {
+        return scrollbarController;
+    }
+
+    /**
+     * Initialize the scrollbar controller.
+     * @param maxColumnSize How far down the graph goes
+     */
     public void initialize(int maxColumnSize) {
         scrollBar.setMax(maxColumnSize);
         scrollBar.valueProperty().addListener(new ChangeListener<Number>() {
@@ -34,10 +41,10 @@ public class ScrollbarController {
 
     }
 
-    public void scroll() {
-
-    }
-
+    /**
+     * Setter for the scrollbar.
+     * @param scrollBar The scrollbar
+     */
     public void setScrollBar(ScrollBar scrollBar) {
         this.scrollBar = scrollBar;
     }
