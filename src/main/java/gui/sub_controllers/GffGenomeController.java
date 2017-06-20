@@ -56,13 +56,12 @@ public class GffGenomeController {
         selectCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Genome, Boolean>, ObservableValue<Boolean>>() {
             @Override
             public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Genome, Boolean> param) {
-                //TODO Make sure this works.
                 ObservableValue<Boolean> res = param.getValue().selectedProperty();
-                if (table.getItems().size() != 1) {
-                    for (int i = 0; i < table.getItems().size(); i++) {
-                        if (i != param.getValue().getId()) {
-                            Genome genome = table.getItems().get(i);
-                            if (genome.isSelected()) {
+                if (res.getValue()) {
+                    if (table.getItems().size() != 1) {
+                        for (int i = 0; i < table.getItems().size(); i++) {
+                            if (i != param.getValue().getId()) {
+                                Genome genome = table.getItems().get(i);
                                 genome.setSelected(false);
                             }
                         }
