@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.sub_controllers.GffGenomeController">
+    <children>
+        <TableView fx:id="table" layoutX="29.0" layoutY="35.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="40.0">
+            <columns>
+                <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
+                <TableColumn fx:id="nameCol" prefWidth="265.0" text="Name" />
+                <TableColumn fx:id="selectCol" prefWidth="75.0" text="Select" />
+            </columns>
+        </TableView>
+        <Label layoutX="208.0" layoutY="14.0" prefHeight="30.0" prefWidth="390.0" text="Choose a Genome to load the annotations on" textAlignment="CENTER" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+            <font>
+                <Font size="22.0" />
+            </font>
+        </Label>
+        <Button layoutX="88.0" layoutY="365.0" mnemonicParsing="false" onAction="#continueClicked" text="Continue" AnchorPane.bottomAnchor="5.0" />
+    </children>
+</AnchorPane>
