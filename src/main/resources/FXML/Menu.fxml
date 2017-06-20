@@ -99,7 +99,7 @@
                   </SplitPane>
                </children>
             </AnchorPane>
-          <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="400.0">
+          <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="400.0">
                <children>
                   <TabPane tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <tabs>
@@ -111,7 +111,7 @@
                                     <Label layoutX="24.0" layoutY="43.0" text="Edges:" />
                                     <Label fx:id="numNodesLabel" layoutX="85.0" layoutY="11.0" text="0" />
                                     <Label fx:id="numEdgesLabel" layoutX="85.0" layoutY="43.0" text="0" />
-                                    <ScrollPane layoutX="205.0" layoutY="-1.0" prefHeight="173.0" prefWidth="1714.0">
+                                    <ScrollPane layoutX="205.0" layoutY="-1.0" prefHeight="173.0" prefWidth="1714.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <content>
                                           <Label fx:id="sequenceInfo" layoutX="20.0" layoutY="30.0" text="Select a Node" />
                                        </content>
