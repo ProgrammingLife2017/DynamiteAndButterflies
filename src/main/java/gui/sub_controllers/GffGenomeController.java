@@ -121,6 +121,10 @@ public class GffGenomeController {
             }
         }
 
+        //TODO improve handling no genome chosen
+        if (temp.isEmpty()) {
+            temp.add(0);
+        }
         DrawableCanvas.getInstance().setAnnotationGenome(temp.get(0));
         close();
     }
