@@ -91,6 +91,8 @@ public class MenuController implements Observer {
     private Button rightPannButton;
     @FXML
     private Button leftPannButton;
+    @FXML
+    private ScrollBar scrollBar;
 
     private PrintStream ps;
     private GraphicsContext gc;
@@ -129,6 +131,7 @@ public class MenuController implements Observer {
         DrawableCanvas.getInstance().setMenuController(this);
 
         DrawableCanvas.getInstance().setSpecificGenomeProperties(specificGenomeProperties);
+        ScrollbarController.getInstance().setScrollBar(scrollBar);
 
         //System.setErr(ps);
         System.setOut(ps);
