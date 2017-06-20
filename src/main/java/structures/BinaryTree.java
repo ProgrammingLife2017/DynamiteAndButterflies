@@ -1,53 +1,53 @@
 package structures;
 
+import java.util.Vector;
+
 /**
  * Created by Jip on 19-6-2017.
  */
 public class BinaryTree {
 
-    public TreeNode addNode(TreeNode root, Annotation annotation) {
-        if (root == null) {
-            return TreeNode.newNode(annotation);
-        }
 
-        int low = root.getLow();
-        if (annotation.getStart() < low) {
-            root.setLeft(addNode(root.getLeft(), annotation));
-        } else {
-            root.setRight(addNode(root.getRight(), annotation));
-        }
-
-        if (root.getMax() < annotation.getEnd()) {
-            root.setMax(annotation.getEnd());
-        }
-
-        return root;
-    }
-
-    boolean doOverlap(Annotation a1, Annotation a2) {
-        if (a1.getStart() <= a2.getEnd() && a2.getStart() <= a1.getEnd()) {
+    boolean doOverlap(Annotation a1, int startCor, int length) {
+        if (a1.getStart() <= startCor + length || startCor <= a1.getEnd()) {
             return true;
         }
         return false;
     }
 
-    Annotation overlapSearch(TreeNode root, Annotation annotation) {
+    TreeNode overlapSearch(TreeNode root, int startCor, int length) {
         if (root == null) {
             return null;
         }
 
-        if (doOverlap(root.getAnnotation(), annotation)) {
-            return root.getAnnotation();
+        if (doOverlap(root.getAnnotation(), startCor, length)) {
+            return root;
         }
 
-        // If left child of root is present and max of left child is
-        // greater than or equal to given interval, then i may
-        // overlap with an interval is left subtree
-        if (root.getLeft() != null && root.getLeft().getMax() >= annotation.getStart()) {
-            return overlapSearch(root.getLeft(), annotation);
+        if (root.getLeft() != null && root.getLeft().getMax() >= startCor) {
+            return overlapSearch(root.getLeft(), startCor, length);
         }
 
-        return overlapSearch(root.getRight(), annotation);
+        return overlapSearch(root.getRight(), startCor, length);
+    }
+
+    /* Recursive function to construct binary tree */
+    public TreeNode buildTreeUtil(Vector<TreeNode> nodes, int start, int end) {
+        // base case
+        if (start > end) {
+            return null;
+        }
+
+        /* Get the middle element and make it root */
+        int mid = (start + end) / 2;
+        TreeNode node = nodes.get(mid);
+
+        /* Using index in Inorder traversal, construct
+           left and right subtress */
+        node.setLeft(buildTreeUtil(nodes, start, mid - 1));
+        node.setRight(buildTreeUtil(nodes, mid + 1, end));
+
+        return node;
     }
 }
 
