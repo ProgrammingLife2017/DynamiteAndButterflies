@@ -47,7 +47,6 @@ public class GffGenomeController {
             realData.add(genome);
             if (i == suggestion) {
                 genome.setSelected(true);
-                break;
             }
         }
         final ObservableList<Genome> data = FXCollections.observableArrayList(realData);
@@ -58,7 +57,17 @@ public class GffGenomeController {
         selectCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Genome, Boolean>, ObservableValue<Boolean>>() {
             @Override
             public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Genome, Boolean> param) {
-                return param.getValue().selectedProperty();
+                //TODO Make sure this works.
+                ObservableValue<Boolean> res = param.getValue().selectedProperty();
+                for (int i = 0; i < table.getItems().size(); i++) {
+                    if (i != param.getValue().getId()) {
+                        Genome genome = table.getItems().get(i);
+                        if (genome.isSelected()) {
+                            genome.setSelected(false);
+                        }
+                    }
+                }
+                return res;
             }
         });
         selectCol.setCellFactory(CheckBoxTableCell.forTableColumn(selectCol));
@@ -94,12 +103,8 @@ public class GffGenomeController {
             }
         }
 
-        if (temp.size() > 2) {
-            //TODO HANDLE CHOOSING TO MANY
-        } else {
-            DrawableCanvas.getInstance().setAnnotationGenome(temp.get(0));
-            close();
-        }
+        DrawableCanvas.getInstance().setAnnotationGenome(temp.get(0));
+        close();
     }
 
     /**

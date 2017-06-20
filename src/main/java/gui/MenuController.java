@@ -167,6 +167,8 @@ public class MenuController implements Observer {
         Stage stage = App.getStage();
         File file = fileController.chooseGffFile(stage);
         String filePath = file.getAbsolutePath();
+        GraphDrawer.getInstance().setSelectedAnnotations(new ArrayList<Annotation>());
+        GraphDrawer.getInstance().redraw();
         GraphDrawer.getInstance().setAllAnnotations(fileController.openGffFileClicked(filePath));
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/chooseGenomeForAnnotations.fxml"));

@@ -12,7 +12,6 @@
   <children>
     <TableView fx:id="annotationTable" prefHeight="-1.0" prefWidth="-1.0" tableMenuButtonVisible="false" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="40.0">
       <columns>
-          <TableColumn fx:id="idColumn" maxWidth="750.0" prefWidth="75.0" text="GenomeID" />
           <TableColumn fx:id="startColumn" maxWidth="850.0" prefWidth="120.0" text="startPoint" />
           <TableColumn fx:id="endColumn" maxWidth="850.0" prefWidth="120.0" text="endPoint" />
           <TableColumn fx:id="infoColumn" prefWidth="400.0" text="Info" />
