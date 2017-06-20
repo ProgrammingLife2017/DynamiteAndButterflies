@@ -256,7 +256,7 @@ public class GraphDrawer {
     private void drawAnnotations(SequenceNode node, double[] coordinates) {
         for (int i = 0; i < selectedAnnotations.size(); i++) {
             Annotation annotation = selectedAnnotations.get(i);
-            int annoID = annotation.getId();
+            int annoID = DrawableCanvas.getInstance().getAnnotationGenome();
             double startXAnno = coordinates[0];
             double startYAnno = coordinates[1] + coordinates[3];
             double annoWidth = coordinates[2];
@@ -309,10 +309,10 @@ public class GraphDrawer {
                 this.setLineWidth(node.getGenomes().length);
                 gc.strokeLine(coordinates[0], coordinates[1] + coordinates[3] / 2,
                         coordinates[0] + coordinates[2], coordinates[1] + coordinates[3] /2);
+            } else {
+                drawColour(node, coordinates);
+                drawAnnotations(node, coordinates);
             }
-
-            drawColour(node, coordinates);
-            drawAnnotations(node, coordinates);
         }
     }
 

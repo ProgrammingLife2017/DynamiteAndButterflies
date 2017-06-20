@@ -167,8 +167,41 @@ public class MenuController implements Observer {
         Stage stage = App.getStage();
         File file = fileController.chooseGffFile(stage);
         String filePath = file.getAbsolutePath();
-        //TODO: do something with this return value.
         GraphDrawer.getInstance().setAllAnnotations(fileController.openGffFileClicked(filePath));
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/chooseGenomeForAnnotations.fxml"));
+        Stage newStage;
+        Parent root = loader.load();
+        final GffGenomeController gffGenomeController
+                = loader.<GffGenomeController>getController();
+
+        HashMap<Integer, String> hashMap;
+
+        hashMap = DrawableCanvas.getInstance().getAllGenomesReversed();
+        if (hashMap == null) {
+            try {
+                openGfaFileClicked();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        gffGenomeController.initialize(hashMap, DrawableCanvas.getInstance().getAnnotationGenome());
+
+        newStage = new Stage();
+        newStage.setScene(new Scene(root));
+        newStage.setTitle("Choose a genome to load the annotation on");
+        newStage.initModality(Modality.APPLICATION_MODAL);
+        newStage.setOnHidden(
+                new EventHandler<WindowEvent>() {
+                    @Override
+                    public void handle(WindowEvent event) {
+                        DrawableCanvas.getInstance().setAnnotationGenome(gffGenomeController.getSelectedGenome());
+                        GraphDrawer.getInstance().redraw();
+                    }
+                }
+        );
+        newStage.showAndWait();
+
         annoBut.setDisable(false);
     }
 

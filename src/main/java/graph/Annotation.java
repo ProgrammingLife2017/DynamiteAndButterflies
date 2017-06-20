@@ -11,7 +11,6 @@ import javafx.beans.property.SimpleStringProperty;
  * Uses this setUp to ensure that it can be loaded into a tableView.
  */
 public class Annotation {
-    private SimpleIntegerProperty id = new SimpleIntegerProperty();
     private SimpleIntegerProperty start = new SimpleIntegerProperty();
     private SimpleIntegerProperty end = new SimpleIntegerProperty();
     private SimpleStringProperty info = new SimpleStringProperty();
@@ -19,13 +18,11 @@ public class Annotation {
 
     /**
      * Constructor of the object
-     * @param idArg the ID of the genome the annotation is on
      * @param startArg the start coördinate of the annotation
      * @param endArg the end coördinate of the annotation
      * @param infoArg the information with the annotation
      */
-    public Annotation(int idArg, int startArg, int endArg, String infoArg) {
-        id.set(idArg);
+    public Annotation(int startArg, int endArg, String infoArg) {
         start.set(startArg);
         end.set(endArg);
         info.set(infoArg);
@@ -38,10 +35,6 @@ public class Annotation {
 
     public int getEnd() {
         return end.get();
-    }
-
-    public int getId() {
-        return id.get();
     }
 
     public String getInfo() {
