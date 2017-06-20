@@ -82,7 +82,8 @@ public class GffGenomeController {
         for (int i = 0; i < hashMap.size(); i++) {
             Genome genome = new Genome(i, hashMap.get(i));
             if (flag) {
-                if (genome.getName().contains("REF")) {
+                if (genome.getName().contains("REF")
+                        || genome.getName().contains("ref")) {
                     genome.setSelected(true);
                     res.add(genome);
                 }
