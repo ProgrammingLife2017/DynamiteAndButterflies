@@ -42,13 +42,12 @@ public class GffGenomeController {
         selectedGenome = suggestion;
 
         ArrayList<Genome> realData = new ArrayList<Genome>();
-        for (int i = 0; i < hashMap.size(); i++) {
-            Genome genome = new Genome(i, hashMap.get(i));
-            realData.add(genome);
-            if (i == suggestion) {
-                genome.setSelected(true);
-            }
+        realData = createGenomeTable(hashMap, suggestion, true);
+        if (realData.size() == 0) {
+            realData = createGenomeTable(hashMap, suggestion, false);
         }
+
+
         final ObservableList<Genome> data = FXCollections.observableArrayList(realData);
         table.setItems(data);
 
@@ -59,11 +58,13 @@ public class GffGenomeController {
             public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Genome, Boolean> param) {
                 //TODO Make sure this works.
                 ObservableValue<Boolean> res = param.getValue().selectedProperty();
-                for (int i = 0; i < table.getItems().size(); i++) {
-                    if (i != param.getValue().getId()) {
-                        Genome genome = table.getItems().get(i);
-                        if (genome.isSelected()) {
-                            genome.setSelected(false);
+                if (table.getItems().size() != 1) {
+                    for (int i = 0; i < table.getItems().size(); i++) {
+                        if (i != param.getValue().getId()) {
+                            Genome genome = table.getItems().get(i);
+                            if (genome.isSelected()) {
+                                genome.setSelected(false);
+                            }
                         }
                     }
                 }
@@ -76,6 +77,24 @@ public class GffGenomeController {
         idCol.setEditable(false);
         nameCol.setEditable(false);
         selectCol.setEditable(true);
+    }
+
+    private ArrayList<Genome> createGenomeTable(HashMap<Integer, String> hashMap, int suggestion, boolean flag) {
+        ArrayList<Genome> res = new ArrayList<Genome>();
+        for (int i = 0; i < hashMap.size(); i++) {
+            Genome genome = new Genome(i, hashMap.get(i));
+            if (flag) {
+                if (genome.getName().contains("REF")) {
+                    res.add(genome);
+                }
+            } else {
+                res.add(genome);
+            }
+            if (i == suggestion) {
+                genome.setSelected(true);
+            }
+        }
+        return res;
     }
 
     /**
