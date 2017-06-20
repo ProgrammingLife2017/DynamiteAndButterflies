@@ -380,7 +380,7 @@ public class SequenceGraph {
     }
 
     public int getFullGraphRightBoundID() {
-        return parentArray[parentArray.length - 1];
+        return parentArray[parentArray.length - 1] + 1;
     }
 
     public int getFullGraphLeftBoundID() {
@@ -411,4 +411,5 @@ public class SequenceGraph {
         return centerNodeID;
     }
 
+    public int getRange() { return boundaries.getRange(); }
 }

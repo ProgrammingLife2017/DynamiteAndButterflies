@@ -1,5 +1,6 @@
 package gui;
 
+import com.sun.corba.se.impl.orbutil.graph.Graph;
 import graph.Annotation;
 import graph.SequenceGraph;
 import graph.SequenceNode;
@@ -31,7 +32,6 @@ public class GraphDrawer {
     private Canvas canvas;
     private int yBase;
     private double zoomLevel;
-    private double radius;
     private double range;
     private double xDifference;
     private double stepSize;
@@ -67,12 +67,8 @@ public class GraphDrawer {
         columns = graph.getColumns();
         columnWidths = new double[columns.size() + 1];
         initializeColumnWidths();
-        long start = System.currentTimeMillis();
         initializeDummyWidths();
-        long end = System.currentTimeMillis();
-        System.out.println(start - end);
         range = columnWidths[columns.size()];
-        radius = columns.size();
         if (zoomLevel == 0) {
             setZoomLevel(columnWidths[columns.size()]);
         }
@@ -104,33 +100,12 @@ public class GraphDrawer {
      */
     public void zoom(final double factor, final int column) {
         setZoomLevel(zoomLevel * factor);
-        setRadius(radius * factor);
         if (zoomLevel != range / 2) {
             moveShapes(column - ((column - xDifference) * factor));
         }
     }
 
-    /**
-     * Change the zoom (invoked by user by clicking on "Go to this Node".
-     *
-     * @param radius The new radius.
-     * @param column  The new Column to be in the centre.
-     */
-    public void changeZoom(int column, int radius) {
-        setRadius(radius);
-        int widthRight = column + radius + 1;
-        int widthLeft = column - radius;
 
-        if (column + radius + 1 > columnWidths.length-1 ) {
-            widthRight = columnWidths.length - 1;
-        }
-        if (column - radius < 0) {
-            widthLeft = 0;
-        }
-
-        setZoomLevel(columnWidths[widthRight] - columnWidths[widthLeft]);
-        moveShapes(columnWidths[widthLeft]);
-    }
 
     /**
      * Redraw all nodes with the same coordinates.
@@ -296,13 +271,12 @@ public class GraphDrawer {
         double[] coordinates = getCoordinates(node);
         if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] > 0) { mostLeftNode = node; }
         if (coordinates[0] < gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] >= gc.getCanvas().getWidth()) { mostRightNode = node; }
-
     }
 
     private void drawNode(SequenceNode node) {
         double[] coordinates = this.getCoordinates().get(node.getId());
-        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] > 0) { mostLeftNode = node; }
-        if (coordinates[0] < gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] >= gc.getCanvas().getWidth()) { mostRightNode = node; }
+        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE > 0) { mostLeftNode = node; }
+        if (coordinates[0] <= gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE >= gc.getCanvas().getWidth()) { mostRightNode = node; }
 
         if (inView(coordinates)) {
             if (node.isDummy()) {
@@ -367,7 +341,6 @@ public class GraphDrawer {
         Minimap.getInstance().setAmountVisible(mostRightNode.getId() - mostLeftNode.getId());
         Minimap.getInstance().draw(gc);
     }
-
 
     public boolean edgeInView(double startx, double endx) {
         return startx < gc.getCanvas().getWidth() && endx > 0;
@@ -525,6 +498,22 @@ public class GraphDrawer {
         return -1;
     }
 
+    public double findZoomLevel(int centreNode, int radius) {
+        int rightNodeID = (int) (centreNode + (double) radius / 2.0);
+        int leftNodeID = (int) (centreNode - (double) radius / 2.0);
+        if (rightNodeID > graph.getFullGraphRightBoundID()) {
+            rightNodeID = graph.getFullGraphRightBoundID();
+            mostRightNode = graph.getNode(graph.getFullGraphRightBoundID());
+        }
+        if (leftNodeID < graph.getFullGraphLeftBoundID()) {
+            leftNodeID = graph.getFullGraphLeftBoundID();
+            mostLeftNode = graph.getNode(graph.getFullGraphLeftBoundID());
+        }
+        int rightColumn = graph.getNode(rightNodeID).getColumn();
+        int leftColumn = graph.getNode(leftNodeID).getColumn();
+        return columnWidths[rightColumn] - columnWidths[leftColumn];
+    }
+
     /**
      * Get function for zoom level.
      *
@@ -532,15 +521,6 @@ public class GraphDrawer {
      */
     public double getZoomLevel() {
         return zoomLevel;
-    }
-
-    /**
-     * Get function for the radius.
-     *
-     * @return the double representing the radius.
-     */
-    public double getRadius() {
-        return radius;
     }
 
     public double getRange() {
@@ -597,16 +577,14 @@ public class GraphDrawer {
         this.xDifference = xDifference;
     }
 
-    public void setRadius(double radius) {
-        if (radius < 1) { radius = 1; }
-        if (radius > range) { radius = range; }
-        this.radius = radius;
-    }
-
     public void setZoomLevel(double zoomLevel) {
         if (zoomLevel < 1) { zoomLevel = 1; }
         if (zoomLevel > range / 2) { zoomLevel = range / 2; }
         this.zoomLevel = zoomLevel;
+    }
+
+    public int getRadius() {
+        return mostRightNode.getId() - mostLeftNode.getId();
     }
 
     public SequenceGraph getGraph() {
