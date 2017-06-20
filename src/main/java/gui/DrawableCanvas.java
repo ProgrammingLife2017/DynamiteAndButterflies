@@ -19,6 +19,7 @@ public class DrawableCanvas extends Observable implements Observer {
     public static final int START_NODE_ID = 1000;
 
     private static DrawableCanvas canvas = new DrawableCanvas();
+    private int annotationGenome;
 
     private GfaParser parser;
 
@@ -91,5 +92,13 @@ public class DrawableCanvas extends Observable implements Observer {
 
     public HashMap<Integer, String> getAllGenomesReversed() {
         return parser.getAllGenomesMapReversed();
+    }
+
+    public void setAnnotationGenome(int annotationGenomeArg) {
+        annotationGenome = annotationGenomeArg;
+    }
+
+    public int getAnnotationGenome() {
+        return annotationGenome;
     }
 }
