@@ -53,7 +53,7 @@ public class ZoomController {
      * Traverses the graph loaded to a specified destination.
      * @param centreNode The centre node to move to
      */
-    public void traverseGraphClicked(int centreNode, double zoom) {
+    public void traverseGraphClicked(int centreNode, int radius) {
         if (!GraphDrawer.getInstance().getGraph().getNodes().containsKey(centreNode)) {
             SequenceGraph newGraph = GraphDrawer.getInstance().getGraph().copy();
             newGraph.createSubGraph(centreNode, PanningController.RENDER_RANGE);
@@ -61,8 +61,8 @@ public class ZoomController {
             GraphDrawer.getInstance().setxDifference(0);
         }
         GraphDrawer drawer = GraphDrawer.getInstance();
+        GraphDrawer.getInstance().setZoomLevel(GraphDrawer.getInstance().findZoomLevel(centreNode, radius));
         double xDiff = drawer.getColumnWidth(drawer.getGraph().getNode(centreNode).getColumn()) - drawer.getZoomLevel() / 2;
-        GraphDrawer.getInstance().setZoomLevel(zoom);
         GraphDrawer.getInstance().moveShapes(xDiff);
         GraphDrawer.getInstance().highlight(centreNode);
     }

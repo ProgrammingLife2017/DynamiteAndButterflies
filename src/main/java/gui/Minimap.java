@@ -134,7 +134,7 @@ public class Minimap {
             int test = GraphDrawer.getInstance().getRadius();
             double xLoc = (pressedX - xCoordinate) / width;
             int node = (int) (GraphDrawer.getInstance().getGraph().getFullGraphRightBoundID() * xLoc);
-            ZoomController.getInstance().traverseGraphClicked(node, GraphDrawer.getInstance().getZoomLevel());
+            ZoomController.getInstance().traverseGraphClicked(node, menuController.getRadius());
             menuController.updateRadius();
         }
     }

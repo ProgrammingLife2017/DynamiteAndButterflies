@@ -1,5 +1,6 @@
 package gui;
 
+import com.sun.corba.se.impl.orbutil.graph.Graph;
 import graph.Annotation;
 import graph.SequenceGraph;
 import graph.SequenceNode;
@@ -66,10 +67,7 @@ public class GraphDrawer {
         columns = graph.getColumns();
         columnWidths = new double[columns.size() + 1];
         initializeColumnWidths();
-        long start = System.currentTimeMillis();
         initializeDummyWidths();
-        long end = System.currentTimeMillis();
-        System.out.println(start - end);
         range = columnWidths[columns.size()];
         if (zoomLevel == 0) {
             setZoomLevel(columnWidths[columns.size()]);
@@ -273,7 +271,6 @@ public class GraphDrawer {
         double[] coordinates = getCoordinates(node);
         if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] > 0) { mostLeftNode = node; }
         if (coordinates[0] < gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] >= gc.getCanvas().getWidth()) { mostRightNode = node; }
-
     }
 
     private void drawNode(SequenceNode node) {
@@ -502,8 +499,18 @@ public class GraphDrawer {
     }
 
     public double findZoomLevel(int centreNode, int radius) {
-        int rightColumn = (int) (centreNode + (double) radius / 2.0);
-        int leftColumn = (int) (centreNode - (double) radius / 2.0);
+        int rightNodeID = (int) (centreNode + (double) radius / 2.0);
+        int leftNodeID = (int) (centreNode - (double) radius / 2.0);
+        if (rightNodeID > graph.getFullGraphRightBoundID()) {
+            rightNodeID = graph.getFullGraphRightBoundID();
+            mostRightNode = graph.getNode(graph.getFullGraphRightBoundID());
+        }
+        if (leftNodeID < graph.getFullGraphLeftBoundID()) {
+            leftNodeID = graph.getFullGraphLeftBoundID();
+            mostLeftNode = graph.getNode(graph.getFullGraphLeftBoundID());
+        }
+        int rightColumn = graph.getNode(rightNodeID).getColumn();
+        int leftColumn = graph.getNode(leftNodeID).getColumn();
         return columnWidths[rightColumn] - columnWidths[leftColumn];
     }
 

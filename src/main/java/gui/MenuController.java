@@ -224,7 +224,6 @@ public class MenuController implements Observer {
      */
     @FXML
     public void clickMouse(MouseEvent mouseEvent) {
-        System.out.println("Clickec on: " + mouseEvent.getX());
         canvasPanel.requestFocus();
         double pressedX = mouseEvent.getX();
         double pressedY = mouseEvent.getY();
@@ -250,7 +249,8 @@ public class MenuController implements Observer {
     public void traverseGraphClicked() {
         if (!nodeTextField.getText().equals("")) {
             int centreNodeID = Integer.parseInt(nodeTextField.getText());
-            ZoomController.getInstance().traverseGraphClicked(centreNodeID, GraphDrawer.getInstance().getZoomLevel());
+            int radius = getRadius();
+            ZoomController.getInstance().traverseGraphClicked(centreNodeID, radius);
             SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
             String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
             sequenceInfo.setText(node.toString(sequence));
@@ -332,8 +332,7 @@ public class MenuController implements Observer {
             //We skip parts[0] because that is the note.
             int centre = Integer.parseInt(parts[1]);
             int radius = Integer.parseInt(parts[2]);
-            double zoomLevel = GraphDrawer.getInstance().findZoomLevel(centre, radius);
-            ZoomController.getInstance().traverseGraphClicked(centre, zoomLevel);
+            ZoomController.getInstance().traverseGraphClicked(centre, radius);
             nodeTextField.setText(centre + "");
         }
     }
@@ -586,6 +585,10 @@ public class MenuController implements Observer {
     public void rainbowButtonClicked() {
         GraphDrawer.getInstance().setRainbowView(rainbowBut.isSelected());
         GraphDrawer.getInstance().redraw();
+    }
+
+    public int getRadius() {
+        return Integer.parseInt(radiusTextField.getText());
     }
 
 }
