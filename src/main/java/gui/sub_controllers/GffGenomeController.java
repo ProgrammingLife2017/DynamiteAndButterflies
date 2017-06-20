@@ -47,7 +47,6 @@ public class GffGenomeController {
             realData = createGenomeTable(hashMap, suggestion, false);
         }
 
-
         final ObservableList<Genome> data = FXCollections.observableArrayList(realData);
         table.setItems(data);
 
@@ -84,11 +83,13 @@ public class GffGenomeController {
             Genome genome = new Genome(i, hashMap.get(i));
             if (flag) {
                 if (genome.getName().contains("REF")) {
+                    genome.setSelected(true);
                     res.add(genome);
                 }
             } else {
                 res.add(genome);
             }
+
             if (i == suggestion) {
                 genome.setSelected(true);
             }
@@ -121,9 +122,10 @@ public class GffGenomeController {
             }
         }
 
-        //TODO improve handling no genome chosen
+        //TODO improve handling no genome chosen -> can be more user friendly but works.
         if (temp.isEmpty()) {
-            temp.add(0);
+            table.getItems().get(0).setSelected(true);
+            temp.add(table.getItems().get(0).getId());
         }
         DrawableCanvas.getInstance().setAnnotationGenome(temp.get(0));
         close();
