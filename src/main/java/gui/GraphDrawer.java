@@ -501,6 +501,12 @@ public class GraphDrawer {
         return -1;
     }
 
+    public double findZoomLevel(int centreNode, int radius) {
+        int rightColumn = (int) (centreNode + (double) radius / 2.0);
+        int leftColumn = (int) (centreNode - (double) radius / 2.0);
+        return columnWidths[rightColumn] - columnWidths[leftColumn];
+    }
+
     /**
      * Get function for zoom level.
      *

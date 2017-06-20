@@ -1,5 +1,6 @@
 package gui.sub_controllers;
 
+import gui.GraphDrawer;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -28,7 +29,7 @@ public class BookmarkPopUp {
      */
     public void initialize(int centreNode, double zoomLevel, BookmarkController bookmarkControllerArg) {
         centreNodeBook.setText(Integer.toString(centreNode));
-        radiusBook.setText(Double.toString(zoomLevel));
+        radiusBook.setText(Integer.toString(GraphDrawer.getInstance().getRadius()));
 
         bookmarkController = bookmarkControllerArg;
     }

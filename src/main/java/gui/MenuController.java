@@ -331,7 +331,8 @@ public class MenuController implements Observer {
             String[] parts = string.split(" - ");
             //We skip parts[0] because that is the note.
             int centre = Integer.parseInt(parts[1]);
-            double zoomLevel = Double.parseDouble(parts[2]);
+            int radius = Integer.parseInt(parts[2]);
+            double zoomLevel = GraphDrawer.getInstance().findZoomLevel(centre, radius);
             ZoomController.getInstance().traverseGraphClicked(centre, zoomLevel);
             nodeTextField.setText(centre + "");
         }
