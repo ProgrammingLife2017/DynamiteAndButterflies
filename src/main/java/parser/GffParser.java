@@ -35,7 +35,12 @@ public class GffParser {
         while ((line = br.readLine()) != null) {
             String[] data = line.split("\t");
 
-            String nameGenome = data[0].split("\\.")[0];
+            String[] nameGenomes = data[0].split("\\.");
+
+            String nameGenome = "";
+            for (int i = 0; i < nameGenomes.length - 1; i++) {
+                nameGenome = nameGenome.concat(nameGenomes[i]);
+            }
             //Here we check if that genome exists/is real.
             Integer nameGenomeID = DrawableCanvas.getInstance().getAllGenomes().get(nameGenome);
             //If it is an actual genome we want to suggest it

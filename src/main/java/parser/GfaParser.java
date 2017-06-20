@@ -228,8 +228,13 @@ public class GfaParser extends Observable implements Runnable {
         this.genomesMap = new HashMap<String, Integer>();
         this.reversedGenomesMap = new HashMap<Integer, String>();
         for (int i = 0; i < strNums.length; i++) {
-            this.genomesMap.put(strNums[i].split("\\.")[0], i);
-            this.reversedGenomesMap.put(i, strNums[i].split("\\.")[0]);
+            String[] nameGenomes = strNums[i].split("\\.");
+            String nameGenome = "";
+            for (int j = 0; j < nameGenomes.length - 1; j++) {
+                nameGenome = nameGenome.concat(nameGenomes[j]);
+            }
+            this.genomesMap.put(nameGenome, i);
+            this.reversedGenomesMap.put(i, nameGenome);
         }
     }
 
