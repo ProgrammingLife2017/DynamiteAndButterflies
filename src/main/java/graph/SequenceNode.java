@@ -1,6 +1,9 @@
 package graph;
 
+import gui.DrawableCanvas;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Class Node2, which represents sequences of DNA. A sequence is a part of a genome.
@@ -174,34 +177,78 @@ public class SequenceNode {
      * @return A string representation of the node.
      */
     public String toString(String sequence) {
-        String str = "Node ID:\t" + this.id + "\n"
-                + "Column index:\t" + this.column + "\n"
-                + "Children:\t";
-        for (Integer i : children) {
-            str += i.toString() + ", ";
-        }
-        str = str.substring(0, str.length() - 2) + "\n" + "Parents:\t";
-        for (Integer i : parents) {
-            str += i.toString() + ", ";
-        }
-        str = str.substring(0, str.length() - 2) + "\n"
-                + "SequenceLength:\t" + this.sequenceLength + "\n"
-                + "Sequence:\t";
-        if (isDummy) {
-            str += "-\n";
-        } else {
-            str += sequence + "\n";
-        }
-        str += "Genomes that go through this:\t";
-        for (Integer i : this.getGenomes()) {
-            str += i.toString() + ", ";
-        }
-        str += "\nCo-Ordinates of the genomes that go through this";
-        for (int offSet : offSets) {
-            str += offSet + ", ";
-        }
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Node ID:\t\t\t").append(this.id).append("\n");
+        stringBuilder.append("Column index:\t\t").append(this.column).append("\n");
+        appendChildren(stringBuilder);
+        appendParents(stringBuilder);
+        stringBuilder.append("SequenceLength:\t").append(this.sequenceLength).append("\n");
+        appendSequence(sequence, stringBuilder);
+        appendGenomes(stringBuilder);
+        appendGenomeCoords(stringBuilder);
+        return stringBuilder.toString();
+    }
 
-        str = str.substring(0, str.length() - 2);
-        return str;
+    /**
+     * Appends genome coordinates to a string builder.
+     * @param stringBuilder string builder to append to.
+     */
+    private void appendGenomeCoords(StringBuilder stringBuilder) {
+        stringBuilder.append("Genome coords:\t");
+        for (Integer i: offSets) {
+            stringBuilder.append(i).append(" ");
+        }
+        stringBuilder.append("\n");
+    }
+
+    /**
+     * Appends genomes to a string builder.
+     * @param stringBuilder string builder to append to.
+     */
+    private void appendGenomes(StringBuilder stringBuilder) {
+        stringBuilder.append("Genomes:\t\t");
+        int[] sortedGenomes = this.getGenomes();
+        Arrays.sort(sortedGenomes);
+        for (Integer i: sortedGenomes) {
+            stringBuilder.append(DrawableCanvas.getInstance().getAllGenomesReversed().get(i)).append(" ");
+        }
+        stringBuilder.append("\n");
+    }
+
+    /**
+     * Append sequence to a string builder.
+     * @param sequence the sequence
+     * @param stringBuilder string builder to append to.
+     */
+    private void appendSequence(String sequence, StringBuilder stringBuilder) {
+        stringBuilder.append("Sequence:\t\t");
+        if (isDummy) {
+            stringBuilder.append("-\n");
+        } else {
+            stringBuilder.append(sequence).append("\n");
+        }
+    }
+
+    /**
+     * Appends parents to a string builder.
+     * @param stringBuilder string builder to append to.
+     */
+    private void appendParents(StringBuilder stringBuilder) {
+        stringBuilder.append("Parents:\t\t\t");
+        for (Integer i: parents) {
+            stringBuilder.append(i).append(" ");
+        }
+        stringBuilder.append("\n");
+    }
+    /**
+     * Appends children to a string builder.
+     * @param stringBuilder string builder to append to.
+     */
+    private void appendChildren(StringBuilder stringBuilder) {
+        stringBuilder.append("Children:\t\t\t");
+        for (Integer i : children) {
+            stringBuilder.append(i).append(" ");
+        }
+        stringBuilder.append("\n");
     }
 }

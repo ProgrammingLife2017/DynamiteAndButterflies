@@ -406,7 +406,12 @@ public class GraphDrawer {
                 SequenceNode node = (SequenceNode) pair.getValue();
                 int nodeID = (Integer) pair.getKey();
                 if (checkClickX(node, xEvent)) {
-                    return graph.getNode(nodeID).getId();
+                    int column = graph.getNode(nodeID).getColumn();
+                    for (SequenceNode displayNode: graph.getColumns().get(column)) {
+                        if (!displayNode.isDummy()) {
+                            return displayNode.getId();
+                        }
+                    }
                 }
             }
         } catch (NullPointerException e) {
