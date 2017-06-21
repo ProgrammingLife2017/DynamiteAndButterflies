@@ -78,6 +78,9 @@ public class GraphDrawer {
         if (mostRightNode == null) {
             mostRightNode = graph.getNode(graph.getRightBoundID());
         }
+        if (mostLeftNode == null) {
+            mostLeftNode = graph.getNode(graph.getLeftBoundID());
+        }
         colourController = new ColourController(selected, rainbowView);
         highlightedNode = 0;
     }
@@ -209,24 +212,38 @@ public class GraphDrawer {
 
     }
 
+    public void drawNodes() {
+        setEmptyCoordinates();
+        gc.setStroke(Color.BLACK);
+        for (int i = 0; i < columns.size(); i++) {
+            ArrayList<SequenceNode> col = columns.get(i);
+            for (int j = 0; j < col.size(); j++) {
+                SequenceNode node = col.get(j);
+                checkExtremeNode(node);
+                drawNode(node);
+                drawEdges(node);
+            }
+        }
+    }
+
     /**
      * Gives all nodes the right coordinates on the canvas and draw them.
      * It depends on whether the dummy nodes checkbox
      * is checked dummy nodes are either drawn or skipped.
      */
-    private void drawNodes() {
-        setEmptyCoordinates();
-        gc.setStroke(Color.BLACK);
-        Iterator it = graph.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
-            checkExtremeNode(node);
-            drawNode(node);
-            drawEdges(node);
-
-        }
-    }
+//    private void drawNodes() {
+//        setEmptyCoordinates();
+//        gc.setStroke(Color.BLACK);
+//        Iterator it = graph.getNodes().entrySet().iterator();
+//        while (it.hasNext()) {
+//            Map.Entry pair = (Map.Entry) it.next();
+//            SequenceNode node = (SequenceNode) pair.getValue();
+//            checkExtremeNode(node);
+//            drawNode(node);
+//            drawEdges(node);
+//
+//        }
+//    }
 
     private void drawAnnotations(SequenceNode node, double[] coordinates) {
         for (int i = 0; i < selectedAnnotations.size(); i++) {
@@ -268,16 +285,19 @@ public class GraphDrawer {
     }
 
     private void checkExtremeNode(SequenceNode node) {
-        double[] coordinates = getCoordinates(node);
-        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] > 0) { mostLeftNode = node; }
-        if (coordinates[0] < gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] >= gc.getCanvas().getWidth()) { mostRightNode = node; }
+        if (!node.isDummy()) {
+            double[] coordinates = getCoordinates(node);
+            if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE > 0) {
+                mostLeftNode = node;
+            }
+            if (coordinates[0] < gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE >= gc.getCanvas().getWidth()) {
+                mostRightNode = node;
+            }
+        }
     }
 
     private void drawNode(SequenceNode node) {
-        double[] coordinates = this.getCoordinates().get(node.getId());
-        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE > 0) { mostLeftNode = node; }
-        if (coordinates[0] <= gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE >= gc.getCanvas().getWidth()) { mostRightNode = node; }
-
+        double[] coordinates = this.coordinates.get(node.getId());
         if (inView(coordinates)) {
             if (node.isDummy()) {
                 this.setLineWidth(node.getGenomes().length);
