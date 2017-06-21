@@ -16,6 +16,8 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 
 /**
@@ -56,15 +58,20 @@ public class AnnotationTableController {
      * @param annotations the annotations to load into the table.
      */
     @FXML
-    public void initialize(ArrayList<Annotation> annotations) {
+    public void initialize(HashMap<Integer, LinkedList<Annotation>> annotations) {
         allSelected = false;
         selection = new ArrayList<Annotation>();
-        for (Annotation annotation : annotations) {
-            if (annotation.getSelected().getValue()) {
-                selection.add(annotation);
+        ArrayList<Annotation> allAnnotations = new ArrayList<Annotation>();
+        for (int i = 0; i < annotations.size(); i++) {
+            LinkedList<Annotation> annotationsInBucket = annotations.get(i);
+            for (Annotation annotation : annotationsInBucket) {
+                if (annotation.getSelected().getValue()) {
+                    selection.add(annotation);
+                }
             }
+            allAnnotations.addAll(annotationsInBucket);
         }
-        masterData = FXCollections.observableArrayList(annotations);
+        masterData = FXCollections.observableArrayList(allAnnotations);
 
         // 0. Initialize the columns.
         startColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("start"));

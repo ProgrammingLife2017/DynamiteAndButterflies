@@ -24,6 +24,17 @@ public class GffParser {
         filePath = absolutePath;
     }
 
+
+//    public HashMap<Integer, LinkedList<Annotation>> getAnnotations() throws IOException {
+////        If annotations known
+//        FileReader fileReader = new FileReader(DrawableCanvas.getInstance().getParser().getPartPath() + "annotations.txt");
+//        if (fileReader != null) {
+//
+//        } else {
+//            return parseGff();
+//        }
+//    }
+
     /**
      * @return an arrayList with the Annotations.
      * @throws IOException If it goes wrong.
@@ -60,7 +71,7 @@ public class GffParser {
             int end = Integer.parseInt(data[4]);
             Annotation anno = new Annotation(start, end, info);
 
-            int whichBucket = (start / BUCKET_SIZE) + 1;
+            int whichBucket = (start / BUCKET_SIZE);
             LinkedList<Annotation> list = buckets.get(whichBucket);
             if (list == null) {
                 list = new LinkedList<Annotation>();
@@ -73,7 +84,7 @@ public class GffParser {
     }
 
     public HashMap<Integer, LinkedList<Annotation>> initializeBucketArray(int maxCor) {
-        int size = (maxCor / BUCKET_SIZE) + 1;
+        int size = (maxCor / BUCKET_SIZE);
 
         return new HashMap<Integer, LinkedList<Annotation>>(size);
     }
