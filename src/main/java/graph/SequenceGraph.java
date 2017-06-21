@@ -357,6 +357,10 @@ public class SequenceGraph {
         return this.nodes;
     }
 
+    public int getDummyNodeIDCounter() {
+        return dummyNodeIDCounter;
+    }
+
 
     public String getPartPath() {
         return partPath;
