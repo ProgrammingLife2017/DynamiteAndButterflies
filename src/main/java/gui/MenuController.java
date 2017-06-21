@@ -216,6 +216,15 @@ public class MenuController implements Observer {
         radiusTextField.setText(GraphDrawer.getInstance().getRadius() + "");
     }
 
+    public int findColumnWrapper(Double xEvent) {
+        int nodeID = GraphDrawer.getInstance().findColumn(xEvent);
+        if (nodeID < 1) {
+            nodeID = Integer.parseInt(nodeTextField.getText());
+        }
+        return nodeID;
+    }
+
+
     /**
      * ZoomIn Action Handler.
      *
@@ -225,7 +234,7 @@ public class MenuController implements Observer {
     public void zoomInClicked() throws IOException {
         double xCentre = canvas.getWidth() / 2;
         ZoomController.getInstance().zoomIn(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
-        nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
+        nodeTextField.setText(findColumnWrapper(xCentre) + "");
     }
 
     /**
@@ -237,7 +246,7 @@ public class MenuController implements Observer {
     public void zoomOutClicked() throws IOException {
         double xCentre = canvas.getWidth() / 2;
         ZoomController.getInstance().zoomOut(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
-        nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
+        nodeTextField.setText(findColumnWrapper(xCentre) + "");
     }
 
     /**
@@ -249,7 +258,7 @@ public class MenuController implements Observer {
     @FXML
     public void scrollZoom(ScrollEvent scrollEvent) throws IOException {
         int column = GraphDrawer.getInstance().mouseLocationColumn(scrollEvent.getX());
-        nodeTextField.setText(GraphDrawer.getInstance().findColumn(scrollEvent.getX()) + "");
+        nodeTextField.setText(findColumnWrapper(scrollEvent.getX()) + "");
         if (scrollEvent.getDeltaY() > 0) {
             ZoomController.getInstance().zoomIn(column);
         } else {
@@ -297,6 +306,7 @@ public class MenuController implements Observer {
                 ZoomController.getInstance().traverseGraphClicked(centreNodeID, radius);
                 SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
                 String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
+                nodeTextField.setText(Integer.toString(centreNodeID));
                 sequenceInfo.setText(node.toString(sequence));
             }
     }
@@ -381,6 +391,10 @@ public class MenuController implements Observer {
         }
     }
 
+    public void updateCenterNode() {
+        nodeTextField.setText(Integer.toString(GraphDrawer.getInstance().getGraph().getCenterNodeID()));
+    }
+
     /**
      * getter for the SequenceMap.
      *
@@ -422,6 +436,7 @@ public class MenuController implements Observer {
                         panningController.initializeKeys(canvasPanel);
                         displayInfo(GraphDrawer.getInstance().getGraph());
                         updateRadius();
+                        updateCenterNode();
                         enableGuiElements();
                     }
                 });
