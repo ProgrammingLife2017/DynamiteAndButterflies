@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.canvas.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollBar?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="1080.0" maxWidth="1920.0" prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MenuController">
+<AnchorPane maxHeight="1080.0" maxWidth="1920.0" prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MenuController">
    <children>
       <BorderPane maxHeight="1080.0" maxWidth="1920.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <bottom>
@@ -130,17 +141,17 @@
           <AnchorPane fx:id="canvasPanel" focusTraversable="true" minHeight="0.0" minWidth="0.0" prefHeight="520.0" prefWidth="1200.0" style="-fx-background-color: WHITE;" BorderPane.alignment="CENTER">
                <children>
                   <Canvas fx:id="canvas" onMouseClicked="#clickMouse" onScroll="#scrollZoom" />
-                  <Button fx:id="zoomInBut" disable="true" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+                  <Button fx:id="zoomInBut" disable="true" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="20.0">
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
                   </Button>
-                  <Button fx:id="zoomOutBut" disable="true" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0">
+                  <Button fx:id="zoomOutBut" disable="true" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="60.0">
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
                   </Button>
-                  <Button fx:id="rightPannButton" disable="true" mnemonicParsing="false" prefHeight="80.0" prefWidth="200.0" text="Right" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="20.0">
+                  <Button fx:id="rightPannButton" disable="true" mnemonicParsing="false" prefHeight="80.0" prefWidth="200.0" text="Right" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="40.0">
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
@@ -150,6 +161,7 @@
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
                   </Button>
+                  <ScrollBar fx:id="scrollBar" layoutX="1184.0" layoutY="125.0" max="10.0" orientation="VERTICAL" visibleAmount="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
          </center>

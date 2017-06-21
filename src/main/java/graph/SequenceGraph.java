@@ -30,6 +30,7 @@ public class SequenceGraph {
     private HTreeMap<Long, String> sequenceHashMap;
     private int dummyNodeIDCounter = -1;
     private String partPath;
+    private int maxColumnSize;
 
 
     /**
@@ -171,7 +172,13 @@ public class SequenceGraph {
             while (columns.size() <= node.getColumn()) {
                 columns.add(new ArrayList<SequenceNode>());
             }
-            columns.get(node.getColumn()).add(node);
+            ArrayList<SequenceNode> column = columns.get(node.getColumn());
+            column.add(node);
+            node.setIndex(node.getColumn());
+            if (column.size() > maxColumnSize) {
+                maxColumnSize = column.size();
+            }
+            node.setIndex(node.getColumn());
         }
 
         minimiseEdgeCrossings(columns);
@@ -393,6 +400,10 @@ public class SequenceGraph {
 
     public int getCenterNodeID() {
         return centerNodeID;
+    }
+
+    public int getMaxColumnSize() {
+        return maxColumnSize;
     }
 
     public int getRange() { return boundaries.getRange(); }
