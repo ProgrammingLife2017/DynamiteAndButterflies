@@ -17,6 +17,7 @@ import javafx.util.Callback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 
@@ -58,12 +59,12 @@ public class AnnotationTableController {
      * @param annotations the annotations to load into the table.
      */
     @FXML
-    public void initialize(HashMap<Integer, LinkedList<Annotation>> annotations) {
+    public void initialize(HashMap<Integer, HashSet<Annotation>> annotations) {
         allSelected = false;
         selection = new ArrayList<Annotation>();
         ArrayList<Annotation> allAnnotations = new ArrayList<Annotation>();
         for (int i = 0; i < annotations.size(); i++) {
-            LinkedList<Annotation> annotationsInBucket = annotations.get(i);
+            HashSet<Annotation> annotationsInBucket = annotations.get(i);
             for (Annotation annotation : annotationsInBucket) {
                 if (annotation.getSelected().getValue()) {
                     selection.add(annotation);

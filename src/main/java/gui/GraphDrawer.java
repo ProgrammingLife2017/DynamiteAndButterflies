@@ -38,8 +38,8 @@ public class GraphDrawer {
     private int highlightedNode;
     private int[] selected = null;
     private ColourController colourController;
-    private HashMap<Integer, LinkedList<Annotation>> allAnnotations
-            = new HashMap<Integer, LinkedList<Annotation>>();
+    private HashMap<Integer, HashSet<Annotation>> allAnnotations
+            = new HashMap<Integer, HashSet<Annotation>>();
     private HashMap<Integer, LinkedList<Annotation>> selectedAnnotations
             = new HashMap<Integer, LinkedList<Annotation>>();
     private SequenceNode mostLeftNode;
@@ -231,51 +231,47 @@ public class GraphDrawer {
             if (node.getGenomes().length == node.getOffsets().length) {
                 placeOfAnnotatedGenome = indexOfGenome;
             }
-            int startBucket = (node.getOffsets()[placeOfAnnotatedGenome] / 5000);
-            int endBucket = ((node.getOffsets()[placeOfAnnotatedGenome] + node.getSequenceLength()) / 5000);
-            LinkedList<Annotation> drawThese = allAnnotations.get(startBucket);
-            LinkedList<Annotation> drawTheseEnd = null;
-            if (startBucket != endBucket) {
-                drawTheseEnd = allAnnotations.get(endBucket);
-            }
-
+            int startBucket = (node.getOffsets()[placeOfAnnotatedGenome] / 20000);
+            int endBucket = ((node.getOffsets()[placeOfAnnotatedGenome] + node.getSequenceLength()) / 20000);
+            HashSet<Annotation> drawThese = allAnnotations.get(startBucket);
+            HashSet<Annotation> drawTheseEnd = allAnnotations.get(endBucket);
             if (drawThese != null) {
                 if (drawTheseEnd != null) {
-                    drawThese.addAll(drawTheseEnd);
-                }
-                double annoHeight = coordinates[3] / 2;
-                double startYAnno = coordinates[1] + coordinates[3] - annoHeight;
-                for (int i = 0; i < drawThese.size(); i++) {
-                    Annotation annotation = drawThese.get(i);
-                    double startXAnno = coordinates[0];
-                    double annoWidth = coordinates[2];
-                    int startOfAnno = annotation.getStart();
-                    int endOfAnno = annotation.getEnd();
-
-                    if (node.getGenomes().length == node.getOffsets().length) {
-                        placeOfAnnotatedGenome = indexOfGenome;
-                    }
-                    int startCorNode = node.getOffsets()[placeOfAnnotatedGenome];
-                    int endCorNode = startCorNode + node.getSequenceLength();
-
-                    if (startOfAnno > endCorNode || endOfAnno <= startCorNode) {
-                        continue;
+                    for (int i = startBucket; i <= endBucket; i++) {
+                        drawThese.addAll(allAnnotations.get(i));
                     }
 
-                    double emptyAtStart = 0.0;
-                    if (startOfAnno > startCorNode) {
-                        emptyAtStart = startOfAnno - startCorNode;
-                        annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
-                        startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                    double annoHeight = coordinates[3] / 2;
+                    double startYAnno = coordinates[1] + coordinates[3] - annoHeight;
+
+                    for (Annotation annotation : drawThese) {
+                        double startXAnno = coordinates[0];
+                        double annoWidth = coordinates[2];
+                        int startOfAnno = annotation.getStart();
+                        int endOfAnno = annotation.getEnd();
+
+                        int startCorNode = node.getOffsets()[placeOfAnnotatedGenome];
+                        int endCorNode = startCorNode + node.getSequenceLength();
+
+                        if (startOfAnno > endCorNode || endOfAnno <= startCorNode) {
+                            continue;
+                        }
+
+                        double emptyAtStart = 0.0;
+                        if (startOfAnno > startCorNode) {
+                            emptyAtStart = startOfAnno - startCorNode;
+                            annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
+                            startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                        }
+                        if (endOfAnno < endCorNode) {
+                            int emptyAtEnd = endCorNode - endOfAnno;
+                            annoWidth = (annoWidth
+                                    * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
+                        }
+                        gc.setFill(Color.RED);
+                        startYAnno += annoHeight;
+                        gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
                     }
-                    if (endOfAnno < endCorNode) {
-                        int emptyAtEnd = endCorNode - endOfAnno;
-                        annoWidth = (annoWidth
-                                * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
-                    }
-                    gc.setFill(colourController.getAnnotationColor(i));
-                    startYAnno += annoHeight;
-                    gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
                 }
             }
         }
@@ -597,7 +593,7 @@ public class GraphDrawer {
         //this.smartAnnotations = intializeAnnotationsOnNodes();
     }
 
-    public void setAllAnnotations(HashMap<Integer, LinkedList<Annotation>> newAnnotations) {
+    public void setAllAnnotations(HashMap<Integer, HashSet<Annotation>> newAnnotations) {
         this.allAnnotations = newAnnotations;
     }
 
@@ -634,7 +630,7 @@ public class GraphDrawer {
         return mostLeftNode;
     }
 
-    public HashMap<Integer, LinkedList<Annotation>> getAllAnnotations() {
+    public HashMap<Integer, HashSet<Annotation>> getAllAnnotations() {
         return allAnnotations;
     }
 

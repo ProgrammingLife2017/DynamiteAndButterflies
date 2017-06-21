@@ -25,10 +25,7 @@ import structures.Annotation;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -591,7 +588,7 @@ public class MenuController implements Observer {
         final AnnotationTableController annotationTableController
                 = loader.<AnnotationTableController>getController();
 
-        HashMap<Integer, LinkedList<Annotation>> allAnnotations;
+        HashMap<Integer, HashSet<Annotation>> allAnnotations;
         allAnnotations = GraphDrawer.getInstance().getAllAnnotations();
         if (allAnnotations.size() == 0) {
             try {

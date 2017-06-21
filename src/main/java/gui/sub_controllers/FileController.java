@@ -138,7 +138,7 @@ public class FileController extends Observable implements Observer {
         progressBarController.run();
     }
 
-    public HashMap<Integer, LinkedList<Annotation>> openGffFileClicked(String filePath) throws IOException {
+    public HashMap<Integer, HashSet<Annotation>> openGffFileClicked(String filePath) throws IOException {
         GffParser parser = new GffParser(filePath);
         return parser.parseGff();
     }

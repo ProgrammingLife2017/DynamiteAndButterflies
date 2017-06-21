@@ -6,14 +6,16 @@ import structures.Annotation;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * Created by lex_b on 12/06/2017.
  */
 public class GffParser {
     private String filePath;
-    private static final int BUCKET_SIZE = 5000;
+    private static final int BUCKET_SIZE = 20000;
 
     /**
      * Constructor.
@@ -39,7 +41,7 @@ public class GffParser {
      * @return an arrayList with the Annotations.
      * @throws IOException If it goes wrong.
      */
-    public HashMap<Integer, LinkedList<Annotation>> parseGff() throws IOException {
+    public HashMap<Integer, HashSet<Annotation>> parseGff() throws IOException {
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line;
@@ -49,7 +51,7 @@ public class GffParser {
         properties.updateProperties();
         int maxCor = Integer.parseInt(properties.getProperty(
                 DrawableCanvas.getInstance().getParser().getPartPath() + "Max-Cor", "-1"));
-        HashMap<Integer, LinkedList<Annotation>> buckets = initializeBucketArray(maxCor);
+        HashMap<Integer, HashSet<Annotation>> buckets = initializeBucketArray(maxCor);
         while ((line = br.readLine()) != null) {
             String[] data = line.split("\t");
 
@@ -71,21 +73,26 @@ public class GffParser {
             int end = Integer.parseInt(data[4]);
             Annotation anno = new Annotation(start, end, info);
 
-            int whichBucket = (start / BUCKET_SIZE);
-            LinkedList<Annotation> list = buckets.get(whichBucket);
-            if (list == null) {
-                list = new LinkedList<Annotation>();
+            int startBucket = (start / BUCKET_SIZE);
+            int endBucket = (end / BUCKET_SIZE);
+
+
+            for (int i=startBucket; i <= endBucket; i++) {
+                HashSet<Annotation> set = buckets.get(i);
+                if (set == null) {
+                    set = new HashSet<>();
+                }
+                set.add(anno);
+            buckets.put(startBucket, set);
             }
-            list.add(anno);
-            buckets.put(whichBucket, list);
         }
         DrawableCanvas.getInstance().setAnnotationGenome(suggestionGenomeOfAnnotation);
         return buckets;
     }
 
-    public HashMap<Integer, LinkedList<Annotation>> initializeBucketArray(int maxCor) {
+    public HashMap<Integer, HashSet<Annotation>> initializeBucketArray(int maxCor) {
         int size = (maxCor / BUCKET_SIZE);
 
-        return new HashMap<Integer, LinkedList<Annotation>>(size);
+        return new HashMap<>(size);
     }
 }
