@@ -28,7 +28,7 @@ public class GraphDrawer {
     private static final double LINE_WIDTH_FACTOR = 0.1;
     private static final double Y_SIZE_FACTOR = 3;
     private static final double LOG_BASE = 2;
-    private static final double SNP_SIZE = 20;
+    private static final double SNP_SIZE = 10;
 
     private Canvas canvas;
     private int yBase;
@@ -196,7 +196,10 @@ public class GraphDrawer {
     private double[] computeCoordinates(SequenceNode node) {
         double[] coordinates = new double[4];
         yBase = (int) GraphDrawer.getInstance().canvas.getHeight() / 4;
-        double width = computeNodeWidth(node) * stepSize * RELATIVE_X_DISTANCE;
+        double width = computeNodeWidth(node) * stepSize;
+        if (!node.isSNP() && (!node.getChildren().isEmpty() && !graph.getNode(node.getChild(0)).isSNP())) {
+            width *= RELATIVE_X_DISTANCE;
+        }
         double height = getYSize();
         double x = (columnWidths[node.getColumn()] - xDifference) * stepSize;
         double y = yBase + (node.getIndex() * RELATIVE_Y_DISTANCE);
