@@ -133,6 +133,7 @@ public class MenuController implements Observer {
         ScrollbarController.getInstance().setScrollBar(scrollBar);
         ZoomController.getInstance().setMenuController(this);
         Minimap.getInstance().setMenuController(this);
+        GraphDrawer.getInstance().setMenuController(this);
 
         //System.setErr(ps);
         System.setOut(ps);
@@ -219,6 +220,11 @@ public class MenuController implements Observer {
 
     public void updateRadius() {
         radiusTextField.setText(GraphDrawer.getInstance().getRadius() + "");
+    }
+
+    public void updateSequenceInfoAlt(SequenceNode node) {
+        String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) node.getId());
+        sequenceInfoAlt.setText(node.toString(sequence));
     }
 
     public int findColumnWrapper(Double xEvent) {

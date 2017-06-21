@@ -9,6 +9,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,6 +32,7 @@ public class GraphDrawer {
     public static final double LOG_BASE = 2;
     private static final double SNP_SIZE = 10;
 
+    private MenuController menuController;
     private Canvas canvas;
     private double zoomLevel;
     private double range;
@@ -455,19 +457,22 @@ public class GraphDrawer {
      */
     public SequenceNode clickNode(double xEvent, double yEvent) {
         SequenceNode click = null;
-
         try {
             Iterator it = graph.getNodes().entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
                 SequenceNode node = (SequenceNode) pair.getValue();
                 if (checkClick(node, xEvent, yEvent)) {
-                    click = graph.getNode(node.getId());
+                    if (click == null) {
+                        click = graph.getNode(node.getId());
+                    } else {
+                        menuController.updateSequenceInfoAlt(node);
+                    }
                     highlight(node.getId());
                 }
             }
         } catch (NullPointerException e) {
-            System.out.println("Graph not yet intialized");
+            System.out.println("Graph not yet initialized");
         }
         return click;
     }
@@ -723,6 +728,10 @@ public class GraphDrawer {
 
     public void setCollapseSNP(boolean collapseSNP) {
         this.collapseSNP = collapseSNP;
+    }
+
+    public void setMenuController(MenuController menuController) {
+        this.menuController = menuController;
     }
 }
 
