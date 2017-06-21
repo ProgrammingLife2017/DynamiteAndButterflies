@@ -233,46 +233,44 @@ public class GraphDrawer {
             }
             int startBucket = (node.getOffsets()[placeOfAnnotatedGenome] / 20000);
             int endBucket = ((node.getOffsets()[placeOfAnnotatedGenome] + node.getSequenceLength()) / 20000);
-            HashSet<Annotation> drawThese = allAnnotations.get(startBucket);
-            HashSet<Annotation> drawTheseEnd = allAnnotations.get(endBucket);
-            if (drawThese != null) {
-                if (drawTheseEnd != null) {
-                    for (int i = startBucket; i <= endBucket; i++) {
-                        drawThese.addAll(allAnnotations.get(i));
-                    }
-
-                    double annoHeight = coordinates[3] / 2;
-                    double startYAnno = coordinates[1] + coordinates[3] - annoHeight;
-
-                    for (Annotation annotation : drawThese) {
-                        double startXAnno = coordinates[0];
-                        double annoWidth = coordinates[2];
-                        int startOfAnno = annotation.getStart();
-                        int endOfAnno = annotation.getEnd();
-
-                        int startCorNode = node.getOffsets()[placeOfAnnotatedGenome];
-                        int endCorNode = startCorNode + node.getSequenceLength();
-
-                        if (startOfAnno > endCorNode || endOfAnno <= startCorNode) {
-                            continue;
-                        }
-
-                        double emptyAtStart = 0.0;
-                        if (startOfAnno > startCorNode) {
-                            emptyAtStart = startOfAnno - startCorNode;
-                            annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
-                            startXAnno = startXAnno + (coordinates[2] - annoWidth);
-                        }
-                        if (endOfAnno < endCorNode) {
-                            int emptyAtEnd = endCorNode - endOfAnno;
-                            annoWidth = (annoWidth
-                                    * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
-                        }
-                        gc.setFill(Color.RED);
-                        startYAnno += annoHeight;
-                        gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
-                    }
+            HashSet<Annotation> drawThese = new HashSet<>();
+            for (int i = startBucket; i <= endBucket; i++) {
+                HashSet<Annotation> tempAnnotations = allAnnotations.get(i);
+                if (tempAnnotations != null) {
+                    drawThese.addAll(tempAnnotations);
                 }
+            }
+
+            double annoHeight = coordinates[3] / 2;
+            double startYAnno = coordinates[1] + coordinates[3] - annoHeight;
+
+            for (Annotation annotation : drawThese) {
+                double startXAnno = coordinates[0];
+                double annoWidth = coordinates[2];
+                int startOfAnno = annotation.getStart();
+                int endOfAnno = annotation.getEnd();
+
+                int startCorNode = node.getOffsets()[placeOfAnnotatedGenome];
+                int endCorNode = startCorNode + node.getSequenceLength();
+
+                if (startOfAnno > endCorNode || endOfAnno <= startCorNode) {
+                    continue;
+                }
+
+                double emptyAtStart = 0.0;
+                if (startOfAnno > startCorNode) {
+                    emptyAtStart = startOfAnno - startCorNode;
+                    annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
+                    startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                }
+                if (endOfAnno < endCorNode) {
+                    int emptyAtEnd = endCorNode - endOfAnno;
+                    annoWidth = (annoWidth
+                            * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
+                }
+                gc.setFill(colourController.getAnnotationColor(startOfAnno, 20000));
+                startYAnno += annoHeight;
+                gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
             }
         }
     }
@@ -303,10 +301,7 @@ public class GraphDrawer {
                         coordinates[0] + coordinates[2], coordinates[1] + coordinates[3] / 2);
             } else {
                 drawColour(node, coordinates);
-                //long start = System.currentTimeMillis();
                 drawAnnotations(node, coordinates);
-                //long end = System.currentTimeMillis();
-                //System.out.println("Time to draw annotations: " + (end - start));
             }
         }
     }

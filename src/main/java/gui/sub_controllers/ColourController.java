@@ -159,13 +159,11 @@ public class ColourController {
         return res;
     }
 
-    public Color getAnnotationColor(int numOfAnnotationsOnNode) {
-        switch (numOfAnnotationsOnNode) {
-            case 0: return Color.RED;
-            case 1: return Color.BLUE;
-            case 2: return Color.GREEN;
-            default: return Color.BLACK;
-        }
+    public Color getAnnotationColor(int startCorAnno, int stepSize) {
+        double doubleStepSize = (double) stepSize;
+        double hue = 360 - (360 * ((startCorAnno % doubleStepSize) / doubleStepSize));
+        double brightness = 0.8 + (0.2 * ((startCorAnno % doubleStepSize) / doubleStepSize));
+        return Color.hsb(hue, 1, brightness);
     }
 
     /**
