@@ -28,6 +28,7 @@ public class GraphDrawer {
     private static final double LINE_WIDTH_FACTOR = 0.1;
     private static final double Y_SIZE_FACTOR = 3;
     private static final double LOG_BASE = 2;
+    private static final double SNP_SIZE = 20;
 
     private Canvas canvas;
     private int yBase;
@@ -139,6 +140,7 @@ public class GraphDrawer {
     private void initializeColumnWidths() {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
+            checkSNPBubble(column);
             double max = 1;
             for (int i = 0; i < column.size(); i++) {
                 if (!column.get(i).isDummy()) {
@@ -217,11 +219,20 @@ public class GraphDrawer {
         gc.setStroke(Color.BLACK);
         for (int i = 0; i < columns.size(); i++) {
             ArrayList<SequenceNode> col = columns.get(i);
-            for (int j = 0; j < col.size(); j++) {
-                SequenceNode node = col.get(j);
-                checkExtremeNode(node);
-                drawNode(node);
-                drawEdges(node);
+            if (checkSNPBubble(col)) {
+                SequenceNode upperNode = col.get(0);
+                SequenceNode lowerNode = col.get(1);
+                upperNode.setSNP(true);
+                lowerNode.setSNP(true);
+                checkExtremeNode(upperNode);
+                drawSNPBubble(upperNode, lowerNode);
+            } else {
+                for (int j = 0; j < col.size(); j++) {
+                    SequenceNode node = col.get(j);
+                    checkExtremeNode(node);
+                    drawNode(node);
+                    drawEdges(node);
+                }
             }
         }
     }
@@ -284,6 +295,39 @@ public class GraphDrawer {
         }
     }
 
+    private boolean checkSNPBubble(ArrayList<SequenceNode> column) {
+        if (column.size() != 2) {
+            return false;
+        }
+        SequenceNode upperNode = column.get(0);
+        SequenceNode lowerNode = column.get(1);
+        if (upperNode.isDummy() || lowerNode.isDummy()) {
+            return false;
+        }
+        if (upperNode.getSequenceLength() != 1 || lowerNode.getSequenceLength() != 1) {
+            return false;
+        }
+        if (upperNode.getParents().size() != 1 || lowerNode.getParents().size() != 1) {
+            return false;
+        }
+        if (upperNode.getChildren().size() != 1 || lowerNode.getChildren().size() != 1) {
+            return false;
+        }
+        int upperParent = upperNode.getParents().get(0);
+        int lowerParent = lowerNode.getParents().get(0);
+        if (upperParent != lowerParent) {
+            return false;
+        }
+        int upperChild = upperNode.getChildren().get(0);
+        int lowerChild = upperNode.getChildren().get(0);
+        if (upperChild != lowerChild) {
+            return false;
+        }
+        upperNode.setSNP(true);
+        lowerNode.setSNP(true);
+        return true;
+    }
+
     private void checkExtremeNode(SequenceNode node) {
         if (!node.isDummy()) {
             double[] coordinates = getCoordinates(node);
@@ -307,6 +351,23 @@ public class GraphDrawer {
                 drawColour(node, coordinates);
                 drawAnnotations(node, coordinates);
             }
+        }
+    }
+
+    private void drawSNPBubble(SequenceNode upperNode, SequenceNode lowerNode) {
+        double[] upperCoordinates = getCoordinates(upperNode);
+        double[] lowerCoordinates = getCoordinates(lowerNode);
+        if (inView(upperCoordinates)) {
+            // if highlighted
+            double leftX = upperCoordinates[0];
+            double midX = leftX + upperCoordinates[2] / 2;
+            double rightX = leftX + upperCoordinates[2];
+            double midY = upperCoordinates[1] + upperCoordinates[3] / 2;
+            double upY = midY - upperCoordinates[3];
+            double downY = midY + upperCoordinates[3];
+
+            gc.fillPolygon(new double[] {leftX, midX, rightX}, new double[] {midY, upY, midY}, 3);
+            gc.fillPolygon(new double[] {leftX, midX, rightX}, new double[] {midY, downY, midY}, 3);
         }
     }
 
@@ -343,14 +404,16 @@ public class GraphDrawer {
         double[] coordinatesParent = getCoordinates(node);
         for (int j = 0; j < parent.getChildren().size(); j++) {
             SequenceNode child = graph.getNode(parent.getChild(j));
-            double[] coordinatesChild = getCoordinates(child);
-            double startx = coordinatesParent[0] + coordinatesParent[2];
-            double starty = coordinatesParent[1] + (coordinatesParent[3] / 2);
-            double endx = coordinatesChild[0];
-            double endy = coordinatesChild[1] + (coordinatesChild[3] / 2);
-            setLineWidth(Math.min(child.getGenomes().length, parent.getGenomes().length));
-            if (edgeInView(startx, endx)) {
-                gc.strokeLine(startx, starty, endx, endy);
+            if (!child.isSNP()) {
+                double[] coordinatesChild = getCoordinates(child);
+                double startx = coordinatesParent[0] + coordinatesParent[2];
+                double starty = coordinatesParent[1] + (coordinatesParent[3] / 2);
+                double endx = coordinatesChild[0];
+                double endy = coordinatesChild[1] + (coordinatesChild[3] / 2);
+                setLineWidth(Math.min(child.getGenomes().length, parent.getGenomes().length));
+                if (edgeInView(startx, endx)) {
+                    gc.strokeLine(startx, starty, endx, endy);
+                }
             }
         }
     }
@@ -367,6 +430,9 @@ public class GraphDrawer {
     }
 
     private double computeNodeWidth(SequenceNode node) {
+        if (node.isSNP()) {
+            return SNP_SIZE;
+        }
         if (node.isDummy()) {
             return columnWidths[node.getColumn() + 1] - columnWidths[node.getColumn()];
         }
