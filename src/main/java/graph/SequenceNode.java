@@ -18,7 +18,7 @@ public class SequenceNode {
     private boolean isDummy;
     private float baryCenterValue;
     private int inDegree;
-
+    private boolean isSNP;
 
     private ArrayList<Integer> children;
     private ArrayList<Integer> parents;
@@ -165,6 +165,14 @@ public class SequenceNode {
 
     public int[] getGenomes() {
         return genomes;
+    }
+
+    public boolean isSNP() {
+        return isSNP;
+    }
+
+    public void setSNP(boolean SNP) {
+        isSNP = SNP;
     }
 
     /**
