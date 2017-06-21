@@ -81,7 +81,8 @@
                               <Button fx:id="goToNodeBut" disable="true" layoutX="26.0" layoutY="72.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node" />
                               <TextField fx:id="radiusTextField" alignment="CENTER" disable="true" layoutX="27.0" layoutY="111.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius" />
                               <Button fx:id="chooseGenome" disable="true" layoutX="14.0" layoutY="171.0" mnemonicParsing="false" onAction="#chooseGenomePress" prefHeight="25.0" prefWidth="120.0" text="Specific Genome" />
-                              <Button fx:id="annoBut" disable="true" layoutX="12.0" layoutY="208.0" mnemonicParsing="false" onAction="#chooseAnnoClicked" prefHeight="25.0" prefWidth="120.0" text="Choose Annotation" /><CheckBox fx:id="rainbowBut" disable="true" layoutX="36.0" layoutY="255.0" mnemonicParsing="false" onAction="#rainbowButtonClicked" selected="true" text="Rainbow view" />
+                              <Button fx:id="annoBut" disable="true" layoutX="12.0" layoutY="208.0" mnemonicParsing="false" onAction="#chooseAnnoClicked" prefHeight="25.0" prefWidth="120.0" text="Choose Annotation" /><CheckBox fx:id="rainbowBut" disable="true" layoutX="16.0" layoutY="252.0" mnemonicParsing="false" onAction="#rainbowButtonClicked" selected="true" text="Rainbow view" />
+                              <CheckBox fx:id="collapseSNPButton" disable="true" layoutX="16.0" layoutY="286.0" mnemonicParsing="false" onAction="#collapseSNPClicked" selected="true" text="Collapse SNPs" />
                            </children>
                         </AnchorPane>
                       <AnchorPane fx:id="canvasPanel" focusTraversable="true" style="-fx-background-color: WHITE;">

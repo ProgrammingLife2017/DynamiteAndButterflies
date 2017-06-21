@@ -49,6 +49,7 @@ public class GraphDrawer {
     private SequenceNode mostRightNode;
     private HashMap<Integer, double[]> coordinates;
     private boolean rainbowView = true;
+    private boolean collapseSNP = true;
 
     public static GraphDrawer getInstance(){
         return drawer;
@@ -197,7 +198,7 @@ public class GraphDrawer {
         double[] coordinates = new double[4];
         yBase = (int) GraphDrawer.getInstance().canvas.getHeight() / 4;
         double width = computeNodeWidth(node) * stepSize;
-        if (!node.isSNP() && (!node.getChildren().isEmpty() && !graph.getNode(node.getChild(0)).isSNP())) {
+        if (!collapseSNP || (!node.isSNP() && !node.getChildren().isEmpty() && !graph.getNode(node.getChild(0)).isSNP())) {
             width *= RELATIVE_X_DISTANCE;
         }
         double height = getYSize();
@@ -222,7 +223,7 @@ public class GraphDrawer {
         gc.setStroke(Color.BLACK);
         for (int i = 0; i < columns.size(); i++) {
             ArrayList<SequenceNode> col = columns.get(i);
-            if (checkSNPBubble(col)) {
+            if (checkSNPBubble(col) && collapseSNP) {
                 SequenceNode upperNode = col.get(0);
                 SequenceNode lowerNode = col.get(1);
                 upperNode.setSNP(true);
@@ -407,7 +408,7 @@ public class GraphDrawer {
         double[] coordinatesParent = getCoordinates(node);
         for (int j = 0; j < parent.getChildren().size(); j++) {
             SequenceNode child = graph.getNode(parent.getChild(j));
-            if (!child.isSNP()) {
+            if (!child.isSNP() || !collapseSNP) {
                 double[] coordinatesChild = getCoordinates(child);
                 double startx = coordinatesParent[0] + coordinatesParent[2];
                 double starty = coordinatesParent[1] + (coordinatesParent[3] / 2);
@@ -700,6 +701,10 @@ public class GraphDrawer {
     public void setRainbowView(boolean rainbowView) {
         this.rainbowView = rainbowView;
         this.colourController = new ColourController(selected, rainbowView);
+    }
+
+    public void setCollapseSNP(boolean collapseSNP) {
+        this.collapseSNP = collapseSNP;
     }
 }
 

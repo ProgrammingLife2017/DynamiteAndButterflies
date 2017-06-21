@@ -93,6 +93,8 @@ public class MenuController implements Observer {
     private Button rightPannButton;
     @FXML
     private Button leftPannButton;
+    @FXML
+    private CheckBox collapseSNPButton;
 
     private PrintStream ps;
     private GraphicsContext gc;
@@ -436,6 +438,7 @@ public class MenuController implements Observer {
         goToNodeBut.setDisable(false);
         chooseGenome.setDisable(false);
         rainbowBut.setDisable(false);
+        collapseSNPButton.setDisable(false);
     }
 
     /**
@@ -622,6 +625,12 @@ public class MenuController implements Observer {
 
     public void rainbowButtonClicked() {
         GraphDrawer.getInstance().setRainbowView(rainbowBut.isSelected());
+        GraphDrawer.getInstance().redraw();
+    }
+
+    @FXML
+    public void collapseSNPClicked() {
+        GraphDrawer.getInstance().setCollapseSNP(collapseSNPButton.isSelected());
         GraphDrawer.getInstance().redraw();
     }
 
