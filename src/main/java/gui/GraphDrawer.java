@@ -1,6 +1,7 @@
 package gui;
 
 import structures.Annotation;
+import com.sun.corba.se.impl.orbutil.graph.Graph;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.ColourController;
@@ -31,7 +32,6 @@ public class GraphDrawer {
     private Canvas canvas;
     private int yBase;
     private double zoomLevel;
-    private double radius;
     private double range;
     private double xDifference;
     private double stepSize;
@@ -50,7 +50,7 @@ public class GraphDrawer {
     private boolean rainbowView = true;
     private HashMap<Integer, ArrayList<Annotation>> smartAnnotations = new HashMap<>();
 
-    public static GraphDrawer getInstance(){
+    public static GraphDrawer getInstance() {
         return drawer;
     }
 
@@ -68,12 +68,8 @@ public class GraphDrawer {
         columns = graph.getColumns();
         columnWidths = new double[columns.size() + 1];
         initializeColumnWidths();
-        long start = System.currentTimeMillis();
         initializeDummyWidths();
-        long end = System.currentTimeMillis();
-        System.out.println(start - end);
         range = columnWidths[columns.size()];
-        radius = columns.size();
         if (zoomLevel == 0) {
             setZoomLevel(columnWidths[columns.size()]);
         }
@@ -105,33 +101,11 @@ public class GraphDrawer {
      */
     public void zoom(final double factor, final int column) {
         setZoomLevel(zoomLevel * factor);
-        setRadius(radius * factor);
         if (zoomLevel != range / 2) {
             moveShapes(column - ((column - xDifference) * factor));
         }
     }
 
-    /**
-     * Change the zoom (invoked by user by clicking on "Go to this Node".
-     *
-     * @param radius The new radius.
-     * @param column  The new Column to be in the centre.
-     */
-    public void changeZoom(int column, int radius) {
-        setRadius(radius);
-        int widthRight = column + radius + 1;
-        int widthLeft = column - radius;
-
-        if (column + radius + 1 > columnWidths.length-1 ) {
-            widthRight = columnWidths.length - 1;
-        }
-        if (column - radius < 0) {
-            widthLeft = 0;
-        }
-
-        setZoomLevel(columnWidths[widthRight] - columnWidths[widthLeft]);
-        moveShapes(columnWidths[widthLeft]);
-    }
 
     /**
      * Redraw all nodes with the same coordinates.
@@ -192,7 +166,7 @@ public class GraphDrawer {
                 int[] result = new int[genomes.size()];
                 int i = 0;
                 Iterator itt = genomes.entrySet().iterator();
-                while(itt.hasNext()) {
+                while (itt.hasNext()) {
                     result[i] = (int) ((Map.Entry) itt.next()).getKey();
                     i++;
                 }
@@ -208,6 +182,7 @@ public class GraphDrawer {
     /**
      * Computes the coordinates for the given node
      * [x,y,width,height]
+     *
      * @param node
      * @return
      */
@@ -224,7 +199,7 @@ public class GraphDrawer {
         }
 
         coordinates[0] = x;
-        coordinates[1] =  y;
+        coordinates[1] = y;
         coordinates[2] = width;
         coordinates[3] = height;
 
@@ -256,7 +231,7 @@ public class GraphDrawer {
             for (int i = 0; i < drawThese.size(); i++) {
                 Annotation annotation = drawThese.get(i);
                 //TODO Ook dit gaat messed up.
-                int annoID = annotation.getId();
+                int annoID = DrawableCanvas.getInstance().getAnnotationGenome();
                 double startXAnno = coordinates[0];
                 double startYAnno = coordinates[1] + coordinates[3];
                 double annoWidth = coordinates[2];
@@ -270,7 +245,6 @@ public class GraphDrawer {
                     if (node.getGenomes().length == node.getOffsets().length) {
                         placeOfAnnotatedGenome = indexOfGenome;
                     }
-
                     int startCorNode = node.getOffsets()[placeOfAnnotatedGenome];
                     int endCorNode = startCorNode + node.getSequenceLength();
 
@@ -298,23 +272,29 @@ public class GraphDrawer {
 
     private void checkExtremeNode(SequenceNode node) {
         double[] coordinates = getCoordinates(node);
-        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] > 0) { mostLeftNode = node; }
-        if (coordinates[0] < gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] >= gc.getCanvas().getWidth()) { mostRightNode = node; }
-
+        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] > 0) {
+            mostLeftNode = node;
+        }
+        if (coordinates[0] < gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] >= gc.getCanvas().getWidth()) {
+            mostRightNode = node;
+        }
     }
 
     private void drawNode(SequenceNode node) {
         double[] coordinates = this.getCoordinates().get(node.getId());
-        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] > 0) { mostLeftNode = node; }
-        if (coordinates[0] < gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] >= gc.getCanvas().getWidth()) { mostRightNode = node; }
+        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE > 0) {
+            mostLeftNode = node;
+        }
+        if (coordinates[0] <= gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE >= gc.getCanvas().getWidth()) {
+            mostRightNode = node;
+        }
 
         if (inView(coordinates)) {
             if (node.isDummy()) {
                 this.setLineWidth(node.getGenomes().length);
                 gc.strokeLine(coordinates[0], coordinates[1] + coordinates[3] / 2,
                         coordinates[0] + coordinates[2], coordinates[1] + coordinates[3] / 2);
-            }
-            else {
+            } else {
                 drawColour(node, coordinates);
                 drawAnnotations(node, coordinates);
             }
@@ -371,7 +351,6 @@ public class GraphDrawer {
         Minimap.getInstance().draw(gc);
     }
 
-
     public boolean edgeInView(double startx, double endx) {
         return startx < gc.getCanvas().getWidth() && endx > 0;
     }
@@ -424,6 +403,7 @@ public class GraphDrawer {
 
     /**
      * Find the column corresponding to the x coordinate.
+     *
      * @param xEvent x coordinate of the click event.
      * @return The column id of the column the x coordinate is in.
      */
@@ -527,6 +507,22 @@ public class GraphDrawer {
         return -1;
     }
 
+    public double findZoomLevel(int centreNode, int radius) {
+        int rightNodeID = (int) (centreNode + (double) radius / 2.0);
+        int leftNodeID = (int) (centreNode - (double) radius / 2.0);
+        if (rightNodeID > graph.getFullGraphRightBoundID()) {
+            rightNodeID = graph.getFullGraphRightBoundID();
+            mostRightNode = graph.getNode(graph.getFullGraphRightBoundID());
+        }
+        if (leftNodeID < graph.getFullGraphLeftBoundID()) {
+            leftNodeID = graph.getFullGraphLeftBoundID();
+            mostLeftNode = graph.getNode(graph.getFullGraphLeftBoundID());
+        }
+        int rightColumn = graph.getNode(rightNodeID).getColumn();
+        int leftColumn = graph.getNode(leftNodeID).getColumn();
+        return columnWidths[rightColumn] - columnWidths[leftColumn];
+    }
+
     /**
      * Get function for zoom level.
      *
@@ -536,21 +532,13 @@ public class GraphDrawer {
         return zoomLevel;
     }
 
-    /**
-     * Get function for the radius.
-     *
-     * @return the double representing the radius.
-     */
-    public double getRadius() {
-        return radius;
-    }
-
     public double getRange() {
         return range;
     }
 
     /**
      * Get function for x difference.
+     *
      * @return The x difference.
      */
     public double getxDifference() {
@@ -561,9 +549,13 @@ public class GraphDrawer {
         return columnWidths[col];
     }
 
-    public double getRightbound() { return xDifference + zoomLevel; }
+    public double getRightbound() {
+        return xDifference + zoomLevel;
+    }
 
-    public double getLeftbound() { return xDifference; }
+    public double getLeftbound() {
+        return xDifference;
+    }
 
     /**
      * Return the column the mouse click is in.
@@ -595,21 +587,27 @@ public class GraphDrawer {
     }
 
     public void setxDifference(double xDifference) {
-        if (xDifference < 0) { xDifference = 0; }
-        if (xDifference + zoomLevel > range) { xDifference = range - zoomLevel; }
+        if (xDifference < 0) {
+            xDifference = 0;
+        }
+        if (xDifference + zoomLevel > range) {
+            xDifference = range - zoomLevel;
+        }
         this.xDifference = xDifference;
     }
 
-    public void setRadius(double radius) {
-        if (radius < 1) { radius = 1; }
-        if (radius > range) { radius = range; }
-        this.radius = radius;
+    public void setZoomLevel(double zoomLevel) {
+        if (zoomLevel < 1) {
+            zoomLevel = 1;
+        }
+        if (zoomLevel > range / 2) {
+            zoomLevel = range / 2;
+        }
+        this.zoomLevel = zoomLevel;
     }
 
-    public void setZoomLevel(double zoomLevel) {
-        if (zoomLevel < 1) { zoomLevel = 1; }
-        if (zoomLevel > range / 2) { zoomLevel = range / 2; }
-        this.zoomLevel = zoomLevel;
+    public int getRadius() {
+        return mostRightNode.getId() - mostLeftNode.getId();
     }
 
     public SequenceGraph getGraph() {
@@ -648,13 +646,9 @@ public class GraphDrawer {
             SequenceNode node = (SequenceNode) pair.getValue();
 
             if (!node.isDummy()) {
-                if (node.getId() == 3) {
-                    System.out.println("NU ZIJN WE HIER");
-                }
                 for (int i = 0; i < selectedAnnotations.size(); i++) {
                     Annotation annotation = selectedAnnotations.get(i);
-                    //TODO, wordt gek met merge van master, alles dezelfde ID uit DrawableCanvas getten.
-                    int annoID = annotation.getId();
+                    int annoID = DrawableCanvas.getInstance().getAnnotationGenome();
                     int indexOfGenome = colourController.containsPos(node.getGenomes(), annoID);
                     if (indexOfGenome != -1) {
                         int startOfAnno = annotation.getStart();

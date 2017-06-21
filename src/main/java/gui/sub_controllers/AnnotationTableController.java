@@ -31,8 +31,6 @@ public class AnnotationTableController {
     @FXML
     private TableView<Annotation> annotationTable;
     @FXML
-    private TableColumn<Annotation, Integer> idColumn;
-    @FXML
     public TableColumn<Annotation, Integer> startColumn;
     @FXML
     public TableColumn<Annotation, Integer> endColumn;
@@ -69,7 +67,6 @@ public class AnnotationTableController {
         masterData = FXCollections.observableArrayList(annotations);
 
         // 0. Initialize the columns.
-        idColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("id"));
         startColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("start"));
         endColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("end"));
         infoColumn.setCellValueFactory(new PropertyValueFactory<Annotation, String>("info"));
@@ -85,7 +82,6 @@ public class AnnotationTableController {
         highlightColumn.setCellFactory(CheckBoxTableCell.forTableColumn(highlightColumn));
 
         annotationTable.setEditable(true);
-        idColumn.setEditable(false);
         startColumn.setEditable(false);
         endColumn.setEditable(false);
         infoColumn.setEditable(false);

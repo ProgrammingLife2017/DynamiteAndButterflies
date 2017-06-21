@@ -1,11 +1,5 @@
 package graph;
 
-import gui.GraphDrawer;
-import gui.sub_controllers.ColourController;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-import structures.Annotation;
-
 import java.util.ArrayList;
 
 /**
@@ -61,8 +55,9 @@ public class SequenceNode {
         this.highlighted = false;
     }
 
-    public boolean isHighlighted() {return this.highlighted;}
-
+    public boolean isHighlighted() {
+        return this.highlighted;
+    }
 
     public Integer getId() {
         return id;
