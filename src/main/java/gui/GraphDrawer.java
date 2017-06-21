@@ -150,28 +150,28 @@ public class GraphDrawer {
 
     public void initializeDummyWidths() {
         HashMap<Integer, String> genomes;
-        Iterator it = graph.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
+        for (int j = -1; j > graph.getDummyNodeIDCounter(); j--) {
             genomes = new HashMap<>(DrawableCanvas.getInstance().getAllGenomesReversed());
-            Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
+            SequenceNode node = graph.getNode(j);
             if (node.isDummy()) {
                 for (SequenceNode i : columns.get(node.getColumn())) {
                     if (!i.isDummy()) {
-                        for (int j : i.getGenomes()) {
-                            genomes.remove(j);
+                        for (int k : i.getGenomes()) {
+                            genomes.remove(k);
                         }
                     }
                 }
                 int[] result = new int[genomes.size()];
                 int i = 0;
-                Iterator itt = genomes.entrySet().iterator();
-                while(itt.hasNext()) {
-                    result[i] = (int) ((Map.Entry) itt.next()).getKey();
+                for (Object o : genomes.entrySet()) {
+                    result[i] = (int) ((Map.Entry) o).getKey();
                     i++;
                 }
-                if(result.length > graph.getNodes().get(node.getParents().get(0)).getGenomes().length) {
-                    result = graph.getNodes().get(node.getParents().get(0)).getGenomes();
+
+                int parentID = node.getParents().get(0);
+                int parentGenomeSize = graph.getNodes().get(parentID).getGenomes().length;
+                if (result.length > parentGenomeSize) {
+                    result = graph.getNodes().get(parentID).getGenomes();
                 }
                 node.setGenomes(result);
             }
