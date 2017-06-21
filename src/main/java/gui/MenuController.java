@@ -72,7 +72,9 @@ public class MenuController implements Observer {
     @FXML
     private MenuItem bookmark3;
     @FXML
-    private Label sequenceInfo;
+    private TextArea sequenceInfo;
+    @FXML
+    private TextArea sequenceInfoAlt;
     @FXML
     private TextField nodeTextField;
     @FXML
@@ -121,7 +123,7 @@ public class MenuController implements Observer {
 
         specificGenomeProperties = new SpecificGenomeProperties(genome1, genome2, genome3);
 
-        ps = new PrintStream(new Console(consoleArea));
+        //ps = new PrintStream(new Console(consoleArea));
         DrawableCanvas.getInstance().setMenuController(this);
         DrawableCanvas.getInstance().setSpecificGenomeProperties(specificGenomeProperties);
         ZoomController.getInstance().setMenuController(this);
@@ -275,8 +277,12 @@ public class MenuController implements Observer {
         }
         if (clicked != null) {
             String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId());
-            sequenceInfo.setText(clicked.toString(sequence));
-            nodeTextField.setText(clicked.getId().toString());
+            if (!mouseEvent.isControlDown()) {
+                sequenceInfo.setText(clicked.toString(sequence));
+                nodeTextField.setText(clicked.getId().toString());
+            } else {
+                sequenceInfoAlt.setText(clicked.toString(sequence));
+            }
         }
     }
 

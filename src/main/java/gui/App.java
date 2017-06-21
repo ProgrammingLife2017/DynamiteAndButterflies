@@ -64,7 +64,7 @@ public class App extends Application {
             stage.setResizable(true);
             stage.show();
             //stage.setMaximized(true); -> Mac fails to load a setMaximized(true) stage.
-            System.out.println(path + " loaded on the stage");
+//            System.out.println(path + " loaded on the stage");
             return loader;
         } catch (IOException e) {
             e.printStackTrace();
