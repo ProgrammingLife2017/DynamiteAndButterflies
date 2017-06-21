@@ -21,7 +21,6 @@ public class ColourController {
 
     private int[] selectedGenomes;
     private boolean rainbowView;
-
     private int lowerPart;
     private int middlePart;
     private int higherPart;
@@ -158,6 +157,15 @@ public class ColourController {
         }
 
         return res;
+    }
+
+    public Color getAnnotationColor(int numOfAnnotationsOnNode) {
+        switch (numOfAnnotationsOnNode) {
+            case 0: return Color.RED;
+            case 1: return Color.BLUE;
+            case 2: return Color.GREEN;
+            default: return Color.BLACK;
+        }
     }
 
     /**

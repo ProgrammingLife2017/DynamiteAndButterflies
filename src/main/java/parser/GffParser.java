@@ -1,16 +1,19 @@
 package parser;
 
+import gui.CustomProperties;
 import gui.DrawableCanvas;
 import structures.Annotation;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * Created by lex_b on 12/06/2017.
  */
 public class GffParser {
     private String filePath;
+    private static final int BUCKET_SIZE = 5000;
 
     /**
      * Constructor.
@@ -25,13 +28,17 @@ public class GffParser {
      * @return an arrayList with the Annotations.
      * @throws IOException If it goes wrong.
      */
-    public ArrayList<Annotation> parseGff() throws IOException {
-        ArrayList<Annotation> annotationList = new ArrayList<>();
+    public HashMap<Integer, LinkedList<Annotation>> parseGff() throws IOException {
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line;
         //Intialize the genome that the annotation wants to be on at 0
         int suggestionGenomeOfAnnotation = 0;
+        CustomProperties properties = new CustomProperties();
+        properties.updateProperties();
+        int maxCor = Integer.parseInt(properties.getProperty(
+                DrawableCanvas.getInstance().getParser().getPartPath() + "Max-Cor", "-1"));
+        HashMap<Integer, LinkedList<Annotation>> buckets = initializeBucketArray(maxCor);
         while ((line = br.readLine()) != null) {
             String[] data = line.split("\t");
 
@@ -52,9 +59,22 @@ public class GffParser {
             int start = Integer.parseInt(data[3]);
             int end = Integer.parseInt(data[4]);
             Annotation anno = new Annotation(start, end, info);
-            annotationList.add(anno);
+
+            int whichBucket = (start / BUCKET_SIZE) + 1;
+            LinkedList<Annotation> list = buckets.get(whichBucket);
+            if (list == null) {
+                list = new LinkedList<Annotation>();
+            }
+            list.add(anno);
+            buckets.put(whichBucket, list);
         }
         DrawableCanvas.getInstance().setAnnotationGenome(suggestionGenomeOfAnnotation);
-        return annotationList;
+        return buckets;
+    }
+
+    public HashMap<Integer, LinkedList<Annotation>> initializeBucketArray(int maxCor) {
+        int size = (maxCor / BUCKET_SIZE) + 1;
+
+        return new HashMap<Integer, LinkedList<Annotation>>(size);
     }
 }
