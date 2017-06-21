@@ -170,6 +170,9 @@ public class GraphDrawer {
                     result[i] = (int) ((Map.Entry) itt.next()).getKey();
                     i++;
                 }
+                if(result.length > graph.getNodes().get(node.getParents().get(0)).getGenomes().length) {
+                    result = graph.getNodes().get(node.getParents().get(0)).getGenomes();
+                }
                 node.setGenomes(result);
             }
         }
