@@ -24,6 +24,8 @@ public class GraphDrawer {
     private static final double LINE_WIDTH_FACTOR = 0.1;
     private static final double Y_SIZE_FACTOR = 3;
     private static final double LOG_BASE = 2;
+    //MUST BE THE SAME AS IN GFF PARSER
+    private static final int BUCKET_SIZE = 20000;
 
     private Canvas canvas;
     private int yBase;
@@ -231,8 +233,8 @@ public class GraphDrawer {
             if (node.getGenomes().length == node.getOffsets().length) {
                 placeOfAnnotatedGenome = indexOfGenome;
             }
-            int startBucket = (node.getOffsets()[placeOfAnnotatedGenome] / 20000);
-            int endBucket = ((node.getOffsets()[placeOfAnnotatedGenome] + node.getSequenceLength()) / 20000);
+            int startBucket = (node.getOffsets()[placeOfAnnotatedGenome] / BUCKET_SIZE);
+            int endBucket = ((node.getOffsets()[placeOfAnnotatedGenome] + node.getSequenceLength()) / BUCKET_SIZE);
             HashSet<Annotation> drawThese = new HashSet<>();
             for (int i = startBucket; i <= endBucket; i++) {
                 HashSet<Annotation> tempAnnotations = allAnnotations.get(i);
@@ -240,11 +242,14 @@ public class GraphDrawer {
                     drawThese.addAll(tempAnnotations);
                 }
             }
+            int[] bigOne = new int[2];
 
             double annoHeight = coordinates[3] / 2;
             double startYAnno = coordinates[1] + coordinates[3] - annoHeight;
 
             for (Annotation annotation : drawThese) {
+//                double annoHeight = coordinates[3] / 2;
+//                double startYAnno = coordinates[1] + coordinates[3];
                 double startXAnno = coordinates[0];
                 double annoWidth = coordinates[2];
                 int startOfAnno = annotation.getStart();
@@ -256,21 +261,32 @@ public class GraphDrawer {
                 if (startOfAnno > endCorNode || endOfAnno <= startCorNode) {
                     continue;
                 }
+                if (bigOne[0] != startOfAnno && bigOne[1] != endOfAnno) {
 
-                double emptyAtStart = 0.0;
-                if (startOfAnno > startCorNode) {
-                    emptyAtStart = startOfAnno - startCorNode;
-                    annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
-                    startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                    double emptyAtStart = 0.0;
+                    if (startOfAnno > startCorNode) {
+                        emptyAtStart = startOfAnno - startCorNode;
+                        annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
+                        startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                    }
+                    if (endOfAnno < endCorNode) {
+                        int emptyAtEnd = endCorNode - endOfAnno;
+                        annoWidth = (annoWidth
+                                * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
+                    }
+                    if (bigOne[0] == 0) {
+                        bigOne[0] = startOfAnno;
+                        bigOne[1] = endOfAnno;
+                    }
+                    gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
+                    if (annotation.getInfo().toLowerCase().contains("parent")) {
+                        gc.fillRect(startXAnno, coordinates[1] + coordinates[3] + annoHeight,
+                                annoWidth, annoHeight);
+                    } else {
+                        startYAnno += annoHeight;
+                        gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
+                    }
                 }
-                if (endOfAnno < endCorNode) {
-                    int emptyAtEnd = endCorNode - endOfAnno;
-                    annoWidth = (annoWidth
-                            * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
-                }
-                gc.setFill(colourController.getAnnotationColor(startOfAnno, 20000));
-                startYAnno += annoHeight;
-                gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
             }
         }
     }

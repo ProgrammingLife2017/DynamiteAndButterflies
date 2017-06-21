@@ -1,6 +1,5 @@
 package gui.sub_controllers;
 
-import structures.Annotation;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,11 +13,11 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import structures.Annotation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 
 /**
@@ -65,12 +64,14 @@ public class AnnotationTableController {
         ArrayList<Annotation> allAnnotations = new ArrayList<Annotation>();
         for (int i = 0; i < annotations.size(); i++) {
             HashSet<Annotation> annotationsInBucket = annotations.get(i);
-            for (Annotation annotation : annotationsInBucket) {
-                if (annotation.getSelected().getValue()) {
-                    selection.add(annotation);
+            if (annotationsInBucket != null) {
+                for (Annotation annotation : annotationsInBucket) {
+                    if (annotation.getSelected().getValue()) {
+                        selection.add(annotation);
+                    }
                 }
+                allAnnotations.addAll(annotationsInBucket);
             }
-            allAnnotations.addAll(annotationsInBucket);
         }
         masterData = FXCollections.observableArrayList(allAnnotations);
 
