@@ -42,6 +42,13 @@ public class SequenceNode {
     }
 
     /**
+     * Return the outdegree of the node
+     * @return outdegree
+     */
+    public int getOutDegree() {
+        return this.getChildren().size();
+    }
+    /**
      * Draw the node highlighted.
      */
     public void highlight() {
