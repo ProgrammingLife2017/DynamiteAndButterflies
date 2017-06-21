@@ -183,9 +183,9 @@ public class SequenceNode {
         appendChildren(stringBuilder);
         appendParents(stringBuilder);
         stringBuilder.append("SequenceLength:\t").append(this.sequenceLength).append("\n");
+        appendSequence(sequence, stringBuilder);
         appendGenomes(stringBuilder);
         appendGenomeCoords(stringBuilder);
-        appendSequence(sequence, stringBuilder);
         return stringBuilder.toString();
     }
 
@@ -206,7 +206,7 @@ public class SequenceNode {
      * @param stringBuilder string builder to append to.
      */
     private void appendGenomes(StringBuilder stringBuilder) {
-        stringBuilder.append("Genomes:\t\t\t");
+        stringBuilder.append("Genomes:\t\t");
         int[] sortedGenomes = this.getGenomes();
         Arrays.sort(sortedGenomes);
         for (Integer i: sortedGenomes) {
