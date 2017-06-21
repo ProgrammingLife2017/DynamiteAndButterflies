@@ -125,7 +125,8 @@ public class Minimap {
         String sizeStr = Integer.toString(size);
         int firstDigit = Integer.parseInt(sizeStr.substring(0, 1));
         int step = firstDigit >= 5 ? 1 : 5;
-        int zeros = sizeStr.substring(1, sizeStr.length() - 1).length();
+        int lastdigits = sizeStr.substring(1, sizeStr.length()).length();
+        int zeros = step == 5 ? lastdigits - 1: lastdigits;
         return (int) (step * Math.pow(10, zeros));
     }
 
