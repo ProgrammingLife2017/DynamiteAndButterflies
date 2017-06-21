@@ -631,15 +631,9 @@ public class MenuController implements Observer {
     public int getRadius() {
         int radius = -1;
         try {
-            int value = Integer.parseInt(radiusTextField.getText());
-            if (value < 1 || value > PanningController.RENDER_RANGE) {
-                throw new NotInRangeException();
-            }
-            radius = value;
+            radius = Integer.parseInt(radiusTextField.getText());
         } catch (NumberFormatException e) {
             System.err.println("The given radius is not a number");
-        } catch (NotInRangeException e) {
-            System.err.println("The given radius is out of bounds");
         }
         return radius;
     }
