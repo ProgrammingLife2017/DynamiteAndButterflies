@@ -360,9 +360,8 @@ public class GraphDrawer {
 
     private void drawSNPBubble(SequenceNode upperNode, SequenceNode lowerNode) {
         double[] upperCoordinates = getCoordinates(upperNode);
-        double[] lowerCoordinates = getCoordinates(lowerNode);
+        coordinates.put(lowerNode.getId(), upperCoordinates);
         if (inView(upperCoordinates)) {
-            // if highlighted
             double leftX = upperCoordinates[0];
             double midX = leftX + upperCoordinates[2] / 2;
             double rightX = leftX + upperCoordinates[2];
@@ -370,6 +369,11 @@ public class GraphDrawer {
             double upY = midY - upperCoordinates[3];
             double downY = midY + upperCoordinates[3];
 
+            if (upperNode.isHighlighted()) {
+                gc.setLineWidth(5);
+                gc.strokePolygon(new double[] {leftX, midX, rightX}, new double[] {midY, upY, midY}, 3);
+                gc.strokePolygon(new double[] {leftX, midX, rightX}, new double[] {midY, downY, midY}, 3);
+            }
             gc.fillPolygon(new double[] {leftX, midX, rightX}, new double[] {midY, upY, midY}, 3);
             gc.fillPolygon(new double[] {leftX, midX, rightX}, new double[] {midY, downY, midY}, 3);
         }
@@ -378,7 +382,7 @@ public class GraphDrawer {
     private void drawColour(SequenceNode node, double[] coordinates) {
         ArrayList<Color> colourMeBby;
         if (node.isHighlighted()) {
-            gc.setLineWidth(6);
+            gc.setLineWidth(5);
             gc.strokeRect(coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
         }
 
@@ -479,7 +483,14 @@ public class GraphDrawer {
      */
     public boolean checkClick(SequenceNode node, double xEvent, double yEvent) {
         double[] coordinates = getCoordinates(node);
-        return (xEvent > coordinates[0] && xEvent < coordinates[0] + coordinates[2] && yEvent > coordinates[1] && yEvent < coordinates[1] + coordinates[3]);
+        if (node.isSNP()) {
+            return (xEvent > coordinates[0] && xEvent < coordinates[0] + coordinates[2]
+                && yEvent > coordinates[1] + coordinates[3] / 2 - coordinates[3]
+                && yEvent < coordinates[1] + coordinates[3] / 2 + coordinates[3]);
+        } else {
+            return (xEvent > coordinates[0] && xEvent < coordinates[0] + coordinates[2]
+                    && yEvent > coordinates[1] && yEvent < coordinates[1] + coordinates[3]);
+        }
     }
 
     /**
