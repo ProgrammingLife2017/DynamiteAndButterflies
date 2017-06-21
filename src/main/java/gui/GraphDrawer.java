@@ -1,6 +1,5 @@
 package gui;
 
-import com.sun.corba.se.impl.orbutil.graph.Graph;
 import graph.Annotation;
 import graph.SequenceGraph;
 import graph.SequenceNode;
@@ -9,10 +8,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
@@ -161,21 +157,56 @@ public class GraphDrawer {
                         }
                     }
                 }
-                int[] result = new int[genomes.size()];
+                int[] genome = new int[genomes.size()];
+                int[] parentGenomes = graph.getNodes().get(node.getParents().get(0)).getGenomes();
+
                 int i = 0;
                 for (Object o : genomes.entrySet()) {
-                    result[i] = (int) ((Map.Entry) o).getKey();
+                    genome[i] = (int) ((Map.Entry) o).getKey();
                     i++;
                 }
 
-                int parentID = node.getParents().get(0);
-                int parentGenomeSize = graph.getNodes().get(parentID).getGenomes().length;
-                if (result.length > parentGenomeSize) {
-                    result = graph.getNodes().get(parentID).getGenomes();
+                ArrayList<Integer> parentGenomeList = convertToArrayList(parentGenomes);
+                SequenceNode child = graph.getNodes().get(node.getChildren().get(0));
+                ArrayList<Integer> childList = getChildrenGenomeList(child);
+
+                ArrayList<Integer> results = new ArrayList<>();
+                for (int aResult : genome) {
+                    if (parentGenomeList.contains(aResult) & childList.contains(aResult)) {
+                        results.add(aResult);
+                    }
                 }
+                int[] result = results.stream().mapToInt(q -> q).toArray();
                 node.setGenomes(result);
             }
         }
+    }
+
+    /**
+     * function that converts and int array to arrayList.
+     * @param array the array to be converted.
+     * @return the arrayList.
+     */
+    private ArrayList<Integer> convertToArrayList(int[] array) {
+        ArrayList<Integer> list = new ArrayList<>();
+        for (int parentGenome : array) {
+            list.add(parentGenome);
+        }
+        return list;
+    }
+
+    /**
+     *
+     * @param child Function that returns the genomes of first child that isn't Dummy.
+     * @return the genomesList of the child
+     */
+    private ArrayList<Integer> getChildrenGenomeList(SequenceNode child) {
+        while(child.isDummy()) {
+            child = graph.getNodes().get(child.getChildren().get(0));
+        }
+        int[] childGenomes = child.getGenomes();
+        ArrayList<Integer> childList = convertToArrayList(childGenomes);
+        return childList;
     }
 
     public boolean inView(double[] coordinates) {
