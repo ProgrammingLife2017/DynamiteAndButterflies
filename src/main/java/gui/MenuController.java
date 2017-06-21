@@ -72,7 +72,9 @@ public class MenuController implements Observer {
     @FXML
     private MenuItem bookmark3;
     @FXML
-    private Label sequenceInfo;
+    private TextArea sequenceInfo;
+    @FXML
+    private TextArea sequenceInfoAlt;
     @FXML
     private TextField nodeTextField;
     @FXML
@@ -95,6 +97,8 @@ public class MenuController implements Observer {
     private Button leftPannButton;
     @FXML
     private CheckBox collapseSNPButton;
+    @FXML
+    private ScrollBar scrollBar;
 
     private PrintStream ps;
     private GraphicsContext gc;
@@ -123,9 +127,10 @@ public class MenuController implements Observer {
 
         specificGenomeProperties = new SpecificGenomeProperties(genome1, genome2, genome3);
 
-        ps = new PrintStream(new Console(consoleArea));
+        //ps = new PrintStream(new Console(consoleArea));
         DrawableCanvas.getInstance().setMenuController(this);
         DrawableCanvas.getInstance().setSpecificGenomeProperties(specificGenomeProperties);
+        ScrollbarController.getInstance().setScrollBar(scrollBar);
         ZoomController.getInstance().setMenuController(this);
         Minimap.getInstance().setMenuController(this);
 
@@ -216,6 +221,15 @@ public class MenuController implements Observer {
         radiusTextField.setText(GraphDrawer.getInstance().getRadius() + "");
     }
 
+    public int findColumnWrapper(Double xEvent) {
+        int nodeID = GraphDrawer.getInstance().findColumn(xEvent);
+        if (nodeID < 1) {
+            nodeID = Integer.parseInt(nodeTextField.getText());
+        }
+        return nodeID;
+    }
+
+
     /**
      * ZoomIn Action Handler.
      *
@@ -225,7 +239,7 @@ public class MenuController implements Observer {
     public void zoomInClicked() throws IOException {
         double xCentre = canvas.getWidth() / 2;
         ZoomController.getInstance().zoomIn(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
-        nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
+        nodeTextField.setText(findColumnWrapper(xCentre) + "");
     }
 
     /**
@@ -237,7 +251,7 @@ public class MenuController implements Observer {
     public void zoomOutClicked() throws IOException {
         double xCentre = canvas.getWidth() / 2;
         ZoomController.getInstance().zoomOut(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
-        nodeTextField.setText(GraphDrawer.getInstance().findColumn(xCentre) + "");
+        nodeTextField.setText(findColumnWrapper(xCentre) + "");
     }
 
     /**
@@ -249,7 +263,7 @@ public class MenuController implements Observer {
     @FXML
     public void scrollZoom(ScrollEvent scrollEvent) throws IOException {
         int column = GraphDrawer.getInstance().mouseLocationColumn(scrollEvent.getX());
-        nodeTextField.setText(GraphDrawer.getInstance().findColumn(scrollEvent.getX()) + "");
+        nodeTextField.setText(findColumnWrapper(scrollEvent.getX()) + "");
         if (scrollEvent.getDeltaY() > 0) {
             ZoomController.getInstance().zoomIn(column);
         } else {
@@ -277,8 +291,12 @@ public class MenuController implements Observer {
         }
         if (clicked != null) {
             String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId());
-            sequenceInfo.setText(clicked.toString(sequence));
-            nodeTextField.setText(clicked.getId().toString());
+            if (!mouseEvent.isControlDown()) {
+                sequenceInfo.setText(clicked.toString(sequence));
+                nodeTextField.setText(clicked.getId().toString());
+            } else {
+                sequenceInfoAlt.setText(clicked.toString(sequence));
+            }
         }
     }
 
@@ -293,6 +311,7 @@ public class MenuController implements Observer {
                 ZoomController.getInstance().traverseGraphClicked(centreNodeID, radius);
                 SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
                 String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
+                nodeTextField.setText(Integer.toString(centreNodeID));
                 sequenceInfo.setText(node.toString(sequence));
             }
     }
@@ -377,6 +396,10 @@ public class MenuController implements Observer {
         }
     }
 
+    public void updateCenterNode() {
+        nodeTextField.setText(Integer.toString(GraphDrawer.getInstance().getGraph().getCenterNodeID()));
+    }
+
     /**
      * getter for the SequenceMap.
      *
@@ -418,6 +441,7 @@ public class MenuController implements Observer {
                         panningController.initializeKeys(canvasPanel);
                         displayInfo(GraphDrawer.getInstance().getGraph());
                         updateRadius();
+                        updateCenterNode();
                         enableGuiElements();
                     }
                 });

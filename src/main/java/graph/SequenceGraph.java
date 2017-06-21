@@ -30,6 +30,7 @@ public class SequenceGraph {
     private HTreeMap<Long, String> sequenceHashMap;
     private int dummyNodeIDCounter = -1;
     private String partPath;
+    private int maxColumnSize;
 
 
     /**
@@ -114,33 +115,6 @@ public class SequenceGraph {
     }
 
     /**
-     * Function to assign the genomes to the nodes in the sequencegraph.
-     */
-    private void assignGenomes() {
-        Iterator it = nodes.entrySet().iterator();
-        try {
-            while (it.hasNext()) {
-                Stream<String> lines = Files.lines(Paths.get(partPath + "genomes.txt"));
-                Map.Entry pair = (Map.Entry) it.next();
-                SequenceNode node = (SequenceNode) pair.getValue();
-                if (!node.isDummy()) {
-                    String line = lines.skip(node.getId() - 1).findFirst().get();
-                    String[] text = line.split(";");
-                    int[] genomes = new int[text.length];
-                    for (int i = 0; i < text.length; i++) {
-                        genomes[i] = Integer.parseInt(text[i]);
-                    }
-                    node.setGenomes(genomes);
-                }
-                lines.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    /**
      * Add nodes with children to the nodes hashmap.
      */
     private void initNodes() {
@@ -198,7 +172,12 @@ public class SequenceGraph {
             while (columns.size() <= node.getColumn()) {
                 columns.add(new ArrayList<SequenceNode>());
             }
-            columns.get(node.getColumn()).add(node);
+            ArrayList<SequenceNode> column = columns.get(node.getColumn());
+            column.add(node);
+            node.setIndex(node.getColumn());
+            if (column.size() > maxColumnSize) {
+                maxColumnSize = column.size();
+            }
             node.setIndex(node.getColumn());
         }
 
@@ -238,8 +217,19 @@ public class SequenceGraph {
             sortColumns(currentColumn);
 
             for (int j = 0; j < currentColumn.size(); j++) {
-                currentColumn.get(j).setIndex(j);
-                this.nodes.get(currentColumn.get(j).getId()).setIndex(j);
+                if (!currentColumn.get(j).isDummy()) {
+                    currentColumn.get(j).setIndex(j);
+                    this.nodes.get(currentColumn.get(j).getId()).setIndex(j);
+                } else {
+                    int parentNodeIndex = nodes.get(currentColumn.get(j).getParents().get(0)).getIndex();
+                    if (parentNodeIndex > j) {
+                        currentColumn.get(j).setIndex(parentNodeIndex);
+                        this.nodes.get(currentColumn.get(j).getId()).setIndex(parentNodeIndex);
+                    } else {
+                        currentColumn.get(j).setIndex(j);
+                        this.nodes.get(currentColumn.get(j).getId()).setIndex(j);
+                    }
+                }
             }
         }
     }
@@ -320,6 +310,7 @@ public class SequenceGraph {
             dummy.setDummy(true);
             parentNode.removeChild(target);
             parentNode.addChild(dummy.getId());
+            dummy.addParent(parent);
             dummy.addChild(target);
             dummy.setColumn(parentNode.getColumn() + 1);
             this.addNode(dummy);
@@ -366,6 +357,10 @@ public class SequenceGraph {
         return this.nodes;
     }
 
+    public int getDummyNodeIDCounter() {
+        return dummyNodeIDCounter;
+    }
+
 
     public String getPartPath() {
         return partPath;
@@ -409,6 +404,10 @@ public class SequenceGraph {
 
     public int getCenterNodeID() {
         return centerNodeID;
+    }
+
+    public int getMaxColumnSize() {
+        return maxColumnSize;
     }
 
     public int getRange() { return boundaries.getRange(); }

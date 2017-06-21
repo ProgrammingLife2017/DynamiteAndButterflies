@@ -3,6 +3,7 @@ package gui;
 import graph.SequenceGraph;
 import gui.sub_controllers.FileController;
 import gui.sub_controllers.PanningController;
+import gui.sub_controllers.ScrollbarController;
 import gui.sub_controllers.SpecificGenomeProperties;
 import parser.GfaParser;
 
@@ -56,6 +57,7 @@ public class DrawableCanvas extends Observable implements Observer {
                             Minimap.getInstance().initialize(graph.getFullGraphRightBoundID());
                             GraphDrawer.getInstance().setGraph(graph);
                             GraphDrawer.getInstance().moveShapes(0.0);
+                            ScrollbarController.getInstance().initialize(graph.getMaxColumnSize());
                             setChanged();
                             notifyObservers(parser.getFilePath());
                             setChanged();

@@ -23,18 +23,19 @@ public class GraphDrawer {
 
     private static GraphDrawer drawer = new GraphDrawer();
 
-    private static final double RELATIVE_X_DISTANCE = 0.8;
-    private static final double RELATIVE_Y_DISTANCE = 50;
-    private static final double LINE_WIDTH_FACTOR = 0.1;
-    private static final double Y_SIZE_FACTOR = 3;
-    private static final double LOG_BASE = 2;
+    public static final double Y_BASE = 100;
+    public static final double RELATIVE_X_DISTANCE = 0.8;
+    public static final double RELATIVE_Y_DISTANCE = 50;
+    public static final double LINE_WIDTH_FACTOR = 0.1;
+    public static final double Y_SIZE_FACTOR = 3;
+    public static final double LOG_BASE = 2;
     private static final double SNP_SIZE = 10;
 
     private Canvas canvas;
-    private int yBase;
     private double zoomLevel;
     private double range;
     private double xDifference;
+    private double yDifference;
     private double stepSize;
     private double[] columnWidths;
     private GraphicsContext gc;
@@ -54,7 +55,6 @@ public class GraphDrawer {
     public static GraphDrawer getInstance(){
         return drawer;
     }
-
 
     public void setEmptyCoordinates() {
         this.coordinates = new HashMap<>();
@@ -91,10 +91,6 @@ public class GraphDrawer {
     public void setCanvas(Canvas canvas) {
         this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
-
-//        MAGIC NUMBER
-        this.yBase = (int) (canvas.getHeight() / 4);
-
     }
 
     /**
@@ -159,25 +155,28 @@ public class GraphDrawer {
 
     public void initializeDummyWidths() {
         HashMap<Integer, String> genomes;
-        Iterator it = graph.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
+        for (int j = -1; j > graph.getDummyNodeIDCounter(); j--) {
             genomes = new HashMap<>(DrawableCanvas.getInstance().getAllGenomesReversed());
-            Map.Entry pair = (Map.Entry) it.next();
-            SequenceNode node = (SequenceNode) pair.getValue();
+            SequenceNode node = graph.getNode(j);
             if (node.isDummy()) {
                 for (SequenceNode i : columns.get(node.getColumn())) {
                     if (!i.isDummy()) {
-                        for (int j : i.getGenomes()) {
-                            genomes.remove(j);
+                        for (int k : i.getGenomes()) {
+                            genomes.remove(k);
                         }
                     }
                 }
                 int[] result = new int[genomes.size()];
                 int i = 0;
-                Iterator itt = genomes.entrySet().iterator();
-                while(itt.hasNext()) {
-                    result[i] = (int) ((Map.Entry) itt.next()).getKey();
+                for (Object o : genomes.entrySet()) {
+                    result[i] = (int) ((Map.Entry) o).getKey();
                     i++;
+                }
+
+                int parentID = node.getParents().get(0);
+                int parentGenomeSize = graph.getNodes().get(parentID).getGenomes().length;
+                if (result.length > parentGenomeSize) {
+                    result = graph.getNodes().get(parentID).getGenomes();
                 }
                 node.setGenomes(result);
             }
@@ -196,14 +195,13 @@ public class GraphDrawer {
      */
     private double[] computeCoordinates(SequenceNode node) {
         double[] coordinates = new double[4];
-        yBase = (int) GraphDrawer.getInstance().canvas.getHeight() / 4;
         double width = computeNodeWidth(node) * stepSize;
         if (!collapseSNP || (!node.isSNP() && !node.getChildren().isEmpty() && !graph.getNode(node.getChild(0)).isSNP())) {
             width *= RELATIVE_X_DISTANCE;
         }
         double height = getYSize();
         double x = (columnWidths[node.getColumn()] - xDifference) * stepSize;
-        double y = yBase + (node.getIndex() * RELATIVE_Y_DISTANCE);
+        double y = Y_BASE + (node.getIndex() * RELATIVE_Y_DISTANCE) - yDifference;
         if (height > width) {
             y += (height - width) / 2;
             height = width;
@@ -507,7 +505,12 @@ public class GraphDrawer {
                 SequenceNode node = (SequenceNode) pair.getValue();
                 int nodeID = (Integer) pair.getKey();
                 if (checkClickX(node, xEvent)) {
-                    return graph.getNode(nodeID).getId();
+                    int column = graph.getNode(nodeID).getColumn();
+                    for (SequenceNode displayNode: graph.getColumns().get(column)) {
+                        if (!displayNode.isDummy()) {
+                            return displayNode.getId();
+                        }
+                    }
                 }
             }
         } catch (NullPointerException e) {
@@ -707,6 +710,10 @@ public class GraphDrawer {
 
     public SequenceNode getMostRightNode() {
         return mostRightNode;
+    }
+
+    public void setyDifference(double yDifference) {
+        this.yDifference = yDifference;
     }
 
     public void setRainbowView(boolean rainbowView) {
