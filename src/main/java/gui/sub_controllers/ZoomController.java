@@ -63,8 +63,8 @@ public class ZoomController {
         GraphDrawer drawer = GraphDrawer.getInstance();
         GraphDrawer.getInstance().setZoomLevel(GraphDrawer.getInstance().findZoomLevel(centreNode, radius));
         double xDiff = drawer.getColumnWidth(drawer.getGraph().getNode(centreNode).getColumn()) - drawer.getZoomLevel() / 2;
-        GraphDrawer.getInstance().moveShapes(xDiff);
         GraphDrawer.getInstance().highlight(centreNode);
+        GraphDrawer.getInstance().moveShapes(xDiff);
     }
 
     public void setMenuController(MenuController menuController) {
