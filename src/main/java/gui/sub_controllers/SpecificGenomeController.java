@@ -1,17 +1,20 @@
 package gui.sub_controllers;
 
-import structures.Genome;
 import gui.DrawableCanvas;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import structures.Genome;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +26,8 @@ import java.util.HashMap;
  */
 public class SpecificGenomeController {
 
-    private int[] selectedGenomes;
+    @FXML
+    private TextField filterField;
     @FXML
     private TableView<Genome> table;
     @FXML
@@ -32,6 +36,8 @@ public class SpecificGenomeController {
     private TableColumn<Genome, String> nameCol;
     @FXML
     private TableColumn highlightCol;
+    private SortedList<Genome> sortedData;
+    private int[] selectedGenomes;
 
     /**
      * This method initializes the environment.
@@ -55,15 +61,12 @@ public class SpecificGenomeController {
             realData.add(genome);
         }
         final ObservableList<Genome> data = FXCollections.observableArrayList(realData);
-        table.setItems(data);
 
         idCol.setCellValueFactory(new PropertyValueFactory<Genome, Integer>("id"));
         nameCol.setCellValueFactory(new PropertyValueFactory<Genome, String>("name"));
-        highlightCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Genome,Boolean>,ObservableValue<Boolean>>()
-        {
+        highlightCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Genome,Boolean>,ObservableValue<Boolean>>() {
             @Override
-            public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Genome, Boolean> param)
-            {
+            public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Genome, Boolean> param) {
                 return param.getValue().selectedProperty();
             }
         });
@@ -74,6 +77,31 @@ public class SpecificGenomeController {
         nameCol.setEditable(false);
         highlightCol.setEditable(true);
 
+        // 1. Wrap the ObservableList in a FilteredList (initially display all data).
+        FilteredList<Genome> filteredData = new FilteredList<>(data, p -> true);
+
+        // 2. Set the filter Predicate whenever the filter changes.
+        filterField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(genome -> {
+                // If filter text is empty, display all annotations.
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                //Check the info, but also co-ordinates.
+                return genome.getName().toLowerCase().contains(lowerCaseFilter);
+            });
+        });
+
+        // 3. Wrap the FilteredList in a SortedList.
+        sortedData = new SortedList<Genome>(filteredData);
+
+        // 4. Bind the SortedList comparator to the TableView comparator.
+        sortedData.comparatorProperty().bind(table.comparatorProperty());
+
+        // 5. Add sorted (and filtered) data to the table.
+        table.setItems(sortedData);
     }
 
     /**
