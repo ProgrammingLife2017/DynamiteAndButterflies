@@ -21,7 +21,6 @@ public class ColourController {
 
     private int[] selectedGenomes;
     private boolean rainbowView;
-
     private int lowerPart;
     private int middlePart;
     private int higherPart;
@@ -153,6 +152,13 @@ public class ColourController {
         }
 
         return res;
+    }
+
+    public Color getAnnotationColor(int startCorAnno, int stepSize) {
+        double doubleStepSize = (double) stepSize;
+        double hue = 360 - (360 * ((startCorAnno % doubleStepSize) / doubleStepSize));
+        double brightness = 0.8 + (0.2 * ((startCorAnno % doubleStepSize) / doubleStepSize));
+        return Color.hsb(hue, 1, brightness);
     }
 
     /**

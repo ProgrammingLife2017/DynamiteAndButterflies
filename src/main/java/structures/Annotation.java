@@ -1,8 +1,11 @@
-package graph;
+package structures;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Created by lex_b on 13/06/2017.
@@ -47,5 +50,18 @@ public class Annotation {
 
     public void setSelected(boolean selected) {
         this.selected.set(selected);
+    }
+
+    public static void selectAll(HashMap<Integer, HashSet<Annotation>> allAnnotations) {
+        HashSet<Annotation> selectThese = new HashSet<>();
+        for (int i = 0; i <= allAnnotations.size(); i++) {
+            HashSet<Annotation> tempAnnotations = allAnnotations.get(i);
+            if (tempAnnotations != null) {
+                selectThese.addAll(tempAnnotations);
+            }
+        }
+        for (Annotation annotation : selectThese) {
+            annotation.setSelected(true);
+        }
     }
 }
