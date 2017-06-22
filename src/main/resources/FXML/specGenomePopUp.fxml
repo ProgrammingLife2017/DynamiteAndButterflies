@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.sub_controllers.SpecificGenomeController">
    <children>
       <TableView fx:id="table" layoutX="29.0" layoutY="35.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="40.0">
@@ -12,12 +17,12 @@
             <TableColumn fx:id="highlightCol" prefWidth="75.0" text="Highlight" />
         </columns>
       </TableView>
-       <HBox id="HBox" alignment="CENTER" spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0"
-             AnchorPane.topAnchor="10.0">
-           <Label text="Filter Table:"/>
-           <TextField fx:id="filterField" HBox.hgrow="ALWAYS"/>
+       <HBox id="HBox" alignment="CENTER" spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+           <Label text="Filter Table:" />
+           <TextField fx:id="filterField" HBox.hgrow="ALWAYS" />
        </HBox>
       <Button layoutX="88.0" layoutY="365.0" mnemonicParsing="false" onAction="#saveSelected" text="Save" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="75.0" />
       <Button layoutX="286.0" layoutY="370.0" mnemonicParsing="false" onAction="#cancelClicked" text="Cancel" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="75.0" />
+       <Button layoutX="306.0" layoutY="458.0" mnemonicParsing="false" onAction="#selectAllFiltered" prefHeight="25.0" prefWidth="88.0" text="(De)Select all" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="155.0" AnchorPane.rightAnchor="155.0" />
    </children>
 </AnchorPane>

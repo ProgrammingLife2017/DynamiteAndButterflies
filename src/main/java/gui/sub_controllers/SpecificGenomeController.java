@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -38,6 +39,7 @@ public class SpecificGenomeController {
     private TableColumn highlightCol;
     private SortedList<Genome> sortedData;
     private int[] selectedGenomes;
+    private boolean allSelected;
 
     /**
      * This method initializes the environment.
@@ -48,6 +50,7 @@ public class SpecificGenomeController {
      */
     public void initialize(HashMap<Integer, String> hashMap, int[] alreadyChosen) {
         selectedGenomes = alreadyChosen;
+        allSelected = false;
 
         ArrayList<Genome> realData = new ArrayList<Genome>();
         for (int i = 0; i < hashMap.size(); i++) {
@@ -152,6 +155,21 @@ public class SpecificGenomeController {
     private void close() {
         Stage stage = (Stage) table.getScene().getWindow();
         stage.close();
+    }
+
+    /**
+     * Can select/deselect the entire sortedData at the same time.
+     */
+    public void selectAllFiltered(ActionEvent actionEvent) {
+        for (Genome genome : sortedData) {
+            if (allSelected) {
+                genome.setSelected(false);
+            } else {
+                genome.setSelected(true);
+            }
+        }
+        table.setItems(sortedData);
+        allSelected = !allSelected;
     }
 }
 
