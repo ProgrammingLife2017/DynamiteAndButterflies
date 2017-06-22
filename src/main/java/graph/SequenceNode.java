@@ -1,9 +1,12 @@
 package graph;
 
 import gui.DrawableCanvas;
+import gui.GraphDrawer;
+import structures.Annotation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * Class Node2, which represents sequences of DNA. A sequence is a part of a genome.
@@ -191,8 +194,12 @@ public class SequenceNode {
     }
 
     private void appendAnnotations(StringBuilder stringBuilder) {
-        stringBuilder.append("Annotations:\t\t");
-
+        HashSet<Annotation> annotations  = GraphDrawer.getInstance().getAnnotationBuckets(this, GraphDrawer.getInstance().getAnnotatedGenomeIndex(this));
+        for (Annotation anno: annotations) {
+            if (anno.getSelected().getValue()) {
+                stringBuilder.append("Annotation info:\n").append(anno.getInfo());
+            }
+        }
     }
 
     /**
