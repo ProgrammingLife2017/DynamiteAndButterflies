@@ -3,6 +3,7 @@ package gui.sub_controllers;
 import com.sun.corba.se.impl.orbutil.graph.Graph;
 import graph.SequenceGraph;
 import gui.GraphDrawer;
+import gui.MenuController;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -29,7 +30,7 @@ public class PanningController extends Observable {
     /**
      * The speed at which to pan.
      */
-    public static final double PANN_FACTOR = 0.01;
+    public static final double PANN_FACTOR = 0.03;
 
     /**
      * The the threshold to update the subGraph.
@@ -46,43 +47,32 @@ public class PanningController extends Observable {
      */
     public static final int RENDER_SHIFT = 1000;
 
+    private static PanningController panningController = new PanningController();
+
+    private MenuController menuController;
     private Button rightPannButton;
     private Button leftPannButton;
-    private Timeline timelineRight;
-    private Timeline timelineLeft;
     private boolean updating;
 
     /**
      * Constructor for the panning controller.
-]     * @param leftPannButton - the pan left button.
-     * @param rightPannButton - the pan right button,
      */
-    public PanningController(Button leftPannButton, Button rightPannButton) {
-        this.leftPannButton = leftPannButton;
-        this.rightPannButton = rightPannButton;
-        initializeTimer();
-        initializeButtons();
+    public PanningController() {
+    }
+
+    public static PanningController getInstance() {
+        return panningController;
     }
 
     /**
-     * Timer for panning.
+     * Initialize the panningcontroller.
+     * @param leftPannButton the pan left button.
+     * @param rightPannButton the pan right button,
      */
-    private void initializeTimer() {
-        timelineRight = new Timeline(new KeyFrame(Duration.millis(10), new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                panRight();
-            }
-        }));
-        timelineRight.setCycleCount(Animation.INDEFINITE);
-
-        timelineLeft = new Timeline(new KeyFrame(Duration.millis(10), new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                panLeft();
-            }
-        }));
-        timelineLeft.setCycleCount(Animation.INDEFINITE);
+    public void initialize(Button leftPannButton, Button rightPannButton) {
+        this.leftPannButton = leftPannButton;
+        this.rightPannButton = rightPannButton;
+        initializeButtons();
     }
 
     /**
@@ -92,26 +82,13 @@ public class PanningController extends Observable {
         rightPannButton.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                timelineRight.play();
+                panRight();
             }
         });
-        rightPannButton.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                timelineRight.pause();
-            }
-        });
-
         leftPannButton.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                timelineLeft.play();
-            }
-        });
-        leftPannButton.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                timelineLeft.pause();
+                panLeft();
             }
         });
     }
@@ -127,22 +104,13 @@ public class PanningController extends Observable {
             @Override
             public void handle(KeyEvent event) {
                 if (event.getCode() == KeyCode.RIGHT) {
-                    timelineRight.play();
+                    panRight();
                 } else if (event.getCode() == KeyCode.LEFT) {
-                    timelineLeft.play();
-                } else if (event.getCode() == KeyCode.ALT) {
-
-                }
-                event.consume();
-            }
-        });
-        canvasPanel.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                if (event.getCode() == KeyCode.RIGHT) {
-                    timelineRight.stop();
-                } else if (event.getCode() == KeyCode.LEFT) {
-                    timelineLeft.stop();
+                    panLeft();
+                } else if (event.getCode() == KeyCode.UP) {
+                    menuController.zoomInClicked();
+                } else if (event.getCode() == KeyCode.DOWN) {
+                    menuController.zoomOutClicked();
                 }
                 event.consume();
             }
@@ -222,4 +190,7 @@ public class PanningController extends Observable {
         GraphDrawer.getInstance().moveShapes(GraphDrawer.getInstance().getxDifference() - GraphDrawer.getInstance().getZoomLevel() * PANN_FACTOR);
     }
 
+    public void setMenuController(MenuController menuController) {
+        this.menuController = menuController;
+    }
 }
