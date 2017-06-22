@@ -46,7 +46,7 @@ public class GraphDrawer {
     private HashMap<Integer, double[]> coordinates;
     private boolean rainbowView = true;
 
-    public static GraphDrawer getInstance(){
+    public static GraphDrawer getInstance() {
         return drawer;
     }
 
@@ -130,9 +130,9 @@ public class GraphDrawer {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             double max = 1;
-            for (int i = 0; i < column.size(); i++) {
-                if (!column.get(i).isDummy()) {
-                    double length = computeNodeWidth(column.get(i));
+            for (SequenceNode aColumn : column) {
+                if (!aColumn.isDummy()) {
+                    double length = computeNodeWidth(aColumn);
                     if (length > max) {
                         max = length;
                     }
@@ -141,8 +141,11 @@ public class GraphDrawer {
             columnWidths[j + 1] = columnWidths[j] + max;
         }
     }
-    
-    public void initializeDummyWidths() {
+
+    /**
+     * Method to initialize dummyWidths.
+     */
+    private void initializeDummyWidths() {
         HashMap<Integer, String> genomes;
         for (int j = -1; j > graph.getDummyNodeIDCounter(); j--) {
             genomes = new HashMap<>(DrawableCanvas.getInstance().getAllGenomesReversed());
@@ -162,7 +165,6 @@ public class GraphDrawer {
                     i++;
                 }
                 int[] parentGenomes = graph.getNodes().get(node.getParents().get(0)).getGenomes();
-
                 int[] childList = getChildrenGenomeList(node);
 
                 ArrayList<Integer> results = new ArrayList<>();
@@ -184,7 +186,7 @@ public class GraphDrawer {
      * @param genome   The genome to see if it is in the check set.
      * @return a boolean true if it is in the set or false if it is not.
      */
-    public boolean contains(int[] checkSet, int genome) {
+    private boolean contains(int[] checkSet, int genome) {
         for (int check : checkSet) {
             if (check == genome) {
                 return true;
@@ -199,21 +201,20 @@ public class GraphDrawer {
      * @return the genomesList of the child
      */
     private int[] getChildrenGenomeList(SequenceNode child) {
-        while(child.isDummy()) {
+        while (child.isDummy()) {
             child = graph.getNodes().get(child.getChildren().get(0));
         }
-        int[] childGenomes = child.getGenomes();
-        return childGenomes;
+        return child.getGenomes();
     }
 
-    public boolean inView(double[] coordinates) {
+    private boolean inView(double[] coordinates) {
         return coordinates[0] + coordinates[2] > 0 && coordinates[0] < gc.getCanvas().getWidth();
     }
 
     /**
      * Computes the coordinates for the given node
      * [x,y,width,height]
-     * @param node
+     * @param node the node.
      * @return
      */
     private double[] computeCoordinates(SequenceNode node) {
