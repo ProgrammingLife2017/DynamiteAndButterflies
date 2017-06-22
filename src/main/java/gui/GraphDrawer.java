@@ -8,10 +8,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import structures.Annotation;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+
 import java.util.*;
 
 /**
@@ -23,49 +20,65 @@ public class GraphDrawer {
 
     private static GraphDrawer drawer = new GraphDrawer();
 
-    public static final double Y_BASE = 100;
-    public static final double RELATIVE_X_DISTANCE = 0.8;
     public static final double RELATIVE_Y_DISTANCE = 50;
-    public static final double LINE_WIDTH_FACTOR = 0.1;
-    public static final double Y_SIZE_FACTOR = 3;
-    public static final double LOG_BASE = 2;
+    private static final double Y_BASE = 100;
+    private static final double RELATIVE_X_DISTANCE = 0.8;
+    private static final double LINE_WIDTH_FACTOR = 0.1;
+    private static final double Y_SIZE_FACTOR = 3;
+    private static final double LOG_BASE = 2;
     private static final double SNP_SIZE = 10;
+    private static final int LINE_WIDTH = 5;
+    private static final int X_INDEX = 0;
+    private static final int Y_INDEX = 1;
+    private static final int WIDTH_INDEX = 2;
+    private static final int HEIGHT_INDEX = 3;
+    private static final int COORDINATES = 4;
+    private static final int POLYGON_POINTS = 3;
     //MUST BE THE SAME AS IN GFF PARSER
     private static final int BUCKET_SIZE = 20000;
 
     private MenuController menuController;
+    private ColourController colourController;
     private Canvas canvas;
+    private GraphicsContext gc;
+    private SequenceGraph graph;
+    private int highlightedNode;
+    private int[] selected = null;
     private double zoomLevel;
     private double range;
     private double xDifference;
     private double yDifference;
     private double stepSize;
     private double[] columnWidths;
-    private GraphicsContext gc;
-    private ArrayList<ArrayList<SequenceNode>> columns;
-    private SequenceGraph graph;
-    private int highlightedNode;
-    private int[] selected = null;
-    private ColourController colourController;
-    private HashMap<Integer, HashSet<Annotation>> allAnnotations
-            = new HashMap<Integer, HashSet<Annotation>>();
+    private boolean rainbowView = true;
     private SequenceNode mostLeftNode;
     private SequenceNode mostRightNode;
+    private ArrayList<ArrayList<SequenceNode>> columns;
     private HashMap<Integer, double[]> coordinates;
-    private boolean rainbowView = true;
+    private HashMap<Integer, HashSet<Annotation>> allAnnotations
+            = new HashMap<>();
 
+    /**
+     * Getter for the singleton Graphdrawer.
+     *
+     * @return this graphdrawer
+     */
     public static GraphDrawer getInstance() {
         return drawer;
     }
 
-    public void setEmptyCoordinates() {
+    /**
+     * initialize the coordinates hashmap.
+     */
+    private void setEmptyCoordinates() {
         this.coordinates = new HashMap<>();
     }
 
-    public HashMap<Integer, double[]> getCoordinates() {
-        return this.coordinates;
-    }
-
+    /**
+     * Initialize a new graph. All values are recomputed except zoomLevel and selected.
+     *
+     * @param graph The new graph
+     */
     public void setGraph(SequenceGraph graph) {
         this.graph = graph;
         columns = graph.getColumns();
@@ -89,8 +102,12 @@ public class GraphDrawer {
         highlightedNode = 0;
     }
 
-
-    public void setCanvas(Canvas canvas) {
+    /**
+     * Setter for the canvas and it's graphics context.
+     *
+     * @param canvas The new canvas
+     */
+    void setCanvas(Canvas canvas) {
         this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
     }
@@ -122,8 +139,8 @@ public class GraphDrawer {
      * @param xDifference Variable to determine which column should be in the centre.
      */
     public void moveShapes(double xDifference) {
-        gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
-        this.stepSize = (gc.getCanvas().getWidth() / zoomLevel);
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        this.stepSize = (canvas.getWidth() / zoomLevel);
         setxDifference(xDifference);
         colourController = new ColourController(selected, rainbowView);
         drawNodes();
@@ -175,7 +192,6 @@ public class GraphDrawer {
                 }
                 int[] parentGenomes = graph.getNodes().get(node.getParents().get(0)).getGenomes();
                 int[] childList = getChildrenGenomeList(node);
-
                 ArrayList<Integer> results = new ArrayList<>();
                 for (int aResult : genome) {
                     if (contains(parentGenomes, aResult) & contains(childList, aResult)) {
@@ -205,7 +221,6 @@ public class GraphDrawer {
     }
 
     /**
-     *
      * @param child Function that returns the genomes of first child that isn't Dummy.
      * @return the genomesList of the child
      */
@@ -216,18 +231,25 @@ public class GraphDrawer {
         return child.getGenomes();
     }
 
+    /**
+     * Check if the given coordinates fall on the screen.
+     *
+     * @param coordinates Coordinates to check
+     * @return True if the coordinates fall on the screen, false otherwise
+     */
     private boolean inView(double[] coordinates) {
-        return coordinates[0] + coordinates[2] > 0 && coordinates[0] < gc.getCanvas().getWidth();
+        return coordinates[X_INDEX] + coordinates[WIDTH_INDEX] > 0 && coordinates[X_INDEX] < canvas.getWidth();
     }
 
     /**
      * Computes the coordinates for the given node.
      * [x,y,width,height]
+     *
      * @param node the node.
      * @return the coordinates.
      */
     private double[] computeCoordinates(SequenceNode node) {
-        double[] coordinates = new double[4];
+        double[] coordinates = new double[COORDINATES];
         double width = computeNodeWidth(node) * stepSize;
         if (relativeWidth(node)) {
             width *= RELATIVE_X_DISTANCE;
@@ -240,16 +262,23 @@ public class GraphDrawer {
             height = width;
         }
 
-        coordinates[0] = x;
-        coordinates[1] = y;
-        coordinates[2] = width;
-        coordinates[3] = height;
+        coordinates[X_INDEX] = x;
+        coordinates[Y_INDEX] = y;
+        coordinates[WIDTH_INDEX] = width;
+        coordinates[HEIGHT_INDEX] = height;
 
         this.coordinates.put(node.getId(), coordinates);
         return coordinates;
 
     }
 
+    /**
+     * Check if a node should have a width relative to the following node. The node with is relative when it is not a
+     * SNP node and it's children isn't either.
+     *
+     * @param node Node to check the relative width
+     * @return True if the width should be relative to its child, false otherwise
+     */
     private boolean relativeWidth(SequenceNode node) {
         if (node.isSNP() && node.isCollapsed()) {
             return false;
@@ -263,31 +292,8 @@ public class GraphDrawer {
         return true;
     }
 
-//    public void drawNodes() {
-//        setEmptyCoordinates();
-//        gc.setStroke(Color.BLACK);
-//        for (int i = 0; i < columns.size(); i++) {
-//            ArrayList<SequenceNode> col = columns.get(i);
-//            if (checkSNPBubble(i) && collapseSNP) {
-//                SequenceNode upperNode = col.get(0);
-//                SequenceNode lowerNode = col.get(1);
-//                checkExtremeNode(upperNode);
-//                drawSNPBubble(upperNode, lowerNode);
-//            } else {
-//                for (int j = 0; j < col.size(); j++) {
-//                    SequenceNode node = col.get(j);
-//                    checkExtremeNode(node);
-//                    drawNode(node);
-//                    drawEdges(node);
-//                }
-//            }
-//        }
-//    }
-
     /**
-     * Gives all nodes the right coordinates on the canvas and draw them.
-     * It depends on whether the dummy nodes checkbox
-     * is checked dummy nodes are either drawn or skipped.
+     * Gives all nodes the right coordinates on the canvas and draws them.
      */
     private void drawNodes() {
         setEmptyCoordinates();
@@ -308,6 +314,12 @@ public class GraphDrawer {
         }
     }
 
+    /**
+     * Draws annotations underneath the give node.
+     *
+     * @param node        Node to draw annotations under
+     * @param coordinates Coordinates of the node
+     */
     private void drawAnnotations(SequenceNode node, double[] coordinates) {
         int indexOfGenome = colourController.containsPos(node.getGenomes(), DrawableCanvas.getInstance().getAnnotationGenome());
 
@@ -327,15 +339,15 @@ public class GraphDrawer {
             }
             int[] bigOne = new int[2];
 
-            double annoHeight = coordinates[3] / 2;
-            double startYAnno = coordinates[1] + coordinates[3] - annoHeight;
+            double annoHeight = coordinates[HEIGHT_INDEX] / 2;
+            double startYAnno = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] - annoHeight;
 
             for (Annotation annotation : drawThese) {
-//                double annoHeight = coordinates[3] / 2;
-//                double startYAnno = coordinates[1] + coordinates[3];
+//                double annoHeight = coordinates[HEIGHT_INDEX] / 2;
+//                double startYAnno = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX];
                 if (annotation.getSelected().getValue()) {
-                    double startXAnno = coordinates[0];
-                    double annoWidth = coordinates[2];
+                    double startXAnno = coordinates[X_INDEX];
+                    double annoWidth = coordinates[WIDTH_INDEX];
                     int startOfAnno = annotation.getStart();
                     int endOfAnno = annotation.getEnd();
 
@@ -351,7 +363,7 @@ public class GraphDrawer {
                         if (startOfAnno > startCorNode) {
                             emptyAtStart = startOfAnno - startCorNode;
                             annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
-                            startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                            startXAnno = startXAnno + (coordinates[WIDTH_INDEX] - annoWidth);
                         }
                         if (endOfAnno < endCorNode) {
                             int emptyAtEnd = endCorNode - endOfAnno;
@@ -365,7 +377,7 @@ public class GraphDrawer {
                         gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
 //                    //TODO Fix overalapping parent annotations
 //                    if (annotation.getInfo().toLowerCase().contains("parent")) {
-//                        gc.fillRect(startXAnno, coordinates[1] + coordinates[3] + annoHeight,
+//                        gc.fillRect(startXAnno, coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] + annoHeight,
 //                                annoWidth, annoHeight);
 //                    } else {
                         startYAnno += annoHeight;
@@ -377,67 +389,75 @@ public class GraphDrawer {
         }
     }
 
-    public boolean checkSNPBubble(int columnID) {
+    /**
+     * Check if a column can be collapsed into a SNP bubble. If so set the nodes isSNP attribute to true.
+     *
+     * @param columnID The column to check for a SNP bubble
+     */
+    private void checkSNPBubble(int columnID) {
         ArrayList<SequenceNode> column = columns.get(columnID);
         if (column.size() != 2) {
-            return false;
+            return;
         }
         SequenceNode upperNode = column.get(0);
         SequenceNode lowerNode = column.get(1);
         if (upperNode.isDummy() || lowerNode.isDummy()) {
-            return false;
+            return;
         }
         if (upperNode.getSequenceLength() != 1 || lowerNode.getSequenceLength() != 1) {
-            return false;
+            return;
         }
         if (upperNode.getParents().size() != 1 || lowerNode.getParents().size() != 1) {
-            return false;
+            return;
         }
         if (upperNode.getChildren().size() != 1 || lowerNode.getChildren().size() != 1) {
-            return false;
+            return;
         }
         int upperParent = upperNode.getParents().get(0);
         int lowerParent = lowerNode.getParents().get(0);
         if (upperParent != lowerParent) {
-            return false;
+            return;
         }
         int upperChild = upperNode.getChildren().get(0);
         int lowerChild = upperNode.getChildren().get(0);
         if (upperChild != lowerChild) {
-            return false;
+            return;
         }
         upperNode.setSNP(true);
         upperNode.setCollapsed(true);
         lowerNode.setSNP(true);
         lowerNode.setCollapsed(true);
-        return true;
     }
 
+    /**
+     * Check if a node is the left most or right most node of the screen. Set the attribute to it if so.
+     *
+     * @param node The node to check if it is an extreme node
+     */
     private void checkExtremeNode(SequenceNode node) {
         if (!node.isDummy()) {
             double[] coordinates = this.coordinates.get(node.getId());
-            if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE > 0) {
+            if (coordinates[X_INDEX] <= 0 && coordinates[X_INDEX] + coordinates[WIDTH_INDEX] / RELATIVE_X_DISTANCE > 0) {
                 mostLeftNode = node;
             }
-            if (coordinates[0] < gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE >= gc.getCanvas().getWidth()) {
+            if (coordinates[X_INDEX] < canvas.getWidth() && coordinates[X_INDEX] + coordinates[WIDTH_INDEX] / RELATIVE_X_DISTANCE >= canvas.getWidth()) {
                 mostRightNode = node;
             }
         }
     }
 
+    /**
+     * Draw an individual node with possibly its annotations if it is in view of the screen. Dummies are drawn as a line.
+     *
+     * @param node The node to be drawn
+     */
     private void drawNode(SequenceNode node) {
         double[] coordinates = this.coordinates.get(node.getId());
-        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE > 0) {
-            mostLeftNode = node;
-        }
-        if (coordinates[0] <= gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE >= gc.getCanvas().getWidth()) {
-            mostRightNode = node;
-        }
         if (inView(coordinates)) {
             if (node.isDummy()) {
                 this.setLineWidth(node.getGenomes().length);
-                gc.strokeLine(coordinates[0], coordinates[1] + coordinates[3] / 2,
-                        coordinates[0] + coordinates[2], coordinates[1] + coordinates[3] / 2);
+                gc.strokeLine(coordinates[X_INDEX], coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] / 2,
+                        coordinates[X_INDEX] + coordinates[WIDTH_INDEX], coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] / 2);
             } else {
                 drawColour(node, coordinates);
                 drawAnnotations(node, coordinates);
@@ -445,47 +465,64 @@ public class GraphDrawer {
         }
     }
 
+    /**
+     * Draw an individual SNP bubble. It is drawn as diamond with the upper node as upper half and lower node as lower
+     * half of the bubble.
+     *
+     * @param upperNode Upper node in the SNP bubble
+     * @param lowerNode Lower node in the SNP bubble
+     */
     private void drawSNPBubble(SequenceNode upperNode, SequenceNode lowerNode) {
         double[] upperCoordinates = this.coordinates.get(upperNode.getId());
         coordinates.put(lowerNode.getId(), upperCoordinates);
         if (inView(upperCoordinates)) {
-            double leftX = upperCoordinates[0];
-            double midX = leftX + upperCoordinates[2] / 2;
-            double rightX = leftX + upperCoordinates[2];
-            double midY = upperCoordinates[1] + upperCoordinates[3] / 2;
-            double upY = midY - upperCoordinates[3];
-            double downY = midY + upperCoordinates[3];
+            double leftX = upperCoordinates[X_INDEX];
+            double midX = leftX + upperCoordinates[WIDTH_INDEX] / 2;
+            double rightX = leftX + upperCoordinates[WIDTH_INDEX];
+            double midY = upperCoordinates[Y_INDEX] + upperCoordinates[HEIGHT_INDEX] / 2;
+            double upY = midY - upperCoordinates[HEIGHT_INDEX];
+            double downY = midY + upperCoordinates[HEIGHT_INDEX];
 
             if (upperNode.isHighlighted()) {
-                gc.setLineWidth(5);
-                gc.strokePolygon(new double[] {leftX, midX, rightX}, new double[] {midY, upY, midY}, 3);
-                gc.strokePolygon(new double[] {leftX, midX, rightX}, new double[] {midY, downY, midY}, 3);
+                gc.setLineWidth(LINE_WIDTH);
+                gc.strokePolygon(new double[]{leftX, midX, rightX}, new double[]{midY, upY, midY}, POLYGON_POINTS);
+                gc.strokePolygon(new double[]{leftX, midX, rightX}, new double[]{midY, downY, midY}, POLYGON_POINTS);
             }
             gc.setFill(Color.CHOCOLATE);
-            gc.fillPolygon(new double[] {leftX, midX, rightX}, new double[] {midY, upY, midY}, 3);
+            gc.fillPolygon(new double[]{leftX, midX, rightX}, new double[]{midY, upY, midY}, POLYGON_POINTS);
             gc.setFill(Color.BROWN);
-            gc.fillPolygon(new double[] {leftX, midX, rightX}, new double[] {midY, downY, midY}, 3);
+            gc.fillPolygon(new double[]{leftX, midX, rightX}, new double[]{midY, downY, midY}, POLYGON_POINTS);
         }
     }
 
+    /**
+     * Draw the individual node in the right colour.
+     * @param node Node to be drawn
+     * @param coordinates Coordinates of the node
+     */
     private void drawColour(SequenceNode node, double[] coordinates) {
         ArrayList<Color> colourMeBby;
         if (node.isHighlighted()) {
-            gc.setLineWidth(5);
+            gc.setLineWidth(LINE_WIDTH);
             gc.setStroke(Color.BLACK);
-            gc.strokeRect(coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
+            gc.strokeRect(coordinates[X_INDEX], coordinates[Y_INDEX], coordinates[WIDTH_INDEX], coordinates[HEIGHT_INDEX]);
         }
-
         colourMeBby = colourController.getNodeColours(node.getGenomes());
-        double tempCoordinate = coordinates[1];
-        double tempHeight = coordinates[3] / colourMeBby.size();
+        double tempCoordinate = coordinates[Y_INDEX];
+        double tempHeight = coordinates[HEIGHT_INDEX] / colourMeBby.size();
         for (Color beamColour : colourMeBby) {
             gc.setFill(beamColour);
-            gc.fillRect(coordinates[0], tempCoordinate, coordinates[2], tempHeight);
+            gc.fillRect(coordinates[X_INDEX], tempCoordinate, coordinates[WIDTH_INDEX], tempHeight);
             tempCoordinate += tempHeight;
         }
     }
 
+    /**
+     * Draw the outgoing edges of the node if the node is not in a SNP bubble. The edges are coloured by the genomes
+     * that pass through the edge.
+     *
+     * @param node Node to draw the outgoing edges of
+     */
     private void drawEdges(SequenceNode node) {
         int nodeID = node.getId();
         SequenceNode parent = graph.getNode(nodeID);
@@ -533,16 +570,33 @@ public class GraphDrawer {
         }
     }
 
-    public void drawMinimap() {
+    /**
+     * Draw the minimap on screen.
+     */
+    private void drawMinimap() {
         Minimap.getInstance().setValue(mostLeftNode.getId());
         Minimap.getInstance().setAmountVisible(mostRightNode.getId() - mostLeftNode.getId());
         Minimap.getInstance().draw(gc);
     }
 
-    public boolean edgeInView(double startx, double endx) {
-        return startx < gc.getCanvas().getWidth() && endx > 0;
+    /**
+     * Check if an edge falls on screen.
+     * @param startx Start x-coordinate of the edge
+     * @param endx End x-coordinate of the edge
+     *
+     * @return True if the edge falls on screen, false otherwise
+     */
+    private boolean edgeInView(double startx, double endx) {
+        return startx < canvas.getWidth() && endx > 0;
     }
 
+    /**
+     * Compute the width of a node depending on its sequencelength. Dummies are as wide as the column and SNP bubbles
+     * have a fixed size.
+     *
+     * @param node Node to compute the width of
+     * @return The width of the node
+     */
     private double computeNodeWidth(SequenceNode node) {
         if (node.isSNP()) {
             return SNP_SIZE;
@@ -554,14 +608,15 @@ public class GraphDrawer {
     }
 
     /**
-     * Check for each node if the click event is within its borders.
-     * If so highlight the node and return it. Also all other nodes are lowlighted.
+     * Check for each node if the click event is within its borders. If so it is highlighted. Control-click gives node
+     * information in the second information pane. If a SNP bubble is clicked information of both nodes is displayed.
+     * On double click a SNP bubble is collapsed/extended.
      *
      * @param xEvent The x coordinate of the click event.
      * @param yEvent The y coordinate of the click event.
-     * @return The sequencenode that has been clicked or null if nothing was clicked.
+     * @param mouseEvent The click event.
      */
-    public void clickNode(double xEvent, double yEvent, MouseEvent mouseEvent) {
+    void clickNode(double xEvent, double yEvent, MouseEvent mouseEvent) {
         try {
             Iterator it = graph.getNodes().entrySet().iterator();
             while (it.hasNext()) {
@@ -595,6 +650,11 @@ public class GraphDrawer {
         }
     }
 
+    /**
+     * Find the neighbouring node in a SNP bubble.
+     * @param node The node to find the neighbour of.
+     * @return The neighbour node.
+     */
     private SequenceNode findSNPNeighbour(SequenceNode node) {
         ArrayList<SequenceNode> column = columns.get(node.getColumn());
         int nodeID = node.getId();
@@ -607,21 +667,21 @@ public class GraphDrawer {
     }
 
     /**
-     * Check if a click event is within the borders of this node.
+     * Check if a click event is within the borders of this node or SNP bubble.
      *
      * @param xEvent x coordinate of the click event
      * @param yEvent y coordinate of the click event
      * @return True if the coordinates of the click event are within borders, false otherwise.
      */
-    public boolean checkClick(SequenceNode node, double xEvent, double yEvent) {
+    private boolean checkClick(SequenceNode node, double xEvent, double yEvent) {
         double[] coordinates = this.coordinates.get(node.getId());
         if (node.isSNP()) {
-            return (xEvent > coordinates[0] && xEvent < coordinates[0] + coordinates[2]
-                && yEvent > coordinates[1] + coordinates[3] / 2 - coordinates[3]
-                && yEvent < coordinates[1] + coordinates[3] / 2 + coordinates[3]);
+            return (xEvent > coordinates[X_INDEX] && xEvent < coordinates[X_INDEX] + coordinates[WIDTH_INDEX]
+                    && yEvent > coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] / 2 - coordinates[HEIGHT_INDEX]
+                    && yEvent < coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] / 2 + coordinates[HEIGHT_INDEX]);
         } else {
-            return (xEvent > coordinates[0] && xEvent < coordinates[0] + coordinates[2]
-                    && yEvent > coordinates[1] && yEvent < coordinates[1] + coordinates[3]);
+            return (xEvent > coordinates[X_INDEX] && xEvent < coordinates[X_INDEX] + coordinates[WIDTH_INDEX]
+                    && yEvent > coordinates[Y_INDEX] && yEvent < coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX]);
         }
     }
 
@@ -631,8 +691,7 @@ public class GraphDrawer {
      * @param xEvent x coordinate of the click event.
      * @return The column id of the column the x coordinate is in.
      */
-    public int findColumn(double xEvent) {
-
+    int findColumn(double xEvent) {
         try {
             Iterator it = graph.getNodes().entrySet().iterator();
             while (it.hasNext()) {
@@ -641,7 +700,7 @@ public class GraphDrawer {
                 int nodeID = (Integer) pair.getKey();
                 if (checkClickX(node, xEvent)) {
                     int column = graph.getNode(nodeID).getColumn();
-                    for (SequenceNode displayNode: graph.getColumns().get(column)) {
+                    for (SequenceNode displayNode : graph.getColumns().get(column)) {
                         if (!displayNode.isDummy()) {
                             return displayNode.getId();
                         }
@@ -657,12 +716,13 @@ public class GraphDrawer {
     /**
      * Check if a click event is within the borders of this node.
      *
-     * @param xEvent x coordinate of the click event
+     * @param node Node to check for the click event.
+     * @param xEvent x coordinate of the click event.
      * @return True if the coordinates of the click event are within borders, false otherwise.
      */
-    public boolean checkClickX(SequenceNode node, double xEvent) {
+    private boolean checkClickX(SequenceNode node, double xEvent) {
         double[] coordinates = this.coordinates.get(node.getId());
-        return (xEvent > coordinates[0] && xEvent < coordinates[0] + coordinates[2]);
+        return (xEvent > coordinates[X_INDEX] && xEvent < coordinates[X_INDEX] + coordinates[WIDTH_INDEX]);
     }
 
     /**
@@ -675,7 +735,7 @@ public class GraphDrawer {
     /**
      * Set the width of the line depending on the level of zoom.
      */
-    public void setLineWidth(double thickness) {
+    private void setLineWidth(double thickness) {
         double zoomWidth = Math.log(stepSize + 1) / Math.log(LOG_BASE) * LINE_WIDTH_FACTOR;
         double relativeSize = 100 * (thickness / (double) DrawableCanvas.getInstance().getAllGenomes().size());
         double genomeWidth = Math.log(relativeSize + 1) / Math.log(LOG_BASE);
@@ -683,29 +743,7 @@ public class GraphDrawer {
     }
 
     /**
-     * Gets the real Centre Column.
-     *
-     * @return the Centre Column.
-     */
-    private ArrayList<SequenceNode> getCentreColumn() {
-        return columns.get(columns.size() / 2);
-    }
-
-    /**
-     * Returns the First SequenceNode (not Dummy) Object from the centre Column.
-     *
-     * @return The Centre Node.
-     */
-    public SequenceNode getRealCentreNode() {
-        ArrayList<SequenceNode> set = getCentreColumn();
-        for (SequenceNode test : set) {
-            return test;
-        }
-        return null;
-    }
-
-    /**
-     * Highlights the centre node.
+     * Highlight the given node and lowlight the previous highlighted node.
      *
      * @param node The node that should be highlighted
      */
@@ -717,25 +755,12 @@ public class GraphDrawer {
         highlightedNode = node;
     }
 
-    //TODO: Loop over the  nodes in the graph (O(n*m) > O(k))
-
     /**
-     * Returns the ColumnId of a Node at the users Choice.
-     *
-     * @param nodeId The Id of the Node you want to find the Column of.
-     * @return The ColumnId
+     * Find the zoomLevel corresponding to a given centre node and a radius.
+     * @param centreNode Centre node around which the radius is set.
+     * @param radius Radius that is converted to a zoomLevel.
+     * @return The zoomLevel.
      */
-    public int getColumnId(final int nodeId) {
-        for (ArrayList<SequenceNode> list : columns) {
-            for (SequenceNode node : list) {
-                if (node.getId() == nodeId) {
-                    return node.getColumn();
-                }
-            }
-        }
-        return -1;
-    }
-
     public double findZoomLevel(int centreNode, int radius) {
         int rightNodeID = (int) (centreNode + (double) radius / 2.0);
         int leftNodeID = (int) (centreNode - (double) radius / 2.0);
@@ -752,7 +777,11 @@ public class GraphDrawer {
         return columnWidths[rightColumn] - columnWidths[leftColumn];
     }
 
-    public void collapse(boolean collapse) {
+    /**
+     * Toggle all SNP nodes isCollapsed attributes.
+     * @param collapse If true set all SNP bubbles to collapsed, set collapsed to false otherwise.
+     */
+    void collapse(boolean collapse) {
         Iterator it = graph.getNodes().entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
@@ -763,64 +792,20 @@ public class GraphDrawer {
         }
     }
 
-    /**
-     * Get function for zoom level.
-     *
-     * @return the Zoom level.
-     */
-    public double getZoomLevel() {
-        return zoomLevel;
+    public void setRainbowView(boolean rainbowView) {
+        this.rainbowView = rainbowView;
+        this.colourController = new ColourController(selected, rainbowView);
     }
 
-    public double getRange() {
-        return range;
-    }
-
-    /**
-     * Get function for x difference.
-     *
-     * @return The x difference.
-     */
-    public double getxDifference() {
-        return xDifference;
-    }
-
-    public double getColumnWidth(int col) {
-        return columnWidths[col];
-    }
-
-    public double getRightbound() {
-        return xDifference + zoomLevel;
-    }
-
-    public double getLeftbound() {
-        return xDifference;
-    }
-
-    /**
-     * Return the column the mouse click is in.
-     *
-     * @param x The x coordinate of the mouse click event
-     * @return The id of the column that the mouse click is in.
-     */
-    public int mouseLocationColumn(double x) {
-        return (int) ((x / stepSize) + xDifference);
-    }
-
-
-    public void setSelected(int[] newSelection) {
+    void setSelected(int[] newSelection) {
         this.selected = newSelection;
         this.colourController = new ColourController(selected, rainbowView);
     }
 
-    public int[] getSelected() {
-        return selected;
-    }
-
-    public void setAllAnnotations(HashMap<Integer, HashSet<Annotation>> newAnnotations) {
-        this.allAnnotations = newAnnotations;
-    }
-
+    /**
+     * Setter for the xDifference. Minimum is 0, maximum is the range of the graph minus the zoomLevel.
+     * @param xDifference The new xDifference.
+     */
     public void setxDifference(double xDifference) {
         if (xDifference < 0) {
             xDifference = 0;
@@ -831,6 +816,10 @@ public class GraphDrawer {
         this.xDifference = xDifference;
     }
 
+    /**
+     * Setter for the zoomLevel. Minimum is 1, maximum is half the range of the graph.
+     * @param zoomLevel The new zoomLevel.
+     */
     public void setZoomLevel(double zoomLevel) {
         if (zoomLevel < 1) {
             zoomLevel = 1;
@@ -841,21 +830,54 @@ public class GraphDrawer {
         this.zoomLevel = zoomLevel;
     }
 
+    /**
+     * Getter for the radius. The radius is computed by the difference between the left most node and the right most
+     * node. So the radius is the number of nodes on screen.
+     * @return The radius of the screen.
+     */
     public int getRadius() {
         return mostRightNode.getId() - mostLeftNode.getId();
+    }
+
+    /**
+     * Find the column where the mouse pointer is located on.
+     * @param x The x-coordinate of the mouse event.
+     * @return The column that is clicked on.
+     */
+    public int mouseLocationColumn(double x) {
+        return (int) ((x / stepSize) + xDifference);
+    }
+
+    public double getZoomLevel() {
+        return zoomLevel;
+    }
+
+    public double getxDifference() {
+        return xDifference;
+    }
+
+    public double getColumnWidth(int col) {
+        return columnWidths[col];
+    }
+
+    public int[] getSelected() {
+        return selected;
+    }
+
+    public HashMap<Integer, HashSet<Annotation>> getAllAnnotations() {
+        return allAnnotations;
+    }
+
+    public void setAllAnnotations(HashMap<Integer, HashSet<Annotation>> newAnnotations) {
+        this.allAnnotations = newAnnotations;
     }
 
     public SequenceGraph getGraph() {
         return graph;
     }
 
-
     public SequenceNode getMostLeftNode() {
         return mostLeftNode;
-    }
-
-    public HashMap<Integer, HashSet<Annotation>> getAllAnnotations() {
-        return allAnnotations;
     }
 
     public SequenceNode getMostRightNode() {
@@ -866,12 +888,7 @@ public class GraphDrawer {
         this.yDifference = yDifference;
     }
 
-    public void setRainbowView(boolean rainbowView) {
-        this.rainbowView = rainbowView;
-        this.colourController = new ColourController(selected, rainbowView);
-    }
-
-    public void setMenuController(MenuController menuController) {
+    void setMenuController(MenuController menuController) {
         this.menuController = menuController;
     }
 }
