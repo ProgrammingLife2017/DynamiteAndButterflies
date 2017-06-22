@@ -141,9 +141,7 @@ public class GraphDrawer {
             columnWidths[j + 1] = columnWidths[j] + max;
         }
     }
-
-
-
+    
     public void initializeDummyWidths() {
         HashMap<Integer, String> genomes;
         for (int j = -1; j > graph.getDummyNodeIDCounter(); j--) {
@@ -158,21 +156,18 @@ public class GraphDrawer {
                     }
                 }
                 int[] genome = new int[genomes.size()];
-                int[] parentGenomes = graph.getNodes().get(node.getParents().get(0)).getGenomes();
-
                 int i = 0;
                 for (Object o : genomes.entrySet()) {
                     genome[i] = (int) ((Map.Entry) o).getKey();
                     i++;
                 }
+                int[] parentGenomes = graph.getNodes().get(node.getParents().get(0)).getGenomes();
 
-                ArrayList<Integer> parentGenomeList = convertToArrayList(parentGenomes);
-                SequenceNode child = graph.getNodes().get(node.getChildren().get(0));
-                ArrayList<Integer> childList = getChildrenGenomeList(child);
+                int[] childList = getChildrenGenomeList(node);
 
                 ArrayList<Integer> results = new ArrayList<>();
                 for (int aResult : genome) {
-                    if (parentGenomeList.contains(aResult) & childList.contains(aResult)) {
+                    if (contains(parentGenomes, aResult) & contains(childList, aResult)) {
                         results.add(aResult);
                     }
                 }
@@ -183,16 +178,19 @@ public class GraphDrawer {
     }
 
     /**
-     * function that converts and int array to arrayList.
-     * @param array the array to be converted.
-     * @return the arrayList.
+     * A simple contains method.
+     *
+     * @param checkSet The set to check if it contains the genome.
+     * @param genome   The genome to see if it is in the check set.
+     * @return a boolean true if it is in the set or false if it is not.
      */
-    private ArrayList<Integer> convertToArrayList(int[] array) {
-        ArrayList<Integer> list = new ArrayList<>();
-        for (int parentGenome : array) {
-            list.add(parentGenome);
+    public boolean contains(int[] checkSet, int genome) {
+        for (int check : checkSet) {
+            if (check == genome) {
+                return true;
+            }
         }
-        return list;
+        return false;
     }
 
     /**
@@ -200,13 +198,12 @@ public class GraphDrawer {
      * @param child Function that returns the genomes of first child that isn't Dummy.
      * @return the genomesList of the child
      */
-    private ArrayList<Integer> getChildrenGenomeList(SequenceNode child) {
+    private int[] getChildrenGenomeList(SequenceNode child) {
         while(child.isDummy()) {
             child = graph.getNodes().get(child.getChildren().get(0));
         }
         int[] childGenomes = child.getGenomes();
-        ArrayList<Integer> childList = convertToArrayList(childGenomes);
-        return childList;
+        return childGenomes;
     }
 
     public boolean inView(double[] coordinates) {
