@@ -39,8 +39,8 @@ public class GffParser {
         int maxCor = Integer.parseInt(properties.getProperty(
                 DrawableCanvas.getInstance().getParser().getPartPath() + "Max-Cor", "-1"));
         HashMap<Integer, HashSet<Annotation>> buckets = initializeBucketArray(maxCor);
+        int annotationIdentifier = 0;
         while ((line = br.readLine()) != null) {
-            int annotationIdentifier = 0;
             String[] data = line.split("\t");
 
             String[] nameGenomes = data[0].split("\\.");

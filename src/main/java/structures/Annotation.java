@@ -69,4 +69,11 @@ public class Annotation {
             annotation.setSelected(true);
         }
     }
+
+    @Override
+    public String toString() {
+        String res = getInfo();
+        res = res.replace("\t", "\n");
+        return res;
+    }
 }

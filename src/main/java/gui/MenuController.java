@@ -276,20 +276,31 @@ public class MenuController implements Observer {
         double pressedX = mouseEvent.getX();
         double pressedY = mouseEvent.getY();
         Minimap.getInstance().clickMinimap(pressedX, pressedY);
-        SequenceNode clicked = null;
+        Object clicked = null;
         try {
-            clicked = GraphDrawer.getInstance().clickNode(pressedX, pressedY);
+            clicked = GraphDrawer.getInstance().clickOnCanvas(pressedX, pressedY);
         } catch (NullPointerException e) {
             System.out.println("The graph is not yet loaded!");
             e.printStackTrace();
         }
         if (clicked != null) {
-            String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId());
-            if (!mouseEvent.isControlDown()) {
-                sequenceInfo.setText(clicked.toString(sequence));
-                nodeTextField.setText(clicked.getId().toString());
-            } else {
-                sequenceInfoAlt.setText(clicked.toString(sequence));
+            if (clicked instanceof SequenceNode) {
+                SequenceNode node = (SequenceNode) clicked;
+                String sequence = DrawableCanvas.getInstance().getParser().
+                        getSequenceHashMap().get((long) node.getId());
+                if (!mouseEvent.isControlDown()) {
+                    sequenceInfo.setText(node.toString(sequence));
+                    nodeTextField.setText(node.getId().toString());
+                } else {
+                    sequenceInfoAlt.setText(node.toString(sequence));
+                }
+            } else if (clicked instanceof Annotation) {
+                Annotation annotation = (Annotation) clicked;
+                if (!mouseEvent.isControlDown()) {
+                    sequenceInfo.setText(annotation.toString());
+                } else {
+                    sequenceInfoAlt.setText(annotation.toString());
+                }
             }
         }
     }

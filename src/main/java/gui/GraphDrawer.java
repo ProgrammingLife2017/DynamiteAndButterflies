@@ -46,7 +46,7 @@ public class GraphDrawer {
     private SequenceNode mostLeftNode;
     private SequenceNode mostRightNode;
     private HashMap<Integer, double[]> coordinates;
-    private HashMap<Integer, double[]> annotationCoordinates;
+    private HashMap<Integer, ArrayList<double[]>> annotationCoordinates;
 
     private boolean rainbowView = true;
 
@@ -64,7 +64,7 @@ public class GraphDrawer {
         return this.coordinates;
     }
 
-    public HashMap<Integer, double[]> getAnnotationCoordinates() {
+    public HashMap<Integer, ArrayList<double[]>> getAnnotationCoordinates() {
         return this.annotationCoordinates;
     }
 
@@ -203,7 +203,6 @@ public class GraphDrawer {
     }
 
     /**
-     *
      * @param child Function that returns the genomes of first child that isn't Dummy.
      * @return the genomesList of the child
      */
@@ -221,6 +220,7 @@ public class GraphDrawer {
     /**
      * Computes the coordinates for the given node.
      * [x,y,width,height]
+     *
      * @param node the node.
      * @return the coordinates.
      */
@@ -263,14 +263,22 @@ public class GraphDrawer {
     }
 
 
-
     public HashSet<Annotation> getAnnotationBuckets(SequenceNode node, int annotatedGenomeIndex) {
         HashSet<Annotation> anno = new HashSet<>();
         if (annotatedGenomeIndex == -1) {
             return anno;
         }
-        int startBucket = (node.getOffsets()[annotatedGenomeIndex] / BUCKET_SIZE);
-        int endBucket = ((node.getOffsets()[annotatedGenomeIndex] + node.getSequenceLength()) / BUCKET_SIZE);
+
+        int startBucket;
+        int endBucket;
+        if (node != null) {
+            startBucket = (node.getOffsets()[annotatedGenomeIndex] / BUCKET_SIZE);
+            endBucket = ((node.getOffsets()[annotatedGenomeIndex] + node.getSequenceLength()) / BUCKET_SIZE);
+        } else {
+            startBucket = 0;
+            endBucket = allAnnotations.size();
+        }
+
         for (int i = startBucket; i <= endBucket; i++) {
             HashSet<Annotation> tempAnnotations = allAnnotations.get(i);
             if (tempAnnotations != null) {
@@ -320,35 +328,40 @@ public class GraphDrawer {
                     continue;
                 }
 
-                    double emptyAtStart = 0.0;
-                    if (startOfAnno > startCorNode) {
-                        emptyAtStart = startOfAnno - startCorNode;
-                        annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
-                        startXAnno = startXAnno + (coordinates[2] - annoWidth);
-                    }
-                    if (endOfAnno < endCorNode) {
-                        int emptyAtEnd = endCorNode - endOfAnno;
-                        annoWidth = (annoWidth
-                                * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
-                    }
+                double emptyAtStart = 0.0;
+                if (startOfAnno > startCorNode) {
+                    emptyAtStart = startOfAnno - startCorNode;
+                    annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
+                    startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                }
+                if (endOfAnno < endCorNode) {
+                    int emptyAtEnd = endCorNode - endOfAnno;
+                    annoWidth = (annoWidth
+                            * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
+                }
 
-                    gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
+                gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
 //                    //TODO Fix overalapping parent annotations
 //                    if (annotation.getInfo().toLowerCase().contains("parent")) {
 //                        gc.fillRect(startXAnno, coordinates[1] + coordinates[3] + annoHeight,
 //                                annoWidth, annoHeight);
 //                    } else {
-                    startYAnno += annoHeight;
+                startYAnno += annoHeight;
 
                 double[] annoCoordinates = new double[4];
                 annoCoordinates[0] = startXAnno;
                 annoCoordinates[1] = startYAnno;
-                annoCoordinates[2] = annoWidth;
-                annoCoordinates[3] = annoHeight;
-                this.getAnnotationCoordinates().put(annotation.getId(), annoCoordinates);
+                annoCoordinates[2] = startXAnno + annoWidth;
+                annoCoordinates[3] = startYAnno + annoHeight;
+                ArrayList<double[]> annoOverNodes = annotationCoordinates.get(annotation.getId());
+                if (annoOverNodes == null) {
+                    annoOverNodes = new ArrayList<>();
+                }
+                annoOverNodes.add(annoCoordinates);
+                annotationCoordinates.put(annotation.getId(), annoOverNodes);
 
                 gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
-                    //}
+                //}
             }
         }
     }
@@ -482,8 +495,8 @@ public class GraphDrawer {
      * @param yEvent The y coordinate of the click event.
      * @return The sequencenode that has been clicked or null if nothing was clicked.
      */
-    public SequenceNode clickNode(double xEvent, double yEvent) {
-        SequenceNode click = null;
+    public Object clickOnCanvas(double xEvent, double yEvent) {
+        Object click = null;
 
         try {
             Iterator it = graph.getNodes().entrySet().iterator();
@@ -493,11 +506,38 @@ public class GraphDrawer {
                 if (checkClick(node, xEvent, yEvent)) {
                     click = graph.getNode(node.getId());
                     highlight(node.getId());
-                    break;
+                    return click;
+                }
+            }
+
+            Iterator dinates = annotationCoordinates.entrySet().iterator();
+            while (dinates.hasNext()) {
+                Map.Entry pair = (Map.Entry) dinates.next();
+                ArrayList<double[]> allAnnoCors = (ArrayList<double[]>) pair.getValue();
+                for (double[] annoCors : allAnnoCors) {
+                    if (xEvent > annoCors[0] && xEvent < annoCors[2]
+                            && yEvent > annoCors[1] && yEvent < annoCors[3]) {
+                        redraw();
+                        gc.setLineWidth(3);
+                        gc.setStroke(Color.BLACK);
+                        gc.strokeRect(annoCors[0], annoCors[1], annoCors[2] - annoCors[0],
+                                annoCors[3] - annoCors[1]);
+
+                        int annoId = (int) pair.getKey();
+                        HashSet<Annotation> setOfAllAnnotations = getAnnotationBuckets(null, 1);
+                        Iterator<Annotation> annotationIterator = setOfAllAnnotations.iterator();
+                        while (annotationIterator.hasNext()) {
+                            Annotation annotation = (Annotation) annotationIterator.next();
+                            if (annotation.getId() == annoId) {
+                                click = annotation;
+                                return click;
+                            }
+                        }
+                    }
                 }
             }
         } catch (NullPointerException e) {
-            System.out.println("Graph not yet intialized");
+            System.out.println("Graph not yet initialized");
         }
         return click;
     }
@@ -530,7 +570,7 @@ public class GraphDrawer {
                 int nodeID = (Integer) pair.getKey();
                 if (checkClickX(node, xEvent)) {
                     int column = graph.getNode(nodeID).getColumn();
-                    for (SequenceNode displayNode: graph.getColumns().get(column)) {
+                    for (SequenceNode displayNode : graph.getColumns().get(column)) {
                         if (!displayNode.isDummy()) {
                             return displayNode.getId();
                         }
