@@ -42,10 +42,12 @@ public class GraphDrawer {
     private int[] selected = null;
     private ColourController colourController;
     private HashMap<Integer, HashSet<Annotation>> allAnnotations
-            = new HashMap<Integer, HashSet<Annotation>>();
+            = new HashMap<>();
     private SequenceNode mostLeftNode;
     private SequenceNode mostRightNode;
     private HashMap<Integer, double[]> coordinates;
+    private HashMap<Integer, double[]> annotationCoordinates;
+
     private boolean rainbowView = true;
 
     public static GraphDrawer getInstance() {
@@ -55,10 +57,15 @@ public class GraphDrawer {
 
     public void setEmptyCoordinates() {
         this.coordinates = new HashMap<>();
+        this.annotationCoordinates = new HashMap<>();
     }
 
     public HashMap<Integer, double[]> getCoordinates() {
         return this.coordinates;
+    }
+
+    public HashMap<Integer, double[]> getAnnotationCoordinates() {
+        return this.annotationCoordinates;
     }
 
     public void setGraph(SequenceGraph graph) {
@@ -332,7 +339,15 @@ public class GraphDrawer {
 //                                annoWidth, annoHeight);
 //                    } else {
                     startYAnno += annoHeight;
-                    gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
+
+                double[] annoCoordinates = new double[4];
+                annoCoordinates[0] = startXAnno;
+                annoCoordinates[1] = startYAnno;
+                annoCoordinates[2] = annoWidth;
+                annoCoordinates[3] = annoHeight;
+                this.getAnnotationCoordinates().put(annotation.getId(), annoCoordinates);
+
+                gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
                     //}
             }
         }
@@ -478,6 +493,7 @@ public class GraphDrawer {
                 if (checkClick(node, xEvent, yEvent)) {
                     click = graph.getNode(node.getId());
                     highlight(node.getId());
+                    break;
                 }
             }
         } catch (NullPointerException e) {

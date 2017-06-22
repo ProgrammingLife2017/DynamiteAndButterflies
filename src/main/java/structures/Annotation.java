@@ -18,18 +18,23 @@ public class Annotation {
     private SimpleIntegerProperty end = new SimpleIntegerProperty();
     private SimpleStringProperty info = new SimpleStringProperty();
     private SimpleBooleanProperty selected  = new SimpleBooleanProperty();
-
+    private int identifier;
     /**
      * Constructor of the object
      * @param startArg the start coördinate of the annotation
      * @param endArg the end coördinate of the annotation
      * @param infoArg the information with the annotation
      */
-    public Annotation(int startArg, int endArg, String infoArg) {
+    public Annotation(int identifier, int startArg, int endArg, String infoArg) {
+        this.identifier = identifier;
         start.set(startArg);
         end.set(endArg);
         info.set(infoArg);
         selected.set(false);
+    }
+
+    public int getId() {
+        return this.identifier;
     }
 
     public int getStart() {
