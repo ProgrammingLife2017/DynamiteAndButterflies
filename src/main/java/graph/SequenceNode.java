@@ -22,6 +22,7 @@ public class SequenceNode {
     private float baryCenterValue;
     private int inDegree;
     private boolean isSNP;
+    private boolean isCollapsed;
 
     private ArrayList<Integer> children;
     private ArrayList<Integer> parents;
@@ -183,6 +184,14 @@ public class SequenceNode {
 
     public void setSNP(boolean SNP) {
         isSNP = SNP;
+    }
+
+    public boolean isCollapsed() {
+        return isCollapsed;
+    }
+
+    public void setCollapsed(boolean collapsed) {
+        isCollapsed = collapsed;
     }
 
     /**

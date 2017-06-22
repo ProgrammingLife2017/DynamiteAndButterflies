@@ -227,6 +227,15 @@ public class MenuController implements Observer {
         sequenceInfoAlt.setText(node.toString(sequence));
     }
 
+    public void updateSequenceInfo(SequenceNode node) {
+        String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) node.getId());
+        sequenceInfo.setText(node.toString(sequence));
+    }
+
+    public void updateNodeTextField(int nodeID) {
+        nodeTextField.setText(nodeID + "");
+    }
+
     public int findColumnWrapper(Double xEvent) {
         int nodeID = GraphDrawer.getInstance().findColumn(xEvent);
         if (nodeID < 1) {
@@ -288,21 +297,11 @@ public class MenuController implements Observer {
         double pressedX = mouseEvent.getX();
         double pressedY = mouseEvent.getY();
         Minimap.getInstance().clickMinimap(pressedX, pressedY);
-        SequenceNode clicked = null;
         try {
-            clicked = GraphDrawer.getInstance().clickNode(pressedX, pressedY);
+            GraphDrawer.getInstance().clickNode(pressedX, pressedY, mouseEvent);
         } catch (NullPointerException e) {
             System.out.println("The graph is not yet loaded!");
             e.printStackTrace();
-        }
-        if (clicked != null) {
-            String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) clicked.getId());
-            if (!mouseEvent.isControlDown()) {
-                sequenceInfo.setText(clicked.toString(sequence));
-                nodeTextField.setText(clicked.getId().toString());
-            } else {
-                sequenceInfoAlt.setText(clicked.toString(sequence));
-            }
         }
     }
 
@@ -660,7 +659,7 @@ public class MenuController implements Observer {
 
     @FXML
     public void collapseSNPClicked() {
-        GraphDrawer.getInstance().setCollapseSNP(collapseSNPButton.isSelected());
+        GraphDrawer.getInstance().collapse(collapseSNPButton.isSelected());
         GraphDrawer.getInstance().redraw();
     }
 

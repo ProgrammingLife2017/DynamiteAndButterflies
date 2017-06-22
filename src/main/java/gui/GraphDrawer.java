@@ -7,6 +7,7 @@ import graph.SequenceNode;
 import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 import java.awt.*;
@@ -52,7 +53,6 @@ public class GraphDrawer {
     private SequenceNode mostRightNode;
     private HashMap<Integer, double[]> coordinates;
     private boolean rainbowView = true;
-    private boolean collapseSNP = true;
 
     public static GraphDrawer getInstance(){
         return drawer;
@@ -139,7 +139,7 @@ public class GraphDrawer {
     private void initializeColumnWidths() {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
-            checkSNPBubble(column);
+            checkSNPBubble(j);
             double max = 1;
             for (int i = 0; i < column.size(); i++) {
                 if (!column.get(i).isDummy()) {
@@ -198,7 +198,7 @@ public class GraphDrawer {
     private double[] computeCoordinates(SequenceNode node) {
         double[] coordinates = new double[4];
         double width = computeNodeWidth(node) * stepSize;
-        if (!collapseSNP || (!node.isSNP() && !node.getChildren().isEmpty() && !graph.getNode(node.getChild(0)).isSNP())) {
+        if (relativeWidth(node)) {
             width *= RELATIVE_X_DISTANCE;
         }
         double height = getYSize();
@@ -214,51 +214,69 @@ public class GraphDrawer {
         coordinates[2] = width;
         coordinates[3] = height;
 
+        this.coordinates.put(node.getId(), coordinates);
         return coordinates;
 
     }
 
-    public void drawNodes() {
-        setEmptyCoordinates();
-        gc.setStroke(Color.BLACK);
-        for (int i = 0; i < columns.size(); i++) {
-            ArrayList<SequenceNode> col = columns.get(i);
-            if (checkSNPBubble(col) && collapseSNP) {
-                SequenceNode upperNode = col.get(0);
-                SequenceNode lowerNode = col.get(1);
-                upperNode.setSNP(true);
-                lowerNode.setSNP(true);
-                checkExtremeNode(upperNode);
-                drawSNPBubble(upperNode, lowerNode);
-            } else {
-                for (int j = 0; j < col.size(); j++) {
-                    SequenceNode node = col.get(j);
-                    checkExtremeNode(node);
-                    drawNode(node);
-                    drawEdges(node);
-                }
+    private boolean relativeWidth(SequenceNode node) {
+        if (node.isSNP() && node.isCollapsed()) {
+            return false;
+        }
+        if (!node.getChildren().isEmpty()) {
+            SequenceNode child = graph.getNode(node.getChild(0));
+            if (child.isSNP() && child.isCollapsed()) {
+                return false;
             }
         }
+        return true;
     }
+
+//    public void drawNodes() {
+//        setEmptyCoordinates();
+//        gc.setStroke(Color.BLACK);
+//        for (int i = 0; i < columns.size(); i++) {
+//            ArrayList<SequenceNode> col = columns.get(i);
+//            if (checkSNPBubble(i) && collapseSNP) {
+//                SequenceNode upperNode = col.get(0);
+//                SequenceNode lowerNode = col.get(1);
+//                checkExtremeNode(upperNode);
+//                drawSNPBubble(upperNode, lowerNode);
+//            } else {
+//                for (int j = 0; j < col.size(); j++) {
+//                    SequenceNode node = col.get(j);
+//                    checkExtremeNode(node);
+//                    drawNode(node);
+//                    drawEdges(node);
+//                }
+//            }
+//        }
+//    }
 
     /**
      * Gives all nodes the right coordinates on the canvas and draw them.
      * It depends on whether the dummy nodes checkbox
      * is checked dummy nodes are either drawn or skipped.
      */
-//    private void drawNodes() {
-//        setEmptyCoordinates();
-//        gc.setStroke(Color.BLACK);
-//        Iterator it = graph.getNodes().entrySet().iterator();
-//        while (it.hasNext()) {
-//            Map.Entry pair = (Map.Entry) it.next();
-//            SequenceNode node = (SequenceNode) pair.getValue();
-//            checkExtremeNode(node);
-//            drawNode(node);
-//            drawEdges(node);
-//
-//        }
-//    }
+    private void drawNodes() {
+        setEmptyCoordinates();
+        gc.setStroke(Color.BLACK);
+        Iterator it = graph.getNodes().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            computeCoordinates(node);
+            checkExtremeNode(node);
+            if (!node.isCollapsed()) {
+                drawNode(node);
+                drawEdges(node);
+            } else if (node.getIndex() == 0) {
+                SequenceNode neighbour = findSNPNeighbour(node);
+                drawSNPBubble(node, neighbour);
+            }
+
+        }
+    }
 
     private void drawAnnotations(SequenceNode node, double[] coordinates) {
         for (int i = 0; i < selectedAnnotations.size(); i++) {
@@ -299,7 +317,8 @@ public class GraphDrawer {
         }
     }
 
-    private boolean checkSNPBubble(ArrayList<SequenceNode> column) {
+    public boolean checkSNPBubble(int columnID) {
+        ArrayList<SequenceNode> column = columns.get(columnID);
         if (column.size() != 2) {
             return false;
         }
@@ -328,13 +347,15 @@ public class GraphDrawer {
             return false;
         }
         upperNode.setSNP(true);
+        upperNode.setCollapsed(true);
         lowerNode.setSNP(true);
+        lowerNode.setCollapsed(true);
         return true;
     }
 
     private void checkExtremeNode(SequenceNode node) {
         if (!node.isDummy()) {
-            double[] coordinates = getCoordinates(node);
+            double[] coordinates = this.coordinates.get(node.getId());
             if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE > 0) {
                 mostLeftNode = node;
             }
@@ -359,7 +380,7 @@ public class GraphDrawer {
     }
 
     private void drawSNPBubble(SequenceNode upperNode, SequenceNode lowerNode) {
-        double[] upperCoordinates = getCoordinates(upperNode);
+        double[] upperCoordinates = this.coordinates.get(upperNode.getId());
         coordinates.put(lowerNode.getId(), upperCoordinates);
         if (inView(upperCoordinates)) {
             double leftX = upperCoordinates[0];
@@ -374,7 +395,9 @@ public class GraphDrawer {
                 gc.strokePolygon(new double[] {leftX, midX, rightX}, new double[] {midY, upY, midY}, 3);
                 gc.strokePolygon(new double[] {leftX, midX, rightX}, new double[] {midY, downY, midY}, 3);
             }
+            gc.setFill(Color.CHOCOLATE);
             gc.fillPolygon(new double[] {leftX, midX, rightX}, new double[] {midY, upY, midY}, 3);
+            gc.setFill(Color.BROWN);
             gc.fillPolygon(new double[] {leftX, midX, rightX}, new double[] {midY, downY, midY}, 3);
         }
     }
@@ -396,24 +419,14 @@ public class GraphDrawer {
         }
     }
 
-    private double[] getCoordinates(SequenceNode node) {
-        if (this.getCoordinates().containsKey(node.getId())) {
-            return this.getCoordinates().get(node.getId());
-        } else {
-            this.getCoordinates().put(node.getId(), computeCoordinates(node));
-            return this.getCoordinates().get(node.getId());
-        }
-    }
-
-
     private void drawEdges(SequenceNode node) {
         int nodeID = node.getId();
         SequenceNode parent = graph.getNode(nodeID);
-        double[] coordinatesParent = getCoordinates(node);
+        double[] coordinatesParent = this.coordinates.get(node.getId());
         for (int j = 0; j < parent.getChildren().size(); j++) {
             SequenceNode child = graph.getNode(parent.getChild(j));
-            if (!child.isSNP() || !collapseSNP) {
-                double[] coordinatesChild = getCoordinates(child);
+            if (!node.isCollapsed() && !child.isCollapsed()) {
+                double[] coordinatesChild = computeCoordinates(child);
                 double startx = coordinatesParent[0] + coordinatesParent[2];
                 double starty = coordinatesParent[1] + (coordinatesParent[3] / 2);
                 double endx = coordinatesChild[0];
@@ -455,26 +468,47 @@ public class GraphDrawer {
      * @param yEvent The y coordinate of the click event.
      * @return The sequencenode that has been clicked or null if nothing was clicked.
      */
-    public SequenceNode clickNode(double xEvent, double yEvent) {
-        SequenceNode click = null;
+    public void clickNode(double xEvent, double yEvent, MouseEvent mouseEvent) {
         try {
             Iterator it = graph.getNodes().entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
                 SequenceNode node = (SequenceNode) pair.getValue();
                 if (checkClick(node, xEvent, yEvent)) {
-                    if (click == null) {
-                        click = graph.getNode(node.getId());
-                    } else {
-                        menuController.updateSequenceInfoAlt(node);
-                    }
                     highlight(node.getId());
+                    if (node.isSNP()) {
+                        SequenceNode neighbour = findSNPNeighbour(node);
+                        menuController.updateSequenceInfo(node);
+                        menuController.updateSequenceInfoAlt(neighbour);
+                        if (mouseEvent.getClickCount() == 2) {
+                            if (!node.isCollapsed()) {
+                                neighbour.setCollapsed(!neighbour.isCollapsed());
+                            }
+                            node.setCollapsed(!node.isCollapsed());
+                        }
+                    } else if (mouseEvent.isControlDown()) {
+                        menuController.updateSequenceInfoAlt(node);
+                    } else {
+                        menuController.updateSequenceInfo(node);
+                        menuController.updateNodeTextField(node.getId());
+                    }
                 }
             }
+            redraw();
         } catch (NullPointerException e) {
             System.out.println("Graph not yet initialized");
         }
-        return click;
+    }
+
+    private SequenceNode findSNPNeighbour(SequenceNode node) {
+        ArrayList<SequenceNode> column = columns.get(node.getColumn());
+        int nodeID = node.getId();
+        int columnNodeID = column.get(0).getId();
+        if (nodeID == columnNodeID) {
+            return column.get(1);
+        } else {
+            return column.get(0);
+        }
     }
 
     /**
@@ -485,7 +519,7 @@ public class GraphDrawer {
      * @return True if the coordinates of the click event are within borders, false otherwise.
      */
     public boolean checkClick(SequenceNode node, double xEvent, double yEvent) {
-        double[] coordinates = getCoordinates(node);
+        double[] coordinates = this.coordinates.get(node.getId());
         if (node.isSNP()) {
             return (xEvent > coordinates[0] && xEvent < coordinates[0] + coordinates[2]
                 && yEvent > coordinates[1] + coordinates[3] / 2 - coordinates[3]
@@ -531,7 +565,7 @@ public class GraphDrawer {
      * @return True if the coordinates of the click event are within borders, false otherwise.
      */
     public boolean checkClickX(SequenceNode node, double xEvent) {
-        double[] coordinates = getCoordinates(node);
+        double[] coordinates = this.coordinates.get(node.getId());
         return (xEvent > coordinates[0] && xEvent < coordinates[0] + coordinates[2]);
     }
 
@@ -585,7 +619,6 @@ public class GraphDrawer {
         }
         graph.getNode(node).highlight();
         highlightedNode = node;
-        redraw();
     }
 
     //TODO: Loop over the  nodes in the graph (O(n*m) > O(k))
@@ -621,6 +654,17 @@ public class GraphDrawer {
         int rightColumn = graph.getNode(rightNodeID).getColumn();
         int leftColumn = graph.getNode(leftNodeID).getColumn();
         return columnWidths[rightColumn] - columnWidths[leftColumn];
+    }
+
+    public void collapse(boolean collapse) {
+        Iterator it = graph.getNodes().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            SequenceNode node = (SequenceNode) pair.getValue();
+            if (node.isSNP()) {
+                node.setCollapsed(collapse);
+            }
+        }
     }
 
     /**
@@ -724,10 +768,6 @@ public class GraphDrawer {
     public void setRainbowView(boolean rainbowView) {
         this.rainbowView = rainbowView;
         this.colourController = new ColourController(selected, rainbowView);
-    }
-
-    public void setCollapseSNP(boolean collapseSNP) {
-        this.collapseSNP = collapseSNP;
     }
 
     public void setMenuController(MenuController menuController) {
