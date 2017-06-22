@@ -172,10 +172,10 @@ public class ColourController {
     }
 
     /**
-     * This method gets an array of the different colours the node should be.
+     * This method gets an array of the different colours the edge should be.
      *
-     * @param genomes The genomes in the node.
-     * @return The list of colours the node should be.
+     * @param genomes The genomes through the edge.
+     * @return The list of colours the edge should be.
      */
     public ArrayList<Color> getEdgeColours(int[] genomes) {
         ArrayList<Color> res = new ArrayList<Color>();
@@ -196,6 +196,12 @@ public class ColourController {
         return res;
     }
 
+    /**
+     * Gets all the single colours of the genomes.
+     *
+     * @param genomes the int[] genomes
+     * @return all genomes that are selected their colours.
+     */
     private ArrayList<Color> rainbowViewColours(int[] genomes) {
         ArrayList<Color> res = new ArrayList<>();
         for (int genome : genomes) {
@@ -207,6 +213,11 @@ public class ColourController {
         return res;
     }
 
+    /**
+     * The base colour of the edges.
+     *
+     * @return the base colour of the edges.
+     */
     public Color getBaseEdgeColour() {
         return Color.BLACK;
     }
