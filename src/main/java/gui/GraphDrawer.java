@@ -292,6 +292,7 @@ public class GraphDrawer {
         ArrayList<Color> colourMeBby;
         if (node.isHighlighted()) {
             gc.setLineWidth(6);
+            gc.setStroke(Color.BLACK);
             gc.strokeRect(coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
         }
 
