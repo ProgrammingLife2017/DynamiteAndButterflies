@@ -395,12 +395,14 @@ public class GraphDrawer {
             double endy = coordinatesChild[1] + (coordinatesChild[3] / 2);
             setLineWidth(Math.min(child.getGenomes().length, parent.getGenomes().length));
 
-            ArrayList<Color> colourMeBby;
-            if (parent.getGenomes().length > child.getGenomes().length) {
-                colourMeBby = colourController.getEdgeColours(node.getGenomes());
-            } else {
-                colourMeBby = colourController.getEdgeColours(parent.getGenomes());
+            ArrayList<Integer> allGenomesInEdge = new ArrayList<>();
+            for (int genomeID : parent.getGenomes()) {
+                if (contains(child.getGenomes(), genomeID)) {
+                    allGenomesInEdge.add(genomeID);
+                }
             }
+            ArrayList<Color> colourMeBby =
+                    colourController.getEdgeColours(allGenomesInEdge.stream().mapToInt(q -> q).toArray());
             if (colourMeBby.size() < 4) {
                 colourMeBby.addAll(colourMeBby);
             }
