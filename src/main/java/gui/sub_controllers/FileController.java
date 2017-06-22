@@ -1,6 +1,6 @@
 package gui.sub_controllers;
 
-import graph.Annotation;
+import structures.Annotation;
 import gui.CustomProperties;
 import gui.DrawableCanvas;
 import javafx.stage.FileChooser;
@@ -9,9 +9,7 @@ import parser.GfaParser;
 import parser.GffParser;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -140,7 +138,7 @@ public class FileController extends Observable implements Observer {
         progressBarController.run();
     }
 
-    public ArrayList<Annotation> openGffFileClicked(String filePath) throws IOException {
+    public HashMap<Integer, HashSet<Annotation>> openGffFileClicked(String filePath) throws IOException {
         GffParser parser = new GffParser(filePath);
         return parser.parseGff();
     }

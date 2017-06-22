@@ -1,6 +1,5 @@
 package gui.sub_controllers;
 
-import graph.Annotation;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,8 +13,11 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import structures.Annotation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 
 /**
@@ -41,30 +43,37 @@ public class AnnotationTableController {
 
     private ObservableList<Annotation> masterData = FXCollections.observableArrayList();
     private SortedList<Annotation> sortedData;
-    private ArrayList<Annotation> selection;
+    private HashMap<Integer, HashSet<Annotation>> annotations;
+    private HashMap<Integer, HashSet<Annotation>> updatedAnnotations;
     private boolean allSelected;
 
     /**
      * Just add some sample data in the constructor.
      */
-    public AnnotationTableController() { }
+    public AnnotationTableController() {
+    }
 
     /**
      * Initializes the controller class.
      * Needs to be called manually to get the data.
      * Initializes the table columns and sets up sorting and filtering.
-     * @param annotations the annotations to load into the table.
+     *
+     * @param annotationsArg the annotations to load into the table.
      */
     @FXML
-    public void initialize(ArrayList<Annotation> annotations) {
+    public void initialize(HashMap<Integer, HashSet<Annotation>> annotationsArg) {
+        this.annotations = annotationsArg;
+        this.updatedAnnotations = this.annotations;
         allSelected = false;
-        selection = new ArrayList<Annotation>();
-        for (Annotation annotation : annotations) {
-            if (annotation.getSelected().getValue()) {
-                selection.add(annotation);
+
+        HashSet<Annotation> drawThese = new HashSet<>();
+        for (int i = 0; i <= annotations.size(); i++) {
+            HashSet<Annotation> tempAnnotations = annotations.get(i);
+            if (tempAnnotations != null) {
+                drawThese.addAll(tempAnnotations);
             }
         }
-        masterData = FXCollections.observableArrayList(annotations);
+        masterData = FXCollections.observableArrayList(new ArrayList<Annotation>(drawThese));
 
         // 0. Initialize the columns.
         startColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("start"));
@@ -73,12 +82,12 @@ public class AnnotationTableController {
         highlightColumn.setCellValueFactory(
                 new Callback<TableColumn.
                         CellDataFeatures<Annotation, Boolean>, ObservableValue<Boolean>>() {
-            @Override
-            public ObservableValue<Boolean> call(
-                    TableColumn.CellDataFeatures<Annotation, Boolean> param) {
-                return param.getValue().getSelected();
-            }
-        });
+                    @Override
+                    public ObservableValue<Boolean> call(
+                            TableColumn.CellDataFeatures<Annotation, Boolean> param) {
+                        return param.getValue().getSelected();
+                    }
+                });
         highlightColumn.setCellFactory(CheckBoxTableCell.forTableColumn(highlightColumn));
 
         annotationTable.setEditable(true);
@@ -116,8 +125,8 @@ public class AnnotationTableController {
         annotationTable.setItems(sortedData);
     }
 
-    public ArrayList<Annotation> getSelection() {
-        return selection;
+    public HashMap<Integer, HashSet<Annotation>> getAnnotations() {
+        return updatedAnnotations;
     }
 
     /**
@@ -125,15 +134,7 @@ public class AnnotationTableController {
      */
     @FXML
     public void saveButtonClicked() {
-        ArrayList<Annotation> res = new ArrayList<Annotation>();
-
-        for (int i = 0; i < annotationTable.getItems().size(); i++) {
-            Annotation annotation = annotationTable.getItems().get(i);
-            if (annotation.getSelected().get()) {
-                res.add(annotation);
-            }
-        }
-        selection = res;
+        updatedAnnotations = annotations;
         close();
     }
 
