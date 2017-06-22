@@ -166,7 +166,9 @@ public class MenuController implements Observer {
         Stage stage = App.getStage();
         File file = fileController.chooseGffFile(stage);
         String filePath = file.getAbsolutePath();
-        GraphDrawer.getInstance().setAllAnnotations(fileController.openGffFileClicked(filePath));
+        HashMap<Integer, HashSet<Annotation>> annotations = fileController.openGffFileClicked(filePath);
+        Annotation.selectAll(annotations);
+        GraphDrawer.getInstance().setAllAnnotations(annotations);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/chooseGenomeForAnnotations.fxml"));
         Stage newStage;
@@ -609,8 +611,7 @@ public class MenuController implements Observer {
         final AnnotationTableController annotationTableController
                 = loader.<AnnotationTableController>getController();
 
-        HashMap<Integer, HashSet<Annotation>> allAnnotations;
-        allAnnotations = GraphDrawer.getInstance().getAllAnnotations();
+        HashMap<Integer, HashSet<Annotation>> allAnnotations = GraphDrawer.getInstance().getAllAnnotations();
         if (allAnnotations.size() == 0) {
             try {
                 openGffFileClicked();
@@ -630,8 +631,8 @@ public class MenuController implements Observer {
                     @Override
                     public void handle(WindowEvent event) {
                         //TODO HANDLE THIS SELECTION
-//                        GraphDrawer.getInstance().
-//                                setSelectedAnnotations(annotationTableController.getSelection());
+                        GraphDrawer.getInstance().
+                                setAllAnnotations(annotationTableController.getAnnotations());
                         GraphDrawer.getInstance().redraw();
                     }
                 }

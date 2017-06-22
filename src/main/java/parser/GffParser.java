@@ -7,8 +7,6 @@ import structures.Annotation;
 import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
 
 /**
  * Created by lex_b on 12/06/2017.
@@ -25,17 +23,6 @@ public class GffParser {
     public GffParser(String absolutePath) {
         filePath = absolutePath;
     }
-
-
-//    public HashMap<Integer, LinkedList<Annotation>> getAnnotations() throws IOException {
-////        If annotations known
-//        FileReader fileReader = new FileReader(DrawableCanvas.getInstance().getParser().getPartPath() + "annotations.txt");
-//        if (fileReader != null) {
-//
-//        } else {
-//            return parseGff();
-//        }
-//    }
 
     /**
      * @return an arrayList with the Annotations.

@@ -43,13 +43,10 @@ public class GraphDrawer {
     private ColourController colourController;
     private HashMap<Integer, HashSet<Annotation>> allAnnotations
             = new HashMap<Integer, HashSet<Annotation>>();
-    private HashMap<Integer, LinkedList<Annotation>> selectedAnnotations
-            = new HashMap<Integer, LinkedList<Annotation>>();
     private SequenceNode mostLeftNode;
     private SequenceNode mostRightNode;
     private HashMap<Integer, double[]> coordinates;
     private boolean rainbowView = true;
-    private HashMap<Integer, ArrayList<Annotation>> smartAnnotations = new HashMap<>();
 
     public static GraphDrawer getInstance() {
         return drawer;
@@ -249,42 +246,44 @@ public class GraphDrawer {
             for (Annotation annotation : drawThese) {
 //                double annoHeight = coordinates[3] / 2;
 //                double startYAnno = coordinates[1] + coordinates[3];
-                double startXAnno = coordinates[0];
-                double annoWidth = coordinates[2];
-                int startOfAnno = annotation.getStart();
-                int endOfAnno = annotation.getEnd();
+                if (annotation.getSelected().getValue()) {
+                    double startXAnno = coordinates[0];
+                    double annoWidth = coordinates[2];
+                    int startOfAnno = annotation.getStart();
+                    int endOfAnno = annotation.getEnd();
 
-                int startCorNode = node.getOffsets()[placeOfAnnotatedGenome];
-                int endCorNode = startCorNode + node.getSequenceLength();
+                    int startCorNode = node.getOffsets()[placeOfAnnotatedGenome];
+                    int endCorNode = startCorNode + node.getSequenceLength();
 
-                if (startOfAnno > endCorNode || endOfAnno <= startCorNode) {
-                    continue;
-                }
-                if (bigOne[0] != startOfAnno && bigOne[1] != endOfAnno) {
+                    if (startOfAnno > endCorNode || endOfAnno <= startCorNode) {
+                        continue;
+                    }
+                    if (bigOne[0] != startOfAnno && bigOne[1] != endOfAnno) {
 
-                    double emptyAtStart = 0.0;
-                    if (startOfAnno > startCorNode) {
-                        emptyAtStart = startOfAnno - startCorNode;
-                        annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
-                        startXAnno = startXAnno + (coordinates[2] - annoWidth);
-                    }
-                    if (endOfAnno < endCorNode) {
-                        int emptyAtEnd = endCorNode - endOfAnno;
-                        annoWidth = (annoWidth
-                                * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
-                    }
-                    if (bigOne[0] == 0) {
-                        bigOne[0] = startOfAnno;
-                        bigOne[1] = endOfAnno;
-                    }
-                    gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
-                    //TODO Fix overalapping parent annotations
-                    if (annotation.getInfo().toLowerCase().contains("parent")) {
-                        gc.fillRect(startXAnno, coordinates[1] + coordinates[3] + annoHeight,
-                                annoWidth, annoHeight);
-                    } else {
+                        double emptyAtStart = 0.0;
+                        if (startOfAnno > startCorNode) {
+                            emptyAtStart = startOfAnno - startCorNode;
+                            annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
+                            startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                        }
+                        if (endOfAnno < endCorNode) {
+                            int emptyAtEnd = endCorNode - endOfAnno;
+                            annoWidth = (annoWidth
+                                    * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
+                        }
+                        if (bigOne[0] == 0) {
+                            bigOne[0] = startOfAnno;
+                            bigOne[1] = endOfAnno;
+                        }
+                        gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
+//                    //TODO Fix overalapping parent annotations
+//                    if (annotation.getInfo().toLowerCase().contains("parent")) {
+//                        gc.fillRect(startXAnno, coordinates[1] + coordinates[3] + annoHeight,
+//                                annoWidth, annoHeight);
+//                    } else {
                         startYAnno += annoHeight;
                         gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
+                        //}
                     }
                 }
             }
@@ -604,11 +603,6 @@ public class GraphDrawer {
         return selected;
     }
 
-    public void setSelectedAnnotations(HashMap<Integer, LinkedList<Annotation>> newAnnotations) {
-        this.selectedAnnotations = newAnnotations;
-        //this.smartAnnotations = intializeAnnotationsOnNodes();
-    }
-
     public void setAllAnnotations(HashMap<Integer, HashSet<Annotation>> newAnnotations) {
         this.allAnnotations = newAnnotations;
     }
@@ -650,10 +644,6 @@ public class GraphDrawer {
         return allAnnotations;
     }
 
-    public HashMap<Integer, LinkedList<Annotation>> getSelectedAnnotations() {
-        return selectedAnnotations;
-    }
-
     public SequenceNode getMostRightNode() {
         return mostRightNode;
     }
@@ -666,53 +656,5 @@ public class GraphDrawer {
         this.rainbowView = rainbowView;
         this.colourController = new ColourController(selected, rainbowView);
     }
-
-//    public HashMap<Integer, ArrayList<Annotation>> intializeAnnotationsOnNodes() {
-//        HashMap<Integer, ArrayList<Annotation>> res = new HashMap<>();
-//
-//        Iterator it = graph.getNodes().entrySet().iterator();
-//        while (it.hasNext()) {
-//            ArrayList<Annotation> annotationsOnThisNode = new ArrayList<Annotation>();
-//            Map.Entry pair = (Map.Entry) it.next();
-//            SequenceNode node = (SequenceNode) pair.getValue();
-//
-//            if (!node.isDummy()) {
-//                for (int i = 0; i < selectedAnnotations.size(); i++) {
-//                    Annotation annotation = selectedAnnotations.get(i);
-//                    int annoID = DrawableCanvas.getInstance().getAnnotationGenome();
-//                    int indexOfGenome = colourController.containsPos(node.getGenomes(), annoID);
-//                    if (indexOfGenome != -1) {
-//                        int startOfAnno = annotation.getStart();
-//                        int endOfAnno = annotation.getEnd();
-//                        int placeOfAnnotatedGenome = 0;
-//
-//                        if (node.getGenomes().length == node.getOffsets().length) {
-//                            placeOfAnnotatedGenome = indexOfGenome;
-//                        }
-//
-//                        int startCorNode = node.getOffsets()[placeOfAnnotatedGenome];
-//                        int endCorNode = startCorNode + node.getSequenceLength();
-//
-//                        if (startOfAnno > endCorNode || endOfAnno <= startCorNode) {
-//                            continue;
-//                        }
-//
-//                        if (startOfAnno >= startCorNode || (startOfAnno < startCorNode && endOfAnno > endCorNode)) {
-//                            annotationsOnThisNode.add(annotation);
-//                        }
-//
-//                        if (endOfAnno < endCorNode) {
-//                            annotationsOnThisNode.add(annotation);
-//                            selectedAnnotations.remove(annotation);
-//                        }
-//                    }
-//                }
-//                if (annotationsOnThisNode.size() != 0) {
-//                    res.put(node.getId(), annotationsOnThisNode);
-//                }
-//            }
-//        }
-//        return res;
-//    }
 }
 
