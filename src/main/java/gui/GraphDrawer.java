@@ -303,7 +303,6 @@ public class GraphDrawer {
             Map.Entry pair = (Map.Entry) it.next();
             SequenceNode node = (SequenceNode) pair.getValue();
             computeCoordinates(node);
-            checkExtremeNode(node);
             if (!node.isCollapsed()) {
                 drawNode(node);
                 drawEdges(node);
@@ -453,6 +452,7 @@ public class GraphDrawer {
      */
     private void drawNode(SequenceNode node) {
         double[] coordinates = this.coordinates.get(node.getId());
+        checkExtremeNode(node);
         if (inView(coordinates)) {
             if (node.isDummy()) {
                 this.setLineWidth(node.getGenomes().length);
