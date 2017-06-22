@@ -130,9 +130,9 @@ public class GraphDrawer {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
             double max = 1;
-            for (int i = 0; i < column.size(); i++) {
-                if (!column.get(i).isDummy()) {
-                    double length = computeNodeWidth(column.get(i));
+            for (SequenceNode aColumn : column) {
+                if (!aColumn.isDummy()) {
+                    double length = computeNodeWidth(aColumn);
                     if (length > max) {
                         max = length;
                     }
@@ -142,7 +142,10 @@ public class GraphDrawer {
         }
     }
 
-    public void initializeDummyWidths() {
+    /**
+     * Method to initialize dummyWidths.
+     */
+    private void initializeDummyWidths() {
         HashMap<Integer, String> genomes;
         for (int j = -1; j > graph.getDummyNodeIDCounter(); j--) {
             genomes = new HashMap<>(DrawableCanvas.getInstance().getAllGenomesReversed());
@@ -155,33 +158,64 @@ public class GraphDrawer {
                         }
                     }
                 }
-                int[] result = new int[genomes.size()];
+                int[] genome = new int[genomes.size()];
                 int i = 0;
                 for (Object o : genomes.entrySet()) {
-                    result[i] = (int) ((Map.Entry) o).getKey();
+                    genome[i] = (int) ((Map.Entry) o).getKey();
                     i++;
                 }
+                int[] parentGenomes = graph.getNodes().get(node.getParents().get(0)).getGenomes();
+                int[] childList = getChildrenGenomeList(node);
 
-                int parentID = node.getParents().get(0);
-                int parentGenomeSize = graph.getNodes().get(parentID).getGenomes().length;
-                if (result.length > parentGenomeSize) {
-                    result = graph.getNodes().get(parentID).getGenomes();
+                ArrayList<Integer> results = new ArrayList<>();
+                for (int aResult : genome) {
+                    if (contains(parentGenomes, aResult) & contains(childList, aResult)) {
+                        results.add(aResult);
+                    }
                 }
+                int[] result = results.stream().mapToInt(q -> q).toArray();
                 node.setGenomes(result);
             }
         }
     }
 
-    public boolean inView(double[] coordinates) {
+    /**
+     * A simple contains method.
+     *
+     * @param checkSet The set to check if it contains the genome.
+     * @param genome   The genome to see if it is in the check set.
+     * @return a boolean true if it is in the set or false if it is not.
+     */
+    private boolean contains(int[] checkSet, int genome) {
+        for (int check : checkSet) {
+            if (check == genome) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param child Function that returns the genomes of first child that isn't Dummy.
+     * @return the genomesList of the child
+     */
+    private int[] getChildrenGenomeList(SequenceNode child) {
+        while (child.isDummy()) {
+            child = graph.getNodes().get(child.getChildren().get(0));
+        }
+        return child.getGenomes();
+    }
+
+    private boolean inView(double[] coordinates) {
         return coordinates[0] + coordinates[2] > 0 && coordinates[0] < gc.getCanvas().getWidth();
     }
 
     /**
-     * Computes the coordinates for the given node
+     * Computes the coordinates for the given node.
      * [x,y,width,height]
-     *
-     * @param node
-     * @return
+     * @param node the node.
+     * @return the coordinates.
      */
     private double[] computeCoordinates(SequenceNode node) {
         double[] coordinates = new double[4];
