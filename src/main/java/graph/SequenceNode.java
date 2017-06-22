@@ -186,7 +186,13 @@ public class SequenceNode {
         appendSequence(sequence, stringBuilder);
         appendGenomes(stringBuilder);
         appendGenomeCoords(stringBuilder);
+        appendAnnotations(stringBuilder);
         return stringBuilder.toString();
+    }
+
+    private void appendAnnotations(StringBuilder stringBuilder) {
+        stringBuilder.append("Annotations:\t\t");
+
     }
 
     /**
@@ -240,6 +246,7 @@ public class SequenceNode {
         }
         stringBuilder.append("\n");
     }
+
     /**
      * Appends children to a string builder.
      * @param stringBuilder string builder to append to.
