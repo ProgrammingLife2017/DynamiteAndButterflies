@@ -130,6 +130,9 @@ public class MenuController implements Observer {
         ZoomController.getInstance().setMenuController(this);
         Minimap.getInstance().setMenuController(this);
         GraphDrawer.getInstance().setMenuController(this);
+        PanningController.getInstance().setMenuController(this);
+        PanningController.getInstance().initialize(leftPannButton, rightPannButton);
+        PanningController.getInstance().initializeKeys(canvasPanel);
 
         //System.setErr(ps);
         //System.setOut(ps);
@@ -247,7 +250,7 @@ public class MenuController implements Observer {
      * @throws IOException exception.
      */
     @FXML
-    public void zoomInClicked() throws IOException {
+    public void zoomInClicked() {
         double xCentre = canvas.getWidth() / 2;
         ZoomController.getInstance().zoomIn(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
         nodeTextField.setText(findColumnWrapper(xCentre) + "");
@@ -259,7 +262,7 @@ public class MenuController implements Observer {
      * @throws IOException exception.
      */
     @FXML
-    public void zoomOutClicked() throws IOException {
+    public void zoomOutClicked() {
         double xCentre = canvas.getWidth() / 2;
         ZoomController.getInstance().zoomOut(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
         nodeTextField.setText(findColumnWrapper(xCentre) + "");
@@ -437,9 +440,6 @@ public class MenuController implements Observer {
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
                         specificGenomeProperties.initialize();
-                        panningController =
-                                new PanningController(leftPannButton, rightPannButton);
-                        panningController.initializeKeys(canvasPanel);
                         displayInfo(GraphDrawer.getInstance().getGraph());
                         updateRadius();
                         updateCenterNode();

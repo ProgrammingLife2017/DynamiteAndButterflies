@@ -32,9 +32,8 @@ public class ZoomController {
     /**
      * Zooms in.
      * @param column the column to zoom in on.
-     * @throws IOException thrown if can't find
      */
-    public void zoomIn(int column) throws IOException {
+    public void zoomIn(int column) {
         GraphDrawer.getInstance().zoom(SCROLL_ZOOM_IN_FACTOR, column);
         menuController.updateRadius();
     }
@@ -44,7 +43,7 @@ public class ZoomController {
      * @param column the column to zoom out on.
      * @throws IOException thrown if can't find
      */
-    public void zoomOut(int column) throws IOException {
+    public void zoomOut(int column) {
         GraphDrawer.getInstance().zoom(SCROLL_ZOOM_OUT_FACTOR, column);
         menuController.updateRadius();
     }
