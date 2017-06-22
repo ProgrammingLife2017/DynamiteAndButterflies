@@ -132,7 +132,7 @@ public class MenuController implements Observer {
         GraphDrawer.getInstance().setMenuController(this);
 
         //System.setErr(ps);
-        System.setOut(ps);
+        //System.setOut(ps);
     }
 
     /**
