@@ -1,41 +1,23 @@
 package gui.sub_controllers;
 
-import com.sun.corba.se.impl.orbutil.graph.Graph;
 import graph.SequenceGraph;
 import gui.GraphDrawer;
 import gui.MenuController;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.util.Duration;
-
-
 import java.util.Observable;
 
 /**
  * Created by Jasper van Tilburg on 29-5-2017.
- *
+ * <p>
  * Controls the panning functionality.
  */
 public class PanningController extends Observable {
-
-    /**
-     * The speed at which to pan.
-     */
-    public static final double PANN_FACTOR = 0.03;
-
-    /**
-     * The the threshold to update the subGraph.
-     */
-    public static final int RENDER_THRESHOLD = 500;
 
     /**
      * The amount of nodes to render.
@@ -43,9 +25,19 @@ public class PanningController extends Observable {
     public static final int RENDER_RANGE = 2000;
 
     /**
+     * The speed at which to pan.
+     */
+    private static final double PANN_FACTOR = 0.03;
+
+    /**
+     * The the threshold to update the subGraph.
+     */
+    private static final int RENDER_THRESHOLD = 500;
+
+    /**
      * The amount of nodes to shift.
      */
-    public static final int RENDER_SHIFT = 1000;
+    private static final int RENDER_SHIFT = 1000;
 
     private static PanningController panningController = new PanningController();
 
@@ -57,16 +49,22 @@ public class PanningController extends Observable {
     /**
      * Constructor for the panning controller.
      */
-    public PanningController() {
+    private PanningController() {
     }
 
+    /**
+     * Return the singleton instance of panning controller.
+     *
+     * @return The panning controller
+     */
     public static PanningController getInstance() {
         return panningController;
     }
 
     /**
      * Initialize the panningcontroller.
-     * @param leftPannButton the pan left button.
+     *
+     * @param leftPannButton  the pan left button.
      * @param rightPannButton the pan right button,
      */
     public void initialize(Button leftPannButton, Button rightPannButton) {
@@ -79,41 +77,28 @@ public class PanningController extends Observable {
      * initialize function for the pan buttons.
      */
     private void initializeButtons() {
-        rightPannButton.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                panRight();
-            }
-        });
-        leftPannButton.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                panLeft();
-            }
-        });
+        rightPannButton.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> panRight());
+        leftPannButton.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> panLeft());
     }
 
     /**
      * listener for key presses.
+     *
      * @param canvasPanel - the canvas which to apply the listener to,
      */
-
     public void initializeKeys(Node canvasPanel) {
         canvasPanel.requestFocus();
-        canvasPanel.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                if (event.getCode() == KeyCode.RIGHT) {
-                    panRight();
-                } else if (event.getCode() == KeyCode.LEFT) {
-                    panLeft();
-                } else if (event.getCode() == KeyCode.UP) {
-                    menuController.zoomInClicked();
-                } else if (event.getCode() == KeyCode.DOWN) {
-                    menuController.zoomOutClicked();
-                }
-                event.consume();
+        canvasPanel.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.RIGHT) {
+                panRight();
+            } else if (event.getCode() == KeyCode.LEFT) {
+                panLeft();
+            } else if (event.getCode() == KeyCode.UP) {
+                menuController.zoomInClicked();
+            } else if (event.getCode() == KeyCode.DOWN) {
+                menuController.zoomOutClicked();
             }
+            event.consume();
         });
     }
 
@@ -124,7 +109,6 @@ public class PanningController extends Observable {
         if (!updating) {
             if (GraphDrawer.getInstance().getGraph().getRightBoundIndex() < GraphDrawer.getInstance().getGraph().getFullGraphRightBoundIndex()) {
                 if (GraphDrawer.getInstance().getMostRightNode().getId() + RENDER_THRESHOLD > GraphDrawer.getInstance().getGraph().getRightBoundID()) {
-                //if (drawer.getxDifference() + drawer.getZoomLevel() + RENDER_THRESHOLD > drawer.getRange()) {
                     updating = true;
                     new Thread(new Task<Integer>() {
                         @Override
