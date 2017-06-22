@@ -189,19 +189,10 @@ public class SequenceNode {
         appendSequence(sequence, stringBuilder);
         appendGenomes(stringBuilder);
         appendGenomeCoords(stringBuilder);
-        appendAnnotations(stringBuilder);
         return stringBuilder.toString();
     }
 
-    private void appendAnnotations(StringBuilder stringBuilder) {
-        HashSet<Annotation> annotations  = GraphDrawer.getInstance().getAnnotationBuckets(this, GraphDrawer.getInstance().getAnnotatedGenomeIndex(this));
-        for (Annotation anno: annotations) {
-            if (anno.getSelected().getValue()) {
-                stringBuilder.append("Annotation info:\n").append(anno.getInfo());
-            }
-        }
-    }
-
+  
     /**
      * Appends genome coordinates to a string builder.
      * @param stringBuilder string builder to append to.
