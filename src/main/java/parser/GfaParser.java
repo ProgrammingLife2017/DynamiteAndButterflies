@@ -7,7 +7,6 @@ import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.regex.Pattern;
@@ -141,6 +140,7 @@ public class GfaParser extends Observable implements Runnable {
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line;
         int sizeOfFile = 0;
+        int maxCor = Integer.MIN_VALUE;
         while ((line = br.readLine()) != null) {
             if (line.startsWith("S")) {
                 String[] data = line.split(("\t"));
@@ -165,6 +165,14 @@ public class GfaParser extends Observable implements Runnable {
                         }
                     } else if (aData.startsWith("START:Z:") || aData.startsWith("OFFSETS:i:") || aData.startsWith("OFFSETS:Z:")) {
                         String OffSets = aData.split(":")[2];
+                        String[] offSetStrings = OffSets.split(";");
+                        int tempOffSetInt;
+                        for (String singleOffSet : offSetStrings) {
+                            tempOffSetInt = Integer.parseInt(singleOffSet);
+                            if (tempOffSetInt > maxCor) {
+                                maxCor = tempOffSetInt;
+                            }
+                        }
                         genomeWriter.write(OffSets);
                         genomeWriter.newLine();
                     }
@@ -191,6 +199,7 @@ public class GfaParser extends Observable implements Runnable {
         properties.updateProperties();
         properties.setProperty(partPath + "childArray.txtsize", Integer.toString(sizeOfFile));
         properties.setProperty(partPath, "true");
+        properties.setProperty(partPath + "Max-Cor", Integer.toString(maxCor));
         properties.saveProperties();
 
     }

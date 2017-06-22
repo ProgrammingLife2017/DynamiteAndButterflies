@@ -1,6 +1,6 @@
 package gui;
 
-import graph.Annotation;
+import exceptions.NotInRangeException;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.*;
@@ -20,16 +20,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.mapdb.HTreeMap;
+import structures.Annotation;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Observable;
-import java.util.Observer;
-
-import exceptions.NotInRangeException;
+import java.util.*;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -173,9 +169,9 @@ public class MenuController implements Observer {
         Stage stage = App.getStage();
         File file = fileController.chooseGffFile(stage);
         String filePath = file.getAbsolutePath();
-        GraphDrawer.getInstance().setSelectedAnnotations(new ArrayList<Annotation>());
-        GraphDrawer.getInstance().redraw();
-        GraphDrawer.getInstance().setAllAnnotations(fileController.openGffFileClicked(filePath));
+        HashMap<Integer, HashSet<Annotation>> annotations = fileController.openGffFileClicked(filePath);
+        Annotation.selectAll(annotations);
+        GraphDrawer.getInstance().setAllAnnotations(annotations);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/chooseGenomeForAnnotations.fxml"));
         Stage newStage;
@@ -623,8 +619,7 @@ public class MenuController implements Observer {
         final AnnotationTableController annotationTableController
                 = loader.<AnnotationTableController>getController();
 
-        ArrayList<Annotation> allAnnotations;
-        allAnnotations = GraphDrawer.getInstance().getAllAnnotations();
+        HashMap<Integer, HashSet<Annotation>> allAnnotations = GraphDrawer.getInstance().getAllAnnotations();
         if (allAnnotations.size() == 0) {
             try {
                 openGffFileClicked();
@@ -643,8 +638,9 @@ public class MenuController implements Observer {
                 new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent event) {
+                        //TODO HANDLE THIS SELECTION
                         GraphDrawer.getInstance().
-                                setSelectedAnnotations(annotationTableController.getSelection());
+                                setAllAnnotations(annotationTableController.getAnnotations());
                         GraphDrawer.getInstance().redraw();
                     }
                 }

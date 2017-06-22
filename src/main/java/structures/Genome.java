@@ -1,4 +1,4 @@
-package graph;
+package structures;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
