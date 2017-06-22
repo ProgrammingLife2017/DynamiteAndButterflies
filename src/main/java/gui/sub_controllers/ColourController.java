@@ -98,7 +98,7 @@ public class ColourController {
      */
     private Color notRainbowView(int length) {
         if (length == 0) {
-            return getBase();
+            return getBaseNodeColour();
         } else if (length < lowerPart) {
             return Color.color(0.9608, 0.8235, 0.8235);
         } else if (length < middlePart) {
@@ -115,7 +115,7 @@ public class ColourController {
      *
      * @return the base colour.
      */
-    public Color getBase() {
+    public Color getBaseNodeColour() {
         return Color.gray(0.5098);
     }
 
@@ -125,22 +125,17 @@ public class ColourController {
      * @param genomes The genomes in the node.
      * @return The list of colours the node should be.
      */
-    public ArrayList<Color> getColors(int[] genomes) {
+    public ArrayList<Color> getNodeColours(int[] genomes) {
         ArrayList<Color> res = new ArrayList<Color>();
         //If there is no selection, it should only be the base colour.
         if (selectedGenomes.length == 0) {
-            res.add(getBase());
+            res.add(getBaseNodeColour());
             return res;
         }
 
         // In rainbowView we assign a colour to each genome
         if (rainbowView) {
-            for (int genome : genomes) {
-                int check = containsPos(selectedGenomes, genome);
-                if (check != -1) {
-                    res.add(getSingle(check));
-                }
-            }
+            res = rainbowViewColours(genomes);
         } else {
             // Else we choose a colour Red.
             int length = 0;
@@ -154,7 +149,7 @@ public class ColourController {
         }
 
         if (res.isEmpty()) {
-            res.add(getBase());
+            res.add(getBaseNodeColour());
         }
 
         return res;
@@ -174,5 +169,45 @@ public class ColourController {
             }
         }
         return false;
+    }
+
+    /**
+     * This method gets an array of the different colours the node should be.
+     *
+     * @param genomes The genomes in the node.
+     * @return The list of colours the node should be.
+     */
+    public ArrayList<Color> getEdgeColours(int[] genomes) {
+        ArrayList<Color> res = new ArrayList<Color>();
+        //If there is no selection, it should only be the base colour.
+        if (selectedGenomes.length == 0 || !rainbowView) {
+            res.add(getBaseEdgeColour());
+            return res;
+        }
+
+        // In rainbowView we assign a colour to each genome
+        if (rainbowView) {
+            res = rainbowViewColours(genomes);
+        }
+        if (res.isEmpty()) {
+            res.add(getBaseEdgeColour());
+        }
+
+        return res;
+    }
+
+    private ArrayList<Color> rainbowViewColours(int[] genomes) {
+        ArrayList<Color> res = new ArrayList<>();
+        for (int genome : genomes) {
+            int check = containsPos(selectedGenomes, genome);
+            if (check != -1) {
+                res.add(getSingle(check));
+            }
+        }
+        return res;
+    }
+
+    public Color getBaseEdgeColour() {
+        return Color.BLACK;
     }
 }
