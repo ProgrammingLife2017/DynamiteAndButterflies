@@ -1,6 +1,6 @@
 package gui.sub_controllers;
 
-import graph.Genome;
+import structures.Genome;
 import gui.DrawableCanvas;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;

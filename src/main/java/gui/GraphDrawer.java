@@ -1,18 +1,14 @@
 package gui;
 
-import com.sun.corba.se.impl.orbutil.graph.Graph;
-import graph.Annotation;
 import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.ColourController;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import structures.Annotation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
@@ -29,6 +25,8 @@ public class GraphDrawer {
     public static final double LINE_WIDTH_FACTOR = 0.1;
     public static final double Y_SIZE_FACTOR = 3;
     public static final double LOG_BASE = 2;
+    //MUST BE THE SAME AS IN GFF PARSER
+    private static final int BUCKET_SIZE = 20000;
 
     private Canvas canvas;
     private double zoomLevel;
@@ -43,14 +41,14 @@ public class GraphDrawer {
     private int highlightedNode;
     private int[] selected = null;
     private ColourController colourController;
-    private ArrayList<Annotation> allAnnotations = new ArrayList<Annotation>();
-    private ArrayList<Annotation> selectedAnnotations = new ArrayList<Annotation>();
+    private HashMap<Integer, HashSet<Annotation>> allAnnotations
+            = new HashMap<Integer, HashSet<Annotation>>();
     private SequenceNode mostLeftNode;
     private SequenceNode mostRightNode;
     private HashMap<Integer, double[]> coordinates;
     private boolean rainbowView = true;
 
-    public static GraphDrawer getInstance(){
+    public static GraphDrawer getInstance() {
         return drawer;
     }
 
@@ -103,7 +101,6 @@ public class GraphDrawer {
     }
 
 
-
     /**
      * Redraw all nodes with the same coordinates.
      */
@@ -129,7 +126,6 @@ public class GraphDrawer {
      * Initializes the widths of each column.
      * Using the widest node of each column.
      */
-
     private void initializeColumnWidths() {
         for (int j = 0; j < columns.size(); j++) {
             ArrayList<SequenceNode> column = columns.get(j);
@@ -145,8 +141,6 @@ public class GraphDrawer {
             columnWidths[j + 1] = columnWidths[j] + max;
         }
     }
-
-
 
     public void initializeDummyWidths() {
         HashMap<Integer, String> genomes;
@@ -185,6 +179,7 @@ public class GraphDrawer {
     /**
      * Computes the coordinates for the given node
      * [x,y,width,height]
+     *
      * @param node
      * @return
      */
@@ -200,7 +195,7 @@ public class GraphDrawer {
         }
 
         coordinates[0] = x;
-        coordinates[1] =  y;
+        coordinates[1] = y;
         coordinates[2] = width;
         coordinates[3] = height;
 
@@ -223,65 +218,102 @@ public class GraphDrawer {
             checkExtremeNode(node);
             drawNode(node);
             drawEdges(node);
-
         }
     }
 
     private void drawAnnotations(SequenceNode node, double[] coordinates) {
-        for (int i = 0; i < selectedAnnotations.size(); i++) {
-            Annotation annotation = selectedAnnotations.get(i);
-            int annoID = DrawableCanvas.getInstance().getAnnotationGenome();
-            double startXAnno = coordinates[0];
-            double startYAnno = coordinates[1] + coordinates[3];
-            double annoWidth = coordinates[2];
+        int indexOfGenome = colourController.containsPos(node.getGenomes(), DrawableCanvas.getInstance().getAnnotationGenome());
+
+        if (indexOfGenome != -1) {
+            int placeOfAnnotatedGenome = 0;
+            if (node.getGenomes().length == node.getOffsets().length) {
+                placeOfAnnotatedGenome = indexOfGenome;
+            }
+            int startBucket = (node.getOffsets()[placeOfAnnotatedGenome] / BUCKET_SIZE);
+            int endBucket = ((node.getOffsets()[placeOfAnnotatedGenome] + node.getSequenceLength()) / BUCKET_SIZE);
+            HashSet<Annotation> drawThese = new HashSet<>();
+            for (int i = startBucket; i <= endBucket; i++) {
+                HashSet<Annotation> tempAnnotations = allAnnotations.get(i);
+                if (tempAnnotations != null) {
+                    drawThese.addAll(tempAnnotations);
+                }
+            }
+            int[] bigOne = new int[2];
+
             double annoHeight = coordinates[3] / 2;
-            int indexOfGenome = colourController.containsPos(node.getGenomes(), annoID);
-            if (indexOfGenome != -1) {
-                int startOfAnno = annotation.getStart();
-                int endOfAnno = annotation.getEnd();
-                int startCorOfGenome = 0;
+            double startYAnno = coordinates[1] + coordinates[3] - annoHeight;
 
-                if (node.getGenomes().length == node.getOffsets().length) {
-                    startCorOfGenome = indexOfGenome;
-                }
+            for (Annotation annotation : drawThese) {
+//                double annoHeight = coordinates[3] / 2;
+//                double startYAnno = coordinates[1] + coordinates[3];
+                if (annotation.getSelected().getValue()) {
+                    double startXAnno = coordinates[0];
+                    double annoWidth = coordinates[2];
+                    int startOfAnno = annotation.getStart();
+                    int endOfAnno = annotation.getEnd();
 
-                if (startOfAnno > (node.getOffsets()[startCorOfGenome] + node.getSequenceLength())
-                        || endOfAnno < (node.getOffsets()[startCorOfGenome])) {
-                    continue;
-                }
+                    int startCorNode = node.getOffsets()[placeOfAnnotatedGenome];
+                    int endCorNode = startCorNode + node.getSequenceLength();
 
-                double emptyAtStart = 0.0;
-                if (startOfAnno > node.getOffsets()[startCorOfGenome]) {
-                    emptyAtStart = startOfAnno - node.getOffsets()[startCorOfGenome];
-                    annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
-                    startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                    if (startOfAnno > endCorNode || endOfAnno <= startCorNode) {
+                        continue;
+                    }
+                    if (bigOne[0] != startOfAnno && bigOne[1] != endOfAnno) {
+
+                        double emptyAtStart = 0.0;
+                        if (startOfAnno > startCorNode) {
+                            emptyAtStart = startOfAnno - startCorNode;
+                            annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
+                            startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                        }
+                        if (endOfAnno < endCorNode) {
+                            int emptyAtEnd = endCorNode - endOfAnno;
+                            annoWidth = (annoWidth
+                                    * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
+                        }
+                        if (bigOne[0] == 0) {
+                            bigOne[0] = startOfAnno;
+                            bigOne[1] = endOfAnno;
+                        }
+                        gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
+//                    //TODO Fix overalapping parent annotations
+//                    if (annotation.getInfo().toLowerCase().contains("parent")) {
+//                        gc.fillRect(startXAnno, coordinates[1] + coordinates[3] + annoHeight,
+//                                annoWidth, annoHeight);
+//                    } else {
+                        startYAnno += annoHeight;
+                        gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
+                        //}
+                    }
                 }
-                if (endOfAnno < (node.getOffsets()[startCorOfGenome] + node.getSequenceLength())) {
-                    int emptyAtEnd = node.getOffsets()[startCorOfGenome] + node.getSequenceLength() - endOfAnno;
-                    annoWidth = (annoWidth * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
-                }
-                gc.setFill(Color.RED);
-                gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
             }
         }
     }
 
     private void checkExtremeNode(SequenceNode node) {
         double[] coordinates = getCoordinates(node);
-        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] > 0) { mostLeftNode = node; }
-        if (coordinates[0] < gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] >= gc.getCanvas().getWidth()) { mostRightNode = node; }
+        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] > 0) {
+            mostLeftNode = node;
+        }
+        if (coordinates[0] < gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] >= gc.getCanvas().getWidth()) {
+            mostRightNode = node;
+        }
     }
 
     private void drawNode(SequenceNode node) {
         double[] coordinates = this.getCoordinates().get(node.getId());
-        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE > 0) { mostLeftNode = node; }
-        if (coordinates[0] <= gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE >= gc.getCanvas().getWidth()) { mostRightNode = node; }
+        if (coordinates[0] <= 0 && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE > 0) {
+            mostLeftNode = node;
+        }
+        if (coordinates[0] <= gc.getCanvas().getWidth() && coordinates[0] + coordinates[2] / RELATIVE_X_DISTANCE >= gc.getCanvas().getWidth()) {
+            mostRightNode = node;
+        }
 
         if (inView(coordinates)) {
             if (node.isDummy()) {
                 this.setLineWidth(node.getGenomes().length);
                 gc.strokeLine(coordinates[0], coordinates[1] + coordinates[3] / 2,
-                        coordinates[0] + coordinates[2], coordinates[1] + coordinates[3] /2);
+                        coordinates[0] + coordinates[2], coordinates[1] + coordinates[3] / 2);
             } else {
                 drawColour(node, coordinates);
                 drawAnnotations(node, coordinates);
@@ -315,7 +347,6 @@ public class GraphDrawer {
         }
     }
 
-
     private void drawEdges(SequenceNode node) {
         int nodeID = node.getId();
         SequenceNode parent = graph.getNode(nodeID);
@@ -333,7 +364,6 @@ public class GraphDrawer {
             }
         }
     }
-
 
     public void drawMinimap() {
         Minimap.getInstance().setValue(mostLeftNode.getId());
@@ -393,6 +423,7 @@ public class GraphDrawer {
 
     /**
      * Find the column corresponding to the x coordinate.
+     *
      * @param xEvent x coordinate of the click event.
      * @return The column id of the column the x coordinate is in.
      */
@@ -533,6 +564,7 @@ public class GraphDrawer {
 
     /**
      * Get function for x difference.
+     *
      * @return The x difference.
      */
     public double getxDifference() {
@@ -543,9 +575,13 @@ public class GraphDrawer {
         return columnWidths[col];
     }
 
-    public double getRightbound() { return xDifference + zoomLevel; }
+    public double getRightbound() {
+        return xDifference + zoomLevel;
+    }
 
-    public double getLeftbound() { return xDifference; }
+    public double getLeftbound() {
+        return xDifference;
+    }
 
     /**
      * Return the column the mouse click is in.
@@ -567,23 +603,27 @@ public class GraphDrawer {
         return selected;
     }
 
-    public void setSelectedAnnotations(ArrayList<Annotation> newAnnotations) {
-        this.selectedAnnotations = newAnnotations;
-    }
-
-    public void setAllAnnotations(ArrayList<Annotation> newAnnotations) {
+    public void setAllAnnotations(HashMap<Integer, HashSet<Annotation>> newAnnotations) {
         this.allAnnotations = newAnnotations;
     }
 
     public void setxDifference(double xDifference) {
-        if (xDifference < 0) { xDifference = 0; }
-        if (xDifference + zoomLevel > range) { xDifference = range - zoomLevel; }
+        if (xDifference < 0) {
+            xDifference = 0;
+        }
+        if (xDifference + zoomLevel > range) {
+            xDifference = range - zoomLevel;
+        }
         this.xDifference = xDifference;
     }
 
     public void setZoomLevel(double zoomLevel) {
-        if (zoomLevel < 1) { zoomLevel = 1; }
-        if (zoomLevel > range / 2) { zoomLevel = range / 2; }
+        if (zoomLevel < 1) {
+            zoomLevel = 1;
+        }
+        if (zoomLevel > range / 2) {
+            zoomLevel = range / 2;
+        }
         this.zoomLevel = zoomLevel;
     }
 
@@ -600,12 +640,8 @@ public class GraphDrawer {
         return mostLeftNode;
     }
 
-    public ArrayList<Annotation> getAllAnnotations() {
+    public HashMap<Integer, HashSet<Annotation>> getAllAnnotations() {
         return allAnnotations;
-    }
-
-    public ArrayList<Annotation> getSelectedAnnotations() {
-        return selectedAnnotations;
     }
 
     public SequenceNode getMostRightNode() {
