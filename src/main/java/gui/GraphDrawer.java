@@ -374,10 +374,11 @@ public class GraphDrawer {
         ArrayList<Color> colourMeBby;
         if (node.isHighlighted()) {
             gc.setLineWidth(6);
+            gc.setStroke(Color.BLACK);
             gc.strokeRect(coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
         }
 
-        colourMeBby = colourController.getColors(node.getGenomes());
+        colourMeBby = colourController.getNodeColours(node.getGenomes());
         double tempCoordinate = coordinates[1];
         double tempHeight = coordinates[3] / colourMeBby.size();
         for (Color beamColour : colourMeBby) {
@@ -408,8 +409,35 @@ public class GraphDrawer {
             double endx = coordinatesChild[0];
             double endy = coordinatesChild[1] + (coordinatesChild[3] / 2);
             setLineWidth(Math.min(child.getGenomes().length, parent.getGenomes().length));
+
+            ArrayList<Integer> allGenomesInEdge = new ArrayList<>();
+            for (int genomeID : parent.getGenomes()) {
+                if (contains(child.getGenomes(), genomeID)) {
+                    allGenomesInEdge.add(genomeID);
+                }
+            }
+            ArrayList<Color> colourMeBby =
+                    colourController.getEdgeColours(allGenomesInEdge.stream().mapToInt(q -> q).toArray());
+            if (colourMeBby.size() < 4) {
+                colourMeBby.addAll(colourMeBby);
+            }
+
             if (edgeInView(startx, endx)) {
-                gc.strokeLine(startx, starty, endx, endy);
+                double tempStartX = startx;
+                double tempStartY = starty;
+                double dashSizeX = (endx - startx) / (double) colourMeBby.size();
+                double dashSizeY = (endy - starty) / (double) colourMeBby.size();
+                double tempEndX = startx + dashSizeX;
+                double tempEndY = starty + dashSizeY;
+
+                for (int i = 0; i < colourMeBby.size(); i++) {
+                    gc.setStroke(colourMeBby.get(i));
+                    gc.strokeLine(tempStartX, tempStartY, tempEndX, tempEndY);
+                    tempStartX = tempEndX;
+                    tempStartY = tempEndY;
+                    tempEndX += dashSizeX;
+                    tempEndY += dashSizeY;
+                }
             }
         }
     }

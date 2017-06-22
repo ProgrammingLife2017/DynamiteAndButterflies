@@ -10,7 +10,7 @@
 
 <AnchorPane minWidth="315.0" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.sub_controllers.AnnotationTableController">
   <children>
-    <TableView fx:id="annotationTable" prefHeight="-1.0" prefWidth="-1.0" tableMenuButtonVisible="false" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="40.0">
+    <TableView fx:id="annotationTable" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="40.0">
       <columns>
           <TableColumn fx:id="startColumn" maxWidth="850.0" prefWidth="120.0" text="startPoint" />
           <TableColumn fx:id="endColumn" maxWidth="850.0" prefWidth="120.0" text="endPoint" />
