@@ -39,7 +39,7 @@ public final class PanningController extends Observable {
      */
     private static final int RENDER_SHIFT = 1000;
 
-    private static final PanningController panningController = new PanningController();
+    private static final PanningController PANNING_CONTROLLER = new PanningController();
 
     private MenuController menuController;
     private Button rightPannButton;
@@ -58,7 +58,7 @@ public final class PanningController extends Observable {
      * @return The panning controller
      */
     public static PanningController getInstance() {
-        return panningController;
+        return PANNING_CONTROLLER;
     }
 
     /**
