@@ -10,6 +10,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollBar?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
@@ -21,9 +22,9 @@
    <children>
       <BorderPane maxHeight="1080.0" maxWidth="1920.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <bottom>
-          <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
+          <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="CENTER">
                <children>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="150.0" style="-fx-background-color: white;">
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="150.0" style="-fx-border-color: grey;">
                      <children>
                         <Label layoutX="14.0" layoutY="14.0" text="Nodes:" />
                         <Label layoutX="14.0" layoutY="43.0" text="Edges:" />
@@ -90,13 +91,13 @@
             </MenuBar>
          </top>
          <left>
-          <AnchorPane maxWidth="150.0" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" BorderPane.alignment="CENTER">
+          <AnchorPane maxWidth="150.0" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" style="-fx-border-color: GREY;" BorderPane.alignment="CENTER">
                <children>
-                  <TextField fx:id="nodeTextField" alignment="CENTER" disable="true" layoutX="10.0" layoutY="30.0" prefHeight="29.0" prefWidth="97.0" promptText="Centre node">
+                  <TextField fx:id="nodeTextField" alignment="CENTER" disable="true" layoutX="27.0" layoutY="64.0" prefHeight="29.0" prefWidth="97.0" promptText="Centre node">
                      <font>
                         <Font size="12.0" />
                      </font></TextField>
-                  <Button fx:id="goToNodeBut" disable="true" layoutX="10.0" layoutY="72.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node">
+                  <Button fx:id="goToNodeBut" disable="true" layoutX="26.0" layoutY="28.0" mnemonicParsing="false" onAction="#traverseGraphClicked" text="Go to this node">
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
@@ -104,11 +105,11 @@
                         <Font size="12.0" />
                      </font>
                   </Button>
-                  <TextField fx:id="radiusTextField" alignment="CENTER" disable="true" layoutX="10.0" layoutY="111.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius">
+                  <TextField fx:id="radiusTextField" alignment="CENTER" disable="true" layoutX="27.0" layoutY="101.0" prefHeight="29.0" prefWidth="97.0" promptText="Radius">
                      <font>
                         <Font size="12.0" />
                      </font></TextField>
-                  <Button fx:id="chooseGenome" disable="true" layoutX="10.0" layoutY="171.0" mnemonicParsing="false" onAction="#chooseGenomePress" prefHeight="25.0" prefWidth="120.0" text="Specific Genome">
+                  <Button fx:id="chooseGenome" disable="true" layoutX="15.0" layoutY="171.0" mnemonicParsing="false" onAction="#chooseGenomePress" prefHeight="25.0" prefWidth="120.0" text="Specific Genome">
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
@@ -116,7 +117,7 @@
                         <Font size="12.0" />
                      </font>
                   </Button>
-                  <Button fx:id="annoBut" disable="true" layoutX="12.0" layoutY="208.0" mnemonicParsing="false" onAction="#chooseAnnoClicked" prefHeight="25.0" prefWidth="120.0" text="Choose Annotation">
+                  <Button fx:id="annoBut" disable="true" layoutX="17.0" layoutY="208.0" mnemonicParsing="false" onAction="#chooseAnnoClicked" prefHeight="25.0" prefWidth="120.0" text="Choose Annotation">
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
@@ -124,16 +125,18 @@
                         <Font size="12.0" />
                      </font>
                   </Button>
-                  <CheckBox fx:id="rainbowBut" disable="true" layoutX="10.0" layoutY="255.0" mnemonicParsing="false" onAction="#rainbowButtonClicked" selected="true" text="Rainbow view">
+                  <CheckBox fx:id="rainbowBut" disable="true" layoutX="29.0" layoutY="278.0" mnemonicParsing="false" onAction="#rainbowButtonClicked" selected="true" text="Rainbow view">
                      <font>
                         <Font size="12.0" />
                      </font>
                   </CheckBox>
-                  <CheckBox fx:id="collapseSNPButton" disable="true" layoutX="10.0" layoutY="285.0" mnemonicParsing="false" onAction="#collapseSNPClicked" selected="true" text="Collapse SNPs">
+                  <CheckBox fx:id="collapseSNPButton" disable="true" layoutX="29.0" layoutY="308.0" mnemonicParsing="false" onAction="#collapseSNPClicked" selected="true" text="Collapse SNPs">
                      <font>
                         <Font size="12.0" />
                      </font>
                   </CheckBox>
+                  <Separator layoutX="-23.0" layoutY="148.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+                  <Separator layoutX="9.0" layoutY="257.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
                </children>
             </AnchorPane>
          </left>
@@ -141,25 +144,31 @@
           <AnchorPane fx:id="canvasPanel" focusTraversable="true" minHeight="0.0" minWidth="0.0" prefHeight="520.0" prefWidth="1200.0" style="-fx-background-color: WHITE;" BorderPane.alignment="CENTER">
                <children>
                   <Canvas fx:id="canvas" onMouseClicked="#clickMouse" onScroll="#scrollZoom" />
-                  <Button fx:id="zoomInBut" disable="true" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="20.0">
+                  <Button fx:id="zoomInBut" disable="true" layoutX="1080.0" layoutY="451.0" mnemonicParsing="false" onAction="#zoomInClicked" prefHeight="32.0" prefWidth="32.0" text="+" AnchorPane.bottomAnchor="70.0" AnchorPane.rightAnchor="100.0">
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
                   </Button>
-                  <Button fx:id="zoomOutBut" disable="true" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="60.0">
+                  <Button fx:id="zoomOutBut" disable="true" layoutX="1080.0" layoutY="495.0" mnemonicParsing="false" onAction="#zoomOutClicked" prefHeight="32.0" prefWidth="32.0" text="-" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="100.0">
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
                   </Button>
-                  <Button fx:id="rightPannButton" disable="true" mnemonicParsing="false" prefHeight="80.0" prefWidth="200.0" text="Right" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="40.0">
+                  <Button fx:id="rightPannButton" disable="true" mnemonicParsing="false" prefHeight="30.0" prefWidth="50.0" text="→" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="40.0">
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
                   </Button>
-                  <Button fx:id="leftPannButton" disable="true" mnemonicParsing="false" prefHeight="80.0" prefWidth="200.0" text="Left" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="20.0">
+                  <Button fx:id="leftPannButton" disable="true" layoutX="1014.0" layoutY="496.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="50.0" text="←" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="142.0">
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
                   </Button>
                   <ScrollBar fx:id="scrollBar" layoutX="1184.0" layoutY="125.0" max="10.0" orientation="VERTICAL" visibleAmount="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
