@@ -1,14 +1,11 @@
 package gui.sub_controllers;
 
 import gui.GraphDrawer;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ScrollBar;
 
 /**
- * Created by Jasper van Tilburg SID on 20-6-2017.
- * <p>
  * This controller handles the scrollbar.
+ * Created by Jasper van Tilburg on 20-6-2017.
  */
 public final class ScrollbarController {
 
@@ -35,13 +32,10 @@ public final class ScrollbarController {
      */
     public void initialize(int maxColumnSize) {
         scrollBar.setMax(maxColumnSize);
-        scrollBar.valueProperty().addListener(new ChangeListener<Number>() {
-            public void changed(ObservableValue<? extends Number> ov,
-                                Number oldValue, Number newValue) {
-                GraphDrawer.getInstance().setyDifference(
-                        scrollBar.getValue() * GraphDrawer.RELATIVE_Y_DISTANCE);
-                GraphDrawer.getInstance().redraw();
-            }
+        scrollBar.valueProperty().addListener((ov, oldValue, newValue) -> {
+            GraphDrawer.getInstance().setyDifference(
+                    scrollBar.getValue() * GraphDrawer.RELATIVE_Y_DISTANCE);
+            GraphDrawer.getInstance().redraw();
         });
 
     }

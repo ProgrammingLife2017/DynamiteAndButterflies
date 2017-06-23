@@ -11,7 +11,7 @@ import java.io.IOException;
  * The Zoom Controller controls all buttons
  * in the GUI that are the boss of zooming.
  */
-public class ZoomController {
+public final class ZoomController {
 
     private static ZoomController zoomController = new ZoomController();
     private MenuController menuController;
@@ -22,7 +22,7 @@ public class ZoomController {
     /**
      * Constructor of the Zoom Controller.
      */
-    public ZoomController() {
+    private ZoomController() {
     }
 
     /**
@@ -48,7 +48,6 @@ public class ZoomController {
      * Zooms out.
      *
      * @param column the column to zoom out on.
-     * @throws IOException thrown if can't find
      */
     public void zoomOut(int column) {
         GraphDrawer.getInstance().zoom(SCROLL_ZOOM_OUT_FACTOR, column);
