@@ -1,13 +1,14 @@
 package exceptions;
 
 /**
- * Created by TUDelft SID on 20-6-2017.
+ * NotInRangeException is thrown when an invalid node ID or an invalid radius is given as input.
+ * Created by Jasper van Tilburg on 20-6-2017.
  */
 public class NotInRangeException extends Exception {
 
-    public NotInRangeException() {}
-
-    public NotInRangeException(String message) {
-        super(message);
+    /**
+     * Constructor.
+     */
+    public NotInRangeException() {
     }
 }
