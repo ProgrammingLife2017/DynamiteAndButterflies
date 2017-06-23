@@ -8,9 +8,7 @@ Genome parser and visualisation
 |-------------------------------------------|----------------------------------------|-----------------------------------------|-----------------------------------------|----------------------------------------|
 | ![jasper](http://i.imgur.com/xHGjfa3.jpg) | ![Lex](http://i.imgur.com/s8z6wXz.jpg) | ![Eric](http://i.imgur.com/N381Hu6.jpg) | ![marc](http://i.imgur.com/3Y9fqJA.jpg) | ![jip](http://i.imgur.com/W3MpLr7.jpg) |
 ## Preview
-![main screen](http://i.imgur.com/f3fXR66.png)
-![file picker](http://i.imgur.com/4EkWHN8.png)
-![zooming](http://i.imgur.com/qE3CEvL.png)
+![main screen](http://i.imgur.com/vhIYpXh.png)
 
 ## Before you start
 When opening the current release for the first time, there might be some problems with the database files already on your computer. To fix this, please delete those files once (they can be found in the folder that also holds you .jar file).
