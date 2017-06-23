@@ -13,6 +13,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import org.jetbrains.annotations.NotNull;
 import structures.Annotation;
 
 import java.util.ArrayList;
@@ -33,15 +34,14 @@ public class AnnotationTableController {
     @FXML
     private TableView<Annotation> annotationTable;
     @FXML
-    public TableColumn<Annotation, Integer> startColumn;
+    private TableColumn<Annotation, Integer> startColumn;
     @FXML
-    public TableColumn<Annotation, Integer> endColumn;
+    private TableColumn<Annotation, Integer> endColumn;
     @FXML
-    public TableColumn<Annotation, String> infoColumn;
+    private TableColumn<Annotation, String> infoColumn;
     @FXML
-    public TableColumn<Annotation, Boolean> highlightColumn;
+    private TableColumn<Annotation, Boolean> highlightColumn;
 
-    private ObservableList<Annotation> masterData = FXCollections.observableArrayList();
     private SortedList<Annotation> sortedData;
     private HashMap<Integer, HashSet<Annotation>> annotations;
     private HashMap<Integer, HashSet<Annotation>> updatedAnnotations;
@@ -61,40 +61,20 @@ public class AnnotationTableController {
      * @param annotationsArg the annotations to load into the table.
      */
     @FXML
+    @SuppressWarnings("MethodLength") //It is only 2 too long and the comments ensure clarity.
     public void initialize(HashMap<Integer, HashSet<Annotation>> annotationsArg) {
         this.annotations = annotationsArg;
         this.updatedAnnotations = this.annotations;
         allSelected = false;
 
-        HashSet<Annotation> drawThese = new HashSet<>();
-        for (int i = 0; i <= annotations.size(); i++) {
-            HashSet<Annotation> tempAnnotations = annotations.get(i);
-            if (tempAnnotations != null) {
-                drawThese.addAll(tempAnnotations);
-            }
-        }
-        masterData = FXCollections.observableArrayList(new ArrayList<Annotation>(drawThese));
+        ObservableList<Annotation> masterData =
+                FXCollections.observableArrayList(new ArrayList<Annotation>(bucketsToHashSet()));
 
         // 0. Initialize the columns.
-        startColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("start"));
-        endColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("end"));
-        infoColumn.setCellValueFactory(new PropertyValueFactory<Annotation, String>("info"));
-        highlightColumn.setCellValueFactory(
-                new Callback<TableColumn.
-                        CellDataFeatures<Annotation, Boolean>, ObservableValue<Boolean>>() {
-                    @Override
-                    public ObservableValue<Boolean> call(
-                            TableColumn.CellDataFeatures<Annotation, Boolean> param) {
-                        return param.getValue().getSelected();
-                    }
-                });
-        highlightColumn.setCellFactory(CheckBoxTableCell.forTableColumn(highlightColumn));
+        initializeColumns();
 
-        annotationTable.setEditable(true);
-        startColumn.setEditable(false);
-        endColumn.setEditable(false);
-        infoColumn.setEditable(false);
-        highlightColumn.setEditable(true);
+        // 0.1 setRight editable columns
+        setEditable();
 
         // 1. Wrap the ObservableList in a FilteredList (initially display all data).
         FilteredList<Annotation> filteredData = new FilteredList<>(masterData, p -> true);
@@ -125,8 +105,62 @@ public class AnnotationTableController {
         annotationTable.setItems(sortedData);
     }
 
-    public HashMap<Integer, HashSet<Annotation>> getAnnotations() {
-        return updatedAnnotations;
+    /**
+     * Sets the hashMap annotations to a HashSet.
+     * @return a hashset of the buckets of annotations
+     */
+    @NotNull
+    private HashSet<Annotation> bucketsToHashSet() {
+        return bucketsToHashSet(this.annotations);
+    }
+
+    /**
+     * Converts the hashMap to a hashSet.
+     * @param hashMap The hashMap to be converted.
+     * @return a hashSet of the hashMap.
+     */
+    private HashSet<Annotation> bucketsToHashSet(HashMap<Integer, HashSet<Annotation>> hashMap) {
+        if (hashMap == null) {
+            return null;
+        }
+        HashSet<Annotation> drawThese = new HashSet<>();
+        for (int i = 0; i <= hashMap.size(); i++) {
+            HashSet<Annotation> tempAnnotations = hashMap.get(i);
+            if (tempAnnotations != null) {
+                drawThese.addAll(tempAnnotations);
+            }
+        }
+        return drawThese;
+    }
+
+    /**
+     * Method that sets the columns and table to the correct editable state.
+     */
+    private void setEditable() {
+        annotationTable.setEditable(true);
+        startColumn.setEditable(false);
+        endColumn.setEditable(false);
+        infoColumn.setEditable(false);
+        highlightColumn.setEditable(true);
+    }
+
+    /**
+     * Method that initializes the columns with the right factories.
+     */
+    private void initializeColumns() {
+        startColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("start"));
+        endColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("end"));
+        infoColumn.setCellValueFactory(new PropertyValueFactory<Annotation, String>("info"));
+        highlightColumn.setCellValueFactory(
+                new Callback<TableColumn.
+                        CellDataFeatures<Annotation, Boolean>, ObservableValue<Boolean>>() {
+                    @Override
+                    public ObservableValue<Boolean> call(
+                            TableColumn.CellDataFeatures<Annotation, Boolean> param) {
+                        return param.getValue().getSelected();
+                    }
+                });
+        highlightColumn.setCellFactory(CheckBoxTableCell.forTableColumn(highlightColumn));
     }
 
     /**
@@ -167,5 +201,9 @@ public class AnnotationTableController {
         }
         annotationTable.setItems(sortedData);
         allSelected = !allSelected;
+    }
+
+    public HashMap<Integer, HashSet<Annotation>> getAnnotations() {
+        return updatedAnnotations;
     }
 }
