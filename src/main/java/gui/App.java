@@ -3,6 +3,7 @@ package gui;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -59,9 +60,10 @@ public class App extends Application {
 
             // Set the pane onto the scene
             Scene scene = new Scene(pane);
-            stage.setTitle("Wow!! DynamiteAndButterflies genome visualiser\t");
+            stage.setTitle("Multiple Genome Visualiser - DynamiteAndButterflies  - TU Delft");
             stage.setScene(scene);
             stage.setResizable(true);
+            stage.getIcons().add(new Image("http://i.imgur.com/CjIn1cR.png"));
             stage.show();
             //stage.setMaximized(true); -> Mac fails to load a setMaximized(true) stage.
 //            System.out.println(path + " loaded on the stage");
