@@ -1,6 +1,5 @@
 package gui.sub_controllers;
 
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -12,7 +11,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.jetbrains.annotations.NotNull;
 import structures.Annotation;
 
@@ -68,7 +66,7 @@ public class AnnotationTableController {
         allSelected = false;
 
         ObservableList<Annotation> masterData =
-                FXCollections.observableArrayList(new ArrayList<Annotation>(bucketsToHashSet()));
+                FXCollections.observableArrayList(new ArrayList<>(bucketsToHashSet()));
 
         // 0. Initialize the columns.
         initializeColumns();
@@ -80,23 +78,22 @@ public class AnnotationTableController {
         FilteredList<Annotation> filteredData = new FilteredList<>(masterData, p -> true);
 
         // 2. Set the filter Predicate whenever the filter changes.
-        filterField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filteredData.setPredicate(annotation -> {
-                // If filter text is empty, display all annotations.
-                if (newValue == null || newValue.isEmpty()) {
-                    return true;
-                }
-                String lowerCaseFilter = newValue.toLowerCase();
+        filterField.textProperty().addListener((observable, oldValue, newValue)
+                -> filteredData.setPredicate(annotation -> {
+            // If filter text is empty, display all annotations.
+            if (newValue == null || newValue.isEmpty()) {
+                return true;
+            }
+            String lowerCaseFilter = newValue.toLowerCase();
 
-                //Check the info, but also co-ordinates.
-                return annotation.getInfo().toLowerCase().contains(lowerCaseFilter)
-                        || Integer.toString(annotation.getStart()).contains(lowerCaseFilter)
-                        || Integer.toString(annotation.getEnd()).contains(lowerCaseFilter);
-            });
-        });
+            //Check the info, but also co-ordinates.
+            return annotation.getInfo().toLowerCase().contains(lowerCaseFilter)
+                    || Integer.toString(annotation.getStart()).contains(lowerCaseFilter)
+                    || Integer.toString(annotation.getEnd()).contains(lowerCaseFilter);
+        }));
 
         // 3. Wrap the FilteredList in a SortedList.
-        sortedData = new SortedList<Annotation>(filteredData);
+        sortedData = new SortedList<>(filteredData);
 
         // 4. Bind the SortedList comparator to the TableView comparator.
         sortedData.comparatorProperty().bind(annotationTable.comparatorProperty());
@@ -107,7 +104,7 @@ public class AnnotationTableController {
 
     /**
      * Sets the hashMap annotations to a HashSet.
-     * @return a hashset of the buckets of annotations
+     * @return a hash set of the buckets of annotations
      */
     @NotNull
     private HashSet<Annotation> bucketsToHashSet() {
@@ -148,18 +145,11 @@ public class AnnotationTableController {
      * Method that initializes the columns with the right factories.
      */
     private void initializeColumns() {
-        startColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("start"));
-        endColumn.setCellValueFactory(new PropertyValueFactory<Annotation, Integer>("end"));
-        infoColumn.setCellValueFactory(new PropertyValueFactory<Annotation, String>("info"));
+        startColumn.setCellValueFactory(new PropertyValueFactory<>("start"));
+        endColumn.setCellValueFactory(new PropertyValueFactory<>("end"));
+        infoColumn.setCellValueFactory(new PropertyValueFactory<>("info"));
         highlightColumn.setCellValueFactory(
-                new Callback<TableColumn.
-                        CellDataFeatures<Annotation, Boolean>, ObservableValue<Boolean>>() {
-                    @Override
-                    public ObservableValue<Boolean> call(
-                            TableColumn.CellDataFeatures<Annotation, Boolean> param) {
-                        return param.getValue().getSelected();
-                    }
-                });
+                param -> param.getValue().getSelected());
         highlightColumn.setCellFactory(CheckBoxTableCell.forTableColumn(highlightColumn));
     }
 

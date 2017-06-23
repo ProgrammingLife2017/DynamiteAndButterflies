@@ -52,7 +52,11 @@ public class Genome {
         return selected;
     }
 
-    public boolean isSelected() { return selected.get(); }
+    public boolean isSelected() {
+        return selected.get();
+    }
 
-    public void setSelected(boolean value) { this.selected.set(value); }
+    public void setSelected(boolean value) {
+        this.selected.set(value);
+    }
 }

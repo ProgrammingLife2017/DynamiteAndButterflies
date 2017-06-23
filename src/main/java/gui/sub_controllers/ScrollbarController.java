@@ -9,7 +9,7 @@ import javafx.scene.control.ScrollBar;
  */
 public final class ScrollbarController {
 
-    private static ScrollbarController scrollbarController = new ScrollbarController();
+    private static final ScrollbarController scrollbarController = new ScrollbarController();
 
     private ScrollBar scrollBar;
 

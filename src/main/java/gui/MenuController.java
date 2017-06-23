@@ -378,8 +378,7 @@ public class MenuController implements Observer {
         Stage stage;
         Parent root = loader.load();
         BookmarkPopUp controller = loader.<BookmarkPopUp>getController();
-        controller.initialize(Integer.parseInt(nodeTextField.getText()),
-                GraphDrawer.getInstance().getZoomLevel(), bookmarkController);
+        controller.initialize(Integer.parseInt(nodeTextField.getText()), bookmarkController);
 
         stage = new Stage();
         stage.setScene(new Scene(root));

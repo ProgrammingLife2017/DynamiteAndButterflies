@@ -16,7 +16,7 @@ public class RecentController {
     private static final String FILE_PREF_2 = "file2";
     private static final String FILE_PREF_3 = "file3";
 
-    private CustomProperties properties;
+    private final CustomProperties properties;
     private static final String EMPTY = "<No recent file>";
 
     /**
@@ -108,7 +108,7 @@ public class RecentController {
     /**
      * Initializes all the recent files from Preferences.
      */
-    public void initialize() {
+    private void initialize() {
         properties.updateProperties();
         properties.setProperty(FILE_PREF_3, properties.getProperty(FILE_PREF_3, EMPTY));
         properties.setProperty(FILE_PREF_2, properties.getProperty(FILE_PREF_2, EMPTY));

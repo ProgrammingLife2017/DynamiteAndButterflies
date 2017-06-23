@@ -17,7 +17,7 @@ import java.util.Observer;
  *
  * A singleton class which represents our canvas and some data it needs.
  */
-final public class DrawableCanvas extends Observable implements Observer {
+public final class DrawableCanvas extends Observable implements Observer {
 
     private static final int START_NODE_ID = 1000;
 

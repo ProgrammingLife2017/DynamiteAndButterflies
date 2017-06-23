@@ -46,7 +46,7 @@ public class PopUpController {
     @FXML
     public void loadDbCorruptPopUp(final String partPath, String message) {
         try {
-            popUp(".db File corrupted");
+            popUp();
             popUpOK.addEventHandler(MouseEvent.MOUSE_CLICKED,
                     new EventHandler<MouseEvent>() {
                         public void handle(MouseEvent e) {
@@ -72,13 +72,13 @@ public class PopUpController {
         }
     }
 
-    private void popUp(String title) throws IOException {
+    private void popUp() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/popUp.fxml"));
         loader.setController(this);
         Parent root = loader.load();
         stage = new Stage();
         stage.setScene(new Scene(root));
-        stage.setTitle(title);
+        stage.setTitle(".db File corrupted");
         stage.initModality(Modality.APPLICATION_MODAL);
     }
 

@@ -11,10 +11,10 @@ import javafx.scene.control.MenuItem;
  */
 public class SpecificGenomeProperties {
 
-    private MenuItem genomes1;
-    private MenuItem genomes2;
-    private MenuItem genomes3;
-    private CustomProperties properties;
+    private final MenuItem genomes1;
+    private final MenuItem genomes2;
+    private final MenuItem genomes3;
+    private final CustomProperties properties;
 
     private static final String PROP_ONE = "firstGenomes";
     private static final String PROP_TWO = "secondGenomes";

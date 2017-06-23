@@ -4,8 +4,6 @@ import graph.SequenceGraph;
 import gui.GraphDrawer;
 import gui.MenuController;
 
-import java.io.IOException;
-
 /**
  * Created by Jip on 17-5-2017.
  * The Zoom Controller controls all buttons
@@ -13,7 +11,7 @@ import java.io.IOException;
  */
 public final class ZoomController {
 
-    private static ZoomController zoomController = new ZoomController();
+    private static final ZoomController ZOOM_CONTROLLER = new ZoomController();
     private MenuController menuController;
 
     private static final double SCROLL_ZOOM_IN_FACTOR = 0.9;
@@ -31,7 +29,7 @@ public final class ZoomController {
      * @return the ZoomController
      */
     public static ZoomController getInstance() {
-        return zoomController;
+        return ZOOM_CONTROLLER;
     }
 
     /**

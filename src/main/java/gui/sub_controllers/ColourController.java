@@ -19,8 +19,10 @@ import java.util.ArrayList;
 @SuppressWarnings("MagicNumber")
 public class ColourController {
 
-    private int[] selectedGenomes;
-    private boolean rainbowView;
+    private static final Color BASE_COLOR = Color.BLACK;
+
+    private final int[] selectedGenomes;
+    private final boolean rainbowView;
     private int lowerPart;
     private int middlePart;
     private int higherPart;
@@ -83,7 +85,7 @@ public class ColourController {
      * @param positionInSelection an integer representing it's position in the selectedGenomes array
      * @return A color.
      */
-    public Color getSingle(int positionInSelection) {
+    private Color getSingle(int positionInSelection) {
         double hue = (360 / selectedGenomes.length) * positionInSelection;
         double brightness = 0.8 + (0.2 / selectedGenomes.length) * positionInSelection;
         return Color.hsb(hue, 1, brightness);
@@ -115,7 +117,7 @@ public class ColourController {
      *
      * @return the base colour.
      */
-    public Color getBaseNodeColour() {
+    private Color getBaseNodeColour() {
         return Color.gray(0.5098);
     }
 
@@ -176,7 +178,7 @@ public class ColourController {
      * @param genome   The genome to see if it is in the check set.
      * @return a boolean true if it is in the set or false if it is not.
      */
-    public boolean contains(int[] checkSet, int genome) {
+    private boolean contains(int[] checkSet, int genome) {
         for (int check : checkSet) {
             if (check == genome) {
                 return true;
@@ -195,7 +197,7 @@ public class ColourController {
         ArrayList<Color> res = new ArrayList<Color>();
         //If there is no selection, it should only be the base colour.
         if (selectedGenomes.length == 0 || !rainbowView) {
-            res.add(getBaseEdgeColour());
+            res.add(BASE_COLOR);
             return res;
         }
 
@@ -204,7 +206,7 @@ public class ColourController {
             res = rainbowViewColours(genomes);
         }
         if (res.isEmpty()) {
-            res.add(getBaseEdgeColour());
+            res.add(BASE_COLOR);
         }
 
         return res;
@@ -225,14 +227,5 @@ public class ColourController {
             }
         }
         return res;
-    }
-
-    /**
-     * The base colour of the edges.
-     *
-     * @return the base colour of the edges.
-     */
-    public Color getBaseEdgeColour() {
-        return Color.BLACK;
     }
 }

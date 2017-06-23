@@ -25,11 +25,9 @@ public class BookmarkPopUp {
      * Intializes the pop up.
      *
      * @param centreNode            The centre node already filled in in the main application
-     * @param zoomLevel             The radius already filled in in the main application
      * @param bookmarkControllerArg The bookmark controller linked to the main application.
      */
-    public void initialize(int centreNode, double zoomLevel,
-                           BookmarkController bookmarkControllerArg) {
+    public void initialize(int centreNode, BookmarkController bookmarkControllerArg) {
         centreNodeBook.setText(Integer.toString(centreNode));
         radiusBook.setText(Integer.toString(GraphDrawer.getInstance().getRadius()));
 

@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  */
 public class BookmarkController {
 
-    private CustomProperties properties;
+    private final CustomProperties properties;
     private final MenuItem bookmark1, bookmark2, bookmark3;
     private static final String BOOKMARK_REGEX = "\\w.*\\s-\\s\\d+\\s+-\\s\\d+";
     private static final String EMPTY = "-";

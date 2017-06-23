@@ -20,7 +20,8 @@ public class Annotation {
     private SimpleBooleanProperty selected  = new SimpleBooleanProperty();
     private int identifier;
     /**
-     * Constructor of the object
+     * Constructor of the object.
+     * @param identifier the ID of the annotation
      * @param startArg the start coördinate of the annotation
      * @param endArg the end coördinate of the annotation
      * @param infoArg the information with the annotation

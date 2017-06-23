@@ -20,19 +20,9 @@ public class FileController extends Observable implements Observer {
 
     private File gfaParDirectory;
     private File gffParDirectory;
-
-    private ProgressBarController progressBarController;
-
+    private final ProgressBarController progressBarController;
     private Thread parseThread;
-
-    private String partPath;
-
-    private CustomProperties properties;
-
-    private PopUpController popUpController;
-
-    private int[] childArray;
-    private int[] parentArray;
+    private final CustomProperties properties;
 
     /**
      * Constructor of the FileController object to control the Files.
@@ -111,11 +101,8 @@ public class FileController extends Observable implements Observer {
      * can be selected and directly be visualised on the screen.
      *
      * @param filePath the filePath of the file.
-     * @throws IOException          exception if no file is found
-     * @throws InterruptedException Exception if the Thread is interrupted.
      */
-    public void openGfaFileClicked(String filePath)
-            throws IOException, InterruptedException {
+    public void openGfaFileClicked(String filePath) {
         if (DrawableCanvas.getInstance().getParser() != null) {
             DrawableCanvas.getInstance().getParser().getDb().close();
         }
@@ -125,11 +112,11 @@ public class FileController extends Observable implements Observer {
         this.addObserver(DrawableCanvas.getInstance());
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
-        partPath = partPaths[partPaths.length - 1];
+        String partPath = partPaths[partPaths.length - 1];
         properties.updateProperties();
         boolean flag = Boolean.parseBoolean(properties.getProperty(partPath, "true"));
         if (!flag) {
-            popUpController = new PopUpController();
+            PopUpController popUpController = new PopUpController();
             String message = "Database File is corrupt,"
                     + " press 'Reload' to reload the file," + "\n"
                     + "or press 'Resume' to recover the data still available.";
@@ -168,19 +155,6 @@ public class FileController extends Observable implements Observer {
     }
 
 
-    /**
-     * Gets the fileName from the filePath.
-     *
-     * @param filePath The path to the file you want the name off
-     * @return The name of the file.
-     */
-    public String fileNameFromPath(String filePath) {
-        String pattern = Pattern.quote(System.getProperty("file.separator"));
-        String[] partPaths = filePath.split(pattern);
-        String fileName = partPaths[partPaths.length - 1];
-        System.out.println(fileName);
-        return fileName;
-    }
 
 
 }
