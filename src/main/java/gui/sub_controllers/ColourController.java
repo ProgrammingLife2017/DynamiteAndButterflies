@@ -235,4 +235,12 @@ public class ColourController {
     public Color getBaseEdgeColour() {
         return Color.BLACK;
     }
+
+    public void setSelectedGenomes(int[] selected) {
+        this.selectedGenomes = selected;
+    }
+
+    public void setRainbowView(boolean rainbowView) {
+        this.rainbowView = rainbowView;
+    }
 }
