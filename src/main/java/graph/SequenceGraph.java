@@ -2,9 +2,7 @@ package graph;
 
 import gui.DrawableCanvas;
 import org.mapdb.HTreeMap;
-
 import java.io.IOException;
-
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -18,20 +16,17 @@ import java.util.stream.Stream;
  */
 public class SequenceGraph {
 
+    private static final int EXTRA_BOUNDS = 100;
+
+    private final int[] parentArray;
+    private final int[] childArray;
+    private int centerNodeID;
+    private int dummyNodeIDCounter = -1;
+    private int maxColumnSize;
+    private Boundary boundaries;
+    private HTreeMap<Long, String> sequenceHashMap;
     private TreeMap<Integer, SequenceNode> nodes;
     private ArrayList<ArrayList<SequenceNode>> columns;
-
-
-
-    private Boundary boundaries;
-    private int centerNodeID;
-    private int[] parentArray;
-    private int[] childArray;
-    private HTreeMap<Long, String> sequenceHashMap;
-    private int dummyNodeIDCounter = -1;
-    private String partPath;
-    private int maxColumnSize;
-
 
     /**
      * The constructor initializes the SequenceGraph with it's basic values.
@@ -48,7 +43,7 @@ public class SequenceGraph {
     }
 
     /**
-     * size method for nodes.
+     * size method for nodes in the sub graph.
      *
      * @return the size of the HashMap
      */
@@ -56,6 +51,11 @@ public class SequenceGraph {
         return nodes.size();
     }
 
+    /**
+     * Size method for the total graph.
+     *
+     * @return The size of the total graph.
+     */
     public int totalSize() {
         return parentArray.length;
     }
@@ -67,8 +67,8 @@ public class SequenceGraph {
      * @param range        - the amount of edges to add to the graph
      */
     public void createSubGraph(int centerNodeID, int range) {
-        this.nodes = new TreeMap<Integer, SequenceNode>();
-        this.columns = new ArrayList<ArrayList<SequenceNode>>();
+        this.nodes = new TreeMap<>();
+        this.columns = new ArrayList<>();
 
         Boundary boundary = new Boundary(centerNodeID, range, parentArray, childArray);
         this.centerNodeID = centerNodeID;
@@ -81,13 +81,15 @@ public class SequenceGraph {
         assignSequenceLenghts();
     }
 
+    /**
+     * Initialize the genomes.
+     */
     private void initGenomes() {
         try {
             String[] genomeData = getGenomes();
             int counter = 0;
-            Iterator it = nodes.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry) it.next();
+            for (Object o : nodes.entrySet()) {
+                Map.Entry pair = (Map.Entry) o;
                 SequenceNode node = (SequenceNode) pair.getValue();
                 String[] specificGenomeData = genomeData[counter].split("-");
                 node.setGenomes(splitOnStringToInt(specificGenomeData[0]));
@@ -104,12 +106,14 @@ public class SequenceGraph {
      * Assign the sequence lengths.
      */
     private void assignSequenceLenghts() {
-        Iterator it = nodes.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
+        for (Object o : nodes.entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
             SequenceNode node = (SequenceNode) pair.getValue();
             if (!node.isDummy()) {
-                node.setSequenceLength(sequenceHashMap.get((long) node.getId()).length());
+                String sequence = sequenceHashMap.get((long) node.getId());
+                if (sequence != null) {
+                    node.setSequenceLength(sequence.length());
+                }
             }
         }
     }
@@ -149,8 +153,11 @@ public class SequenceGraph {
      */
     private String[] getGenomes() throws IOException {
         try {
-            Stream<String> lines = Files.lines(Paths.get("" + DrawableCanvas.getInstance().getParser().getPartPath() + "genomes.txt"));
-            Stream<String>  line = lines.skip(boundaries.getLeftBoundID() - 1).limit(boundaries.getRightBoundID() + 100);
+            String filePath = DrawableCanvas.getInstance()
+                    .getParser().getPartPath() + "genomes.txt";
+            Stream<String> lines = Files.lines(Paths.get(filePath));
+            Stream<String> line = lines.skip(boundaries.getLeftBoundID() - 1)
+                    .limit(boundaries.getRightBoundID() + EXTRA_BOUNDS);
             return line.toArray(String[]::new);
         } catch (Exception e) {
             e.printStackTrace();
@@ -164,13 +171,13 @@ public class SequenceGraph {
      * @return - the column list with solved edge crossings.
      */
     private ArrayList<ArrayList<SequenceNode>> initColumns() {
-        ArrayList<ArrayList<SequenceNode>> columns = new ArrayList<ArrayList<SequenceNode>>();
+        ArrayList<ArrayList<SequenceNode>> columns = new ArrayList<>();
 
         for (Object o : nodes.entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             SequenceNode node = (SequenceNode) pair.getValue();
             while (columns.size() <= node.getColumn()) {
-                columns.add(new ArrayList<SequenceNode>());
+                columns.add(new ArrayList<>());
             }
             ArrayList<SequenceNode> column = columns.get(node.getColumn());
             column.add(node);
@@ -190,16 +197,16 @@ public class SequenceGraph {
      */
     private void findLongestPath() {
 
-        for (Object o : this.getNodes   ().entrySet()) {
+        for (Object o : this.getNodes().entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             SequenceNode currentNode = (SequenceNode) pair.getValue();
 
-                for (int child : currentNode.getChildren()) {
-                        this.getNode(child).addParent(currentNode.getId());
-                    if (this.getNode(child).getColumn() < currentNode.getColumn() + 1) {
-                        nodes.get(child).setColumn(currentNode.getColumn() + 1);
-                    }
+            for (int child : currentNode.getChildren()) {
+                this.getNode(child).addParent(currentNode.getId());
+                if (this.getNode(child).getColumn() < currentNode.getColumn() + 1) {
+                    nodes.get(child).setColumn(currentNode.getColumn() + 1);
                 }
+            }
         }
     }
 
@@ -221,7 +228,8 @@ public class SequenceGraph {
                     currentColumn.get(j).setIndex(j);
                     this.nodes.get(currentColumn.get(j).getId()).setIndex(j);
                 } else {
-                    int parentNodeIndex = nodes.get(currentColumn.get(j).getParents().get(0)).getIndex();
+                    int parentNodeID = currentColumn.get(j).getParents().get(0);
+                    int parentNodeIndex = nodes.get(parentNodeID).getIndex();
                     if (parentNodeIndex > j) {
                         currentColumn.get(j).setIndex(parentNodeIndex);
                         this.nodes.get(currentColumn.get(j).getId()).setIndex(parentNodeIndex);
@@ -255,23 +263,21 @@ public class SequenceGraph {
      */
     private void sortColumns(ArrayList<SequenceNode> currentColumn) {
         // sort childlayer based on barycenter values.
-        Collections.sort(currentColumn, new Comparator<SequenceNode>() {
-            public int compare(SequenceNode o1, SequenceNode o2) {
-                float baryVal1 = nodes.get(o1.getId()).getBaryCenterValue();
-                float baryVal2 = nodes.get(o2.getId()).getBaryCenterValue();
-                if (baryVal1 > baryVal2) {
+        currentColumn.sort((o1, o2) -> {
+            float baryVal1 = nodes.get(o1.getId()).getBaryCenterValue();
+            float baryVal2 = nodes.get(o2.getId()).getBaryCenterValue();
+            if (baryVal1 > baryVal2) {
+                return 1;
+            } else if (baryVal1 < baryVal2) {
+                return -1;
+            } else if (baryVal1 == baryVal2) {
+                if (nodes.get(o1.getId()).isDummy()) {
                     return 1;
-                } else if (baryVal1 < baryVal2) {
+                } else {
                     return -1;
-                } else if (baryVal1 == baryVal2) {
-                    if (nodes.get(o1.getId()).isDummy()) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
                 }
-                return 0;
             }
+            return 0;
         });
     }
 
@@ -303,8 +309,6 @@ public class SequenceGraph {
      */
     private void addDummyHelper(int span, int parent, int target) {
         SequenceNode parentNode = this.getNode(parent);
-        SequenceNode targetNode = this.getNode(target);
-
         if (span > 1) {
             SequenceNode dummy = new SequenceNode(dummyNodeIDCounter--);
             dummy.setDummy(true);
@@ -320,21 +324,11 @@ public class SequenceGraph {
     }
 
     /**
-     * Getter for the column list.
-     *
-     * @return the column arraylist with an arraylist with nodes.
-     */
-    public ArrayList<ArrayList<SequenceNode>> getColumns() {
-        return this.columns;
-    }
-
-
-    /**
      * Add a node to the ArrayList of Nodes.
      *
      * @param node The node to be added.
      */
-    public void addNode(SequenceNode node) {
+    void addNode(SequenceNode node) {
         this.nodes.put(node.getId(), node);
     }
 
@@ -349,6 +343,16 @@ public class SequenceGraph {
     }
 
     /**
+     * Make a copy of the graph with the values of parrentArray, childArray and sequenceHashMap.
+     *
+     * @return Copy of the graph.
+     */
+    public SequenceGraph copy() {
+        return new SequenceGraph(parentArray, childArray, sequenceHashMap);
+    }
+
+
+    /**
      * Returns all nodes contained in the graph.
      *
      * @return A HashMap of all nodes and their IDs contained in the graph.
@@ -361,9 +365,8 @@ public class SequenceGraph {
         return dummyNodeIDCounter;
     }
 
-
-    public String getPartPath() {
-        return partPath;
+    public ArrayList<ArrayList<SequenceNode>> getColumns() {
+        return this.columns;
     }
 
     public int getFullGraphRightBoundIndex() {
@@ -390,10 +393,6 @@ public class SequenceGraph {
         return boundaries.getRightBoundID();
     }
 
-    public SequenceGraph copy() {
-        return new SequenceGraph(parentArray, childArray, sequenceHashMap);
-    }
-
     public int getLeftBoundIndex() {
         return boundaries.getLeftBoundIndex();
     }
@@ -410,5 +409,4 @@ public class SequenceGraph {
         return maxColumnSize;
     }
 
-    public int getRange() { return boundaries.getRange(); }
 }

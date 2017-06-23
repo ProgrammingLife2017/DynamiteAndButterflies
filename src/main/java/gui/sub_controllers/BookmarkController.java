@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  */
 public class BookmarkController {
 
-    private CustomProperties properties;
+    private final CustomProperties properties;
     private final MenuItem bookmark1, bookmark2, bookmark3;
     private static final String BOOKMARK_REGEX = "\\w.*\\s-\\s\\d+\\s+-\\s\\d+";
     private static final String EMPTY = "-";
@@ -37,6 +37,7 @@ public class BookmarkController {
 
     /**
      * Checks the string if it has the right syntax.
+     *
      * @param realBM A string that is returned if it has the correct syntax.
      * @return A string or faulty string depending on the check
      */
@@ -54,7 +55,7 @@ public class BookmarkController {
      * @param nodes  The centre node
      * @param radius The radius of nodes we should save/show
      */
-    public void saving(String note, String nodes, String radius) {
+    void saving(String note, String nodes, String radius) {
         properties.updateProperties();
 
         String filePath = properties.getProperty("file", "def");
@@ -87,16 +88,16 @@ public class BookmarkController {
      * Loads the bookmarks of the specific file filePath.
      *
      * @param filePath The file that is being
-     *                     loaded whose bookmarks should be loaded.
+     *                 loaded whose bookmarks should be loaded.
      */
     public void initialize(String filePath) {
         properties.updateProperties();
         properties.setProperty(FILE_BOOKMARK3 + filePath,
-                                properties.getProperty(FILE_BOOKMARK3 + filePath, EMPTY));
+                properties.getProperty(FILE_BOOKMARK3 + filePath, EMPTY));
         properties.setProperty(FILE_BOOKMARK2 + filePath,
-                                properties.getProperty(FILE_BOOKMARK2 + filePath, EMPTY));
+                properties.getProperty(FILE_BOOKMARK2 + filePath, EMPTY));
         properties.setProperty(FILE_BOOKMARK1 + filePath,
-                                properties.getProperty(FILE_BOOKMARK1 + filePath, EMPTY));
+                properties.getProperty(FILE_BOOKMARK1 + filePath, EMPTY));
         properties.saveProperties();
 
         bookmark3.setText(properties.getProperty(FILE_BOOKMARK3 + filePath, EMPTY));

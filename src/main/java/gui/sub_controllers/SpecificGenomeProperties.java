@@ -6,15 +6,15 @@ import javafx.scene.control.MenuItem;
 
 /**
  * Created by Jip on 9-6-2017.
- *
+ * <p>
  * This class handles the menu part of saving bookmarks about the genome views.
  */
 public class SpecificGenomeProperties {
 
-    private MenuItem genomes1;
-    private MenuItem genomes2;
-    private MenuItem genomes3;
-    private CustomProperties properties;
+    private final MenuItem genomes1;
+    private final MenuItem genomes2;
+    private final MenuItem genomes3;
+    private final CustomProperties properties;
 
     private static final String PROP_ONE = "firstGenomes";
     private static final String PROP_TWO = "secondGenomes";
@@ -25,6 +25,7 @@ public class SpecificGenomeProperties {
 
     /**
      * Constructor of the genomeproperties.
+     *
      * @param g1 The first menui=Item
      * @param g2 the second menuItem
      * @param g3 the third menuItem
@@ -39,9 +40,10 @@ public class SpecificGenomeProperties {
 
     /**
      * Updates the list of bookmarked genomes.
+     *
      * @param genomes The string to add.
      */
-    public void update(String genomes) {
+    private void update(String genomes) {
         properties.updateProperties();
         properties.setProperty(PROP_THREE + filePath, genomes2.getText());
         properties.setProperty(PROP_TWO + filePath, genomes1.getText());
@@ -76,15 +78,18 @@ public class SpecificGenomeProperties {
 
     /**
      * Handles the save button and parsing data to a string.
+     *
      * @param selectedGenomes The selectedGenomes.
      */
-    public void saving(int[] selectedGenomes) {
-        String save = "Genomes" + " - ";
+    void saving(int[] selectedGenomes) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Genomes - ");
 
         for (int addSelectedGen : selectedGenomes) {
-            save += Integer.toString(addSelectedGen) + ", ";
+            stringBuilder.append(addSelectedGen).append(", ");
         }
-        save = save.replaceAll(", $", "");
-        update(save);
+        String res = stringBuilder.toString();
+        res = res.replaceAll(", $", "");
+        update(res);
     }
 }

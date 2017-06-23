@@ -10,7 +10,10 @@ import java.util.HashSet;
 
 /**
  * Created by lex_b on 12/06/2017.
+ *
+ * A Gff file parser that can parse the data into annotations.
  */
+@SuppressWarnings("MagicNumber") //Because it is a parser we know what kind of file we expect and how its built.
 public class GffParser {
     private String filePath;
     private static final int BUCKET_SIZE = 20000;
@@ -65,20 +68,27 @@ public class GffParser {
             int endBucket = (end / BUCKET_SIZE);
 
 
-            for (int i=startBucket; i <= endBucket; i++) {
+            for (int i = startBucket; i <= endBucket; i++) {
                 HashSet<Annotation> set = buckets.get(i);
                 if (set == null) {
                     set = new HashSet<>();
                 }
                 set.add(anno);
-            buckets.put(startBucket, set);
+                buckets.put(startBucket, set);
             }
         }
+        br.close();
         DrawableCanvas.getInstance().setAnnotationGenome(suggestionGenomeOfAnnotation);
         return buckets;
     }
 
-    public HashMap<Integer, HashSet<Annotation>> initializeBucketArray(int maxCor) {
+    /**
+     * Initialize function for bucketArray.
+     *
+     * @param maxCor - biggest coord.
+     * @return a new hashmap with a specific size.
+     */
+    private HashMap<Integer, HashSet<Annotation>> initializeBucketArray(int maxCor) {
         int size = (maxCor / BUCKET_SIZE);
 
         return new HashMap<>(size);

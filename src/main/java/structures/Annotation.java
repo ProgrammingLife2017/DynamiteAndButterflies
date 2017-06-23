@@ -20,7 +20,8 @@ public class Annotation {
     private SimpleBooleanProperty selected  = new SimpleBooleanProperty();
     private int identifier;
     /**
-     * Constructor of the object
+     * Constructor of the object.
+     * @param identifier the ID of the annotation
      * @param startArg the start coördinate of the annotation
      * @param endArg the end coördinate of the annotation
      * @param infoArg the information with the annotation
@@ -57,6 +58,10 @@ public class Annotation {
         this.selected.set(selected);
     }
 
+    /**
+     * Selects all the annotations.
+     * @param allAnnotations Selects all these annotations
+     */
     public static void selectAll(HashMap<Integer, HashSet<Annotation>> allAnnotations) {
         HashSet<Annotation> selectThese = new HashSet<>();
         for (int i = 0; i <= allAnnotations.size(); i++) {

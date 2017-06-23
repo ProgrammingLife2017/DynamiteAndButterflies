@@ -18,6 +18,8 @@ import java.util.HashMap;
 
 /**
  * Created by Jip on 20-6-2017.
+ * <p>
+ * This popUp gives the user a chocie on which genome to load the annotations.
  */
 public class GffGenomeController {
 
@@ -41,8 +43,7 @@ public class GffGenomeController {
     public void initialize(HashMap<Integer, String> hashMap, int suggestion) {
         selectedGenome = suggestion;
 
-        ArrayList<Genome> realData = new ArrayList<Genome>();
-        realData = createGenomeTable(hashMap, suggestion, true);
+        ArrayList<Genome> realData = createGenomeTable(hashMap, suggestion, true);
         if (realData.size() == 0) {
             realData = createGenomeTable(hashMap, suggestion, false);
         }
@@ -50,12 +51,26 @@ public class GffGenomeController {
         final ObservableList<Genome> data = FXCollections.observableArrayList(realData);
         table.setItems(data);
 
+        initializeColumns();
+
+        table.setEditable(true);
+        idCol.setEditable(false);
+        nameCol.setEditable(false);
+        selectCol.setEditable(true);
+    }
+
+    /**
+     * Initializes the columns with their correct factories.
+     */
+    private void initializeColumns() {
         idCol.setCellValueFactory(new PropertyValueFactory<Genome, Integer>("id"));
         nameCol.setCellValueFactory(new PropertyValueFactory<Genome, String>("name"));
-        selectCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Genome, Boolean>, ObservableValue<Boolean>>() {
+        selectCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Genome, Boolean>,
+                ObservableValue<Boolean>>() {
             @Override
-            public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Genome, Boolean> param) {
-                ObservableValue<Boolean> res = param.getValue().selectedProperty();
+            public ObservableValue<Boolean> call(
+                    TableColumn.CellDataFeatures<Genome, Boolean> param) {
+                ObservableValue<Boolean> res = param.getValue().getSelectedProperty();
                 if (res.getValue()) {
                     if (table.getItems().size() != 1) {
                         for (int i = 0; i < table.getItems().size(); i++) {
@@ -70,20 +85,15 @@ public class GffGenomeController {
             }
         });
         selectCol.setCellFactory(CheckBoxTableCell.forTableColumn(selectCol));
-
-        table.setEditable(true);
-        idCol.setEditable(false);
-        nameCol.setEditable(false);
-        selectCol.setEditable(true);
     }
 
-    private ArrayList<Genome> createGenomeTable(HashMap<Integer, String> hashMap, int suggestion, boolean flag) {
+    private ArrayList<Genome> createGenomeTable(HashMap<Integer, String> hashMap,
+                                                int suggestion, boolean flag) {
         ArrayList<Genome> res = new ArrayList<Genome>();
         for (int i = 0; i < hashMap.size(); i++) {
             Genome genome = new Genome(i, hashMap.get(i));
             if (flag) {
-                if (genome.getName().contains("REF")
-                        || genome.getName().contains("ref")) {
+                if (genome.getName().toLowerCase().contains("ref")) {
                     genome.setSelected(true);
                     res.add(genome);
                 }

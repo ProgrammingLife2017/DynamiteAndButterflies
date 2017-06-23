@@ -19,6 +19,8 @@ import java.util.ArrayList;
 @SuppressWarnings("MagicNumber")
 public class ColourController {
 
+    private static final Color BASE_COLOR = Color.BLACK;
+
     private int[] selectedGenomes;
     private boolean rainbowView;
     private int lowerPart;
@@ -32,6 +34,7 @@ public class ColourController {
      * Constructor of the colourController.
      *
      * @param allSelectedGenomes A int[] with all the selected genomes.
+     * @param rainbowViewArg     A boolean with if rainbowView is turned on or off.
      */
     public ColourController(int[] allSelectedGenomes, boolean rainbowViewArg) {
         selectedGenomes = allSelectedGenomes;
@@ -82,7 +85,7 @@ public class ColourController {
      * @param positionInSelection an integer representing it's position in the selectedGenomes array
      * @return A color.
      */
-    public Color getSingle(int positionInSelection) {
+    private Color getSingle(int positionInSelection) {
         double hue = (360 / selectedGenomes.length) * positionInSelection;
         double brightness = 0.8 + (0.2 / selectedGenomes.length) * positionInSelection;
         return Color.hsb(hue, 1, brightness);
@@ -114,7 +117,7 @@ public class ColourController {
      *
      * @return the base colour.
      */
-    public Color getBaseNodeColour() {
+    private Color getBaseNodeColour() {
         return Color.gray(0.5098);
     }
 
@@ -154,6 +157,13 @@ public class ColourController {
         return res;
     }
 
+    /**
+     * Gets the colour of an Annotation.
+     *
+     * @param startCorAnno Chooses one based on its start coordinate
+     * @param stepSize     And how far it is in a setp.
+     * @return The Color of the annotation
+     */
     public Color getAnnotationColor(int startCorAnno, int stepSize) {
         double doubleStepSize = (double) stepSize;
         double hue = 360 - (360 * ((startCorAnno % doubleStepSize) / doubleStepSize));
@@ -168,7 +178,7 @@ public class ColourController {
      * @param genome   The genome to see if it is in the check set.
      * @return a boolean true if it is in the set or false if it is not.
      */
-    public boolean contains(int[] checkSet, int genome) {
+    private boolean contains(int[] checkSet, int genome) {
         for (int check : checkSet) {
             if (check == genome) {
                 return true;
@@ -187,7 +197,7 @@ public class ColourController {
         ArrayList<Color> res = new ArrayList<Color>();
         //If there is no selection, it should only be the base colour.
         if (selectedGenomes.length == 0 || !rainbowView) {
-            res.add(getBaseEdgeColour());
+            res.add(BASE_COLOR);
             return res;
         }
 
@@ -196,7 +206,7 @@ public class ColourController {
             res = rainbowViewColours(genomes);
         }
         if (res.isEmpty()) {
-            res.add(getBaseEdgeColour());
+            res.add(BASE_COLOR);
         }
 
         return res;
@@ -219,12 +229,11 @@ public class ColourController {
         return res;
     }
 
-    /**
-     * The base colour of the edges.
-     *
-     * @return the base colour of the edges.
-     */
-    public Color getBaseEdgeColour() {
-        return Color.BLACK;
+    public void setSelectedGenomes(int[] selected) {
+        this.selectedGenomes = selected;
+    }
+
+    public void setRainbowView(boolean rainbowView) {
+        this.rainbowView = rainbowView;
     }
 }

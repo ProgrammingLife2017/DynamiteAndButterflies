@@ -8,10 +8,11 @@ import javafx.scene.control.ProgressBar;
  */
 public class ProgressBarController {
 
-    private ProgressBar progressBar;
+    private final ProgressBar progressBar;
 
     /**
      * Constructor.
+     *
      * @param bar The progressbar.
      */
     public ProgressBarController(ProgressBar bar) {

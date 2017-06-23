@@ -3,7 +3,7 @@ package graph;
 /**
  * Class to determine the boundary of a sub-graph.
  */
-public class Boundary {
+class Boundary {
     private int centerNodeID;
     private int range;
 
@@ -14,10 +14,11 @@ public class Boundary {
 
     /**
      * Boundary constructor, calls setBoundary.
+     *
      * @param centerNodeID - the center-node.
-     * @param range - the range in amount of nodes as range.
-     * @param parentArray - the parent edges.
-     * @param childArray - the child edges.
+     * @param range        - the range in amount of nodes as range.
+     * @param parentArray  - the parent edges.
+     * @param childArray   - the child edges.
      */
     Boundary(int centerNodeID, int range, int[] parentArray, int[] childArray) {
         this.centerNodeID = centerNodeID;
@@ -28,8 +29,9 @@ public class Boundary {
 
     /**
      * sets the boundary's.
+     *
      * @param parentArray - the parent edges.
-     * @param childArray - the child edges.
+     * @param childArray  - the child edges.
      */
     private void setBoundaries(int[] parentArray, int[] childArray) {
         leftBoundIndex = 0;
@@ -51,12 +53,13 @@ public class Boundary {
 
     /**
      * Method to determine the right bound.
+     *
      * @param rightBoundID - the node of which we want the parentArray index.
-     * @param parentArray - the array in which to lookup the rightBound node.
+     * @param parentArray  - the array in which to lookup the rightBound node.
      * @return returns the index of the rightBoundNode.
      */
     private int findRightBoundIndex(int rightBoundID, int[] parentArray) {
-        for (int i = parentArray.length-1; i >= 0; i--) {
+        for (int i = parentArray.length - 1; i >= 0; i--) {
             if (parentArray[i] == rightBoundID) {
                 if (parentArray[i + 1] != rightBoundID) {
                     return i;
@@ -69,6 +72,7 @@ public class Boundary {
 
     /**
      * Method to determine the right bound.
+     *
      * @param leftBoundID - the node of which we want the parentArray index.
      * @param parentArray - the array in which to lookup the rightBound node.
      * @return returns the index of the rightBoundNode.
@@ -82,35 +86,18 @@ public class Boundary {
         throw new IllegalArgumentException();
     }
 
-
-    /**
-     * Getter for right bound index.
-     * @return the right bound index.
-     */
     int getRightBoundIndex() {
         return rightBoundIndex;
     }
 
-    /**
-     * Getter for right bound index.
-     * @return the right bound index.
-     */
     int getLeftBoundIndex() {
         return leftBoundIndex;
     }
 
-    /**
-     * Getter for leftBoundID.
-     * @return the leftBoundID..
-     */
     int getLeftBoundID() {
         return leftBoundID;
     }
 
-    /**
-     * Getter for rightBoundID.
-     * @return the rightBoundID..
-     */
     int getRightBoundID() {
         return rightBoundID;
     }
