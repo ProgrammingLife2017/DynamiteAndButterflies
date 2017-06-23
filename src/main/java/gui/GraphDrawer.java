@@ -864,7 +864,9 @@ public class GraphDrawer {
 
     void setSelected(int[] newSelection) {
         this.selected = newSelection;
-        this.colourController = new ColourController(selected, rainbowView);
+        if (newSelection != null) {
+            this.colourController = new ColourController(selected, rainbowView);
+        }
     }
 
     /**
@@ -959,6 +961,12 @@ public class GraphDrawer {
 
     void setMenuController(MenuController menuController) {
         this.menuController = menuController;
+    }
+
+    public void reset() {
+        setAllAnnotations(new HashMap<>());
+        setSelected(null);
+        this.annotationCoordinates = null;
     }
 }
 

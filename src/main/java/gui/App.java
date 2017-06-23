@@ -63,7 +63,7 @@ public class App extends Application {
             stage.setTitle("Multiple Genome Visualiser - DynamiteAndButterflies  - TU Delft");
             stage.setScene(scene);
             stage.setResizable(true);
-            stage.getIcons().add(new Image(App.class.getResourceAsStream("main/resources/icon.png")));
+            stage.getIcons().add(new Image("http://i.imgur.com/CjIn1cR.png"));
             stage.show();
             //stage.setMaximized(true); -> Mac fails to load a setMaximized(true) stage.
 //            System.out.println(path + " loaded on the stage");
