@@ -119,7 +119,11 @@
     <property name="message" value="Line has trailing spaces."/>
     <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
   </module>
-  <module name="SuppressionCommentFilter"/>
+  <module name="SuppressionCommentFilter">
+    <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)"/>
+    <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)"/>
+    <property name="checkFormat" value="$1"/>
+  </module>
   <module name="SuppressWithNearbyCommentFilter"/>
   <module name="SuppressWarningsFilter" />
 </module>

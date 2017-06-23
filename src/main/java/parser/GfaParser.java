@@ -22,7 +22,6 @@ public class GfaParser extends Observable implements Runnable {
     private String partPath;
     private CustomProperties properties = new CustomProperties();
 
-    Boolean indexedGfaFile = false;
     private DB db;
 
     private HashMap<String, Integer> genomesMap;
@@ -36,6 +35,10 @@ public class GfaParser extends Observable implements Runnable {
         filePath = absolutePath;
     }
 
+    /**
+     * Getter for the path the file is stored.
+     * @return the Path.
+     */
     public String getPartPath() {
         return this.partPath;
     }
@@ -49,6 +52,10 @@ public class GfaParser extends Observable implements Runnable {
         }
     }
 
+    /**
+     * Getter for the filePath.
+     * @return the filePath.
+     */
     public String getFilePath() {
         return filePath;
     }
@@ -179,7 +186,6 @@ public class GfaParser extends Observable implements Runnable {
         properties.setProperty(partPath, "true");
         properties.setProperty(partPath + "Max-Cor", Integer.toString(maxCor));
         properties.saveProperties();
-
     }
 
     /**
@@ -188,7 +194,9 @@ public class GfaParser extends Observable implements Runnable {
      * @return - boolean true or false
      */
     private boolean aDataStartsWithCorrect(String aData) {
-        return aData.startsWith("START:Z:") || aData.startsWith("OFFSETS:i:") || aData.startsWith("OFFSETS:Z:");
+        return aData.startsWith("START:Z:")
+                || aData.startsWith("OFFSETS:i:")
+                || aData.startsWith("OFFSETS:Z:");
     }
 
     /**
@@ -196,7 +204,7 @@ public class GfaParser extends Observable implements Runnable {
      * @param parentWriter - the parent writer
      * @param childWriter- the child writer
      * @param line - line to write
-     * @throws IOException
+     * @throws IOException if something goes wrong with the file.
      */
     private void writeEdge(BufferedWriter parentWriter, BufferedWriter childWriter, String line) throws IOException {
         String[] edgeDataString = line.split("\t");
@@ -207,7 +215,7 @@ public class GfaParser extends Observable implements Runnable {
     }
 
     /**
-     * Get the highest coordinate from the offsets
+     * Get the highest coordinate from the offsets.
      * @param maxCor - the current highest coord.
      * @param offSetStrings - the strings which are compared.
      * @return - the max coordinate.
@@ -306,7 +314,6 @@ public class GfaParser extends Observable implements Runnable {
     /**
      *
      * @return The map with the genomes.
-     * @throws IOException For reading a file.
      */
     public HashMap<Integer, String> getAllGenomesMapReversed() {
         return reversedGenomesMap;
