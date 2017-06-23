@@ -9,15 +9,17 @@ import javafx.scene.text.Font;
  * Created by Jasper van Tilburg on 15-6-2017.
  * The minimap class controls a small bar in the screen the shows where in the DNA sequence you are.
  */
-public class Minimap {
+public final class Minimap {
 
-    public static final int MINIMAP_Y = 40;
-    public static final int MINIMAP_HEIGHT = 20;
-    public static final int TEXT_Y = 80;
-    public static final int TEXT_END_Y = 35;
-    public static final int TEXT_SIZE = 10;
-    public static final int DIVISION_LINE_HEIGHT = 55;
-    public static final int CHAR_WIDTH = 3;
+    private static final int STEP_THRESHOLD = 5;
+    private static final int WIDTH_FACTOR = 100;
+    private static final int MINIMAP_Y = 40;
+    private static final int MINIMAP_HEIGHT = 20;
+    private static final int TEXT_Y = 80;
+    private static final int TEXT_END_Y = 35;
+    private static final int TEXT_SIZE = 10;
+    private static final int DIVISION_LINE_HEIGHT = 55;
+    private static final int CHAR_WIDTH = 3;
 
     private static Minimap minimap = new Minimap();
     private MenuController menuController;
@@ -52,7 +54,7 @@ public class Minimap {
         amountVisible = 0;
         size = sizeVal;
         stepSize = computeDivisions();
-        width = Math.log10(size) * 100;
+        width = Math.log10(size) * WIDTH_FACTOR;
     }
 
     /**
@@ -60,7 +62,7 @@ public class Minimap {
      *
      * @param gc The GraphicsContext object needed to draw the minimap
      */
-    public void draw(GraphicsContext gc) {
+    void draw(GraphicsContext gc) {
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(1);
         gc.setFont(new Font("Arial", TEXT_SIZE));
@@ -80,7 +82,8 @@ public class Minimap {
     private void drawMapBox(GraphicsContext gc) {
         gc.strokeRect(xCoordinate, MINIMAP_Y, width, MINIMAP_HEIGHT);
         gc.strokeText("0", xCoordinate, TEXT_Y);
-        gc.strokeText(size + "", xCoordinate + width - Integer.toString(size).length() * CHAR_WIDTH, TEXT_END_Y);
+        gc.strokeText(size + "",
+                xCoordinate + width - Integer.toString(size).length() * CHAR_WIDTH, TEXT_END_Y);
     }
 
     /**
@@ -103,7 +106,8 @@ public class Minimap {
      */
     private void drawViewBox(GraphicsContext gc) {
         gc.setStroke(Color.RED);
-        gc.strokeRect(xCoordinate + valueToXCoordinate(value), MINIMAP_Y, valueToXCoordinate(amountVisible), MINIMAP_HEIGHT);
+        gc.strokeRect(xCoordinate + valueToXCoordinate(value), MINIMAP_Y,
+                valueToXCoordinate(amountVisible), MINIMAP_HEIGHT);
     }
 
     /**
@@ -124,9 +128,9 @@ public class Minimap {
     private int computeDivisions() {
         String sizeStr = Integer.toString(size);
         int firstDigit = Integer.parseInt(sizeStr.substring(0, 1));
-        int step = firstDigit >= 5 ? 1 : 5;
+        int step = firstDigit >= STEP_THRESHOLD ? 1 : STEP_THRESHOLD;
         int lastdigits = sizeStr.substring(1, sizeStr.length()).length();
-        int zeros = step == 5 ? lastdigits - 1: lastdigits;
+        int zeros = step == STEP_THRESHOLD ? lastdigits - 1: lastdigits;
         return (int) (step * Math.pow(10, zeros));
     }
 
@@ -144,25 +148,15 @@ public class Minimap {
                 && pressedY >= MINIMAP_Y && pressedY <= MINIMAP_Y + MINIMAP_HEIGHT;
     }
 
-    /**
-     * Setter for the amount of nodes visible.
-     *
-     * @param amountVisible Amount of nodes visible
-     */
-    public void setAmountVisible(double amountVisible) {
+    void setAmountVisible(double amountVisible) {
         this.amountVisible = amountVisible;
     }
 
-    /**
-     * Setter for the value of the first node in screen, i.e. left side of the screen.
-     *
-     * @param value ID of the first node
-     */
-    public void setValue(double value) {
+    void setValue(double value) {
         this.value = value;
     }
 
-    public void setMenuController(MenuController menuController) {
+    void setMenuController(MenuController menuController) {
         this.menuController = menuController;
     }
 }
