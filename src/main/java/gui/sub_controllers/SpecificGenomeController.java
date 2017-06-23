@@ -122,7 +122,7 @@ public class SpecificGenomeController {
                     @Override
                     public ObservableValue<Boolean> call(
                             TableColumn.CellDataFeatures<Genome, Boolean> param) {
-                        return param.getValue().selectedProperty();
+                        return param.getValue().getSelectedProperty();
                     }
                 });
         highlightCol.setCellFactory(CheckBoxTableCell.forTableColumn(highlightCol));

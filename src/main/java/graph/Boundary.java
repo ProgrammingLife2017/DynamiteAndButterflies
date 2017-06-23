@@ -101,8 +101,4 @@ class Boundary {
     int getRightBoundID() {
         return rightBoundID;
     }
-
-    int getRange() {
-        return range;
-    }
 }
