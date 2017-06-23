@@ -1,5 +1,6 @@
 package gui;
 
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,10 +29,18 @@ public class CustomProperties extends java.util.Properties {
     public void updateProperties() {
         try {
             FileReader fileReader = new FileReader(PROPERY_FILENAME);
-            this.load(fileReader);
-            fileReader.close();
-        } catch (IOException e) {
-            System.out.println("Something went wrong while reading properties.");
+            try {
+                this.load(fileReader);
+            } catch (IOException e) {
+                System.err.println("Something went wrong while reading properties.");
+            }
+            try {
+                fileReader.close();
+            } catch (IOException e) {
+                System.err.println("Something went wrong with closing the fileReader");
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println("Properties files does not exist.");
         }
     }
 
@@ -42,10 +51,18 @@ public class CustomProperties extends java.util.Properties {
     public void saveProperties() {
         try {
             FileWriter fileWriter = new FileWriter(PROPERY_FILENAME);
-            this.store(fileWriter, "Property files for Dynamite and Butterflies");
-            fileWriter.close();
-        } catch (Exception e) {
-            System.out.println("Something went wrong while writing properties.");
+            try {
+                this.store(fileWriter, "Property files for Dynamite and Butterflies");
+            } catch (IOException e) {
+                System.err.println("Something went wrong with writing properties");
+            }
+            try {
+                fileWriter.close();
+            } catch (IOException e) {
+                System.err.println("Something went wrong with closing the fileWriter");
+            }
+        } catch (IOException e) {
+            System.err.println("Something went wrong while making fileWriter.");
         }
     }
 

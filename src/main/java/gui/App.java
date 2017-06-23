@@ -66,7 +66,7 @@ public class App extends Application {
             stage.show();
             // stage.setMaximized(true); -> Mac fails to load a setMaximized(true) stage.
         } catch (IOException e) {
-            System.out
+            System.err
                     .println("Something went wrong while loading the fxml file");
         }
     }

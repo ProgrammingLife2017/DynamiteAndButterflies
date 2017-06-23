@@ -153,8 +153,4 @@ public class FileController extends Observable implements Observer {
             }
         }
     }
-
-
-
-
 }

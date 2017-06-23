@@ -21,8 +21,8 @@ public class ColourController {
 
     private static final Color BASE_COLOR = Color.BLACK;
 
-    private final int[] selectedGenomes;
-    private final boolean rainbowView;
+    private int[] selectedGenomes;
+    private boolean rainbowView;
     private int lowerPart;
     private int middlePart;
     private int higherPart;
@@ -227,5 +227,13 @@ public class ColourController {
             }
         }
         return res;
+    }
+
+    public void setSelectedGenomes(int[] selected) {
+        this.selectedGenomes = selected;
+    }
+
+    public void setRainbowView(boolean rainbowView) {
+        this.rainbowView = rainbowView;
     }
 }

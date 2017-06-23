@@ -18,8 +18,8 @@ public class SequenceGraph {
 
     private static final int EXTRA_BOUNDS = 100;
 
-    private int[] parentArray;
-    private int[] childArray;
+    private final int[] parentArray;
+    private final int[] childArray;
     private int centerNodeID;
     private int dummyNodeIDCounter = -1;
     private int maxColumnSize;

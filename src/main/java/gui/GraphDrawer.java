@@ -143,7 +143,8 @@ public class GraphDrawer {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         this.stepSize = (canvas.getWidth() / zoomLevel);
         setxDifference(xDifference);
-        colourController = new ColourController(selected, rainbowView);
+        colourController.setSelectedGenomes(selected);
+        colourController.setRainbowView(rainbowView);
         drawNodes();
         drawMinimap();
     }
@@ -195,7 +196,7 @@ public class GraphDrawer {
                 int[] childList = getChildrenGenomeList(node);
                 ArrayList<Integer> results = new ArrayList<>();
                 for (int aResult : genome) {
-                    if (contains(parentGenomes, aResult) & contains(childList, aResult)) {
+                    if (contains(parentGenomes, aResult) && contains(childList, aResult)) {
                         results.add(aResult);
                     }
                 }
@@ -738,7 +739,7 @@ public class GraphDrawer {
             }
             redraw();
             } catch (NullPointerException e) {
-                System.out.println("Graph not yet initialized");
+                System.err.println("Graph not yet initialized");
             }
             return null;
         }
@@ -806,7 +807,7 @@ public class GraphDrawer {
                 }
             }
         } catch (NullPointerException e) {
-            System.out.println("No graph has been loaded.");
+            System.err.println("No graph has been loaded.");
         }
         return -1;
     }
@@ -998,15 +999,14 @@ public class GraphDrawer {
 
     void setRainbowView(boolean rainbowView) {
         this.rainbowView = rainbowView;
-        this.colourController = new ColourController(selected, rainbowView);
+        this.colourController.setRainbowView(this.rainbowView);
     }
 
     void setSelected(int[] newSelection) {
         this.selected = newSelection;
         if (newSelection != null) {
-            this.colourController = new ColourController(selected, rainbowView);
+            this.colourController.setSelectedGenomes(this.selected);
         }
     }
-    //CHECKSTYLE: On
 }
 
