@@ -149,41 +149,19 @@ public class GfaParser extends Observable implements Runnable {
                     if (aData.startsWith("ORI:Z:")) {
                         String[] genomes = aData.split(":")[2].split(";");
                         for (int j = 0; j < genomes.length; j++) {
-                            if (genomesMap.get(genomes[j].split("\\.")[0]) != null) {
-                                if (j == genomes.length - 1) {
-                                    genomeWriter.write(genomesMap.get(genomes[j].split("\\.")[0]) + "-");
-                                } else {
-                                    genomeWriter.write(genomesMap.get(genomes[j].split("\\.")[0]) + ";");
-                                }
-                            } else {
-                                if (j == genomes.length - 1) {
-                                    genomeWriter.write(genomes[j] + "-");
-                                } else {
-                                    genomeWriter.write(genomes[j] + ";");
-                                }
-                            }
+                            writeGenomes(genomeWriter, genomes, j);
                         }
-                    } else if (aData.startsWith("START:Z:") || aData.startsWith("OFFSETS:i:") || aData.startsWith("OFFSETS:Z:")) {
-                        String OffSets = aData.split(":")[2];
-                        String[] offSetStrings = OffSets.split(";");
-                        int tempOffSetInt;
-                        for (String singleOffSet : offSetStrings) {
-                            tempOffSetInt = Integer.parseInt(singleOffSet);
-                            if (tempOffSetInt > maxCor) {
-                                maxCor = tempOffSetInt;
-                            }
-                        }
-                        genomeWriter.write(OffSets);
+                    } else if (aDataStartsWithCorrect(aData)) {
+                        String offSets = aData.split(":")[2];
+                        String[] offSetStrings = offSets.split(";");
+                        maxCor = getMaxCor(maxCor, offSetStrings);
+                        genomeWriter.write(offSets);
                         genomeWriter.newLine();
                     }
                 }
                 sequenceMap.put((long) (id), data[2]);
             } else if (line.startsWith("L")) {
-                String[] edgeDataString = line.split("\t");
-                int parentId = Integer.parseInt(edgeDataString[1]);
-                int childId = Integer.parseInt(edgeDataString[3]);
-               parentWriter.write(parentId + ",");
-               childWriter.write(childId + ",");
+                writeEdge(parentWriter, childWriter, line);
                sizeOfFile++;
             }
         }
@@ -204,6 +182,76 @@ public class GfaParser extends Observable implements Runnable {
 
     }
 
+    /**
+     * checks if aData starts with the correct strings.
+     * @param aData - the data string
+     * @return - boolean true or false
+     */
+    private boolean aDataStartsWithCorrect(String aData) {
+        return aData.startsWith("START:Z:") || aData.startsWith("OFFSETS:i:") || aData.startsWith("OFFSETS:Z:");
+    }
+
+    /**
+     * Writes the edges to an edges file.
+     * @param parentWriter - the parent writer
+     * @param childWriter- the child writer
+     * @param line - line to write
+     * @throws IOException
+     */
+    private void writeEdge(BufferedWriter parentWriter, BufferedWriter childWriter, String line) throws IOException {
+        String[] edgeDataString = line.split("\t");
+        int parentId = Integer.parseInt(edgeDataString[1]);
+        int childId = Integer.parseInt(edgeDataString[3]);
+        parentWriter.write(parentId + ",");
+        childWriter.write(childId + ",");
+    }
+
+    /**
+     * Get the highest coordinate from the offsets
+     * @param maxCor - the current highest coord.
+     * @param offSetStrings - the strings which are compared.
+     * @return - the max coordinate.
+     */
+    private int getMaxCor(int maxCor, String[] offSetStrings) {
+        int tempOffSetInt;
+        for (String singleOffSet : offSetStrings) {
+            tempOffSetInt = Integer.parseInt(singleOffSet);
+            if (tempOffSetInt > maxCor) {
+                maxCor = tempOffSetInt;
+            }
+        }
+        return maxCor;
+    }
+
+    /**
+     * Writes the genomes to a file.
+     * @param genomeWriter - the writer
+     * @param genomes - the genomes
+     * @param j - loop counter
+     * @throws IOException - can throw IO exception
+     */
+    private void writeGenomes(BufferedWriter genomeWriter, String[] genomes, int j) throws IOException {
+        if (genomesMap.get(genomes[j].split("\\.")[0]) != null) {
+            if (j == genomes.length - 1) {
+                genomeWriter.write(genomesMap.get(genomes[j].split("\\.")[0]) + "-");
+            } else {
+                genomeWriter.write(genomesMap.get(genomes[j].split("\\.")[0]) + ";");
+            }
+        } else {
+            if (j == genomes.length - 1) {
+                genomeWriter.write(genomes[j] + "-");
+            } else {
+                genomeWriter.write(genomes[j] + ";");
+            }
+        }
+    }
+
+    /**
+     * converts the array txt file to an int[].
+     * @param isParent - is parent boolean
+     * @return - the int[]
+     * @throws IOException - can throw IO exception due to using an inputstream.
+     */
     private int[] read(boolean isParent) throws IOException {
         String additionToPath;
         if (isParent) {
@@ -232,6 +280,10 @@ public class GfaParser extends Observable implements Runnable {
         return read(false);
     }
 
+    /**
+     * puts the genomes in maps with indices.
+     * @param allGenomes - string containing genomes.
+     */
     private void setAllGenomesMap(String allGenomes) {
         String[] strNums = allGenomes.split(";");
         this.genomesMap = new HashMap<String, Integer>();
