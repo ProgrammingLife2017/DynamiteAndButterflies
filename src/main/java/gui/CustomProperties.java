@@ -31,7 +31,7 @@ public class CustomProperties extends java.util.Properties {
             this.load(fileReader);
             fileReader.close();
         } catch (IOException e) {
-            System.out.println("Something went wrong while reading properties.");
+            System.err.println("Something went wrong while reading properties.");
         }
     }
 
@@ -45,7 +45,7 @@ public class CustomProperties extends java.util.Properties {
             this.store(fileWriter, "Property files for Dynamite and Butterflies");
             fileWriter.close();
         } catch (Exception e) {
-            System.out.println("Something went wrong while writing properties.");
+            System.err.println("Something went wrong while writing properties.");
         }
     }
 

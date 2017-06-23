@@ -738,7 +738,7 @@ public class GraphDrawer {
             }
             redraw();
             } catch (NullPointerException e) {
-                System.out.println("Graph not yet initialized");
+                System.err.println("Graph not yet initialized");
             }
             return null;
         }
@@ -806,7 +806,7 @@ public class GraphDrawer {
                 }
             }
         } catch (NullPointerException e) {
-            System.out.println("No graph has been loaded.");
+            System.err.println("No graph has been loaded.");
         }
         return -1;
     }

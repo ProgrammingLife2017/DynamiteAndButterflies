@@ -166,21 +166,4 @@ public class FileController extends Observable implements Observer {
             }
         }
     }
-
-
-    /**
-     * Gets the fileName from the filePath.
-     *
-     * @param filePath The path to the file you want the name off
-     * @return The name of the file.
-     */
-    public String fileNameFromPath(String filePath) {
-        String pattern = Pattern.quote(System.getProperty("file.separator"));
-        String[] partPaths = filePath.split(pattern);
-        String fileName = partPaths[partPaths.length - 1];
-        System.out.println(fileName);
-        return fileName;
-    }
-
-
 }

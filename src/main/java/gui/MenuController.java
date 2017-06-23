@@ -282,7 +282,7 @@ public class MenuController implements Observer {
      * ZoomIn Action Handler.
      */
     @FXML
-    private void zoomInClicked() {
+    public void zoomInClicked() {
         double xCentre = canvas.getWidth() / 2;
         ZoomController.getInstance().zoomIn(
                 GraphDrawer.getInstance().mouseLocationColumn(xCentre));
@@ -293,7 +293,7 @@ public class MenuController implements Observer {
      * ZoomOut Action Handler.
      */
     @FXML
-    private void zoomOutClicked() {
+    public void zoomOutClicked() {
         double xCentre = canvas.getWidth() / 2;
         ZoomController.getInstance().zoomOut(
                 GraphDrawer.getInstance().mouseLocationColumn(xCentre));
@@ -332,7 +332,7 @@ public class MenuController implements Observer {
         try {
             clicked = GraphDrawer.getInstance().clickOnCanvas(pressedX, pressedY, mouseEvent);
         } catch (NullPointerException e) {
-            System.out.println("The graph is not yet loaded!");
+            System.err.println("The graph is not yet loaded!");
             e.printStackTrace();
         }
         if (clicked != null) {
@@ -490,7 +490,7 @@ public class MenuController implements Observer {
         try {
             return DrawableCanvas.getInstance().getParser().getSequenceHashMap();
         } catch (NullPointerException e) {
-            System.out.println("No graph was loaded so no sequenceHashMap to get");
+            System.err.println("No graph was loaded so no sequenceHashMap to get");
         }
         return null;
     }
@@ -579,13 +579,13 @@ public class MenuController implements Observer {
             try {
                 openGfaFileClicked();
             } catch (IOException | InterruptedException e1) {
-                System.out.println("Something went wrong opening GfaFileClicked");
+                System.err.println("Something went wrong opening GfaFileClicked");
             }
         } else {
             try {
                 openGfaFileClicked(filePath);
             } catch (IOException | InterruptedException e) {
-                System.out.println("Something went wrong opening GfaFileClicked");
+                System.err.println("Something went wrong opening GfaFileClicked");
             }
         }
     }
