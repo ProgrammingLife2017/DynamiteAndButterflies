@@ -199,4 +199,18 @@ public class SequenceNodeTest {
         assertEquals(node.getIndex(), 20);
     }
 
+    @Test
+    public void getsetboolTest() {
+        node.setSequenceLength(1);
+        assertTrue(node.getSequenceLength() == 1);
+        node.setSNP(false);
+        assertTrue(!node.isSNP());
+        node.setSNP(true);
+        assertTrue(node.isSNP());
+
+        node.incrementInDegree();
+        node.addChild(1);
+        assertTrue(node.getOutDegree() == 1);
+    }
+
 }
