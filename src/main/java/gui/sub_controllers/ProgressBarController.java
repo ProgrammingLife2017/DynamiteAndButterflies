@@ -12,6 +12,7 @@ public class ProgressBarController {
 
     /**
      * Constructor.
+     *
      * @param bar The progressbar.
      */
     public ProgressBarController(ProgressBar bar) {

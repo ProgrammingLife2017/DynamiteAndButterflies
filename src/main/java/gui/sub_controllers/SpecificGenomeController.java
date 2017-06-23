@@ -6,7 +6,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -52,33 +51,11 @@ public class SpecificGenomeController {
         selectedGenomes = alreadyChosen;
         allSelected = false;
 
-        ArrayList<Genome> realData = new ArrayList<Genome>();
-        for (int i = 0; i < hashMap.size(); i++) {
-            Genome genome = new Genome(i, hashMap.get(i));
-            for (int hasBeenSelected : alreadyChosen) {
-                if (i == hasBeenSelected) {
-                    genome.setSelected(true);
-                    break;
-                }
-            }
-            realData.add(genome);
-        }
+        ArrayList<Genome> realData = createData(hashMap, alreadyChosen);
         final ObservableList<Genome> data = FXCollections.observableArrayList(realData);
 
-        idCol.setCellValueFactory(new PropertyValueFactory<Genome, Integer>("id"));
-        nameCol.setCellValueFactory(new PropertyValueFactory<Genome, String>("name"));
-        highlightCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Genome,Boolean>,ObservableValue<Boolean>>() {
-            @Override
-            public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Genome, Boolean> param) {
-                return param.getValue().selectedProperty();
-            }
-        });
-        highlightCol.setCellFactory(CheckBoxTableCell.forTableColumn(highlightCol));
-
-        table.setEditable(true);
-        idCol.setEditable(false);
-        nameCol.setEditable(false);
-        highlightCol.setEditable(true);
+        initializeColumns();
+        setEditable();
 
         // 1. Wrap the ObservableList in a FilteredList (initially display all data).
         FilteredList<Genome> filteredData = new FilteredList<>(data, p -> true);
@@ -105,6 +82,50 @@ public class SpecificGenomeController {
 
         // 5. Add sorted (and filtered) data to the table.
         table.setItems(sortedData);
+    }
+
+    /**
+     * Translates the hasMap into dataSet that can be used in the table.
+     *
+     * @param hashMap       The hashMap of data
+     * @param alreadyChosen The array of already chosen genomes.
+     * @return ArrayList of Genomes, usable in the tableView.
+     */
+    private ArrayList<Genome> createData(HashMap<Integer, String> hashMap, int[] alreadyChosen) {
+        ArrayList<Genome> res = new ArrayList<>();
+        for (int i = 0; i < hashMap.size(); i++) {
+            Genome genome = new Genome(i, hashMap.get(i));
+            for (int hasBeenSelected : alreadyChosen) {
+                if (i == hasBeenSelected) {
+                    genome.setSelected(true);
+                    break;
+                }
+            }
+            res.add(genome);
+        }
+        return res;
+    }
+
+    private void setEditable() {
+        table.setEditable(true);
+        idCol.setEditable(false);
+        nameCol.setEditable(false);
+        highlightCol.setEditable(true);
+    }
+
+    private void initializeColumns() {
+        idCol.setCellValueFactory(new PropertyValueFactory<Genome, Integer>("id"));
+        nameCol.setCellValueFactory(new PropertyValueFactory<Genome, String>("name"));
+        highlightCol.setCellValueFactory(
+                new Callback<TableColumn.CellDataFeatures<Genome, Boolean>,
+                        ObservableValue<Boolean>>() {
+                    @Override
+                    public ObservableValue<Boolean> call(
+                            TableColumn.CellDataFeatures<Genome, Boolean> param) {
+                        return param.getValue().selectedProperty();
+                    }
+                });
+        highlightCol.setCellFactory(CheckBoxTableCell.forTableColumn(highlightCol));
     }
 
     /**
@@ -160,7 +181,7 @@ public class SpecificGenomeController {
     /**
      * Can select/deselect the entire sortedData at the same time.
      */
-    public void selectAllFiltered(ActionEvent actionEvent) {
+    public void selectAllFiltered() {
         for (Genome genome : sortedData) {
             if (allSelected) {
                 genome.setSelected(false);
