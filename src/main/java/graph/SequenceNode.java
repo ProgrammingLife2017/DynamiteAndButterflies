@@ -209,6 +209,22 @@ public class SequenceNode {
         }
     }
 
+    /**
+     * Increment the baryCenterValue by some amount.
+     *
+     * @param baryCenterValue Amount to increase baryCenterValue with
+     */
+    void incrementBaryCenterValue(float baryCenterValue) {
+        this.baryCenterValue += baryCenterValue;
+    }
+
+    /**
+     * Increment inDegree by one.
+     */
+    void incrementInDegree() {
+        this.inDegree++;
+    }
+
     public boolean isHighlighted() {
         return this.highlighted;
     }
@@ -263,14 +279,6 @@ public class SequenceNode {
 
     public int[] getOffsets() {
         return this.offSets;
-    }
-
-    void incrementBaryCenterValue(float baryCenterValue) {
-        this.baryCenterValue += baryCenterValue;
-    }
-
-    void incrementInDegree() {
-        this.inDegree++;
     }
 
     public int getSequenceLength() {
