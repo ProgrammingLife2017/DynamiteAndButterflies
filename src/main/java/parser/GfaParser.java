@@ -29,6 +29,7 @@ public class GfaParser extends Observable implements Runnable {
 
     /**
      * Constructor.
+     *
      * @param absolutePath The path location of the file.
      */
     public GfaParser(String absolutePath) {
@@ -37,6 +38,7 @@ public class GfaParser extends Observable implements Runnable {
 
     /**
      * Getter for the path the file is stored.
+     *
      * @return the Path.
      */
     public String getPartPath() {
@@ -54,6 +56,7 @@ public class GfaParser extends Observable implements Runnable {
 
     /**
      * Getter for the filePath.
+     *
      * @return the filePath.
      */
     public String getFilePath() {
@@ -62,6 +65,7 @@ public class GfaParser extends Observable implements Runnable {
 
     /**
      * getter for db of the sequencemap.
+     *
      * @return db.
      */
     public DB getDb() {
@@ -71,6 +75,7 @@ public class GfaParser extends Observable implements Runnable {
 
     /**
      * This method parses the file specified in filepath into a sequence graph.
+     *
      * @param filePath A string specifying where the file is stored.
      * @throws IOException For instance when the file is not found
      */
@@ -81,19 +86,19 @@ public class GfaParser extends Observable implements Runnable {
         String[] partPaths = filePath.split(pattern);
         partPath = partPaths[partPaths.length - 1];
         db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().
-                                                fileMmapPreclearDisable().cleanerHackEnable().
-                                                closeOnJvmShutdown().checksumHeaderBypass().make();
+                fileMmapPreclearDisable().cleanerHackEnable().
+                closeOnJvmShutdown().checksumHeaderBypass().make();
         if (db.get(partPath + ".sequence.db") != null) {
             sequenceMap = db.hashMap(partPath + ".sequence.db").
-                            keySerializer(Serializer.LONG).
-                            valueSerializer(Serializer.STRING).createOrOpen();
+                    keySerializer(Serializer.LONG).
+                    valueSerializer(Serializer.STRING).createOrOpen();
             parseHeaders();
         } else {
             properties.setProperty(partPath, "false");
             properties.saveProperties();
             sequenceMap = db.hashMap(partPath + ".sequence.db").
-                                    keySerializer(Serializer.LONG).
-                                    valueSerializer(Serializer.STRING).createOrOpen();
+                    keySerializer(Serializer.LONG).
+                    valueSerializer(Serializer.STRING).createOrOpen();
             parseHeaders();
             parseSpecific(filePath);
         }
@@ -125,14 +130,16 @@ public class GfaParser extends Observable implements Runnable {
 
     /**
      * Getter for the sequenceHashMap.
+     *
      * @return The HashMap.
-         */
+     */
     public synchronized HTreeMap<Long, String> getSequenceHashMap() {
         return sequenceMap;
     }
 
     /**
      * Parses the file with a boolean whether to create a db file or not. Creates the Graph
+     *
      * @param filePath The file to parse/
      * @throws IOException Reader.
      */
@@ -169,18 +176,21 @@ public class GfaParser extends Observable implements Runnable {
                 sequenceMap.put((long) (id), data[2]);
             } else if (line.startsWith("L")) {
                 writeEdge(parentWriter, childWriter, line);
-               sizeOfFile++;
+                sizeOfFile++;
             }
         }
-        in.close();
-        br.close();
-        parentWriter.flush();
-        parentWriter.close();
-        genomeWriter.flush();
-        genomeWriter.close();
-        childWriter.flush();
-        childWriter.close();
+        closeStreams(parentWriter, childWriter, genomeWriter, in, br);
         db.commit();
+        updateProperties(sizeOfFile, maxCor);
+    }
+
+    /**
+     * Update the properties.
+     *
+     * @param sizeOfFile - the size of the file.
+     * @param maxCor     - max coord value
+     */
+    private void updateProperties(int sizeOfFile, int maxCor) {
         properties.updateProperties();
         properties.setProperty(partPath + "childArray.txtsize", Integer.toString(sizeOfFile));
         properties.setProperty(partPath, "true");
@@ -189,7 +199,33 @@ public class GfaParser extends Observable implements Runnable {
     }
 
     /**
+     * Close all the streams used to parse the data.
+     *
+     * @param parentWriter - parentWriter to close.
+     * @param childWriter  - childWriter to close.
+     * @param genomeWriter - genomeWriter to close.
+     * @param in           - input stream to close.
+     * @param br           - buffered reader to close.
+     * @throws IOException - throws IO exception.
+     */
+    private void closeStreams(BufferedWriter parentWriter,
+                              BufferedWriter childWriter,
+                              BufferedWriter genomeWriter,
+                              InputStream in,
+                              BufferedReader br) throws IOException {
+        in.close();
+        br.close();
+        parentWriter.flush();
+        parentWriter.close();
+        genomeWriter.flush();
+        genomeWriter.close();
+        childWriter.flush();
+        childWriter.close();
+    }
+
+    /**
      * checks if aData starts with the correct strings.
+     *
      * @param aData - the data string
      * @return - boolean true or false
      */
@@ -201,12 +237,14 @@ public class GfaParser extends Observable implements Runnable {
 
     /**
      * Writes the edges to an edges file.
+     *
      * @param parentWriter - the parent writer
      * @param childWriter- the child writer
-     * @param line - line to write
+     * @param line         - line to write
      * @throws IOException if something goes wrong with the file.
      */
-    private void writeEdge(BufferedWriter parentWriter, BufferedWriter childWriter, String line) throws IOException {
+    private void writeEdge(BufferedWriter parentWriter, BufferedWriter childWriter,
+                           String line) throws IOException {
         String[] edgeDataString = line.split("\t");
         int parentId = Integer.parseInt(edgeDataString[1]);
         int childId = Integer.parseInt(edgeDataString[3]);
@@ -216,7 +254,8 @@ public class GfaParser extends Observable implements Runnable {
 
     /**
      * Get the highest coordinate from the offsets.
-     * @param maxCor - the current highest coord.
+     *
+     * @param maxCor        - the current highest coord.
      * @param offSetStrings - the strings which are compared.
      * @return - the max coordinate.
      */
@@ -233,12 +272,14 @@ public class GfaParser extends Observable implements Runnable {
 
     /**
      * Writes the genomes to a file.
+     *
      * @param genomeWriter - the writer
-     * @param genomes - the genomes
-     * @param j - loop counter
+     * @param genomes      - the genomes
+     * @param j            - loop counter
      * @throws IOException - can throw IO exception
      */
-    private void writeGenomes(BufferedWriter genomeWriter, String[] genomes, int j) throws IOException {
+    private void writeGenomes(BufferedWriter genomeWriter, String[] genomes, int j)
+            throws IOException {
         if (genomesMap.get(genomes[j].split("\\.")[0]) != null) {
             if (j == genomes.length - 1) {
                 genomeWriter.write(genomesMap.get(genomes[j].split("\\.")[0]) + "-");
@@ -256,6 +297,7 @@ public class GfaParser extends Observable implements Runnable {
 
     /**
      * converts the array txt file to an int[].
+     *
      * @param isParent - is parent boolean
      * @return - the int[]
      * @throws IOException - can throw IO exception due to using an inputstream.
@@ -268,11 +310,11 @@ public class GfaParser extends Observable implements Runnable {
             additionToPath = "childArray.txt";
         }
         InputStream in = new FileInputStream(System.getProperty("user.dir")
-                        + System.getProperty("file.separator") + partPath + additionToPath);
+                + System.getProperty("file.separator") + partPath + additionToPath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-        String []strNums = br.readLine().split(",");
+        String[] strNums = br.readLine().split(",");
         int size = strNums.length;
-        int [] nodeArray = new int[size];
+        int[] nodeArray = new int[size];
         for (int i = 0; i < size; i++) {
             nodeArray[i] = Integer.parseInt(strNums[i]);
 
@@ -280,16 +322,29 @@ public class GfaParser extends Observable implements Runnable {
         return nodeArray;
     }
 
+    /**
+     * Wrapper for read function to get the childArray.
+     *
+     * @return the childArray.
+     * @throws IOException - reads a file, so it might cause IO Exceptions.
+     */
     public int[] getParentArray() throws IOException {
         return read(true);
     }
 
+    /**
+     * wrapper for read function to get the parentArray.
+     *
+     * @return the parentArray
+     * @throws IOException - reads a file, so it might cause IO Exceptions
+     */
     public int[] getChildArray() throws IOException {
         return read(false);
     }
 
     /**
      * puts the genomes in maps with indices.
+     *
      * @param allGenomes - string containing genomes.
      */
     private void setAllGenomesMap(String allGenomes) {
@@ -312,7 +367,6 @@ public class GfaParser extends Observable implements Runnable {
     }
 
     /**
-     *
      * @return The map with the genomes.
      */
     public HashMap<Integer, String> getAllGenomesMapReversed() {

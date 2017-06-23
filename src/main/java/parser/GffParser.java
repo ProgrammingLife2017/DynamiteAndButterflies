@@ -65,20 +65,26 @@ public class GffParser {
             int endBucket = (end / BUCKET_SIZE);
 
 
-            for (int i=startBucket; i <= endBucket; i++) {
+            for (int i = startBucket; i <= endBucket; i++) {
                 HashSet<Annotation> set = buckets.get(i);
                 if (set == null) {
                     set = new HashSet<>();
                 }
                 set.add(anno);
-            buckets.put(startBucket, set);
+                buckets.put(startBucket, set);
             }
         }
         DrawableCanvas.getInstance().setAnnotationGenome(suggestionGenomeOfAnnotation);
         return buckets;
     }
 
-    public HashMap<Integer, HashSet<Annotation>> initializeBucketArray(int maxCor) {
+    /**
+     * Initialize function for bucketArray.
+     *
+     * @param maxCor - biggest coord.
+     * @return a new hashmap with a specific size.
+     */
+    private HashMap<Integer, HashSet<Annotation>> initializeBucketArray(int maxCor) {
         int size = (maxCor / BUCKET_SIZE);
 
         return new HashMap<>(size);
