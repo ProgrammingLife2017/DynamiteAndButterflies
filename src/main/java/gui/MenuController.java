@@ -92,6 +92,8 @@ public class MenuController implements Observer {
     @FXML
     private Button leftPannButton;
     @FXML
+    private CheckBox collapseSNPButton;
+    @FXML
     private ScrollBar scrollBar;
 
     private PrintStream ps;
@@ -127,9 +129,13 @@ public class MenuController implements Observer {
         ScrollbarController.getInstance().setScrollBar(scrollBar);
         ZoomController.getInstance().setMenuController(this);
         Minimap.getInstance().setMenuController(this);
+        GraphDrawer.getInstance().setMenuController(this);
+        PanningController.getInstance().setMenuController(this);
+        PanningController.getInstance().initialize(leftPannButton, rightPannButton);
+        PanningController.getInstance().initializeKeys(canvasPanel);
 
         //System.setErr(ps);
-        System.setOut(ps);
+        //System.setOut(ps);
     }
 
     /**
@@ -215,6 +221,20 @@ public class MenuController implements Observer {
         radiusTextField.setText(GraphDrawer.getInstance().getRadius() + "");
     }
 
+    public void updateSequenceInfoAlt(SequenceNode node) {
+        String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) node.getId());
+        sequenceInfoAlt.setText(node.toString(sequence));
+    }
+
+    public void updateSequenceInfo(SequenceNode node) {
+        String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) node.getId());
+        sequenceInfo.setText(node.toString(sequence));
+    }
+
+    public void updateNodeTextField(int nodeID) {
+        nodeTextField.setText(nodeID + "");
+    }
+
     public int findColumnWrapper(Double xEvent) {
         int nodeID = GraphDrawer.getInstance().findColumn(xEvent);
         if (nodeID < 1) {
@@ -230,7 +250,7 @@ public class MenuController implements Observer {
      * @throws IOException exception.
      */
     @FXML
-    public void zoomInClicked() throws IOException {
+    public void zoomInClicked() {
         double xCentre = canvas.getWidth() / 2;
         ZoomController.getInstance().zoomIn(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
         nodeTextField.setText(findColumnWrapper(xCentre) + "");
@@ -242,7 +262,7 @@ public class MenuController implements Observer {
      * @throws IOException exception.
      */
     @FXML
-    public void zoomOutClicked() throws IOException {
+    public void zoomOutClicked() {
         double xCentre = canvas.getWidth() / 2;
         ZoomController.getInstance().zoomOut(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
         nodeTextField.setText(findColumnWrapper(xCentre) + "");
@@ -278,7 +298,7 @@ public class MenuController implements Observer {
         Minimap.getInstance().clickMinimap(pressedX, pressedY);
         Object clicked = null;
         try {
-            clicked = GraphDrawer.getInstance().clickOnCanvas(pressedX, pressedY);
+            clicked = GraphDrawer.getInstance().clickOnCanvas(pressedX, pressedY, mouseEvent);
         } catch (NullPointerException e) {
             System.out.println("The graph is not yet loaded!");
             e.printStackTrace();
@@ -294,6 +314,7 @@ public class MenuController implements Observer {
                 } else {
                     sequenceInfoAlt.setText(node.toString(sequence));
                 }
+                GraphDrawer.getInstance().redraw();
             } else if (clicked instanceof Annotation) {
                 Annotation annotation = (Annotation) clicked;
                 if (!mouseEvent.isControlDown()) {
@@ -310,15 +331,15 @@ public class MenuController implements Observer {
      */
     @FXML
     public void traverseGraphClicked() {
-            int centreNodeID = getCentreNodeID();
-            int radius = getRadius();
-            if (centreNodeID != -1 && radius != -1) {
-                ZoomController.getInstance().traverseGraphClicked(centreNodeID, radius);
-                SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
-                String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
-                nodeTextField.setText(Integer.toString(centreNodeID));
-                sequenceInfo.setText(node.toString(sequence));
-            }
+        int centreNodeID = getCentreNodeID();
+        int radius = getRadius();
+        if (centreNodeID != -1 && radius != -1) {
+            ZoomController.getInstance().traverseGraphClicked(centreNodeID, radius);
+            SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
+            String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
+            nodeTextField.setText(Integer.toString(centreNodeID));
+            sequenceInfo.setText(node.toString(sequence));
+        }
     }
 
     /**
@@ -441,9 +462,6 @@ public class MenuController implements Observer {
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
                         specificGenomeProperties.initialize();
-                        panningController =
-                                new PanningController(leftPannButton, rightPannButton);
-                        panningController.initializeKeys(canvasPanel);
                         displayInfo(GraphDrawer.getInstance().getGraph());
                         updateRadius();
                         updateCenterNode();
@@ -467,6 +485,7 @@ public class MenuController implements Observer {
         goToNodeBut.setDisable(false);
         chooseGenome.setDisable(false);
         rainbowBut.setDisable(false);
+        collapseSNPButton.setDisable(false);
     }
 
     /**
@@ -653,6 +672,12 @@ public class MenuController implements Observer {
 
     public void rainbowButtonClicked() {
         GraphDrawer.getInstance().setRainbowView(rainbowBut.isSelected());
+        GraphDrawer.getInstance().redraw();
+    }
+
+    @FXML
+    public void collapseSNPClicked() {
+        GraphDrawer.getInstance().collapse(collapseSNPButton.isSelected());
         GraphDrawer.getInstance().redraw();
     }
 

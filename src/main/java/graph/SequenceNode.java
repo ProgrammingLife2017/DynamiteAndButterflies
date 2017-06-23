@@ -1,12 +1,9 @@
 package graph;
 
 import gui.DrawableCanvas;
-import gui.GraphDrawer;
-import structures.Annotation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 
 /**
  * Class Node2, which represents sequences of DNA. A sequence is a part of a genome.
@@ -24,7 +21,8 @@ public class SequenceNode {
     private boolean isDummy;
     private float baryCenterValue;
     private int inDegree;
-
+    private boolean isSNP;
+    private boolean isCollapsed;
 
     private ArrayList<Integer> children;
     private ArrayList<Integer> parents;
@@ -47,6 +45,13 @@ public class SequenceNode {
         this.offSets = new int[0];
     }
 
+    /**
+     * Return the outdegree of the node
+     * @return outdegree
+     */
+    public int getOutDegree() {
+        return this.getChildren().size();
+    }
     /**
      * Draw the node highlighted.
      */
@@ -171,6 +176,22 @@ public class SequenceNode {
 
     public int[] getGenomes() {
         return genomes;
+    }
+
+    public boolean isSNP() {
+        return isSNP;
+    }
+
+    public void setSNP(boolean SNP) {
+        isSNP = SNP;
+    }
+
+    public boolean isCollapsed() {
+        return isCollapsed;
+    }
+
+    public void setCollapsed(boolean collapsed) {
+        isCollapsed = collapsed;
     }
 
     /**
