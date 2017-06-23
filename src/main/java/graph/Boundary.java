@@ -101,4 +101,8 @@ class Boundary {
     int getRightBoundID() {
         return rightBoundID;
     }
+
+    public int getRange() {
+        return range;
+    }
 }

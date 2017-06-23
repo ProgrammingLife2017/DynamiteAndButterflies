@@ -103,9 +103,6 @@
     </module>
     <module name="UpperEll"/>
     <module name="FallThrough"/>
-    <module name="MethodLength">
-      <property name="max" value="30"/>
-    </module>
   </module>
   <module name="NewlineAtEndOfFile">
     <property name="severity" value="ignore"/>

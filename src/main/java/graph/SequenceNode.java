@@ -46,96 +46,6 @@ public class SequenceNode {
     }
 
     /**
-     * Forms a string of the sequence node.
-     *
-     * @param sequence With it's sequence which we do not constantly want in memory
-     * @return A string representation of the node.
-     */
-    public String toString(String sequence) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Node ID:\t\t\t").append(this.id).append("\n");
-        stringBuilder.append("Column index:\t\t").append(this.column).append("\n");
-        appendChildren(stringBuilder);
-        appendParents(stringBuilder);
-        stringBuilder.append("SequenceLength:\t").append(this.sequenceLength).append("\n");
-        appendSequence(sequence, stringBuilder);
-        appendGenomes(stringBuilder);
-        appendGenomeCoords(stringBuilder);
-        return stringBuilder.toString();
-    }
-
-
-    /**
-     * Appends genome coordinates to a string builder.
-     *
-     * @param stringBuilder string builder to append to.
-     */
-    private void appendGenomeCoords(StringBuilder stringBuilder) {
-        stringBuilder.append("Genome coords:\t");
-        for (Integer i : offSets) {
-            stringBuilder.append(i).append(" ");
-        }
-        stringBuilder.append("\n");
-    }
-
-    /**
-     * Appends genomes to a string builder.
-     *
-     * @param stringBuilder string builder to append to.
-     */
-    private void appendGenomes(StringBuilder stringBuilder) {
-        stringBuilder.append("Genomes:\t\t");
-        int[] sortedGenomes = this.getGenomes();
-        Arrays.sort(sortedGenomes);
-        for (Integer i : sortedGenomes) {
-            String genomeString = DrawableCanvas.getInstance().getAllGenomesReversed().get(i);
-            stringBuilder.append(genomeString).append(" ");
-        }
-        stringBuilder.append("\n");
-    }
-
-    /**
-     * Append sequence to a string builder.
-     *
-     * @param sequence      the sequence
-     * @param stringBuilder string builder to append to.
-     */
-    private void appendSequence(String sequence, StringBuilder stringBuilder) {
-        stringBuilder.append("Sequence:\t\t");
-        if (isDummy) {
-            stringBuilder.append("-\n");
-        } else {
-            stringBuilder.append(sequence).append("\n");
-        }
-    }
-
-    /**
-     * Appends parents to a string builder.
-     *
-     * @param stringBuilder string builder to append to.
-     */
-    private void appendParents(StringBuilder stringBuilder) {
-        stringBuilder.append("Parents:\t\t\t");
-        for (Integer i : parents) {
-            stringBuilder.append(i).append(" ");
-        }
-        stringBuilder.append("\n");
-    }
-
-    /**
-     * Appends children to a string builder.
-     *
-     * @param stringBuilder string builder to append to.
-     */
-    private void appendChildren(StringBuilder stringBuilder) {
-        stringBuilder.append("Children:\t\t\t");
-        for (Integer i : children) {
-            stringBuilder.append(i).append(" ");
-        }
-        stringBuilder.append("\n");
-    }
-
-    /**
      * Draw the node highlighted.
      */
     public void highlight() {
@@ -307,5 +217,95 @@ public class SequenceNode {
 
     public void setCollapsed(boolean collapsed) {
         isCollapsed = collapsed;
+    }
+
+    /**
+     * Forms a string of the sequence node.
+     *
+     * @param sequence With it's sequence which we do not constantly want in memory
+     * @return A string representation of the node.
+     */
+    public String toString(String sequence) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Node ID:\t\t\t").append(this.id).append("\n");
+        stringBuilder.append("Column index:\t\t").append(this.column).append("\n");
+        appendChildren(stringBuilder);
+        appendParents(stringBuilder);
+        stringBuilder.append("SequenceLength:\t").append(this.sequenceLength).append("\n");
+        appendSequence(sequence, stringBuilder);
+        appendGenomes(stringBuilder);
+        appendGenomeCoords(stringBuilder);
+        return stringBuilder.toString();
+    }
+
+  
+    /**
+     * Appends genome coordinates to a string builder.
+     * @param stringBuilder string builder to append to.
+     */
+    private void appendGenomeCoords(StringBuilder stringBuilder) {
+        stringBuilder.append("Genome coords:\t");
+        for (Integer i: offSets) {
+            stringBuilder.append(i).append(" ");
+        }
+        stringBuilder.append("\n");
+    }
+
+    /**
+     * Appends genomes to a string builder.
+     * @param stringBuilder string builder to append to.
+     */
+    private void appendGenomes(StringBuilder stringBuilder) {
+        if (this.getGenomes().length != 0) {
+            stringBuilder.append("Genomes:\t\t");
+            int[] sortedGenomes = this.getGenomes();
+            Arrays.sort(sortedGenomes);
+            for (Integer i: sortedGenomes) {
+                stringBuilder.append(DrawableCanvas.getInstance().getAllGenomesReversed().get(i)).append(" ");
+            }
+            stringBuilder.append("\n");
+        }
+    }
+
+    /**
+     * Append sequence to a string builder.
+     * @param sequence the sequence
+     * @param stringBuilder string builder to append to.
+     */
+    private void appendSequence(String sequence, StringBuilder stringBuilder) {
+        stringBuilder.append("Sequence:\t\t");
+        if (isDummy) {
+            stringBuilder.append("-\n");
+        } else {
+            stringBuilder.append(sequence).append("\n");
+        }
+    }
+
+    /**
+     * Appends parents to a string builder.
+     * @param stringBuilder string builder to append to.
+     */
+    private void appendParents(StringBuilder stringBuilder) {
+        stringBuilder.append("Parents:\t\t\t");
+        for (Integer i: parents) {
+            stringBuilder.append(i).append(" ");
+        }
+        stringBuilder.append("\n");
+    }
+
+    /**
+     * Appends children to a string builder.
+     * @param stringBuilder string builder to append to.
+     */
+    private void appendChildren(StringBuilder stringBuilder) {
+        stringBuilder.append("Children:\t\t\t");
+        for (Integer i : children) {
+            stringBuilder.append(i).append(" ");
+        }
+        stringBuilder.append("\n");
+    }
+
+    public int getOutDegree() {
+        return children.size();
     }
 }
