@@ -6,7 +6,7 @@ import java.io.IOException;
 
 /**
  * Created by Jip on 7-6-2017.
- *
+ * <p>
  * Custom properties class that extends a java api properties
  * Create my own two methods to ensure they use our file.
  */
@@ -31,7 +31,7 @@ public class CustomProperties extends java.util.Properties {
             this.load(fileReader);
             fileReader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Something went wrong while reading properties.");
         }
     }
 
@@ -45,7 +45,7 @@ public class CustomProperties extends java.util.Properties {
             this.store(fileWriter, "Property files for Dynamite and Butterflies");
             fileWriter.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Something went wrong while writing properties.");
         }
     }
 

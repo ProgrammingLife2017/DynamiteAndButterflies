@@ -14,67 +14,64 @@ import java.util.Observer;
 
 /**
  * Created by eric on 8-6-17.
+ *
+ * A singleton class which represents our canvas and some data it needs.
  */
-public class DrawableCanvas extends Observable implements Observer {
+final public class DrawableCanvas extends Observable implements Observer {
 
-    public static final int START_NODE_ID = 1000;
+    private static final int START_NODE_ID = 1000;
 
     private static DrawableCanvas canvas = new DrawableCanvas();
     private int annotationGenome;
 
     private GfaParser parser;
 
-    private MenuController mc;
-
-    private  SpecificGenomeProperties specificGenomeProperties;
+    private SpecificGenomeProperties specificGenomeProperties;
 
 
     private DrawableCanvas() {
 
     }
 
+    /**
+     * Gets the DrawableCanvas instance.
+     * @return the DrawableCanvas
+     */
     public static DrawableCanvas getInstance() {
         return canvas;
     }
 
-
-    public void setSpecificGenomeProperties(SpecificGenomeProperties sgp) {
-        this.specificGenomeProperties = sgp;
-    }
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof FileController) {
-            {
-                if (arg instanceof Integer) {
-                    if ( ( (Integer) arg) == 0) {
-                        try {
-                            int[] childArray = parser.getChildArray();
-                            HashMap<Integer, String> allGenomes = parser.getAllGenomesMapReversed();
-
-                            int [] parentArray = parser.getParentArray();
-                            SequenceGraph graph = new SequenceGraph(parentArray, childArray, getParser().getSequenceHashMap());
-                            graph.createSubGraph(START_NODE_ID, PanningController.RENDER_RANGE);
-                            Minimap.getInstance().initialize(graph.getFullGraphRightBoundID());
-                            GraphDrawer.getInstance().setGraph(graph);
-                            GraphDrawer.getInstance().moveShapes(0.0);
-                            ScrollbarController.getInstance().initialize(graph.getMaxColumnSize());
-                            setChanged();
-                            notifyObservers(parser.getFilePath());
-                            setChanged();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                    }
-
+            if (arg instanceof Integer) {
+                if (((Integer) arg) == 0) {
+                    try {
+                        int[] childArray = parser.getChildArray();
+                        int[] parentArray = parser.getParentArray();
+                        SequenceGraph graph = new SequenceGraph(
+                                parentArray, childArray, getParser().getSequenceHashMap());
+                        graph.createSubGraph(START_NODE_ID, PanningController.RENDER_RANGE);
+                        Minimap.getInstance().initialize(graph.getFullGraphRightBoundID());
+                        GraphDrawer.getInstance().setGraph(graph);
+                        GraphDrawer.getInstance().redraw();
+                        ScrollbarController.getInstance().initialize(graph.getMaxColumnSize());
+                        setChanged();
+                        notifyObservers(parser.getFilePath());
+                        setChanged();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
+
         }
     }
 
     public void setMenuController(MenuController mc) {
-        this.mc = mc;
         this.addObserver(mc);
     }
+
     public void setParser(GfaParser parser) {
         this.parser = parser;
 
@@ -102,5 +99,9 @@ public class DrawableCanvas extends Observable implements Observer {
 
     public int getAnnotationGenome() {
         return annotationGenome;
+    }
+
+    public void setSpecificGenomeProperties(SpecificGenomeProperties sgp) {
+        this.specificGenomeProperties = sgp;
     }
 }

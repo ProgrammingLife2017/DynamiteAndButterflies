@@ -10,7 +10,7 @@ import javafx.scene.control.ScrollBar;
  * <p>
  * This controller handles the scrollbar.
  */
-final class ScrollbarController {
+public final class ScrollbarController {
 
     private static ScrollbarController scrollbarController = new ScrollbarController();
 
