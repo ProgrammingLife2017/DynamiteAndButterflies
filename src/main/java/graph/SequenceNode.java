@@ -231,13 +231,15 @@ public class SequenceNode {
      * @param stringBuilder string builder to append to.
      */
     private void appendGenomes(StringBuilder stringBuilder) {
-        stringBuilder.append("Genomes:\t\t");
-        int[] sortedGenomes = this.getGenomes();
-        Arrays.sort(sortedGenomes);
-        for (Integer i: sortedGenomes) {
-            stringBuilder.append(DrawableCanvas.getInstance().getAllGenomesReversed().get(i)).append(" ");
+        if (this.getGenomes().length != 0) {
+            stringBuilder.append("Genomes:\t\t");
+            int[] sortedGenomes = this.getGenomes();
+            Arrays.sort(sortedGenomes);
+            for (Integer i: sortedGenomes) {
+                stringBuilder.append(DrawableCanvas.getInstance().getAllGenomesReversed().get(i)).append(" ");
+            }
+            stringBuilder.append("\n");
         }
-        stringBuilder.append("\n");
     }
 
     /**
