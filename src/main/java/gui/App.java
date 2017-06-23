@@ -40,7 +40,7 @@ public class App extends Application {
         loadScene();
     }
 
-    private static Stage stage;
+    private Stage stage;
     private static CustomProperties properties;
     private static FXMLLoader loader;
 

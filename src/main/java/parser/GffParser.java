@@ -74,6 +74,7 @@ public class GffParser {
                 buckets.put(startBucket, set);
             }
         }
+        br.close();
         DrawableCanvas.getInstance().setAnnotationGenome(suggestionGenomeOfAnnotation);
         return buckets;
     }

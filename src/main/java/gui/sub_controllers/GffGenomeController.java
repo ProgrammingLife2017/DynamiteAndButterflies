@@ -43,8 +43,7 @@ public class GffGenomeController {
     public void initialize(HashMap<Integer, String> hashMap, int suggestion) {
         selectedGenome = suggestion;
 
-        ArrayList<Genome> realData = new ArrayList<Genome>();
-        realData = createGenomeTable(hashMap, suggestion, true);
+        ArrayList<Genome> realData = createGenomeTable(hashMap, suggestion, true);
         if (realData.size() == 0) {
             realData = createGenomeTable(hashMap, suggestion, false);
         }

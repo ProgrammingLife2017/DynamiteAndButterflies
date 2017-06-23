@@ -195,7 +195,7 @@ public class GraphDrawer {
                 int[] childList = getChildrenGenomeList(node);
                 ArrayList<Integer> results = new ArrayList<>();
                 for (int aResult : genome) {
-                    if (contains(parentGenomes, aResult) & contains(childList, aResult)) {
+                    if (contains(parentGenomes, aResult) && contains(childList, aResult)) {
                         results.add(aResult);
                     }
                 }

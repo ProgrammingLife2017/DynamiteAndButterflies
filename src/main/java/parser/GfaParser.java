@@ -312,14 +312,19 @@ public class GfaParser extends Observable implements Runnable {
         InputStream in = new FileInputStream(System.getProperty("user.dir")
                 + System.getProperty("file.separator") + partPath + additionToPath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-        String[] strNums = br.readLine().split(",");
-        int size = strNums.length;
-        int[] nodeArray = new int[size];
-        for (int i = 0; i < size; i++) {
-            nodeArray[i] = Integer.parseInt(strNums[i]);
+        String line = br.readLine();
+        if (line != null) {
+            String[] strNums = line.split(",");
+            int size = strNums.length;
+            int[] nodeArray = new int[size];
+            for (int i = 0; i < size; i++) {
+                nodeArray[i] = Integer.parseInt(strNums[i]);
 
+            }
+            return nodeArray;
+        } else {
+            return null;
         }
-        return nodeArray;
     }
 
     /**
