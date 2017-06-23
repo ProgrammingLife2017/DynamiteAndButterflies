@@ -30,6 +30,7 @@ public class PopUpController {
     private Button openLoc;
 
     private Stage stage;
+
     /**
      * Constructor of the PopUp controller  that controls pop-ups on errors.
      */
@@ -38,8 +39,9 @@ public class PopUpController {
 
     /**
      * The popup for a corrupt database file.
+     *
      * @param partPath The path to the file
-     * @param message The message to display.
+     * @param message  The message to display.
      */
     @FXML
     public void loadDbCorruptPopUp(final String partPath, String message) {
@@ -50,7 +52,7 @@ public class PopUpController {
                         public void handle(MouseEvent e) {
                             stage.close();
                         }
-            });
+                    });
             openLoc.addEventHandler(MouseEvent.MOUSE_CLICKED,
                     new EventHandler<MouseEvent>() {
                         public void handle(MouseEvent e) {
@@ -62,7 +64,7 @@ public class PopUpController {
                             assert success;
                             stage.close();
                         }
-            });
+                    });
             setMessage(message);
             stage.showAndWait();
         } catch (Exception e) {
@@ -84,6 +86,4 @@ public class PopUpController {
     private void setMessage(String messageArg) {
         message.setText(messageArg);
     }
-
-
 }

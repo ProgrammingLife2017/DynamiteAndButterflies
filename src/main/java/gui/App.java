@@ -66,12 +66,15 @@ public class App extends Application {
             stage.show();
             // stage.setMaximized(true); -> Mac fails to load a setMaximized(true) stage.
         } catch (IOException e) {
-            e.printStackTrace();
             System.out
                     .println("Something went wrong while loading the fxml file");
         }
     }
 
+    /**
+     * Initializes the properties file.
+     * @throws IOException Throws IOException if writing the file goes wrong.
+     */
     private static void setUpProperties() throws IOException {
         properties = new CustomProperties();
         try {
@@ -91,15 +94,6 @@ public class App extends Application {
 
     @Override
     public void stop() {
-        properties.updateProperties();
-
-        String stringOfFile = properties.getProperty("file", "def");
-        int numOfBookmarks = Integer.parseInt(
-                properties.getProperty("bookmarkNum" + stringOfFile, "-1"));
-        properties.setProperty("bookmarkNum" + stringOfFile, Integer.toString(numOfBookmarks));
-
-        properties.saveProperties();
-
         MenuController controller = loader.getController();
         if (controller.getSequenceHashMap() != null) {
             controller.getSequenceHashMap().close();

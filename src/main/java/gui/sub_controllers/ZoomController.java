@@ -25,12 +25,18 @@ public class ZoomController {
     public ZoomController() {
     }
 
+    /**
+     * Gets the singleton zoomController.
+     *
+     * @return the ZoomController
+     */
     public static ZoomController getInstance() {
         return zoomController;
     }
 
     /**
      * Zooms in.
+     *
      * @param column the column to zoom in on.
      */
     public void zoomIn(int column) {
@@ -40,6 +46,7 @@ public class ZoomController {
 
     /**
      * Zooms out.
+     *
      * @param column the column to zoom out on.
      * @throws IOException thrown if can't find
      */
@@ -50,7 +57,9 @@ public class ZoomController {
 
     /**
      * Traverses the graph loaded to a specified destination.
+     *
      * @param centreNode The centre node to move to
+     * @param radius     Moves to the correct place in the graph
      */
     public void traverseGraphClicked(int centreNode, int radius) {
         if (!GraphDrawer.getInstance().getGraph().getNodes().containsKey(centreNode)) {
@@ -60,8 +69,11 @@ public class ZoomController {
             GraphDrawer.getInstance().setxDifference(0);
         }
         GraphDrawer drawer = GraphDrawer.getInstance();
-        GraphDrawer.getInstance().setZoomLevel(GraphDrawer.getInstance().findZoomLevel(centreNode, radius));
-        double xDiff = drawer.getColumnWidth(drawer.getGraph().getNode(centreNode).getColumn()) - drawer.getZoomLevel() / 2;
+        GraphDrawer.getInstance().setZoomLevel(
+                GraphDrawer.getInstance().findZoomLevel(centreNode, radius));
+        double xDiff = drawer.getColumnWidth(
+                drawer.getGraph().getNode(centreNode).getColumn())
+                - drawer.getZoomLevel() / 2;
         GraphDrawer.getInstance().highlight(centreNode);
         GraphDrawer.getInstance().moveShapes(xDiff);
     }

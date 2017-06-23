@@ -12,9 +12,9 @@ public class RecentController {
     private final MenuItem file2;
     private final MenuItem file3;
 
-    private String filePref1 = "file1";
-    private String filePref2 = "file2";
-    private String filePref3 = "file3";
+    private static final String FILE_PREF_1 = "file1";
+    private static final String FILE_PREF_2 = "file2";
+    private static final String FILE_PREF_3 = "file3";
 
     private CustomProperties properties;
     private static final String EMPTY = "<No recent file>";
@@ -61,9 +61,9 @@ public class RecentController {
         int check = isDuplicate(filePath);
         switch (check) {
             case -1:
-                properties.setProperty(filePref3, file2.getText());
-                properties.setProperty(filePref2, file1.getText());
-                properties.setProperty(filePref1, filePath);
+                properties.setProperty(FILE_PREF_3, file2.getText());
+                properties.setProperty(FILE_PREF_2, file1.getText());
+                properties.setProperty(FILE_PREF_1, filePath);
 
                 file3.setText(file2.getText());
                 file2.setText(file1.getText());
@@ -72,14 +72,15 @@ public class RecentController {
             case 1:
                 break;
             case 2:
-                String temp = properties.getProperty(filePref2, EMPTY);
-                properties.setProperty(filePref2, properties.getProperty(filePref1, EMPTY));
-                properties.setProperty(filePref1, temp);
+                String temp = properties.getProperty(FILE_PREF_2, EMPTY);
+                properties.setProperty(FILE_PREF_2, properties.getProperty(FILE_PREF_1, EMPTY));
+                properties.setProperty(FILE_PREF_1, temp);
 
                 file1.setText(temp);
-                file2.setText(properties.getProperty(filePref2, EMPTY));
+                file2.setText(properties.getProperty(FILE_PREF_2, EMPTY));
                 break;
-            default: throw new UnsupportedOperationException();
+            default:
+                throw new UnsupportedOperationException();
         }
         properties.saveProperties();
     }
@@ -93,11 +94,11 @@ public class RecentController {
     private int isDuplicate(String filePath) {
         int res = -1;
 
-        if (properties.getProperty(filePref1, EMPTY).equals(filePath)) {
+        if (properties.getProperty(FILE_PREF_1, EMPTY).equals(filePath)) {
             res = 1;
-        } else if (properties.getProperty(filePref2, EMPTY).equals(filePath)) {
+        } else if (properties.getProperty(FILE_PREF_2, EMPTY).equals(filePath)) {
             res = 2;
-        } else if (properties.getProperty(filePref3, EMPTY).equals(filePath)) {
+        } else if (properties.getProperty(FILE_PREF_3, EMPTY).equals(filePath)) {
             res = -1;    //The last recent file is the same behaviour as adding the new filepath
             // Get rid of the last one and add the new one at the top.
         }
@@ -109,12 +110,12 @@ public class RecentController {
      */
     public void initialize() {
         properties.updateProperties();
-        properties.setProperty(filePref3, properties.getProperty(filePref3, EMPTY));
-        properties.setProperty(filePref2, properties.getProperty(filePref2, EMPTY));
-        properties.setProperty(filePref1, properties.getProperty(filePref1, EMPTY));
+        properties.setProperty(FILE_PREF_3, properties.getProperty(FILE_PREF_3, EMPTY));
+        properties.setProperty(FILE_PREF_2, properties.getProperty(FILE_PREF_2, EMPTY));
+        properties.setProperty(FILE_PREF_1, properties.getProperty(FILE_PREF_1, EMPTY));
 
-        file1.setText(properties.getProperty(filePref1, EMPTY));
-        file2.setText(properties.getProperty(filePref2, EMPTY));
-        file3.setText(properties.getProperty(filePref3, EMPTY));
+        file1.setText(properties.getProperty(FILE_PREF_1, EMPTY));
+        file2.setText(properties.getProperty(FILE_PREF_2, EMPTY));
+        file3.setText(properties.getProperty(FILE_PREF_3, EMPTY));
     }
 }
