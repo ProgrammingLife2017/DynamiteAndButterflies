@@ -58,6 +58,10 @@ public class Annotation {
         this.selected.set(selected);
     }
 
+    /**
+     * Selects all the annotations.
+     * @param allAnnotations Selects all these annotations
+     */
     public static void selectAll(HashMap<Integer, HashSet<Annotation>> allAnnotations) {
         HashSet<Annotation> selectThese = new HashSet<>();
         for (int i = 0; i <= allAnnotations.size(); i++) {

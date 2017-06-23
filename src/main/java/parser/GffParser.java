@@ -10,7 +10,10 @@ import java.util.HashSet;
 
 /**
  * Created by lex_b on 12/06/2017.
+ *
+ * A Gff file parser that can parse the data into annotations.
  */
+@SuppressWarnings("MagicNumber") //Because it is a parser we know what kind of file we expect and how its built.
 public class GffParser {
     private String filePath;
     private static final int BUCKET_SIZE = 20000;
