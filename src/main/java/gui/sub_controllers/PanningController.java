@@ -4,12 +4,12 @@ import graph.SequenceGraph;
 import gui.GraphDrawer;
 import gui.MenuController;
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+
 import java.util.Observable;
 
 /**
@@ -17,7 +17,7 @@ import java.util.Observable;
  * <p>
  * Controls the panning functionality.
  */
-public class PanningController extends Observable {
+public final class PanningController extends Observable {
 
     /**
      * The amount of nodes to render.
@@ -107,35 +107,23 @@ public class PanningController extends Observable {
      */
     private void panRight() {
         if (!updating) {
-            if (GraphDrawer.getInstance().getGraph().getRightBoundIndex() < GraphDrawer.getInstance().getGraph().getFullGraphRightBoundIndex()) {
-                if (GraphDrawer.getInstance().getMostRightNode().getId() + RENDER_THRESHOLD > GraphDrawer.getInstance().getGraph().getRightBoundID()) {
-                    updating = true;
-                    new Thread(new Task<Integer>() {
-                        @Override
-                        protected Integer call() throws Exception {
-                            //System.out.println("OLD: getRightBoundID: " + drawer.getGraph().getRightBoundID() + ", getFullGraphRightBoundID: " + drawer.getGraph().getFullGraphRightBoundID() + ", getCentreNodeID: " + drawer.getGraph().getCenterNodeID());
-                            long start = System.currentTimeMillis();
-                            SequenceGraph newGraph = GraphDrawer.getInstance().getGraph().copy();
-                            newGraph.createSubGraph(GraphDrawer.getInstance().getGraph().getCenterNodeID() + RENDER_SHIFT, RENDER_RANGE);
-                            int leftMostID = GraphDrawer.getInstance().getMostLeftNode().getId();
-                            GraphDrawer.getInstance().setGraph(newGraph);
-                            GraphDrawer.getInstance().setxDifference(GraphDrawer.getInstance().getColumnWidth(GraphDrawer.getInstance().getGraph().getNode(leftMostID).getColumn()));
-                            long end = System.currentTimeMillis();
-                            System.out.println("Runtime: " + (end - start));
-                            //System.out.println("NEW: getRightBoundID: " + drawer.getGraph().getRightBoundID() + ", getFullGraphRightBoundID: " + drawer.getGraph().getFullGraphRightBoundID() + ", getCentreNodeID: " + drawer.getGraph().getCenterNodeID());
-                            updating = false;
-                            return null;
-                        }
-                    }).start();
+            if (GraphDrawer.getInstance().getGraph().getRightBoundIndex()
+                    < GraphDrawer.getInstance().getGraph().getFullGraphRightBoundIndex()) {
+                if (GraphDrawer.getInstance().getMostRightNode().getId() + RENDER_THRESHOLD
+                        > GraphDrawer.getInstance().getGraph().getRightBoundID()) {
+                    updateGraph(Direction.RIGHT);
                 }
             }
         }
-        if (GraphDrawer.getInstance().getGraph().getNodes().containsKey(GraphDrawer.getInstance().getGraph().getFullGraphRightBoundID())) {
-            if (GraphDrawer.getInstance().getxDifference() + GraphDrawer.getInstance().getZoomLevel() > GraphDrawer.getInstance().getColumnWidth(GraphDrawer.getInstance().getGraph().getColumns().size())) {
+        if (GraphDrawer.getInstance().getGraph().getNodes()
+                .containsKey(GraphDrawer.getInstance().getGraph().getFullGraphRightBoundID())) {
+            if (GraphDrawer.getInstance().getxDifference() + GraphDrawer.getInstance().getZoomLevel()
+                    > GraphDrawer.getInstance().getColumnWidth(GraphDrawer.getInstance().getGraph().getColumns().size())) {
                 return;
             }
         }
-        GraphDrawer.getInstance().moveShapes(GraphDrawer.getInstance().getxDifference() + GraphDrawer.getInstance().getZoomLevel() * PANN_FACTOR);
+        GraphDrawer.getInstance().moveShapes(GraphDrawer.getInstance().getxDifference()
+                + GraphDrawer.getInstance().getZoomLevel() * PANN_FACTOR);
     }
 
     /**
@@ -143,36 +131,54 @@ public class PanningController extends Observable {
      */
     private void panLeft() {
         if (!updating) {
-            if (GraphDrawer.getInstance().getGraph().getLeftBoundIndex() > GraphDrawer.getInstance().getGraph().getFullGraphLeftBoundIndex()) {
+            if (GraphDrawer.getInstance().getGraph().getLeftBoundIndex()
+                    > GraphDrawer.getInstance().getGraph().getFullGraphLeftBoundIndex()) {
                 if (GraphDrawer.getInstance().getxDifference() - RENDER_THRESHOLD < 0) {
-                    updating = true;
-                    new Thread(new Task<Integer>() {
-                        @Override
-                        protected Integer call() throws Exception {
-                            //System.out.println("OLD: getLeftBoundID: " + drawer.getGraph().getLeftBoundID() + ", getFullGraphLeftBoundID: " + drawer.getGraph().getFullGraphLeftBoundID() + ", getCentreNodeID: " + drawer.getGraph().getCenterNodeID());
-                            long start = System.currentTimeMillis();
-                            SequenceGraph newGraph = GraphDrawer.getInstance().getGraph().copy();
-                            newGraph.createSubGraph(GraphDrawer.getInstance().getGraph().getCenterNodeID() - RENDER_SHIFT, RENDER_RANGE);
-                            int leftMostID = GraphDrawer.getInstance().getMostLeftNode().getId();
-                            GraphDrawer.getInstance().setGraph(newGraph);
-                            GraphDrawer.getInstance().setxDifference(GraphDrawer.getInstance().getColumnWidth(GraphDrawer.getInstance().getGraph().getNode(leftMostID).getColumn()));
-                            long end = System.currentTimeMillis();
-                            System.out.println("Runtime: " + (end - start));
-                            //System.out.println("NEW: getLeftBoundID: " + drawer.getGraph().getLeftBoundID() + ", getFullGraphLeftBoundID: " + drawer.getGraph().getFullGraphLeftBoundID() + ", getCentreNodeID: " + drawer.getGraph().getCenterNodeID());
-                            updating = false;
-                            return null;
-                        }
-                    }).start();
+                    updateGraph(Direction.LEFT);
                 }
             }
         }
-        if (GraphDrawer.getInstance().getGraph().getNodes().containsKey(GraphDrawer.getInstance().getGraph().getFullGraphLeftBoundID())) {
+        if (GraphDrawer.getInstance().getGraph().getNodes()
+                .containsKey(GraphDrawer.getInstance().getGraph().getFullGraphLeftBoundID())) {
             if (GraphDrawer.getInstance().getxDifference() < 0) {
                 return;
             }
         }
-        GraphDrawer.getInstance().moveShapes(GraphDrawer.getInstance().getxDifference() - GraphDrawer.getInstance().getZoomLevel() * PANN_FACTOR);
+        GraphDrawer.getInstance().moveShapes(GraphDrawer.getInstance().getxDifference()
+                - GraphDrawer.getInstance().getZoomLevel() * PANN_FACTOR);
     }
+
+    /**
+     * Run a separate thread to update the graph when the screen nears the left or right bound.
+     *
+     * @param dir The direction in which is being panned.
+     */
+    private void updateGraph(Direction dir) {
+        updating = true;
+        new Thread(new Task<Integer>() {
+            @Override
+            protected Integer call() throws Exception {
+                SequenceGraph newGraph = GraphDrawer.getInstance().getGraph().copy();
+                int centerNodeID = GraphDrawer.getInstance().getGraph().getCenterNodeID();
+                if (dir == Direction.RIGHT) {
+                    newGraph.createSubGraph(centerNodeID + RENDER_SHIFT, RENDER_RANGE);
+                } else {
+                    newGraph.createSubGraph(centerNodeID - RENDER_SHIFT, RENDER_RANGE);
+                }
+                int leftMostID = GraphDrawer.getInstance().getMostLeftNode().getId();
+                GraphDrawer.getInstance().setGraph(newGraph);
+                GraphDrawer.getInstance().setxDifference(GraphDrawer.getInstance()
+                        .getColumnWidth(GraphDrawer.getInstance().getGraph().getNode(leftMostID).getColumn()));
+                updating = false;
+                return null;
+            }
+        }).start();
+    }
+
+    /**
+     * Enum to define the direction of panning.
+     */
+    private enum Direction { LEFT, RIGHT }
 
     public void setMenuController(MenuController menuController) {
         this.menuController = menuController;
