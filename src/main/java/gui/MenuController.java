@@ -154,6 +154,7 @@ public class MenuController implements Observer {
     }
 
     private void openGfaFileClicked(String filePath) throws IOException, InterruptedException {
+        GraphDrawer.getInstance().reset();
         fileController.openGfaFileClicked(filePath);
         recentController.update(filePath);
         annoBut.setDisable(true);
