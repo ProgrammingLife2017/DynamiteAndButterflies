@@ -60,16 +60,16 @@ public class GraphDrawer {
             = new HashMap<>();
 
     /**
-     * Getter for the singleton Graphdrawer.
+     * Getter for the singleton GraphDrawer.
      *
-     * @return this graphdrawer
+     * @return this GraphDrawer
      */
     public static GraphDrawer getInstance() {
         return drawer;
     }
 
     /**
-     * initialize the coordinates hashmap.
+     * Initializes the coordinates hashMap.
      */
     private void setEmptyCoordinates() {
         this.coordinates = new HashMap<>();
@@ -248,7 +248,8 @@ public class GraphDrawer {
      * @return True if the coordinates fall on the screen, false otherwise
      */
     private boolean inView(double[] coordinates) {
-        return coordinates[X_INDEX] + coordinates[WIDTH_INDEX] > 0 && coordinates[X_INDEX] < canvas.getWidth();
+        return ((coordinates[X_INDEX] + coordinates[WIDTH_INDEX]) > 0)
+                && (coordinates[X_INDEX] < canvas.getWidth());
     }
 
     /**
@@ -283,7 +284,8 @@ public class GraphDrawer {
     }
 
     /**
-     * Check if a node should have a width relative to the following node. The node with is relative when it is not a
+     * Check if a node should have a width relative to the following node.
+     * The node with is relative when it is not a
      * SNP node and it's children isn't either.
      *
      * @param node Node to check the relative width
@@ -308,9 +310,8 @@ public class GraphDrawer {
     private void drawNodes() {
         setEmptyCoordinates();
         gc.setStroke(Color.BLACK);
-        Iterator it = graph.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
+        for (Object o : graph.getNodes().entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
             SequenceNode node = (SequenceNode) pair.getValue();
             computeCoordinates(node);
             if (!node.isCollapsed()) {
@@ -323,33 +324,47 @@ public class GraphDrawer {
         }
     }
 
-    public HashSet<Annotation> getAnnotationBuckets(SequenceNode node, int annotatedGenomeIndex) {
-        HashSet<Annotation> anno = new HashSet<>();
-        if (annotatedGenomeIndex == -1) {
-            return anno;
+    /**
+     * Gets all relevant buckets of the node.
+     *
+     * @param node the node in which we're searching for annotations.
+     * @param annotatedGenome the genome that is annotated
+     * @return The hashSet of all annotations in the node.
+     */
+    private HashSet<Annotation> getAnnotationBuckets(SequenceNode node, int annotatedGenome) {
+        HashSet<Annotation> annotationHashSet = new HashSet<>();
+        if (annotatedGenome == -1) {
+            return annotationHashSet;
         }
 
-        int startBucket;
-        int endBucket;
+        int startBucketId;
+        int endBucketId;
         if (node != null) {
-            startBucket = (node.getOffsets()[annotatedGenomeIndex] / BUCKET_SIZE);
-            endBucket = ((node.getOffsets()[annotatedGenomeIndex] + node.getSequenceLength()) / BUCKET_SIZE);
+            startBucketId = (node.getOffsets()[annotatedGenome] / BUCKET_SIZE);
+            endBucketId = ((node.getOffsets()[annotatedGenome]
+                    + node.getSequenceLength()) / BUCKET_SIZE);
         } else {
-            startBucket = 0;
-            endBucket = allAnnotations.size();
+            startBucketId = 0;
+            endBucketId = allAnnotations.size();
         }
 
-        for (int i = startBucket; i <= endBucket; i++) {
+        for (int i = startBucketId; i <= endBucketId; i++) {
             HashSet<Annotation> tempAnnotations = allAnnotations.get(i);
             if (tempAnnotations != null) {
-                anno.addAll(tempAnnotations);
+                annotationHashSet.addAll(tempAnnotations);
             }
         }
-        return anno;
+        return annotationHashSet;
     }
 
-    public int getAnnotatedGenomeIndex(SequenceNode node) {
-        int indexOfGenome = colourController.containsPos(node.getGenomes(), DrawableCanvas.getInstance().getAnnotationGenome());
+    /**
+     * Gets the position of the offSets relative to annotation.
+     * @param node The node which we are finding he position on.
+     * @return the position in offSets.
+     */
+    private int getAnnotatedGenomeIndex(SequenceNode node) {
+        int indexOfGenome = colourController.containsPos(node.getGenomes(),
+                DrawableCanvas.getInstance().getAnnotationGenome());
         if (indexOfGenome == -1) {
             return indexOfGenome;
         }
@@ -371,8 +386,8 @@ public class GraphDrawer {
      * @param coordinates Coordinates of the node
      */
     private void drawAnnotations(SequenceNode node, double[] coordinates) {
-        int annotatedGenomeIndex = getAnnotatedGenomeIndex(node);
-        HashSet<Annotation> annotations = getAnnotationBuckets(node, annotatedGenomeIndex);
+        int annotatedGenome = getAnnotatedGenomeIndex(node);
+        HashSet<Annotation> annotations = getAnnotationBuckets(node, annotatedGenome);
 
 
         double annoHeight = coordinates[3] / 2;
@@ -385,7 +400,7 @@ public class GraphDrawer {
                 int startOfAnno = annotation.getStart();
                 int endOfAnno = annotation.getEnd();
 
-                int startCorNode = node.getOffsets()[annotatedGenomeIndex];
+                int startCorNode = node.getOffsets()[annotatedGenome];
                 int endCorNode = startCorNode + node.getSequenceLength();
 
                 if (!isMyAnnnotation(startOfAnno, endOfAnno, startCorNode, endCorNode)) {
