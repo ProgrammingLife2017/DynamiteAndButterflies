@@ -32,6 +32,7 @@ public class ColourController {
      * Constructor of the colourController.
      *
      * @param allSelectedGenomes A int[] with all the selected genomes.
+     * @param rainbowViewArg     A boolean with if rainbowView is turned on or off.
      */
     public ColourController(int[] allSelectedGenomes, boolean rainbowViewArg) {
         selectedGenomes = allSelectedGenomes;
@@ -154,6 +155,13 @@ public class ColourController {
         return res;
     }
 
+    /**
+     * Gets the colour of an Annotation.
+     *
+     * @param startCorAnno Chooses one based on its start coordinate
+     * @param stepSize     And how far it is in a setp.
+     * @return The Color of the annotation
+     */
     public Color getAnnotationColor(int startCorAnno, int stepSize) {
         double doubleStepSize = (double) stepSize;
         double hue = 360 - (360 * ((startCorAnno % doubleStepSize) / doubleStepSize));
