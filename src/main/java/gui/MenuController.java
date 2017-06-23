@@ -296,11 +296,33 @@ public class MenuController implements Observer {
         double pressedX = mouseEvent.getX();
         double pressedY = mouseEvent.getY();
         Minimap.getInstance().clickMinimap(pressedX, pressedY);
+        Object clicked = null;
         try {
-            GraphDrawer.getInstance().clickNode(pressedX, pressedY, mouseEvent);
+            clicked = GraphDrawer.getInstance().clickOnCanvas(pressedX, pressedY, mouseEvent);
         } catch (NullPointerException e) {
             System.out.println("The graph is not yet loaded!");
             e.printStackTrace();
+        }
+        if (clicked != null) {
+            if (clicked instanceof SequenceNode) {
+                SequenceNode node = (SequenceNode) clicked;
+                String sequence = DrawableCanvas.getInstance().getParser().
+                        getSequenceHashMap().get((long) node.getId());
+                if (!mouseEvent.isControlDown()) {
+                    sequenceInfo.setText(node.toString(sequence));
+                    nodeTextField.setText(node.getId().toString());
+                } else {
+                    sequenceInfoAlt.setText(node.toString(sequence));
+                }
+                GraphDrawer.getInstance().redraw();
+            } else if (clicked instanceof Annotation) {
+                Annotation annotation = (Annotation) clicked;
+                if (!mouseEvent.isControlDown()) {
+                    sequenceInfo.setText(annotation.toString());
+                } else {
+                    sequenceInfoAlt.setText(annotation.toString());
+                }
+            }
         }
     }
 
@@ -309,15 +331,15 @@ public class MenuController implements Observer {
      */
     @FXML
     public void traverseGraphClicked() {
-            int centreNodeID = getCentreNodeID();
-            int radius = getRadius();
-            if (centreNodeID != -1 && radius != -1) {
-                ZoomController.getInstance().traverseGraphClicked(centreNodeID, radius);
-                SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
-                String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
-                nodeTextField.setText(Integer.toString(centreNodeID));
-                sequenceInfo.setText(node.toString(sequence));
-            }
+        int centreNodeID = getCentreNodeID();
+        int radius = getRadius();
+        if (centreNodeID != -1 && radius != -1) {
+            ZoomController.getInstance().traverseGraphClicked(centreNodeID, radius);
+            SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
+            String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
+            nodeTextField.setText(Integer.toString(centreNodeID));
+            sequenceInfo.setText(node.toString(sequence));
+        }
     }
 
     /**

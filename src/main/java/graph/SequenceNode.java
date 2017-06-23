@@ -213,6 +213,7 @@ public class SequenceNode {
         return stringBuilder.toString();
     }
 
+  
     /**
      * Appends genome coordinates to a string builder.
      * @param stringBuilder string builder to append to.
@@ -264,6 +265,7 @@ public class SequenceNode {
         }
         stringBuilder.append("\n");
     }
+
     /**
      * Appends children to a string builder.
      * @param stringBuilder string builder to append to.
