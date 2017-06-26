@@ -103,7 +103,7 @@ public class MenuController implements Observer {
     private BookmarkController bookmarkController;
     private FileController fileController;
     private RecentController recentController;
-    private SpecificGenomeProperties specificGenomeProperties;
+    private RecentGenomeController recentGenomeController;
     private String filePath;
 
     public MenuController() {
@@ -123,11 +123,11 @@ public class MenuController implements Observer {
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
 
-        specificGenomeProperties = new SpecificGenomeProperties(genome1, genome2, genome3);
+        recentGenomeController = new RecentGenomeController(genome1, genome2, genome3);
 
         ps = new PrintStream(new Console(consoleArea));
         DrawableCanvas.getInstance().setMenuController(this);
-        DrawableCanvas.getInstance().setSpecificGenomeProperties(specificGenomeProperties);
+        DrawableCanvas.getInstance().setRecentGenomeController(recentGenomeController);
         ScrollbarController.getInstance().setScrollBar(scrollBar);
         ZoomController.getInstance().setMenuController(this);
         Minimap.getInstance().setMenuController(this);
@@ -515,7 +515,7 @@ public class MenuController implements Observer {
                         String offTitle = parts[0];
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
-                        specificGenomeProperties.initialize();
+                        recentGenomeController.initialize();
                         displayInfo(GraphDrawer.getInstance().getGraph());
                         updateRadius();
                         updateCenterNode();
