@@ -55,7 +55,7 @@ public class GraphDrawer {
     private ArrayList<ArrayList<SequenceNode>> columns;
     private HashMap<Integer, double[]> coordinates;
     private HashMap<Integer, ArrayList<double[]>> annotationCoordinates;
-    private HashMap<Integer, HashSet<Annotation>> allAnnotations
+    private HashMap<Integer, TreeSet<Annotation>> allAnnotations
             = new HashMap<>();
 
     /**
@@ -341,7 +341,7 @@ public class GraphDrawer {
         }
 
         for (int i = startBucketId; i <= endBucketId; i++) {
-            HashSet<Annotation> tempAnnotations = allAnnotations.get(i);
+            TreeSet<Annotation> tempAnnotations = allAnnotations.get(i);
             if (tempAnnotations != null) {
                 annotationHashSet.addAll(tempAnnotations);
             }
@@ -1004,11 +1004,11 @@ public class GraphDrawer {
         return selected;
     }
 
-    public HashMap<Integer, HashSet<Annotation>> getAllAnnotations() {
+    public HashMap<Integer, TreeSet<Annotation>> getAllAnnotations() {
         return allAnnotations;
     }
 
-    public void setAllAnnotations(HashMap<Integer, HashSet<Annotation>> newAnnotations) {
+    public void setAllAnnotations(HashMap<Integer, TreeSet<Annotation>> newAnnotations) {
         this.allAnnotations = newAnnotations;
     }
 

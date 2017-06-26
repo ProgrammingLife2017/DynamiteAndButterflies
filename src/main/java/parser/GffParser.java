@@ -6,7 +6,7 @@ import structures.Annotation;
 
 import java.io.*;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.TreeSet;
 
 /**
  * Created by lex_b on 12/06/2017.
@@ -31,7 +31,7 @@ public class GffParser {
      * @return an arrayList with the Annotations.
      * @throws IOException If it goes wrong.
      */
-    public HashMap<Integer, HashSet<Annotation>> parseGff() throws IOException {
+    public HashMap<Integer, TreeSet<Annotation>> parseGff() throws IOException {
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line;
@@ -41,7 +41,7 @@ public class GffParser {
         properties.updateProperties();
         int maxCor = Integer.parseInt(properties.getProperty(
                 DrawableCanvas.getInstance().getParser().getPartPath() + "Max-Cor", "-1"));
-        HashMap<Integer, HashSet<Annotation>> buckets = initializeBucketArray(maxCor);
+        HashMap<Integer, TreeSet<Annotation>> buckets = initializeBucketArray(maxCor);
         int annotationIdentifier = 0;
         while ((line = br.readLine()) != null) {
             String[] data = line.split("\t");
@@ -69,9 +69,9 @@ public class GffParser {
 
 
             for (int i = startBucket; i <= endBucket; i++) {
-                HashSet<Annotation> set = buckets.get(i);
+                TreeSet<Annotation> set = buckets.get(i);
                 if (set == null) {
-                    set = new HashSet<>();
+                    set = new TreeSet<>();
                 }
                 set.add(anno);
                 buckets.put(startBucket, set);
@@ -88,7 +88,7 @@ public class GffParser {
      * @param maxCor - biggest coord.
      * @return a new hashmap with a specific size.
      */
-    private HashMap<Integer, HashSet<Annotation>> initializeBucketArray(int maxCor) {
+    private HashMap<Integer, TreeSet<Annotation>> initializeBucketArray(int maxCor) {
         int size = (maxCor / BUCKET_SIZE);
 
         return new HashMap<>(size);
