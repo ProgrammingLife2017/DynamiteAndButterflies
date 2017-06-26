@@ -8,7 +8,11 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import structures.Annotation;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
@@ -548,10 +552,14 @@ public class GraphDrawer {
                 gc.strokePolygon(new double[]{leftX, midX, rightX},
                                 new double[]{midY, downY, midY}, POLYGON_POINTS);
             }
-            gc.setFill(Color.CHOCOLATE);
+            gc.setFill(colourController.getSNPColour(
+                    DrawableCanvas.getInstance().getParser().getSequenceHashMap()
+                            .get((long) upperNode.getId())));
             gc.fillPolygon(new double[]{leftX, midX, rightX},
                     new double[]{midY, upY, midY}, POLYGON_POINTS);
-            gc.setFill(Color.BROWN);
+            gc.setFill(colourController.getSNPColour(
+                    DrawableCanvas.getInstance().getParser().getSequenceHashMap()
+                            .get((long) lowerNode.getId())));
             gc.fillPolygon(new double[]{leftX, midX, rightX},
                     new double[]{midY, downY, midY}, POLYGON_POINTS);
         }

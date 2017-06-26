@@ -236,4 +236,22 @@ public class ColourController {
     public void setRainbowView(boolean rainbowView) {
         this.rainbowView = rainbowView;
     }
+
+    public Color getSNPColour(String base) {
+        if (base != null) {
+            switch (base) {
+                case "C":
+                    return Color.color(0, 0, 0.6196);
+                case "A":
+                    return Color.color(0, 0.6196, 0);
+                case "G":
+                    return Color.color(0.6196, 0.6196, 0);
+                case "T":
+                    return Color.color(0.6196, 0, 0);
+                default:
+                    return Color.CHOCOLATE;
+            }
+        }
+        return Color.CHOCOLATE;
+    }
 }
