@@ -618,19 +618,33 @@ public class GraphDrawer {
                 }
 
                 if (edgeInView(startX, endX)) {
+                    double columnWidth = (columnWidths[node.getColumn() + 1] - columnWidths[node.getColumn()])
+                            * stepSize * RELATIVE_X_DISTANCE;
+                    double endXHalf = (columnWidth - coordinatesParent[WIDTH_INDEX]);
+
                     double tempStartX = startX;
-                    double tempStartY = startY;
-                    double dashSizeX = (endX - startX) / (double) colourMeBby.size();
-                    double dashSizeY = (endY - startY) / (double) colourMeBby.size();
-                    double tempEndX = startX + dashSizeX;
-                    double tempEndY = startY + dashSizeY;
+                    double dashSizeX = endXHalf / (double) colourMeBby.size();
+                    double tempEndX = startX;
 
                     for (Color aColourMeBby : colourMeBby) {
+                        tempEndX += dashSizeX;
+                        gc.setStroke(aColourMeBby);
+                        gc.strokeLine(tempStartX, startY, tempEndX, startY);
+                        tempStartX = tempEndX;
+                    }
+
+                    dashSizeX = (endX - (startX + endXHalf)) / (double) colourMeBby.size();
+                    double tempStartY = startY;
+                    double dashSizeY = (endY - startY) / (double) colourMeBby.size();
+                    double tempEndY = startY + dashSizeY;
+
+
+                    for (Color aColourMeBby : colourMeBby) {
+                        tempEndX += dashSizeX;
                         gc.setStroke(aColourMeBby);
                         gc.strokeLine(tempStartX, tempStartY, tempEndX, tempEndY);
                         tempStartX = tempEndX;
                         tempStartY = tempEndY;
-                        tempEndX += dashSizeX;
                         tempEndY += dashSizeY;
                     }
                 }
