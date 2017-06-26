@@ -87,11 +87,17 @@ public class Annotation implements Comparable<Annotation> {
     @Override
     public int compareTo(@NotNull Annotation o) {
         if (this.getStart() < o.getStart()) {
-            return 1;
-        } else if (this.getStart() > o.getStart()) {
             return -1;
+        } else if (this.getStart() > o.getStart()) {
+            return 1;
         } else {
-            return 0;
+            if (this.getEnd() > o.getEnd()) {
+                return 1;
+            } else if (this.getEnd() < o.getEnd()) {
+                return -1;
+            } else {
+                return 0;
+            }
         }
     }
 }

@@ -323,8 +323,8 @@ public class GraphDrawer {
      * @param annotatedGenome the genome that is annotated
      * @return The hashSet of all annotations in the node.
      */
-    private HashSet<Annotation> getAnnotationBuckets(SequenceNode node, int annotatedGenome) {
-        HashSet<Annotation> annotationHashSet = new HashSet<>();
+    private TreeSet<Annotation> getAnnotationBuckets(SequenceNode node, int annotatedGenome) {
+        TreeSet<Annotation> annotationHashSet = new TreeSet<>();
         if (annotatedGenome == -1) {
             return annotationHashSet;
         }
@@ -388,11 +388,8 @@ public class GraphDrawer {
      */
     private void drawAnnotations(SequenceNode node, double[] coordinates) {
         int annotatedGenome = getAnnotatedGenomeIndex(node);
-        HashSet<Annotation> annotations = getAnnotationBuckets(node, annotatedGenome);
-
-
-        double annoHeight = coordinates[HEIGHT_INDEX] / 2;
-        double startYAnno = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] - annoHeight;
+        TreeSet<Annotation> annotations = getAnnotationBuckets(node, annotatedGenome);
+        HashMap<Integer, Integer> drawnLayers = new HashMap<>();
 
         for (Annotation annotation : annotations) {
             if (annotation.getSelected().getValue()) {
@@ -420,8 +417,24 @@ public class GraphDrawer {
                             * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
                 }
 
+                double annoHeight = coordinates[HEIGHT_INDEX] / 2;
+                double startYAnno = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] - annoHeight;
+
+                for (int i = 1; i <= drawnLayers.size() + 1; i++) {
+                    Integer filled = drawnLayers.get(i);
+                    if (filled == null) {
+                        drawnLayers.put(i, endOfAnno);
+                        startYAnno = startYAnno + (annoHeight * i);
+                        break;
+                    } else if (filled < endOfAnno) {
+                        startYAnno = startYAnno + (annoHeight * i);
+                        drawnLayers.put(i, endOfAnno);
+                        break;
+                    }
+                }
+
+
                 gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
-                startYAnno += annoHeight;
 
                 double[] annoCoordinates = new double[COORDINATES];
                 annoCoordinates[X_INDEX] = startXAnno;
@@ -758,7 +771,7 @@ public class GraphDrawer {
                         //TODO make sure this stays there when zooming.
 
                         int annoId = (int) pair.getKey();
-                        HashSet<Annotation> setOfAllAnnotations = getAnnotationBuckets(null, 1);
+                        TreeSet<Annotation> setOfAllAnnotations = getAnnotationBuckets(null, 1);
                         for (Annotation annotation : setOfAllAnnotations) {
                             if (annotation.getId() == annoId) {
                                 return annotation;
