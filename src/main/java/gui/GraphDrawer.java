@@ -924,8 +924,14 @@ public class GraphDrawer {
         if (zoomLevel < 1) {
             zoomLevel = 1;
         }
-        if (zoomLevel > range / 2) {
-            zoomLevel = range / 2;
+        if (graph.getLeftBoundID() != 1 || graph.getRightBoundID() < graph.getFullGraphRightBoundID()) {
+            if (zoomLevel > range / 2) {
+                zoomLevel = range / 2;
+            }
+        } else {
+            if (zoomLevel > range) {
+                zoomLevel = range;
+            }
         }
         this.zoomLevel = zoomLevel;
     }
