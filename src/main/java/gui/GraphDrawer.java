@@ -26,6 +26,7 @@ public class GraphDrawer {
     private static final double LINE_WIDTH_FACTOR = 0.1;
     private static final double LOG_BASE = 2;
     private static final double SNP_SIZE = 10;
+    private static final double MIN_HEIGHT = 5;
     private static final int LINE_WIDTH = 5;
     private static final int X_INDEX = 0;
     private static final int Y_INDEX = 1;
@@ -732,7 +733,7 @@ public class GraphDrawer {
         double zoomHeight = Math.log(stepSize + 1) / Math.log(LOG_BASE);
         double relativeSize = 100 * (node.getGenomes().length / (double) DrawableCanvas.getInstance().getAllGenomes().size());
         double genomeWidth = Math.log(relativeSize + 1) / Math.log(LOG_BASE);
-        return genomeWidth * zoomHeight;
+        return Math.max(genomeWidth * zoomHeight, MIN_HEIGHT);
 //        return Math.log(stepSize + 1) / Math.log(LOG_BASE) * Y_SIZE_FACTOR;
     }
 
