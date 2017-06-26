@@ -21,7 +21,7 @@ public class GraphDrawer {
     private static GraphDrawer drawer = new GraphDrawer();
 
     public static final double RELATIVE_Y_DISTANCE = 50;
-    private static final double Y_BASE = 100;
+    private static final double Y_BASE = 150;
     private static final double RELATIVE_X_DISTANCE = 0.8;
     private static final double LINE_WIDTH_FACTOR = 0.1;
     private static final double LOG_BASE = 2;
@@ -597,7 +597,7 @@ public class GraphDrawer {
      * @return The width of the node
      */
     private double computeNodeWidth(SequenceNode node) {
-        if (node.isSNP()) {
+        if (node.isCollapsed()) {
             return SNP_SIZE;
         }
         if (node.isDummy()) {
