@@ -510,11 +510,13 @@ public class GraphDrawer {
         checkExtremeNode(node);
         if (inView(coordinates)) {
             if (node.isDummy()) {
+                ArrayList<Color> colourMeBby = colourController.getEdgeColours(node.getGenomes());
                 this.setLineWidth(node.getGenomes().length);
-                gc.strokeLine(coordinates[X_INDEX],
-                        coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] / 2,
-                        coordinates[X_INDEX] + coordinates[WIDTH_INDEX],
-                        coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] / 2);
+                double startX = coordinates[X_INDEX];
+                double startY = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] / 2;
+                double endX = coordinates[X_INDEX] + coordinates[WIDTH_INDEX];
+                double endY = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] / 2;
+                colourThisEdge(startX, startY, endX, endY, colourMeBby);
             } else {
                 drawColour(node, coordinates);
                 drawAnnotations(node, coordinates);
@@ -613,28 +615,43 @@ public class GraphDrawer {
                 ArrayList<Color> colourMeBby =
                         colourController.getEdgeColours(
                                 allGenomesInEdge.stream().mapToInt(q -> q).toArray());
-                if (colourMeBby.size() < 4) {
-                    colourMeBby.addAll(colourMeBby);
-                }
 
                 if (edgeInView(startX, endX)) {
-                    double tempStartX = startX;
-                    double tempStartY = startY;
-                    double dashSizeX = (endX - startX) / (double) colourMeBby.size();
-                    double dashSizeY = (endY - startY) / (double) colourMeBby.size();
-                    double tempEndX = startX + dashSizeX;
-                    double tempEndY = startY + dashSizeY;
-
-                    for (Color aColourMeBby : colourMeBby) {
-                        gc.setStroke(aColourMeBby);
-                        gc.strokeLine(tempStartX, tempStartY, tempEndX, tempEndY);
-                        tempStartX = tempEndX;
-                        tempStartY = tempEndY;
-                        tempEndX += dashSizeX;
-                        tempEndY += dashSizeY;
-                    }
+                    colourThisEdge(startX, startY, endX, endY, colourMeBby);
                 }
             }
+        }
+    }
+
+    /**
+     * Method that colours the edge based on it's start point and endpoints.
+     * As well as based on the colours it should be.
+     * @param startX startXPosition of the edge
+     * @param startY startYPosition of the edge
+     * @param endX endXPosition of the edge
+     * @param endY endYPosition of the edge
+     * @param colourMeBby ArrayList of the colours it should be.
+     */
+    private void colourThisEdge(double startX, double startY,
+                                double endX, double endY, ArrayList<Color> colourMeBby) {
+        if (colourMeBby.size() < 4) {
+            colourMeBby.addAll(colourMeBby);
+        }
+
+        double tempStartX = startX;
+        double tempStartY = startY;
+        double dashSizeX = (endX - startX) / (double) colourMeBby.size();
+        double dashSizeY = (endY - startY) / (double) colourMeBby.size();
+        double tempEndX = startX + dashSizeX;
+        double tempEndY = startY + dashSizeY;
+
+        for (Color aColour : colourMeBby) {
+            gc.setStroke(aColour);
+            gc.strokeLine(tempStartX, tempStartY, tempEndX, tempEndY);
+            tempStartX = tempEndX;
+            tempStartY = tempEndY;
+            tempEndX += dashSizeX;
+            tempEndY += dashSizeY;
         }
     }
 
