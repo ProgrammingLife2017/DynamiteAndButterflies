@@ -19,7 +19,8 @@ import java.util.ArrayList;
 @SuppressWarnings("MagicNumber")
 public class ColourController {
 
-    private static final Color BASE_COLOR = Color.BLACK;
+    private static final Color EDGE_BASE_COLOUR = Color.BLACK;
+    private static final Color NODE_BASE_COLOUR = Color.gray(0.5098);
 
     private int[] selectedGenomes;
     private boolean rainbowView;
@@ -96,11 +97,11 @@ public class ColourController {
      * That is then based on the length of the genomes selected.
      *
      * @param length the length of the selected genomes.
-     * @return a color.
+     * @return a color red.
      */
-    private Color notRainbowView(int length) {
+    private Color notRainbowViewNode(int length) {
         if (length == 0) {
-            return getBaseNodeColour();
+            return NODE_BASE_COLOUR;
         } else if (length < lowerPart) {
             return Color.color(0.9608, 0.8235, 0.8235);
         } else if (length < middlePart) {
@@ -113,15 +114,6 @@ public class ColourController {
     }
 
     /**
-     * Returns the base colour.
-     *
-     * @return the base colour.
-     */
-    private Color getBaseNodeColour() {
-        return Color.gray(0.5098);
-    }
-
-    /**
      * This method gets an array of the different colours the node should be.
      *
      * @param genomes The genomes in the node.
@@ -131,7 +123,7 @@ public class ColourController {
         ArrayList<Color> res = new ArrayList<Color>();
         //If there is no selection, it should only be the base colour.
         if (selectedGenomes.length == 0) {
-            res.add(getBaseNodeColour());
+            res.add(NODE_BASE_COLOUR);
             return res;
         }
 
@@ -140,18 +132,13 @@ public class ColourController {
             res = rainbowViewColours(genomes);
         } else {
             // Else we choose a colour Red.
-            int length = 0;
-            for (int genome : genomes) {
-                if (contains(selectedGenomes, genome)) {
-                    length++;
-                }
-            }
-            res.add(notRainbowView(length));
+            int length = getSizeContained(genomes);
+            res.add(notRainbowViewNode(length));
             return res;
         }
 
         if (res.isEmpty()) {
-            res.add(getBaseNodeColour());
+            res.add(NODE_BASE_COLOUR);
         }
 
         return res;
@@ -196,8 +183,8 @@ public class ColourController {
     public ArrayList<Color> getEdgeColours(int[] genomes) {
         ArrayList<Color> res = new ArrayList<Color>();
         //If there is no selection, it should only be the base colour.
-        if (selectedGenomes.length == 0 || !rainbowView) {
-            res.add(BASE_COLOR);
+        if (selectedGenomes.length == 0) {
+            res.add(EDGE_BASE_COLOUR);
             return res;
         }
 
@@ -206,9 +193,19 @@ public class ColourController {
             res = rainbowViewColours(genomes);
         }
         if (res.isEmpty()) {
-            res.add(BASE_COLOR);
+            res.add(EDGE_BASE_COLOUR);
         }
 
+        return res;
+    }
+
+    private int getSizeContained(int[] genomes) {
+        int res = 0;
+        for (int genome : genomes) {
+            if (contains(selectedGenomes, genome)) {
+                res++;
+            }
+        }
         return res;
     }
 
@@ -231,6 +228,7 @@ public class ColourController {
 
     public void setSelectedGenomes(int[] selected) {
         this.selectedGenomes = selected;
+        initialize();
     }
 
     public void setRainbowView(boolean rainbowView) {
