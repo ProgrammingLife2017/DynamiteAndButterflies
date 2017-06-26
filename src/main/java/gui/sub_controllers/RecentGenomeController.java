@@ -1,7 +1,10 @@
 package gui.sub_controllers;
 
 import gui.CustomProperties;
+import gui.DrawableCanvas;
 import javafx.scene.control.MenuItem;
+
+import java.util.HashMap;
 
 
 /**
@@ -99,11 +102,13 @@ public class RecentGenomeController {
      * @param selectedGenomes The selectedGenomes.
      */
     void saving(int[] selectedGenomes) {
+        HashMap<Integer, String> genomeNames = DrawableCanvas.getInstance().getAllGenomesReversed();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Genomes - ");
 
-        for (int addSelectedGen : selectedGenomes) {
-            stringBuilder.append(addSelectedGen).append(", ");
+        for (int selectedGen : selectedGenomes) {
+            String nameOfGenome = genomeNames.get(selectedGen);
+            stringBuilder.append(nameOfGenome).append(", ");
         }
         String res = stringBuilder.toString();
         res = res.replaceAll(", $", "");

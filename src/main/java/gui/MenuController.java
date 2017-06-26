@@ -667,10 +667,12 @@ public class MenuController implements Observer {
             //We skip parts[0] because that is "Genomes".
             String listOfIds = parts[1];
 
+            HashMap<String, Integer> genomeIds = DrawableCanvas.getInstance().getAllGenomes();
+
             parts = listOfIds.split(", ");
             int[] res = new int[parts.length];
             for (int i = 0; i < parts.length; i++) {
-                int oneSelected = Integer.parseInt(parts[i]);
+                int oneSelected = genomeIds.get(parts[i]);
                 res[i] = oneSelected;
             }
 
