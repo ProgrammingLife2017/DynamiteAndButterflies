@@ -81,7 +81,7 @@ public final class Minimap {
      */
     private void drawMapBox(GraphicsContext gc) {
         gc.strokeRect(xCoordinate, MINIMAP_Y, width, MINIMAP_HEIGHT);
-        gc.strokeText("0", xCoordinate, TEXT_Y);
+        gc.strokeText("1", xCoordinate, TEXT_Y);
         gc.strokeText(size + "",
                 xCoordinate + width - Integer.toString(size).length() * CHAR_WIDTH, TEXT_END_Y);
     }

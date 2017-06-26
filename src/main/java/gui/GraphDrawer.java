@@ -20,12 +20,12 @@ public class GraphDrawer {
     private static GraphDrawer drawer = new GraphDrawer();
 
     public static final double RELATIVE_Y_DISTANCE = 50;
-    private static final double Y_BASE = 100;
+    private static final double Y_BASE = 150;
     private static final double RELATIVE_X_DISTANCE = 0.8;
     private static final double LINE_WIDTH_FACTOR = 0.1;
-    private static final double Y_SIZE_FACTOR = 3;
     private static final double LOG_BASE = 2;
     private static final double SNP_SIZE = 10;
+    private static final double MIN_HEIGHT = 5;
     private static final int LINE_WIDTH = 5;
     private static final int X_INDEX = 0;
     private static final int Y_INDEX = 1;
@@ -257,9 +257,9 @@ public class GraphDrawer {
         if (relativeWidth(node)) {
             width *= RELATIVE_X_DISTANCE;
         }
-        double height = getYSize();
+        double height = getYSize(node);
         double x = (columnWidths[node.getColumn()] - xDifference) * stepSize;
-        double y = Y_BASE + (node.getIndex() * RELATIVE_Y_DISTANCE) - yDifference;
+        double y = Y_BASE + (node.getIndex() * RELATIVE_Y_DISTANCE) - yDifference - (height / 2);
         if (height > width) {
             y += (height - width) / 2;
             height = width;
@@ -618,19 +618,33 @@ public class GraphDrawer {
                 }
 
                 if (edgeInView(startX, endX)) {
+                    double columnWidth = (columnWidths[node.getColumn() + 1] - columnWidths[node.getColumn()])
+                            * stepSize * RELATIVE_X_DISTANCE;
+                    double endXHalf = (columnWidth - coordinatesParent[WIDTH_INDEX]);
+
                     double tempStartX = startX;
-                    double tempStartY = startY;
-                    double dashSizeX = (endX - startX) / (double) colourMeBby.size();
-                    double dashSizeY = (endY - startY) / (double) colourMeBby.size();
-                    double tempEndX = startX + dashSizeX;
-                    double tempEndY = startY + dashSizeY;
+                    double dashSizeX = endXHalf / (double) colourMeBby.size();
+                    double tempEndX = startX;
 
                     for (Color aColourMeBby : colourMeBby) {
+                        tempEndX += dashSizeX;
+                        gc.setStroke(aColourMeBby);
+                        gc.strokeLine(tempStartX, startY, tempEndX, startY);
+                        tempStartX = tempEndX;
+                    }
+
+                    dashSizeX = (endX - (startX + endXHalf)) / (double) colourMeBby.size();
+                    double tempStartY = startY;
+                    double dashSizeY = (endY - startY) / (double) colourMeBby.size();
+                    double tempEndY = startY + dashSizeY;
+
+
+                    for (Color aColourMeBby : colourMeBby) {
+                        tempEndX += dashSizeX;
                         gc.setStroke(aColourMeBby);
                         gc.strokeLine(tempStartX, tempStartY, tempEndX, tempEndY);
                         tempStartX = tempEndX;
                         tempStartY = tempEndY;
-                        tempEndX += dashSizeX;
                         tempEndY += dashSizeY;
                     }
                 }
@@ -667,7 +681,7 @@ public class GraphDrawer {
      * @return The width of the node
      */
     private double computeNodeWidth(SequenceNode node) {
-        if (node.isSNP()) {
+        if (node.isCollapsed()) {
             return SNP_SIZE;
         }
         if (node.isDummy()) {
@@ -828,8 +842,13 @@ public class GraphDrawer {
     /**
      * Set the height of the node depending on the level of zoom.
      */
-    private double getYSize() {
-        return Math.log(stepSize + 1) / Math.log(LOG_BASE) * Y_SIZE_FACTOR;
+    private double getYSize(SequenceNode node) {
+        if (node.isSNP()) { return SNP_SIZE * stepSize / 2; }
+        double zoomHeight = Math.log(stepSize + 1) / Math.log(LOG_BASE);
+        double relativeSize = 100 * (node.getGenomes().length / (double) DrawableCanvas.getInstance().getAllGenomes().size());
+        double genomeWidth = Math.log(relativeSize + 1) / Math.log(LOG_BASE);
+        return Math.max(genomeWidth * zoomHeight, MIN_HEIGHT);
+//        return Math.log(stepSize + 1) / Math.log(LOG_BASE) * Y_SIZE_FACTOR;
     }
 
     /**
@@ -919,8 +938,14 @@ public class GraphDrawer {
         if (zoomLevel < 1) {
             zoomLevel = 1;
         }
-        if (zoomLevel > range / 2) {
-            zoomLevel = range / 2;
+        if (graph.getLeftBoundID() != 1 || graph.getRightBoundID() < graph.getFullGraphRightBoundID()) {
+            if (zoomLevel > range / 2) {
+                zoomLevel = range / 2;
+            }
+        } else {
+            if (zoomLevel > range) {
+                zoomLevel = range;
+            }
         }
         this.zoomLevel = zoomLevel;
     }

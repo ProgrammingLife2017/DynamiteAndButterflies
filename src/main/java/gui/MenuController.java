@@ -134,10 +134,9 @@ public class MenuController implements Observer {
         GraphDrawer.getInstance().setMenuController(this);
         PanningController.getInstance().setMenuController(this);
         PanningController.getInstance().initialize(leftPannButton, rightPannButton);
-        PanningController.getInstance().initializeKeys(canvasPanel);
 
         //System.setErr(ps);
-        System.setOut(ps);
+        //System.setOut(ps);
     }
 
     /**
@@ -168,6 +167,7 @@ public class MenuController implements Observer {
         fileController.openGfaFileClicked(filePath);
         recentController.update(filePath);
         annoBut.setDisable(true);
+        PanningController.getInstance().initializeKeys(canvasPanel);
     }
 
 
