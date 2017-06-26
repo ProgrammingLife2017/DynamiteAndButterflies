@@ -390,7 +390,6 @@ public class GraphDrawer {
         int annotatedGenome = getAnnotatedGenomeIndex(node);
         HashSet<Annotation> annotations = getAnnotationBuckets(node, annotatedGenome);
 
-
         double annoHeight = coordinates[HEIGHT_INDEX] / 2;
         double startYAnno = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] - annoHeight;
 
@@ -718,7 +717,7 @@ public class GraphDrawer {
      * @param mouseEvent The click event.
      * @return an Object that was clicked.
      */
-    Object clickOnCanvas(double xEvent, double yEvent, MouseEvent mouseEvent) {
+    void clickOnCanvas(double xEvent, double yEvent, MouseEvent mouseEvent) {
         try {
             for (Object o : graph.getNodes().entrySet()) {
                 Map.Entry pair = (Map.Entry) o;
@@ -727,9 +726,11 @@ public class GraphDrawer {
                     highlight(node.getId());
                     if (node.isSNP()) {
                         SequenceNode neighbour = findSNPNeighbour(node);
-                        menuController.updateSequenceInfo(node);
                         if (node.isCollapsed()) {
+                            menuController.updateSequenceInfo(node);
                             menuController.updateSequenceInfoAlt(neighbour);
+                        } else {
+                            menuController.updateInfoSeqNode(mouseEvent.isControlDown(), node);
                         }
                         if (mouseEvent.getClickCount() == 2) {
                             if (!node.isCollapsed()) {
@@ -738,7 +739,7 @@ public class GraphDrawer {
                             node.setCollapsed(!node.isCollapsed());
                         }
                     } else {
-                        return node;
+                        menuController.updateInfoSeqNode(mouseEvent.isControlDown(), node);
                     }
                 }
             }
@@ -761,7 +762,7 @@ public class GraphDrawer {
                         HashSet<Annotation> setOfAllAnnotations = getAnnotationBuckets(null, 1);
                         for (Annotation annotation : setOfAllAnnotations) {
                             if (annotation.getId() == annoId) {
-                                return annotation;
+                                menuController.updateInfoAnnotation(mouseEvent.isControlDown(), annotation);
                             }
                         }
                     }
@@ -771,7 +772,6 @@ public class GraphDrawer {
             } catch (NullPointerException e) {
                 System.err.println("Graph not yet initialized");
             }
-            return null;
         }
 
         /**
