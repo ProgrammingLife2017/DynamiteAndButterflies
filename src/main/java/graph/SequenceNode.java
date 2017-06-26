@@ -12,15 +12,15 @@ import java.util.Arrays;
 public class SequenceNode {
 
     private int id;
-    private int[] genomes;
-    private int[] offSets;
     private int index;
     private int column;
     private int sequenceLength;
+    private int inDegree;
+    private int[] genomes;
+    private int[] offSets;
+    private float baryCenterValue;
     private boolean highlighted;
     private boolean isDummy;
-    private float baryCenterValue;
-    private int inDegree;
     private boolean isSNP;
     private boolean isCollapsed;
 
@@ -38,20 +38,13 @@ public class SequenceNode {
         this.column = 0;
         this.inDegree = 0;
         this.baryCenterValue = 0;
-        this.parents = new ArrayList<Integer>();
-        this.children = new ArrayList<Integer>();
+        this.parents = new ArrayList<>();
+        this.children = new ArrayList<>();
         this.isDummy = false;
         this.genomes = new int[0];
         this.offSets = new int[0];
     }
 
-    /**
-     * Return the outdegree of the node
-     * @return outdegree
-     */
-    public int getOutDegree() {
-        return this.getChildren().size();
-    }
     /**
      * Draw the node highlighted.
      */
@@ -66,6 +59,82 @@ public class SequenceNode {
         this.highlighted = false;
     }
 
+    /**
+     * method to resolve the baryCenterValue.
+     *
+     * @return - returns the barycenterValue / inDegree
+     */
+    float getBaryCenterValue() {
+        return baryCenterValue / inDegree;
+    }
+
+    /**
+     * Add a child to the children list. No duplicates allowed.
+     *
+     * @param id Child to be added.
+     */
+    void addChild(Integer id) {
+        if (!this.children.contains(id)) {
+            this.children.add(id);
+        }
+    }
+
+    /**
+     * Remove a child from the children list.
+     *
+     * @param id Child to be removed.
+     */
+    void removeChild(Integer id) {
+        this.children.remove(id);
+    }
+
+    /**
+     * Check if this node has any children.
+     *
+     * @return True if the node has at least 1 child, false otherwise.
+     */
+    boolean hasChildren() {
+        return children.size() > 0;
+    }
+
+    /**
+     * Add a parent to the parents list. No duplicates allowed.
+     *
+     * @param id The parent to be added.
+     */
+    void addParent(Integer id) {
+        if (!this.parents.contains(id)) {
+            this.parents.add(id);
+        }
+    }
+
+    /**
+     * Increment the value of column by some amount.
+     *
+     * @param i The amount to increment column by.
+     */
+    void incrementColumn(int i) {
+        if (this.column < i + 1) {
+            column = i + 1;
+        }
+    }
+
+    /**
+     * Increment the baryCenterValue by some amount.
+     *
+     * @param baryCenterValue Amount to increase baryCenterValue with
+     */
+    void incrementBaryCenterValue(float baryCenterValue) {
+        this.baryCenterValue += baryCenterValue;
+    }
+
+    /**
+     * Increment inDegree by one.
+     */
+    void incrementInDegree() {
+        this.inDegree++;
+    }
+
     public boolean isHighlighted() {
         return this.highlighted;
     }
@@ -78,27 +147,8 @@ public class SequenceNode {
         return children.get(id);
     }
 
-    public void addChild(Integer id) {
-        if (!this.children.contains(id))
-            this.children.add(id);
-    }
-
-    void removeChild(Integer id) {
-        this.children.remove(id);
-    }
-
     public ArrayList<Integer> getParents() {
         return parents;
-    }
-
-    void addParent(Integer id) {
-        if (!this.parents.contains(id)) {
-            this.parents.add(id);
-        }
-    }
-
-    boolean hasChildren() {
-        return children.size() > 0;
     }
 
     public ArrayList<Integer> getChildren() {
@@ -129,12 +179,6 @@ public class SequenceNode {
         this.column = col;
     }
 
-    void incrementColumn(int i) {
-        if (this.column < i + 1) {
-            column = i + 1;
-        }
-    }
-
     public void setGenomes(int[] genomesArg) {
         this.genomes = genomesArg;
     }
@@ -145,25 +189,6 @@ public class SequenceNode {
 
     public int[] getOffsets() {
         return this.offSets;
-    }
-
-    /**
-     * method to resolve the baryCenterValue.
-     *
-     * @return - returns the barycenterValue / inDegree
-     */
-    float getBaryCenterValue() {
-        return baryCenterValue / inDegree;
-    }
-
-
-    void incrementBaryCenterValue(float baryCenterValue) {
-        this.baryCenterValue += baryCenterValue;
-    }
-
-
-    void incrementInDegree() {
-        this.inDegree++;
     }
 
     public int getSequenceLength() {
@@ -182,8 +207,8 @@ public class SequenceNode {
         return isSNP;
     }
 
-    public void setSNP(boolean SNP) {
-        isSNP = SNP;
+    public void setSNP(boolean snp) {
+        isSNP = snp;
     }
 
     public boolean isCollapsed() {
@@ -213,6 +238,7 @@ public class SequenceNode {
         return stringBuilder.toString();
     }
 
+  
     /**
      * Appends genome coordinates to a string builder.
      * @param stringBuilder string builder to append to.
@@ -230,13 +256,15 @@ public class SequenceNode {
      * @param stringBuilder string builder to append to.
      */
     private void appendGenomes(StringBuilder stringBuilder) {
-        stringBuilder.append("Genomes:\t\t");
-        int[] sortedGenomes = this.getGenomes();
-        Arrays.sort(sortedGenomes);
-        for (Integer i: sortedGenomes) {
-            stringBuilder.append(DrawableCanvas.getInstance().getAllGenomesReversed().get(i)).append(" ");
+        if (this.getGenomes().length != 0) {
+            stringBuilder.append("Genomes:\t\t");
+            int[] sortedGenomes = this.getGenomes();
+            Arrays.sort(sortedGenomes);
+            for (Integer i: sortedGenomes) {
+                stringBuilder.append(DrawableCanvas.getInstance().getAllGenomesReversed().get(i)).append(" ");
+            }
+            stringBuilder.append("\n");
         }
-        stringBuilder.append("\n");
     }
 
     /**
@@ -264,6 +292,7 @@ public class SequenceNode {
         }
         stringBuilder.append("\n");
     }
+
     /**
      * Appends children to a string builder.
      * @param stringBuilder string builder to append to.
@@ -274,5 +303,9 @@ public class SequenceNode {
             stringBuilder.append(i).append(" ");
         }
         stringBuilder.append("\n");
+    }
+
+    public int getOutDegree() {
+        return children.size();
     }
 }

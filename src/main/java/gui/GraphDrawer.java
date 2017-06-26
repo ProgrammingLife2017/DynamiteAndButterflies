@@ -8,7 +8,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import structures.Annotation;
-
 import java.util.*;
 
 /**
@@ -55,23 +54,25 @@ public class GraphDrawer {
     private SequenceNode mostRightNode;
     private ArrayList<ArrayList<SequenceNode>> columns;
     private HashMap<Integer, double[]> coordinates;
+    private HashMap<Integer, ArrayList<double[]>> annotationCoordinates;
     private HashMap<Integer, HashSet<Annotation>> allAnnotations
             = new HashMap<>();
 
     /**
-     * Getter for the singleton Graphdrawer.
+     * Getter for the singleton GraphDrawer.
      *
-     * @return this graphdrawer
+     * @return this GraphDrawer
      */
     public static GraphDrawer getInstance() {
         return drawer;
     }
 
     /**
-     * initialize the coordinates hashmap.
+     * Initializes the coordinates hashMap.
      */
     private void setEmptyCoordinates() {
         this.coordinates = new HashMap<>();
+        this.annotationCoordinates = new HashMap<>();
     }
 
     /**
@@ -142,7 +143,8 @@ public class GraphDrawer {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         this.stepSize = (canvas.getWidth() / zoomLevel);
         setxDifference(xDifference);
-        colourController = new ColourController(selected, rainbowView);
+        colourController.setSelectedGenomes(selected);
+        colourController.setRainbowView(rainbowView);
         drawNodes();
         drawMinimap();
     }
@@ -194,7 +196,7 @@ public class GraphDrawer {
                 int[] childList = getChildrenGenomeList(node);
                 ArrayList<Integer> results = new ArrayList<>();
                 for (int aResult : genome) {
-                    if (contains(parentGenomes, aResult) & contains(childList, aResult)) {
+                    if (contains(parentGenomes, aResult) && contains(childList, aResult)) {
                         results.add(aResult);
                     }
                 }
@@ -238,7 +240,8 @@ public class GraphDrawer {
      * @return True if the coordinates fall on the screen, false otherwise
      */
     private boolean inView(double[] coordinates) {
-        return coordinates[X_INDEX] + coordinates[WIDTH_INDEX] > 0 && coordinates[X_INDEX] < canvas.getWidth();
+        return ((coordinates[X_INDEX] + coordinates[WIDTH_INDEX]) > 0)
+                && (coordinates[X_INDEX] < canvas.getWidth());
     }
 
     /**
@@ -273,7 +276,8 @@ public class GraphDrawer {
     }
 
     /**
-     * Check if a node should have a width relative to the following node. The node with is relative when it is not a
+     * Check if a node should have a width relative to the following node.
+     * The node with is relative when it is not a
      * SNP node and it's children isn't either.
      *
      * @param node Node to check the relative width
@@ -298,9 +302,8 @@ public class GraphDrawer {
     private void drawNodes() {
         setEmptyCoordinates();
         gc.setStroke(Color.BLACK);
-        Iterator it = graph.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
+        for (Object o : graph.getNodes().entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
             SequenceNode node = (SequenceNode) pair.getValue();
             computeCoordinates(node);
             if (!node.isCollapsed()) {
@@ -314,82 +317,132 @@ public class GraphDrawer {
     }
 
     /**
+     * Gets all relevant buckets of the node.
+     *
+     * @param node the node in which we're searching for annotations.
+     * @param annotatedGenome the genome that is annotated
+     * @return The hashSet of all annotations in the node.
+     */
+    private HashSet<Annotation> getAnnotationBuckets(SequenceNode node, int annotatedGenome) {
+        HashSet<Annotation> annotationHashSet = new HashSet<>();
+        if (annotatedGenome == -1) {
+            return annotationHashSet;
+        }
+
+        int startBucketId;
+        int endBucketId;
+        if (node != null) {
+            startBucketId = (node.getOffsets()[annotatedGenome] / BUCKET_SIZE);
+            endBucketId = ((node.getOffsets()[annotatedGenome]
+                    + node.getSequenceLength()) / BUCKET_SIZE);
+        } else {
+            startBucketId = 0;
+            endBucketId = allAnnotations.size();
+        }
+
+        for (int i = startBucketId; i <= endBucketId; i++) {
+            HashSet<Annotation> tempAnnotations = allAnnotations.get(i);
+            if (tempAnnotations != null) {
+                annotationHashSet.addAll(tempAnnotations);
+            }
+        }
+        return annotationHashSet;
+    }
+
+    /**
+     * Gets the position of the offSets relative to annotation.
+     * @param node The node which we are finding he position on.
+     * @return the position in offSets.
+     */
+    private int getAnnotatedGenomeIndex(SequenceNode node) {
+        int indexOfGenome = colourController.containsPos(node.getGenomes(),
+                DrawableCanvas.getInstance().getAnnotationGenome());
+        if (indexOfGenome == -1) {
+            return indexOfGenome;
+        }
+        int annotatedGenomeIndex = 0;
+        if (node.getGenomes().length == node.getOffsets().length) {
+            annotatedGenomeIndex = indexOfGenome;
+        }
+        return annotatedGenomeIndex;
+    }
+
+    /**
+     * Checks if this annotation hits a node.
+     * @param startXAnnotation The xStart of the annotation
+     * @param endXAnnotation The xEnd of the annotation
+     * @param startXNode The xStart of the of the node
+     * @param endXNode The xEnd of the node
+     * @return a boolean true if it hits. Else false.
+     */
+    private boolean isMyAnnnotation(int startXAnnotation, int endXAnnotation,
+                                    int startXNode, int endXNode) {
+        return !(startXAnnotation > endXNode || endXAnnotation <= startXNode);
+    }
+
+    /**
      * Draws annotations underneath the give node.
      *
      * @param node        Node to draw annotations under
      * @param coordinates Coordinates of the node
      */
     private void drawAnnotations(SequenceNode node, double[] coordinates) {
-        int indexOfGenome = colourController.containsPos(node.getGenomes(), DrawableCanvas.getInstance().getAnnotationGenome());
+        int annotatedGenome = getAnnotatedGenomeIndex(node);
+        HashSet<Annotation> annotations = getAnnotationBuckets(node, annotatedGenome);
 
-        if (indexOfGenome != -1) {
-            int placeOfAnnotatedGenome = 0;
-            if (node.getGenomes().length == node.getOffsets().length) {
-                placeOfAnnotatedGenome = indexOfGenome;
-            }
-            int startBucket = (node.getOffsets()[placeOfAnnotatedGenome] / BUCKET_SIZE);
-            int endBucket = ((node.getOffsets()[placeOfAnnotatedGenome] + node.getSequenceLength()) / BUCKET_SIZE);
-            HashSet<Annotation> drawThese = new HashSet<>();
-            for (int i = startBucket; i <= endBucket; i++) {
-                HashSet<Annotation> tempAnnotations = allAnnotations.get(i);
-                if (tempAnnotations != null) {
-                    drawThese.addAll(tempAnnotations);
+
+        double annoHeight = coordinates[HEIGHT_INDEX] / 2;
+        double startYAnno = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] - annoHeight;
+
+        for (Annotation annotation : annotations) {
+            if (annotation.getSelected().getValue()) {
+                double startXAnno = coordinates[X_INDEX];
+                double annoWidth = coordinates[WIDTH_INDEX];
+                int startOfAnno = annotation.getStart();
+                int endOfAnno = annotation.getEnd();
+
+                int startCorNode = node.getOffsets()[annotatedGenome];
+                int endCorNode = startCorNode + node.getSequenceLength();
+
+                if (!isMyAnnnotation(startOfAnno, endOfAnno, startCorNode, endCorNode)) {
+                    continue;
                 }
-            }
-            int[] bigOne = new int[2];
 
-            double annoHeight = coordinates[HEIGHT_INDEX] / 2;
-            double startYAnno = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] - annoHeight;
-
-            for (Annotation annotation : drawThese) {
-//                double annoHeight = coordinates[HEIGHT_INDEX] / 2;
-//                double startYAnno = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX];
-                if (annotation.getSelected().getValue()) {
-                    double startXAnno = coordinates[X_INDEX];
-                    double annoWidth = coordinates[WIDTH_INDEX];
-                    int startOfAnno = annotation.getStart();
-                    int endOfAnno = annotation.getEnd();
-
-                    int startCorNode = node.getOffsets()[placeOfAnnotatedGenome];
-                    int endCorNode = startCorNode + node.getSequenceLength();
-
-                    if (startOfAnno > endCorNode || endOfAnno <= startCorNode) {
-                        continue;
-                    }
-                    if (bigOne[0] != startOfAnno && bigOne[1] != endOfAnno) {
-
-                        double emptyAtStart = 0.0;
-                        if (startOfAnno > startCorNode) {
-                            emptyAtStart = startOfAnno - startCorNode;
-                            annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
-                            startXAnno = startXAnno + (coordinates[WIDTH_INDEX] - annoWidth);
-                        }
-                        if (endOfAnno < endCorNode) {
-                            int emptyAtEnd = endCorNode - endOfAnno;
-                            annoWidth = (annoWidth
-                                    * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
-                        }
-                        if (bigOne[0] == 0) {
-                            bigOne[0] = startOfAnno;
-                            bigOne[1] = endOfAnno;
-                        }
-                        gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
-//                    //TODO Fix overalapping parent annotations
-//                    if (annotation.getInfo().toLowerCase().contains("parent")) {
-//                        gc.fillRect(startXAnno, coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] + annoHeight,
-//                                annoWidth, annoHeight);
-//                    } else {
-                        startYAnno += annoHeight;
-                        gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
-                        //}
-                    }
+                double emptyAtStart = 0.0;
+                if (startOfAnno > startCorNode) {
+                    emptyAtStart = startOfAnno - startCorNode;
+                    annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
+                    startXAnno = startXAnno + (coordinates[2] - annoWidth);
                 }
+                if (endOfAnno < endCorNode) {
+                    int emptyAtEnd = endCorNode - endOfAnno;
+                    annoWidth = (annoWidth
+                            * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
+                }
+
+                gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
+                startYAnno += annoHeight;
+
+                double[] annoCoordinates = new double[COORDINATES];
+                annoCoordinates[X_INDEX] = startXAnno;
+                annoCoordinates[Y_INDEX] = startYAnno;
+                annoCoordinates[WIDTH_INDEX] = startXAnno + annoWidth;
+                annoCoordinates[HEIGHT_INDEX] = startYAnno + annoHeight;
+                ArrayList<double[]> annoOverNodes = annotationCoordinates.get(annotation.getId());
+                if (annoOverNodes == null) {
+                    annoOverNodes = new ArrayList<>();
+                }
+                annoOverNodes.add(annoCoordinates);
+                annotationCoordinates.put(annotation.getId(), annoOverNodes);
+
+                gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
             }
         }
     }
 
     /**
-     * Check if a column can be collapsed into a SNP bubble. If so set the nodes isSNP attribute to true.
+     * Check if a column can be collapsed into a SNP bubble.
+     * If so set the nodes isSNP attribute to true.
      *
      * @param columnID The column to check for a SNP bubble
      */
@@ -403,13 +456,9 @@ public class GraphDrawer {
         if (upperNode.isDummy() || lowerNode.isDummy()) {
             return;
         }
-        if (upperNode.getSequenceLength() != 1 || lowerNode.getSequenceLength() != 1) {
-            return;
-        }
-        if (upperNode.getParents().size() != 1 || lowerNode.getParents().size() != 1) {
-            return;
-        }
-        if (upperNode.getChildren().size() != 1 || lowerNode.getChildren().size() != 1) {
+        if ((upperNode.getSequenceLength() != 1 || lowerNode.getSequenceLength() != 1)
+            || (upperNode.getParents().size() != 1 || lowerNode.getParents().size() != 1)
+            || (upperNode.getChildren().size() != 1 || lowerNode.getChildren().size() != 1)) {
             return;
         }
         int upperParent = upperNode.getParents().get(0);
@@ -429,24 +478,30 @@ public class GraphDrawer {
     }
 
     /**
-     * Check if a node is the left most or right most node of the screen. Set the attribute to it if so.
+     * Check if a node is the left most or right most node of the screen.
+     * Set the attribute to it if so.
      *
      * @param node The node to check if it is an extreme node
      */
     private void checkExtremeNode(SequenceNode node) {
         if (!node.isDummy()) {
             double[] coordinates = this.coordinates.get(node.getId());
-            if (coordinates[X_INDEX] <= 0 && coordinates[X_INDEX] + coordinates[WIDTH_INDEX] / RELATIVE_X_DISTANCE > 0) {
+            if ((coordinates[X_INDEX] <= 0)
+                    && (coordinates[X_INDEX] + coordinates[WIDTH_INDEX]
+                        / RELATIVE_X_DISTANCE > 0)) {
                 mostLeftNode = node;
             }
-            if (coordinates[X_INDEX] < canvas.getWidth() && coordinates[X_INDEX] + coordinates[WIDTH_INDEX] / RELATIVE_X_DISTANCE >= canvas.getWidth()) {
+            if ((coordinates[X_INDEX] < canvas.getWidth())
+                    && (coordinates[X_INDEX] + coordinates[WIDTH_INDEX]
+                        / RELATIVE_X_DISTANCE >= canvas.getWidth())) {
                 mostRightNode = node;
             }
         }
     }
 
     /**
-     * Draw an individual node with possibly its annotations if it is in view of the screen. Dummies are drawn as a line.
+     * Draw an individual node with possibly its annotations if it is in view of the screen.
+     * Dummies are drawn as a line.
      *
      * @param node The node to be drawn
      */
@@ -456,8 +511,10 @@ public class GraphDrawer {
         if (inView(coordinates)) {
             if (node.isDummy()) {
                 this.setLineWidth(node.getGenomes().length);
-                gc.strokeLine(coordinates[X_INDEX], coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] / 2,
-                        coordinates[X_INDEX] + coordinates[WIDTH_INDEX], coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] / 2);
+                gc.strokeLine(coordinates[X_INDEX],
+                        coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] / 2,
+                        coordinates[X_INDEX] + coordinates[WIDTH_INDEX],
+                        coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] / 2);
             } else {
                 drawColour(node, coordinates);
                 drawAnnotations(node, coordinates);
@@ -466,7 +523,8 @@ public class GraphDrawer {
     }
 
     /**
-     * Draw an individual SNP bubble. It is drawn as diamond with the upper node as upper half and lower node as lower
+     * Draw an individual SNP bubble.
+     * It is drawn as diamond with the upper node as upper half and lower node as lower
      * half of the bubble.
      *
      * @param upperNode Upper node in the SNP bubble
@@ -485,19 +543,24 @@ public class GraphDrawer {
 
             if (upperNode.isHighlighted()) {
                 gc.setLineWidth(LINE_WIDTH);
-                gc.strokePolygon(new double[]{leftX, midX, rightX}, new double[]{midY, upY, midY}, POLYGON_POINTS);
-                gc.strokePolygon(new double[]{leftX, midX, rightX}, new double[]{midY, downY, midY}, POLYGON_POINTS);
+                gc.strokePolygon(new double[]{leftX, midX, rightX},
+                                new double[]{midY, upY, midY}, POLYGON_POINTS);
+                gc.strokePolygon(new double[]{leftX, midX, rightX},
+                                new double[]{midY, downY, midY}, POLYGON_POINTS);
             }
             gc.setFill(Color.CHOCOLATE);
-            gc.fillPolygon(new double[]{leftX, midX, rightX}, new double[]{midY, upY, midY}, POLYGON_POINTS);
+            gc.fillPolygon(new double[]{leftX, midX, rightX},
+                    new double[]{midY, upY, midY}, POLYGON_POINTS);
             gc.setFill(Color.BROWN);
-            gc.fillPolygon(new double[]{leftX, midX, rightX}, new double[]{midY, downY, midY}, POLYGON_POINTS);
+            gc.fillPolygon(new double[]{leftX, midX, rightX},
+                    new double[]{midY, downY, midY}, POLYGON_POINTS);
         }
     }
 
     /**
      * Draw the individual node in the right colour.
-     * @param node Node to be drawn
+     *
+     * @param node        Node to be drawn
      * @param coordinates Coordinates of the node
      */
     private void drawColour(SequenceNode node, double[] coordinates) {
@@ -505,7 +568,10 @@ public class GraphDrawer {
         if (node.isHighlighted()) {
             gc.setLineWidth(LINE_WIDTH);
             gc.setStroke(Color.BLACK);
-            gc.strokeRect(coordinates[X_INDEX], coordinates[Y_INDEX], coordinates[WIDTH_INDEX], coordinates[HEIGHT_INDEX]);
+            gc.strokeRect(coordinates[X_INDEX],
+                            coordinates[Y_INDEX],
+                            coordinates[WIDTH_INDEX],
+                            coordinates[HEIGHT_INDEX]);
         }
         colourMeBby = colourController.getNodeColours(node.getGenomes());
         double tempCoordinate = coordinates[Y_INDEX];
@@ -518,7 +584,8 @@ public class GraphDrawer {
     }
 
     /**
-     * Draw the outgoing edges of the node if the node is not in a SNP bubble. The edges are coloured by the genomes
+     * Draw the outgoing edges of the node if the node is not in a SNP bubble.
+     * The edges are coloured by the genomes
      * that pass through the edge.
      *
      * @param node Node to draw the outgoing edges of
@@ -531,10 +598,10 @@ public class GraphDrawer {
             SequenceNode child = graph.getNode(parent.getChild(j));
             if (!node.isCollapsed() && !child.isCollapsed()) {
                 double[] coordinatesChild = computeCoordinates(child);
-                double startx = coordinatesParent[0] + coordinatesParent[2];
-                double starty = coordinatesParent[1] + (coordinatesParent[3] / 2);
-                double endx = coordinatesChild[0];
-                double endy = coordinatesChild[1] + (coordinatesChild[3] / 2);
+                double startX = coordinatesParent[X_INDEX] + coordinatesParent[WIDTH_INDEX];
+                double startY = coordinatesParent[Y_INDEX] + (coordinatesParent[HEIGHT_INDEX] / 2);
+                double endX = coordinatesChild[X_INDEX];
+                double endY = coordinatesChild[Y_INDEX] + (coordinatesChild[HEIGHT_INDEX] / 2);
                 setLineWidth(Math.min(child.getGenomes().length, parent.getGenomes().length));
 
                 ArrayList<Integer> allGenomesInEdge = new ArrayList<>();
@@ -544,21 +611,22 @@ public class GraphDrawer {
                     }
                 }
                 ArrayList<Color> colourMeBby =
-                        colourController.getEdgeColours(allGenomesInEdge.stream().mapToInt(q -> q).toArray());
+                        colourController.getEdgeColours(
+                                allGenomesInEdge.stream().mapToInt(q -> q).toArray());
                 if (colourMeBby.size() < 4) {
                     colourMeBby.addAll(colourMeBby);
                 }
 
-                if (edgeInView(startx, endx)) {
-                    double tempStartX = startx;
-                    double tempStartY = starty;
-                    double dashSizeX = (endx - startx) / (double) colourMeBby.size();
-                    double dashSizeY = (endy - starty) / (double) colourMeBby.size();
-                    double tempEndX = startx + dashSizeX;
-                    double tempEndY = starty + dashSizeY;
+                if (edgeInView(startX, endX)) {
+                    double tempStartX = startX;
+                    double tempStartY = startY;
+                    double dashSizeX = (endX - startX) / (double) colourMeBby.size();
+                    double dashSizeY = (endY - startY) / (double) colourMeBby.size();
+                    double tempEndX = startX + dashSizeX;
+                    double tempEndY = startY + dashSizeY;
 
-                    for (int i = 0; i < colourMeBby.size(); i++) {
-                        gc.setStroke(colourMeBby.get(i));
+                    for (Color aColourMeBby : colourMeBby) {
+                        gc.setStroke(aColourMeBby);
                         gc.strokeLine(tempStartX, tempStartY, tempEndX, tempEndY);
                         tempStartX = tempEndX;
                         tempStartY = tempEndY;
@@ -581,9 +649,9 @@ public class GraphDrawer {
 
     /**
      * Check if an edge falls on screen.
-     * @param startx Start x-coordinate of the edge
-     * @param endx End x-coordinate of the edge
      *
+     * @param startx Start x-coordinate of the edge
+     * @param endx   End x-coordinate of the edge
      * @return True if the edge falls on screen, false otherwise
      */
     private boolean edgeInView(double startx, double endx) {
@@ -591,7 +659,8 @@ public class GraphDrawer {
     }
 
     /**
-     * Compute the width of a node depending on its sequencelength. Dummies are as wide as the column and SNP bubbles
+     * Compute the width of a node depending on its sequencelength.
+     * Dummies are as wide as the column and SNP bubbles
      * have a fixed size.
      *
      * @param node Node to compute the width of
@@ -608,19 +677,21 @@ public class GraphDrawer {
     }
 
     /**
-     * Check for each node if the click event is within its borders. If so it is highlighted. Control-click gives node
-     * information in the second information pane. If a SNP bubble is clicked information of both nodes is displayed.
+     * Check for each node if the click event is within its borders.
+     * If so it is highlighted. Control-click gives node
+     * information in the second information pane.
+     * If a SNP bubble is clicked information of both nodes is displayed.
      * On double click a SNP bubble is collapsed/extended.
      *
-     * @param xEvent The x coordinate of the click event.
-     * @param yEvent The y coordinate of the click event.
+     * @param xEvent     The x coordinate of the click event.
+     * @param yEvent     The y coordinate of the click event.
      * @param mouseEvent The click event.
+     * @return an Object that was clicked.
      */
-    void clickNode(double xEvent, double yEvent, MouseEvent mouseEvent) {
+    Object clickOnCanvas(double xEvent, double yEvent, MouseEvent mouseEvent) {
         try {
-            Iterator it = graph.getNodes().entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry) it.next();
+            for (Object o : graph.getNodes().entrySet()) {
+                Map.Entry pair = (Map.Entry) o;
                 SequenceNode node = (SequenceNode) pair.getValue();
                 if (checkClick(node, xEvent, yEvent)) {
                     highlight(node.getId());
@@ -636,25 +707,49 @@ public class GraphDrawer {
                             }
                             node.setCollapsed(!node.isCollapsed());
                         }
-                    } else if (mouseEvent.isControlDown()) {
-                        menuController.updateSequenceInfoAlt(node);
                     } else {
-                        menuController.updateSequenceInfo(node);
-                        menuController.updateNodeTextField(node.getId());
+                        return node;
+                    }
+                }
+            }
+
+            for (Object o : annotationCoordinates.entrySet()) {
+                Map.Entry pair = (Map.Entry) o;
+                ArrayList<double[]> allAnnoCors = (ArrayList<double[]>) pair.getValue();
+                for (double[] annoCors : allAnnoCors) {
+                    if (xEvent > annoCors[X_INDEX] && xEvent < annoCors[WIDTH_INDEX]
+                            && yEvent > annoCors[Y_INDEX] && yEvent < annoCors[HEIGHT_INDEX]) {
+                        redraw();
+                        gc.setLineWidth(HEIGHT_INDEX);
+                        gc.setStroke(Color.BLACK);
+                        gc.strokeRect(annoCors[X_INDEX], annoCors[Y_INDEX],
+                                annoCors[WIDTH_INDEX] - annoCors[X_INDEX],
+                                annoCors[HEIGHT_INDEX] - annoCors[Y_INDEX]);
+                        //TODO make sure this stays there when zooming.
+
+                        int annoId = (int) pair.getKey();
+                        HashSet<Annotation> setOfAllAnnotations = getAnnotationBuckets(null, 1);
+                        for (Annotation annotation : setOfAllAnnotations) {
+                            if (annotation.getId() == annoId) {
+                                return annotation;
+                            }
+                        }
                     }
                 }
             }
             redraw();
-        } catch (NullPointerException e) {
-            System.out.println("Graph not yet initialized");
+            } catch (NullPointerException e) {
+                System.err.println("Graph not yet initialized");
+            }
+            return null;
         }
-    }
 
-    /**
-     * Find the neighbouring node in a SNP bubble.
-     * @param node The node to find the neighbour of.
-     * @return The neighbour node.
-     */
+        /**
+         * Find the neighbouring node in a SNP bubble.
+         * @param node The node to find the neighbour of.
+         * @return The neighbour node.
+         */
+
     private SequenceNode findSNPNeighbour(SequenceNode node) {
         ArrayList<SequenceNode> column = columns.get(node.getColumn());
         int nodeID = node.getId();
@@ -676,12 +771,17 @@ public class GraphDrawer {
     private boolean checkClick(SequenceNode node, double xEvent, double yEvent) {
         double[] coordinates = this.coordinates.get(node.getId());
         if (node.isSNP()) {
-            return (xEvent > coordinates[X_INDEX] && xEvent < coordinates[X_INDEX] + coordinates[WIDTH_INDEX]
-                    && yEvent > coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] / 2 - coordinates[HEIGHT_INDEX]
-                    && yEvent < coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] / 2 + coordinates[HEIGHT_INDEX]);
+            return ((xEvent > coordinates[X_INDEX])
+                    && (xEvent < coordinates[X_INDEX] + coordinates[WIDTH_INDEX])
+                    && (yEvent > coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX]
+                        / 2 - coordinates[HEIGHT_INDEX])
+                    && (yEvent < coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX]
+                        / 2 + coordinates[HEIGHT_INDEX]));
         } else {
-            return (xEvent > coordinates[X_INDEX] && xEvent < coordinates[X_INDEX] + coordinates[WIDTH_INDEX]
-                    && yEvent > coordinates[Y_INDEX] && yEvent < coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX]);
+            return ((xEvent > coordinates[X_INDEX])
+                    && (xEvent < coordinates[X_INDEX] + coordinates[WIDTH_INDEX])
+                    && (yEvent > coordinates[Y_INDEX])
+                    && (yEvent < coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX]));
         }
     }
 
@@ -693,9 +793,8 @@ public class GraphDrawer {
      */
     int findColumn(double xEvent) {
         try {
-            Iterator it = graph.getNodes().entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry) it.next();
+            for (Object o : graph.getNodes().entrySet()) {
+                Map.Entry pair = (Map.Entry) o;
                 SequenceNode node = (SequenceNode) pair.getValue();
                 int nodeID = (Integer) pair.getKey();
                 if (checkClickX(node, xEvent)) {
@@ -708,7 +807,7 @@ public class GraphDrawer {
                 }
             }
         } catch (NullPointerException e) {
-            System.out.println("No graph has been loaded.");
+            System.err.println("No graph has been loaded.");
         }
         return -1;
     }
@@ -716,13 +815,14 @@ public class GraphDrawer {
     /**
      * Check if a click event is within the borders of this node.
      *
-     * @param node Node to check for the click event.
+     * @param node   Node to check for the click event.
      * @param xEvent x coordinate of the click event.
      * @return True if the coordinates of the click event are within borders, false otherwise.
      */
     private boolean checkClickX(SequenceNode node, double xEvent) {
         double[] coordinates = this.coordinates.get(node.getId());
-        return (xEvent > coordinates[X_INDEX] && xEvent < coordinates[X_INDEX] + coordinates[WIDTH_INDEX]);
+        return ((xEvent > coordinates[X_INDEX])
+                && (xEvent < coordinates[X_INDEX] + coordinates[WIDTH_INDEX]));
     }
 
     /**
@@ -742,7 +842,8 @@ public class GraphDrawer {
      */
     private void setLineWidth(double thickness) {
         double zoomWidth = Math.log(stepSize + 1) / Math.log(LOG_BASE) * LINE_WIDTH_FACTOR;
-        double relativeSize = 100 * (thickness / (double) DrawableCanvas.getInstance().getAllGenomes().size());
+        double relativeSize = 100 * (thickness
+                                / (double) DrawableCanvas.getInstance().getAllGenomes().size());
         double genomeWidth = Math.log(relativeSize + 1) / Math.log(LOG_BASE);
         gc.setLineWidth(genomeWidth * zoomWidth);
     }
@@ -762,8 +863,9 @@ public class GraphDrawer {
 
     /**
      * Find the zoomLevel corresponding to a given centre node and a radius.
+     *
      * @param centreNode Centre node around which the radius is set.
-     * @param radius Radius that is converted to a zoomLevel.
+     * @param radius     Radius that is converted to a zoomLevel.
      * @return The zoomLevel.
      */
     public double findZoomLevel(int centreNode, int radius) {
@@ -784,12 +886,12 @@ public class GraphDrawer {
 
     /**
      * Toggle all SNP nodes isCollapsed attributes.
+     *
      * @param collapse If true set all SNP bubbles to collapsed, set collapsed to false otherwise.
      */
     void collapse(boolean collapse) {
-        Iterator it = graph.getNodes().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
+        for (Object o : graph.getNodes().entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
             SequenceNode node = (SequenceNode) pair.getValue();
             if (node.isSNP()) {
                 node.setCollapsed(collapse);
@@ -797,18 +899,10 @@ public class GraphDrawer {
         }
     }
 
-    public void setRainbowView(boolean rainbowView) {
-        this.rainbowView = rainbowView;
-        this.colourController = new ColourController(selected, rainbowView);
-    }
-
-    void setSelected(int[] newSelection) {
-        this.selected = newSelection;
-        this.colourController = new ColourController(selected, rainbowView);
-    }
-
     /**
-     * Setter for the xDifference. Minimum is 0, maximum is the range of the graph minus the zoomLevel.
+     * Setter for the xDifference.
+     * Minimum is 0, maximum is the range of the graph minus the zoomLevel.
+     *
      * @param xDifference The new xDifference.
      */
     public void setxDifference(double xDifference) {
@@ -823,6 +917,7 @@ public class GraphDrawer {
 
     /**
      * Setter for the zoomLevel. Minimum is 1, maximum is half the range of the graph.
+     *
      * @param zoomLevel The new zoomLevel.
      */
     public void setZoomLevel(double zoomLevel) {
@@ -836,8 +931,10 @@ public class GraphDrawer {
     }
 
     /**
-     * Getter for the radius. The radius is computed by the difference between the left most node and the right most
+     * Getter for the radius.
+     * The radius is computed by the difference between the left most node and the right most
      * node. So the radius is the number of nodes on screen.
+     *
      * @return The radius of the screen.
      */
     public int getRadius() {
@@ -846,13 +943,15 @@ public class GraphDrawer {
 
     /**
      * Find the column where the mouse pointer is located on.
+     *
      * @param x The x-coordinate of the mouse event.
      * @return The column that is clicked on.
      */
-    public int mouseLocationColumn(double x) {
+    int mouseLocationColumn(double x) {
         return (int) ((x / stepSize) + xDifference);
     }
 
+    //CHECKSTYLE: OFF
     public double getZoomLevel() {
         return zoomLevel;
     }
@@ -895,6 +994,24 @@ public class GraphDrawer {
 
     void setMenuController(MenuController menuController) {
         this.menuController = menuController;
+    }
+
+    public void reset() {
+        setAllAnnotations(new HashMap<>());
+        setSelected(null);
+        this.annotationCoordinates = null;
+    }
+
+    void setRainbowView(boolean rainbowView) {
+        this.rainbowView = rainbowView;
+        this.colourController.setRainbowView(this.rainbowView);
+    }
+
+    void setSelected(int[] newSelection) {
+        this.selected = newSelection;
+        if (newSelection != null) {
+            this.colourController.setSelectedGenomes(this.selected);
+        }
     }
 }
 

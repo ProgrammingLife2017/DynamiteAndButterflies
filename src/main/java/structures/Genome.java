@@ -36,10 +36,6 @@ public class Genome {
         this.id.set(id);
     }
 
-    public void setName(String name) {
-        this.name.set(name);
-    }
-
     public int getId() {
         return id.get();
     }
@@ -48,11 +44,19 @@ public class Genome {
         return name.get();
     }
 
-    public BooleanProperty selectedProperty() {
+    public BooleanProperty getSelectedProperty() {
         return selected;
     }
 
-    public boolean isSelected() { return selected.get(); }
+    /**
+     * Returns true iff the genome is selected.
+     * @return true if selected is true.
+     */
+    public boolean isSelected() {
+        return selected.get();
+    }
 
-    public void setSelected(boolean value) { this.selected.set(value); }
+    public void setSelected(boolean value) {
+        this.selected.set(value);
+    }
 }

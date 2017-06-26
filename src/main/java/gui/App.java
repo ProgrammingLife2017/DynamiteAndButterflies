@@ -3,6 +3,7 @@ package gui;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -11,7 +12,7 @@ import java.io.*;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
- *
+ * <p>
  * The Application class.
  * This class creates and maintains the different elements of the gui.
  */
@@ -19,6 +20,7 @@ public class App extends Application {
 
     /**
      * A main method that launches the application.
+     *
      * @param args arguments that might be neccesary later
      */
     public static void main(String[] args) {
@@ -27,53 +29,52 @@ public class App extends Application {
 
     /**
      * Launches the application with Menu.fxml as default scene.
+     *
      * @param stageIn The stage to load the app.
      * @throws UnsupportedEncodingException Needs a certain encoding
-     * @throws FileNotFoundException Needs a certain file
+     * @throws FileNotFoundException        Needs a certain file
      */
     public void start(Stage stageIn) throws UnsupportedEncodingException, FileNotFoundException {
         stage = stageIn;
         stage.setTitle("Programming Life");
-        loadScene("/FXML/Menu.fxml");
+        loadScene();
     }
 
     private static Stage stage;
-    private static AnchorPane pane;
     private static CustomProperties properties;
     private static FXMLLoader loader;
 
     /**
      * This method is able to load FXML files onto the stage.
-     * @param path Path of the FXML file to be loaded on the screen
-     * @return The FXMLLoader
      */
-    public static FXMLLoader loadScene(String path) {
+    private static void loadScene() {
 
         try {
             setUpProperties();
 
             // Load the anchor pane
             loader = new FXMLLoader();
-            loader.setLocation(App.class.getResource(path));
-            pane = loader.load();
+            loader.setLocation(App.class.getResource("/FXML/Menu.fxml"));
+            AnchorPane pane = loader.load();
 
             // Set the pane onto the scene
             Scene scene = new Scene(pane);
-            stage.setTitle("Wow!! DynamiteAndButterflies genome visualiser\t");
+            stage.setTitle("Multiple Genome Visualiser - DynamiteAndButterflies  - TU Delft");
             stage.setScene(scene);
             stage.setResizable(true);
+            stage.getIcons().add(new Image("http://i.imgur.com/CjIn1cR.png"));
             stage.show();
-            //stage.setMaximized(true); -> Mac fails to load a setMaximized(true) stage.
-//            System.out.println(path + " loaded on the stage");
-            return loader;
+            // stage.setMaximized(true); -> Mac fails to load a setMaximized(true) stage.
         } catch (IOException e) {
-            e.printStackTrace();
-            System.out
+            System.err
                     .println("Something went wrong while loading the fxml file");
         }
-        return null;
     }
 
+    /**
+     * Initializes the properties file.
+     * @throws IOException Throws IOException if writing the file goes wrong.
+     */
     private static void setUpProperties() throws IOException {
         properties = new CustomProperties();
         try {
@@ -93,15 +94,6 @@ public class App extends Application {
 
     @Override
     public void stop() {
-        properties.updateProperties();
-
-        String stringOfFile = properties.getProperty("file", "def");
-        int numOfBookmarks = Integer.parseInt(
-                properties.getProperty("bookmarkNum" + stringOfFile, "-1"));
-        properties.setProperty("bookmarkNum" + stringOfFile, Integer.toString(numOfBookmarks));
-
-        properties.saveProperties();
-
         MenuController controller = loader.getController();
         if (controller.getSequenceHashMap() != null) {
             controller.getSequenceHashMap().close();
@@ -110,9 +102,10 @@ public class App extends Application {
 
     /**
      * Getter for the stage on which the application is loaded.
+     *
      * @return The Stage on which the application is loaded.
      */
-    public static Stage getStage() {
+    static Stage getStage() {
         return stage;
     }
 }

@@ -11,7 +11,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -25,7 +24,10 @@ import structures.Annotation;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -36,17 +38,17 @@ import java.util.*;
 public class MenuController implements Observer {
 
     @FXML
-    public Button annoBut;
+    private Button annoBut;
     @FXML
-    public Button chooseGenome;
+    private Button chooseGenome;
     @FXML
-    public CheckBox rainbowBut;
+    private CheckBox rainbowBut;
     @FXML
-    public Button zoomInBut;
+    private Button zoomInBut;
     @FXML
-    public Button zoomOutBut;
+    private Button zoomOutBut;
     @FXML
-    public Button goToNodeBut;
+    private Button goToNodeBut;
     @FXML
     private MenuItem genome1;
     @FXML
@@ -97,24 +99,24 @@ public class MenuController implements Observer {
     private ScrollBar scrollBar;
 
     private PrintStream ps;
-    private GraphicsContext gc;
     private CustomProperties properties;
     private BookmarkController bookmarkController;
     private FileController fileController;
     private RecentController recentController;
-    private PanningController panningController;
     private SpecificGenomeProperties specificGenomeProperties;
     private String filePath;
+
+    public MenuController() {
+    }
 
     /**
      * Initializes the canvas.
      */
     @FXML
-    public void initialize() {
+    private void initialize() {
         canvas.widthProperty().bind(canvasPanel.widthProperty());
         canvas.heightProperty().bind(canvasPanel.heightProperty());
         GraphDrawer.getInstance().setCanvas(canvas);
-        gc = canvas.getGraphicsContext2D();
         properties = new CustomProperties();
 
         fileController = new FileController(new ProgressBarController(progressBar));
@@ -123,34 +125,46 @@ public class MenuController implements Observer {
 
         specificGenomeProperties = new SpecificGenomeProperties(genome1, genome2, genome3);
 
-        //ps = new PrintStream(new Console(consoleArea));
+        ps = new PrintStream(new Console(consoleArea));
         DrawableCanvas.getInstance().setMenuController(this);
         DrawableCanvas.getInstance().setSpecificGenomeProperties(specificGenomeProperties);
         ScrollbarController.getInstance().setScrollBar(scrollBar);
         ZoomController.getInstance().setMenuController(this);
         Minimap.getInstance().setMenuController(this);
         GraphDrawer.getInstance().setMenuController(this);
+        PanningController.getInstance().setMenuController(this);
+        PanningController.getInstance().initialize(leftPannButton, rightPannButton);
+        PanningController.getInstance().initializeKeys(canvasPanel);
 
         //System.setErr(ps);
-        //System.setOut(ps);
+        System.setOut(ps);
     }
 
     /**
-     * When 'open gfa file' is clicked this method opens a filechooser from which a gfa
+     * When 'open gfa file' is clicked this method opens a fileChooser from which a gfa
      * can be selected and directly be visualised on the screen.
      *
      * @throws IOException          if there is no file specified.
      * @throws InterruptedException Exception when the Thread is interrupted.
      */
     @FXML
-    public void openGfaFileClicked() throws IOException, InterruptedException {
+    private void openGfaFileClicked() throws IOException, InterruptedException {
         Stage stage = App.getStage();
         File file = fileController.chooseGfaFile(stage);
         String filePath = file.getAbsolutePath();
         openGfaFileClicked(filePath);
     }
 
+    /**
+     * This method parses the gfa file specified in the filePath.
+     * That file is then immediately visualised on the screen.
+     *
+     * @param filePath The filepath to the .gfa file
+     * @throws IOException          if it can't parse/find the file
+     * @throws InterruptedException if it is interrupted
+     */
     private void openGfaFileClicked(String filePath) throws IOException, InterruptedException {
+        GraphDrawer.getInstance().reset();
         fileController.openGfaFileClicked(filePath);
         recentController.update(filePath);
         annoBut.setDisable(true);
@@ -165,23 +179,23 @@ public class MenuController implements Observer {
      * @throws InterruptedException Exception when the Thread is interrupted.
      */
     @FXML
-    public void openGffFileClicked() throws IOException, InterruptedException {
+    private void openGffFileClicked() throws IOException, InterruptedException {
         Stage stage = App.getStage();
         File file = fileController.chooseGffFile(stage);
         String filePath = file.getAbsolutePath();
-        HashMap<Integer, HashSet<Annotation>> annotations = fileController.openGffFileClicked(filePath);
+        HashMap<Integer, HashSet<Annotation>> annotations =
+                fileController.openGffFileClicked(filePath);
         Annotation.selectAll(annotations);
         GraphDrawer.getInstance().setAllAnnotations(annotations);
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/chooseGenomeForAnnotations.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                "/FXML/chooseGenomeForAnnotations.fxml"));
         Stage newStage;
         Parent root = loader.load();
         final GffGenomeController gffGenomeController
                 = loader.<GffGenomeController>getController();
 
-        HashMap<Integer, String> hashMap;
-
-        hashMap = DrawableCanvas.getInstance().getAllGenomesReversed();
+        HashMap<Integer, String> hashMap = DrawableCanvas.getInstance().getAllGenomesReversed();
         if (hashMap == null) {
             try {
                 openGfaFileClicked();
@@ -199,7 +213,8 @@ public class MenuController implements Observer {
                 new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent event) {
-                        DrawableCanvas.getInstance().setAnnotationGenome(gffGenomeController.getSelectedGenome());
+                        DrawableCanvas.getInstance().setAnnotationGenome(
+                                gffGenomeController.getSelectedGenome());
                         GraphDrawer.getInstance().redraw();
                     }
                 }
@@ -209,30 +224,52 @@ public class MenuController implements Observer {
         annoBut.setDisable(false);
     }
 
+    /**
+     * Sets the size of the graph after loading it.
+     *
+     * @param graph The graph with the information
+     */
     private void displayInfo(SequenceGraph graph) {
         numNodesLabel.setText(graph.getFullGraphRightBoundID() + "");
         numEdgesLabel.setText(graph.totalSize() + "");
     }
 
+    /**
+     * Updates the radius.
+     */
     public void updateRadius() {
         radiusTextField.setText(GraphDrawer.getInstance().getRadius() + "");
     }
 
-    public void updateSequenceInfoAlt(SequenceNode node) {
-        String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) node.getId());
+    /**
+     * Updates the alternative information window.
+     *
+     * @param node the Node that should be shown.
+     */
+    void updateSequenceInfoAlt(SequenceNode node) {
+        String sequence = DrawableCanvas.getInstance().getParser().
+                getSequenceHashMap().get((long) node.getId());
         sequenceInfoAlt.setText(node.toString(sequence));
     }
 
-    public void updateSequenceInfo(SequenceNode node) {
-        String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) node.getId());
+    /**
+     * Updates the alternative information window.
+     *
+     * @param node the Node that should be shown.
+     */
+    void updateSequenceInfo(SequenceNode node) {
+        String sequence = DrawableCanvas.getInstance().getParser().
+                getSequenceHashMap().get((long) node.getId());
         sequenceInfo.setText(node.toString(sequence));
     }
 
-    public void updateNodeTextField(int nodeID) {
-        nodeTextField.setText(nodeID + "");
-    }
-
-    public int findColumnWrapper(Double xEvent) {
+    /**
+     * Use this method to get a real node in the nodeTextField.
+     *
+     * @param xEvent Used to find the column needed.
+     * @return A positive int of the real node in the column.
+     */
+    private int findColumnWrapper(Double xEvent) {
         int nodeID = GraphDrawer.getInstance().findColumn(xEvent);
         if (nodeID < 1) {
             nodeID = Integer.parseInt(nodeTextField.getText());
@@ -243,25 +280,23 @@ public class MenuController implements Observer {
 
     /**
      * ZoomIn Action Handler.
-     *
-     * @throws IOException exception.
      */
     @FXML
-    public void zoomInClicked() throws IOException {
+    public void zoomInClicked() {
         double xCentre = canvas.getWidth() / 2;
-        ZoomController.getInstance().zoomIn(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
+        ZoomController.getInstance().zoomIn(
+                GraphDrawer.getInstance().mouseLocationColumn(xCentre));
         nodeTextField.setText(findColumnWrapper(xCentre) + "");
     }
 
     /**
      * ZoomOut Action Handler.
-     *
-     * @throws IOException exception.
      */
     @FXML
-    public void zoomOutClicked() throws IOException {
+    public void zoomOutClicked() {
         double xCentre = canvas.getWidth() / 2;
-        ZoomController.getInstance().zoomOut(GraphDrawer.getInstance().mouseLocationColumn(xCentre));
+        ZoomController.getInstance().zoomOut(
+                GraphDrawer.getInstance().mouseLocationColumn(xCentre));
         nodeTextField.setText(findColumnWrapper(xCentre) + "");
     }
 
@@ -272,7 +307,7 @@ public class MenuController implements Observer {
      * @throws IOException throws exception if column doesn't exist.
      */
     @FXML
-    public void scrollZoom(ScrollEvent scrollEvent) throws IOException {
+    private void scrollZoom(ScrollEvent scrollEvent) throws IOException {
         int column = GraphDrawer.getInstance().mouseLocationColumn(scrollEvent.getX());
         nodeTextField.setText(findColumnWrapper(scrollEvent.getX()) + "");
         if (scrollEvent.getDeltaY() > 0) {
@@ -288,57 +323,98 @@ public class MenuController implements Observer {
      * @param mouseEvent the mouse event.
      */
     @FXML
-    public void clickMouse(MouseEvent mouseEvent) {
+    private void clickMouse(MouseEvent mouseEvent) {
         canvasPanel.requestFocus();
         double pressedX = mouseEvent.getX();
         double pressedY = mouseEvent.getY();
         Minimap.getInstance().clickMinimap(pressedX, pressedY);
+        Object clicked = null;
         try {
-            GraphDrawer.getInstance().clickNode(pressedX, pressedY, mouseEvent);
+            clicked = GraphDrawer.getInstance().clickOnCanvas(pressedX, pressedY, mouseEvent);
         } catch (NullPointerException e) {
-            System.out.println("The graph is not yet loaded!");
+            System.err.println("The graph is not yet loaded!");
             e.printStackTrace();
         }
+        if (clicked != null) {
+            if (clicked instanceof SequenceNode) {
+                updateInfoSeqNode(mouseEvent.isControlDown(), (SequenceNode) clicked);
+            } else if (clicked instanceof Annotation) {
+                updateInfoAnnotation(mouseEvent.isControlDown(), (Annotation) clicked);
+            }
+        }
+    }
+
+    /**
+     * Updates the information fields with annotation information.
+     *
+     * @param controlDown boolean true iff control is down
+     * @param clicked     The annotation that was clicked
+     */
+    private void updateInfoAnnotation(boolean controlDown, Annotation clicked) {
+        if (!controlDown) {
+            sequenceInfo.setText(clicked.toString());
+        } else {
+            sequenceInfoAlt.setText(clicked.toString());
+        }
+    }
+
+    /**
+     * Updates the information fields with node information.
+     *
+     * @param controlDown boolean true iff control is down
+     * @param clicked     The node that was clicked
+     */
+    private void updateInfoSeqNode(boolean controlDown, SequenceNode clicked) {
+        String sequence = DrawableCanvas.getInstance().getParser().
+                getSequenceHashMap().get((long) clicked.getId());
+        if (!controlDown) {
+            sequenceInfo.setText(clicked.toString(sequence));
+            nodeTextField.setText(clicked.getId().toString());
+        } else {
+            sequenceInfoAlt.setText(clicked.toString(sequence));
+        }
+        GraphDrawer.getInstance().redraw();
     }
 
     /**
      * Adds a button to traverse the graph with.
      */
     @FXML
-    public void traverseGraphClicked() {
-            int centreNodeID = getCentreNodeID();
-            int radius = getRadius();
-            if (centreNodeID != -1 && radius != -1) {
-                ZoomController.getInstance().traverseGraphClicked(centreNodeID, radius);
-                SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
-                String sequence = DrawableCanvas.getInstance().getParser().getSequenceHashMap().get((long) centreNodeID);
-                nodeTextField.setText(Integer.toString(centreNodeID));
-                sequenceInfo.setText(node.toString(sequence));
-            }
+    private void traverseGraphClicked() {
+        int centreNodeID = getCentreNodeID();
+        int radius = getRadius();
+        if (centreNodeID != -1 && radius != -1) {
+            ZoomController.getInstance().traverseGraphClicked(centreNodeID, radius);
+            SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
+            String sequence = DrawableCanvas.getInstance().getParser()
+                    .getSequenceHashMap().get((long) centreNodeID);
+            nodeTextField.setText(Integer.toString(centreNodeID));
+            sequenceInfo.setText(node.toString(sequence));
+        }
     }
 
     /**
      * Pressed the bookmark1 menuItem.
      */
     @FXML
-    public void pressNewBookmark1() {
-        bookmarked(bookmark1);
+    private void pressNewBookmark1() {
+        bookmarkPressed(bookmark1);
     }
 
     /**
      * Pressed the bookmark2 menuItem.
      */
     @FXML
-    public void pressNewBookmark2() {
-        bookmarked(bookmark2);
+    private void pressNewBookmark2() {
+        bookmarkPressed(bookmark2);
     }
 
     /**
      * Pressed the bookmark3 menuItem.
      */
     @FXML
-    public void pressNewBookmark3() {
-        bookmarked(bookmark3);
+    private void pressNewBookmark3() {
+        bookmarkPressed(bookmark3);
     }
 
     /**
@@ -347,13 +423,12 @@ public class MenuController implements Observer {
      * @throws IOException Throws expception if it can't find the fxml file.
      */
     @FXML
-    public void newSaveBookmarkPress() throws IOException {
+    private void newSaveBookmarkPress() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/bookmarkPopUp.fxml"));
         Stage stage;
         Parent root = loader.load();
         BookmarkPopUp controller = loader.<BookmarkPopUp>getController();
-        controller.initialize(Integer.parseInt(nodeTextField.getText()),
-                GraphDrawer.getInstance().getZoomLevel(), bookmarkController);
+        controller.initialize(Integer.parseInt(nodeTextField.getText()), bookmarkController);
 
         stage = new Stage();
         stage.setScene(new Scene(root));
@@ -368,7 +443,7 @@ public class MenuController implements Observer {
      * @throws IOException if the fxml file doesn't exist.
      */
     @FXML
-    public void manageBookmarks() throws IOException {
+    private void manageBookmarks() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/manageBookmarks.fxml"));
         Stage stage;
         Parent root = loader.load();
@@ -385,7 +460,7 @@ public class MenuController implements Observer {
      *
      * @param bookmark the button that specifies the bookmark
      */
-    private void bookmarked(MenuItem bookmark) {
+    private void bookmarkPressed(MenuItem bookmark) {
         if (!bookmark.getText().equals("-")) {
             String string = bookmark.getText();
             String[] parts = string.split(" - ");
@@ -397,8 +472,12 @@ public class MenuController implements Observer {
         }
     }
 
-    public void updateCenterNode() {
-        nodeTextField.setText(Integer.toString(GraphDrawer.getInstance().getGraph().getCenterNodeID()));
+    /**
+     * Updates the centreNode.
+     */
+    private void updateCenterNode() {
+        nodeTextField.setText(Integer.toString(
+                GraphDrawer.getInstance().getGraph().getCenterNodeID()));
     }
 
     /**
@@ -410,7 +489,7 @@ public class MenuController implements Observer {
         try {
             return DrawableCanvas.getInstance().getParser().getSequenceHashMap();
         } catch (NullPointerException e) {
-            System.out.println("No graph was loaded so no sequenceHashMap to get");
+            System.err.println("No graph was loaded so no sequenceHashMap to get");
         }
         return null;
     }
@@ -437,9 +516,6 @@ public class MenuController implements Observer {
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
                         specificGenomeProperties.initialize();
-                        panningController =
-                                new PanningController(leftPannButton, rightPannButton);
-                        panningController.initializeKeys(canvasPanel);
                         displayInfo(GraphDrawer.getInstance().getGraph());
                         updateRadius();
                         updateCenterNode();
@@ -451,7 +527,7 @@ public class MenuController implements Observer {
     }
 
     /**
-     * Enables all the buttons and textfields a user could need to view the graph.
+     * Enables all the buttons and textFields a user could need to view the graph.
      */
     private void enableGuiElements() {
         zoomInBut.setDisable(false);
@@ -470,7 +546,7 @@ public class MenuController implements Observer {
      * Button one of the File -> Recent menu.
      */
     @FXML
-    public void file1Press() {
+    private void file1Press() {
         pressedRecent(file1);
     }
 
@@ -478,7 +554,7 @@ public class MenuController implements Observer {
      * Button two of the File -> Recent menu.
      */
     @FXML
-    public void file2Press() {
+    private void file2Press() {
         pressedRecent(file2);
     }
 
@@ -486,7 +562,7 @@ public class MenuController implements Observer {
      * Button three of the File -> Recent menu.
      */
     @FXML
-    public void file3Press() {
+    private void file3Press() {
         pressedRecent(file3);
     }
 
@@ -501,18 +577,14 @@ public class MenuController implements Observer {
         if (filePath == null) {
             try {
                 openGfaFileClicked();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (IOException | InterruptedException e1) {
+                System.err.println("Something went wrong opening GfaFileClicked");
             }
         } else {
             try {
                 openGfaFileClicked(filePath);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (IOException | InterruptedException e) {
+                System.err.println("Something went wrong opening GfaFileClicked");
             }
         }
     }
@@ -523,7 +595,7 @@ public class MenuController implements Observer {
      * @throws IOException when something goes wrong with IO.
      */
     @FXML
-    public void chooseGenomePress() throws IOException {
+    private void chooseGenomePress() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/specGenomePopUp.fxml"));
         Stage stage;
         Parent root = loader.load();
@@ -563,7 +635,7 @@ public class MenuController implements Observer {
      * Pressing on the first saved genomes.
      */
     @FXML
-    public void genome1Click() {
+    private void genome1Click() {
         genomeBookmarkClicked(genome1);
     }
 
@@ -571,7 +643,7 @@ public class MenuController implements Observer {
      * Pressing on the second saved genomes.
      */
     @FXML
-    public void genome2Click() {
+    private void genome2Click() {
         genomeBookmarkClicked(genome2);
     }
 
@@ -579,7 +651,7 @@ public class MenuController implements Observer {
      * Pressing on the third saved genomes.
      */
     @FXML
-    public void genome3Click() {
+    private void genome3Click() {
         genomeBookmarkClicked(genome3);
     }
 
@@ -612,14 +684,16 @@ public class MenuController implements Observer {
      *
      * @throws IOException if something goes wrong.
      */
-    public void chooseAnnoClicked() throws IOException {
+    @FXML
+    private void chooseAnnoClicked() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/AnnotationTable.fxml"));
         Stage stage;
         Parent root = loader.load();
         final AnnotationTableController annotationTableController
                 = loader.<AnnotationTableController>getController();
 
-        HashMap<Integer, HashSet<Annotation>> allAnnotations = GraphDrawer.getInstance().getAllAnnotations();
+        HashMap<Integer, HashSet<Annotation>> allAnnotations =
+                GraphDrawer.getInstance().getAllAnnotations();
         if (allAnnotations.size() == 0) {
             try {
                 openGffFileClicked();
@@ -648,18 +722,29 @@ public class MenuController implements Observer {
         stage.showAndWait();
     }
 
-    public void rainbowButtonClicked() {
+    /**
+     * Handles switching rainbowView on and off.
+     */
+    @FXML
+    private void rainbowButtonClicked() {
         GraphDrawer.getInstance().setRainbowView(rainbowBut.isSelected());
         GraphDrawer.getInstance().redraw();
     }
 
+    /**
+     * Handles viewing SNPs yes or no.
+     */
     @FXML
     public void collapseSNPClicked() {
         GraphDrawer.getInstance().collapse(collapseSNPButton.isSelected());
         GraphDrawer.getInstance().redraw();
     }
 
-    public int getRadius() {
+    /**
+     * Gets the radius of the radiusTextField.
+     * @return The integer in the radiusTextField
+     */
+    int getRadius() {
         int radius = -1;
         try {
             radius = Integer.parseInt(radiusTextField.getText());
@@ -669,11 +754,16 @@ public class MenuController implements Observer {
         return radius;
     }
 
-    public int getCentreNodeID() {
+    /**
+     * Gets the centreNode of the nodeTextField.
+     * @return the integer in the nodeTextField
+     */
+    private int getCentreNodeID() {
         int centreNode = -1;
         try {
             int value = Integer.parseInt(nodeTextField.getText());
-            if (value < 1 || value > GraphDrawer.getInstance().getGraph().getFullGraphRightBoundID()) {
+            if ((value < 1)
+                    || (value > GraphDrawer.getInstance().getGraph().getFullGraphRightBoundID())) {
                 throw new NotInRangeException();
             }
             centreNode = value;

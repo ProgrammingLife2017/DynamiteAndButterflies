@@ -1,48 +1,48 @@
 package gui.sub_controllers;
 
 import gui.GraphDrawer;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ScrollBar;
 
 /**
- * Created by Jasper van Tilburg SID on 20-6-2017.
+ * This controller handles the scrollbar.
+ * Created by Jasper van Tilburg on 20-6-2017.
  */
-public class ScrollbarController {
+public final class ScrollbarController {
 
-    public static ScrollbarController scrollbarController = new ScrollbarController();
+    private static final ScrollbarController SCROLLBAR_CONTROLLER = new ScrollbarController();
 
     private ScrollBar scrollBar;
 
-    public ScrollbarController() {
+    private ScrollbarController() {
     }
 
     /**
      * Getter for the singleton ScrollbarController.
+     *
      * @return the scrollbar controller
      */
     public static ScrollbarController getInstance() {
-        return scrollbarController;
+        return SCROLLBAR_CONTROLLER;
     }
 
     /**
      * Initialize the scrollbar controller.
+     *
      * @param maxColumnSize How far down the graph goes
      */
     public void initialize(int maxColumnSize) {
         scrollBar.setMax(maxColumnSize);
-        scrollBar.valueProperty().addListener(new ChangeListener<Number>() {
-            public void changed(ObservableValue<? extends Number> ov,
-                                Number old_val, Number new_val) {
-                GraphDrawer.getInstance().setyDifference(scrollBar.getValue() * GraphDrawer.RELATIVE_Y_DISTANCE);
-                GraphDrawer.getInstance().redraw();
-            }
+        scrollBar.valueProperty().addListener((ov, oldValue, newValue) -> {
+            GraphDrawer.getInstance().setyDifference(
+                    scrollBar.getValue() * GraphDrawer.RELATIVE_Y_DISTANCE);
+            GraphDrawer.getInstance().redraw();
         });
 
     }
 
     /**
      * Setter for the scrollbar.
+     *
      * @param scrollBar The scrollbar
      */
     public void setScrollBar(ScrollBar scrollBar) {
