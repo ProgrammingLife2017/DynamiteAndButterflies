@@ -231,6 +231,7 @@ public class ColourController {
 
     public void setSelectedGenomes(int[] selected) {
         this.selectedGenomes = selected;
+        initialize();
     }
 
     public void setRainbowView(boolean rainbowView) {
