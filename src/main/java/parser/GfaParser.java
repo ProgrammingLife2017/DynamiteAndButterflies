@@ -27,8 +27,6 @@ public class GfaParser extends Observable implements Runnable {
     private CustomProperties properties = new CustomProperties();
 
     private DB db;
-    private DB dbGenomes;
-    private DB dbOffSets;
 
     private HashMap<String, Integer> genomesMap;
     private HashMap<Integer, String> reversedGenomesMap;
@@ -91,23 +89,17 @@ public class GfaParser extends Observable implements Runnable {
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] partPaths = filePath.split(pattern);
         partPath = partPaths[partPaths.length - 1];
-        db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().
-                fileMmapPreclearDisable().cleanerHackEnable().
-                closeOnJvmShutdown().checksumHeaderBypass().make();
-        dbGenomes = DBMaker.fileDB(partPath + ".genomes.db").fileMmapEnable().
-                fileMmapPreclearDisable().cleanerHackEnable().
-                closeOnJvmShutdown().checksumHeaderBypass().make();
-        dbOffSets = DBMaker.fileDB(partPath + ".offSets.db").fileMmapEnable().
+        db = DBMaker.fileDB(partPath + ".database.db").fileMmapEnable().
                 fileMmapPreclearDisable().cleanerHackEnable().
                 closeOnJvmShutdown().checksumHeaderBypass().make();
         if (db.get(partPath + ".sequence.db") != null) {
             sequenceMap = db.hashMap(partPath + ".sequence.db").
                     keySerializer(Serializer.LONG).
                     valueSerializer(Serializer.STRING).createOrOpen();
-            genomes = dbGenomes.hashMap(partPath + ".genomes.db").
+            genomes = db.hashMap(partPath + ".genomes.db").
                     keySerializer(Serializer.INTEGER).
                     valueSerializer(Serializer.INT_ARRAY).createOrOpen();
-            offSets = dbOffSets.hashMap(partPath + ".offSets.db").
+            offSets = db.hashMap(partPath + ".offSets.db").
                     keySerializer(Serializer.INTEGER).
                     valueSerializer(Serializer.INT_ARRAY).createOrOpen();
             parseHeaders();
@@ -117,10 +109,10 @@ public class GfaParser extends Observable implements Runnable {
             sequenceMap = db.hashMap(partPath + ".sequence.db").
                     keySerializer(Serializer.LONG).
                     valueSerializer(Serializer.STRING).createOrOpen();
-            genomes = dbGenomes.hashMap(partPath + ".genomes.db").
+            genomes = db.hashMap(partPath + ".genomes.db").
                     keySerializer(Serializer.INTEGER).
                     valueSerializer(Serializer.INT_ARRAY).createOrOpen();
-            offSets = dbOffSets.hashMap(partPath + ".offSets.db").
+            offSets = db.hashMap(partPath + ".offSets.db").
                     keySerializer(Serializer.INTEGER).
                     valueSerializer(Serializer.INT_ARRAY).createOrOpen();
             parseHeaders();
@@ -214,10 +206,6 @@ public class GfaParser extends Observable implements Runnable {
         }
         closeStreams(parentWriter, childWriter, in, br);
         db.commit();
-        dbGenomes.commit();
-        dbOffSets.commit();
-        System.out.println(offSets.get(1).toString());
-        System.out.println(genomes.get(1).toString());
         updateProperties(sizeOfFile, maxCor);
     }
 

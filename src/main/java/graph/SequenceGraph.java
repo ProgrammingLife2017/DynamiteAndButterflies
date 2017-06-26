@@ -136,33 +136,6 @@ public class SequenceGraph {
         }
     }
 
-    private int[] splitOnStringToInt(String text) {
-        String[] genomesText = text.split(";");
-        int[] genomes = new int[genomesText.length];
-        for (int j = 0; j < genomesText.length; j++) {
-            genomes[j] = Integer.parseInt(genomesText[j]);
-        }
-        return genomes;
-    }
-
-    /**
-     * Finds the longest path of the graph and sets columns accordingly.
-     */
-    private String[] getGenomes() throws IOException {
-        try {
-            String filePath = DrawableCanvas.getInstance()
-                    .getParser().getPartPath() + "genomes.txt";
-            Stream<String> lines = Files.lines(Paths.get(filePath));
-            Stream<String> line = lines.skip(boundaries.getLeftBoundID() - 1)
-                    .limit(boundaries.getRightBoundID() + EXTRA_BOUNDS);
-            String[] tmp = new String[boundaries.getLeftBoundID() - boundaries.getLeftBoundID() + EXTRA_BOUNDS];
-            return line.toArray(String[]::new);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        throw new IOException("Node not in genome list");
-    }
-
     /**
      * Creates a column list for easier crossing reduction.
      *
