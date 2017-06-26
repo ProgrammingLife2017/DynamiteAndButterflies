@@ -50,7 +50,7 @@ public final class DrawableCanvas extends Observable implements Observer {
                         int[] childArray = parser.getChildArray();
                         int[] parentArray = parser.getParentArray();
                         SequenceGraph graph = new SequenceGraph(
-                                parentArray, childArray, getParser().getSequenceHashMap());
+                                parentArray, childArray, getParser().getSequenceHashMap(), getParser().getOffSets(), getParser().getGenomes());
                         graph.createSubGraph(START_NODE_ID, PanningController.RENDER_RANGE);
                         Minimap.getInstance().initialize(graph.getFullGraphRightBoundID());
                         GraphDrawer.getInstance().setGraph(graph);

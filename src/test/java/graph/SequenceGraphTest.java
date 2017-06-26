@@ -21,7 +21,11 @@ public class SequenceGraphTest {
 
     private SequenceGraph graph;
     private HTreeMap<Long, String> map;
+    private HTreeMap<Integer, int[]> offSets;
+    private HTreeMap<Integer, int[]> genomes;
     private DB db;
+    private DB db2;
+    private DB db3;
 
 
     @Before
@@ -31,12 +35,22 @@ public class SequenceGraphTest {
         db = DBMaker.tempFileDB().closeOnJvmShutdown().make();
         map = db.hashMap("test map").keySerializer(Serializer.LONG).
                 valueSerializer(Serializer.STRING).createOrOpen();
+        db2 = DBMaker.tempFileDB().closeOnJvmShutdown().make();
+        offSets = db2.hashMap("test map").keySerializer(Serializer.INTEGER).
+                valueSerializer(Serializer.INT_ARRAY).createOrOpen();
+        db3 = DBMaker.tempFileDB().closeOnJvmShutdown().make();
+        genomes = db3.hashMap("test map").keySerializer(Serializer.INTEGER).
+                valueSerializer(Serializer.INT_ARRAY).createOrOpen();
         //populate sequencemap
         for(int i = 1; i <= 19; i++) {
             map.put((long) i, "A");
+            int[] temp = new int[1];
+            temp[0] = i;
+            offSets.put(i, temp);
+            genomes.put(i, temp);
         }
 
-        graph = new SequenceGraph(parentArray, childArray, map);
+        graph = new SequenceGraph(parentArray, childArray, map, offSets, genomes);
         graph.createSubGraph(1, 27);
     }
 
@@ -93,7 +107,7 @@ public class SequenceGraphTest {
 
     @Test (expected = IllegalArgumentException.class)
     public void invalidArgument() throws Exception {
-        graph = new SequenceGraph(parentArray, childArray, null);
+        graph = new SequenceGraph(parentArray, childArray, null, null, null);
         graph.createSubGraph(-1, 1);
     }
 }

@@ -137,7 +137,7 @@ public class MenuController implements Observer {
         PanningController.getInstance().initializeKeys(canvasPanel);
 
         //System.setErr(ps);
-        System.setOut(ps);
+        //System.setOut(ps);
     }
 
     /**

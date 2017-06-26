@@ -2,6 +2,7 @@ package graph;
 
 import gui.DrawableCanvas;
 import org.mapdb.HTreeMap;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -25,6 +26,9 @@ public class SequenceGraph {
     private int maxColumnSize;
     private Boundary boundaries;
     private HTreeMap<Long, String> sequenceHashMap;
+    private HTreeMap<Integer, int[]> offSetsMap;
+    private HTreeMap<Integer, int[]> genomesMap;
+
     private TreeMap<Integer, SequenceNode> nodes;
     private ArrayList<ArrayList<SequenceNode>> columns;
 
@@ -36,10 +40,12 @@ public class SequenceGraph {
      * @param sequenceHashMap - the sequenceHashMap.
      */
     public SequenceGraph(final int[] parentArray, final int[] childArray,
-                         HTreeMap<Long, String> sequenceHashMap) {
+                         HTreeMap<Long, String> sequenceHashMap, HTreeMap<Integer, int[]> offSetsMap, HTreeMap<Integer, int[]> genomesMap) {
         this.sequenceHashMap = sequenceHashMap;
         this.parentArray = parentArray;
         this.childArray = childArray;
+        this.offSetsMap = offSetsMap;
+        this.genomesMap = genomesMap;
     }
 
     /**
@@ -85,21 +91,12 @@ public class SequenceGraph {
      * Initialize the genomes.
      */
     private void initGenomes() {
-        try {
-            String[] genomeData = getGenomes();
-            int counter = 0;
-            for (Object o : nodes.entrySet()) {
-                Map.Entry pair = (Map.Entry) o;
-                SequenceNode node = (SequenceNode) pair.getValue();
-                String[] specificGenomeData = genomeData[counter].split("-");
-                node.setGenomes(splitOnStringToInt(specificGenomeData[0]));
-                node.setOffSets(splitOnStringToInt(specificGenomeData[1]));
-                counter++;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (Object o : nodes.entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
+            SequenceNode node = (SequenceNode) pair.getValue();
+            node.setOffSets(offSetsMap.get(node.getId()));
+            node.setGenomes(genomesMap.get(node.getId()));
         }
-
     }
 
     /**
@@ -158,6 +155,7 @@ public class SequenceGraph {
             Stream<String> lines = Files.lines(Paths.get(filePath));
             Stream<String> line = lines.skip(boundaries.getLeftBoundID() - 1)
                     .limit(boundaries.getRightBoundID() + EXTRA_BOUNDS);
+            String[] tmp = new String[boundaries.getLeftBoundID() - boundaries.getLeftBoundID() + EXTRA_BOUNDS];
             return line.toArray(String[]::new);
         } catch (Exception e) {
             e.printStackTrace();
@@ -348,7 +346,7 @@ public class SequenceGraph {
      * @return Copy of the graph.
      */
     public SequenceGraph copy() {
-        return new SequenceGraph(parentArray, childArray, sequenceHashMap);
+        return new SequenceGraph(parentArray, childArray, sequenceHashMap, offSetsMap, genomesMap);
     }
 
 

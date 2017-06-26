@@ -7,6 +7,7 @@ import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.regex.Pattern;
@@ -17,12 +18,17 @@ import java.util.regex.Pattern;
 public class GfaParser extends Observable implements Runnable {
     private HTreeMap<Long, String> sequenceMap;
 
+    private HTreeMap<Integer, int[]> genomes;
+    private HTreeMap<Integer, int[]> offSets;
+
     private String filePath;
 
     private String partPath;
     private CustomProperties properties = new CustomProperties();
 
     private DB db;
+    private DB dbGenomes;
+    private DB dbOffSets;
 
     private HashMap<String, Integer> genomesMap;
     private HashMap<Integer, String> reversedGenomesMap;
@@ -88,10 +94,22 @@ public class GfaParser extends Observable implements Runnable {
         db = DBMaker.fileDB(partPath + ".sequence.db").fileMmapEnable().
                 fileMmapPreclearDisable().cleanerHackEnable().
                 closeOnJvmShutdown().checksumHeaderBypass().make();
+        dbGenomes = DBMaker.fileDB(partPath + ".genomes.db").fileMmapEnable().
+                fileMmapPreclearDisable().cleanerHackEnable().
+                closeOnJvmShutdown().checksumHeaderBypass().make();
+        dbOffSets = DBMaker.fileDB(partPath + ".offSets.db").fileMmapEnable().
+                fileMmapPreclearDisable().cleanerHackEnable().
+                closeOnJvmShutdown().checksumHeaderBypass().make();
         if (db.get(partPath + ".sequence.db") != null) {
             sequenceMap = db.hashMap(partPath + ".sequence.db").
                     keySerializer(Serializer.LONG).
                     valueSerializer(Serializer.STRING).createOrOpen();
+            genomes = dbGenomes.hashMap(partPath + ".genomes.db").
+                    keySerializer(Serializer.INTEGER).
+                    valueSerializer(Serializer.INT_ARRAY).createOrOpen();
+            offSets = dbOffSets.hashMap(partPath + ".offSets.db").
+                    keySerializer(Serializer.INTEGER).
+                    valueSerializer(Serializer.INT_ARRAY).createOrOpen();
             parseHeaders();
         } else {
             properties.setProperty(partPath, "false");
@@ -99,6 +117,12 @@ public class GfaParser extends Observable implements Runnable {
             sequenceMap = db.hashMap(partPath + ".sequence.db").
                     keySerializer(Serializer.LONG).
                     valueSerializer(Serializer.STRING).createOrOpen();
+            genomes = dbGenomes.hashMap(partPath + ".genomes.db").
+                    keySerializer(Serializer.INTEGER).
+                    valueSerializer(Serializer.INT_ARRAY).createOrOpen();
+            offSets = dbOffSets.hashMap(partPath + ".offSets.db").
+                    keySerializer(Serializer.INTEGER).
+                    valueSerializer(Serializer.INT_ARRAY).createOrOpen();
             parseHeaders();
             parseSpecific(filePath);
         }
@@ -137,6 +161,14 @@ public class GfaParser extends Observable implements Runnable {
         return sequenceMap;
     }
 
+    public synchronized HTreeMap<Integer, int[]> getOffSets() {
+        return offSets;
+    }
+
+    public synchronized HTreeMap<Integer, int[]> getGenomes() {
+        return genomes;
+    }
+
     /**
      * Parses the file with a boolean whether to create a db file or not. Creates the Graph
      *
@@ -148,8 +180,7 @@ public class GfaParser extends Observable implements Runnable {
                 new BufferedWriter(new FileWriter(partPath + "parentArray.txt"));
         BufferedWriter childWriter =
                 new BufferedWriter(new FileWriter(partPath + "childArray.txt"));
-        BufferedWriter genomeWriter =
-                new BufferedWriter(new FileWriter(partPath + "genomes.txt"));
+        //BufferedWriter genomeWriter = new BufferedWriter(new FileWriter(partPath + "genomes.txt"));
         InputStream in = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line;
@@ -162,25 +193,31 @@ public class GfaParser extends Observable implements Runnable {
                 for (String aData : data) {
                     if (aData.startsWith("ORI:Z:")) {
                         String[] genomes = aData.split(":")[2].split(";");
-                        for (int j = 0; j < genomes.length; j++) {
-                            writeGenomes(genomeWriter, genomes, j);
-                        }
+                        writeGenomes(id, genomes);
                     } else if (aDataStartsWithCorrect(aData)) {
                         String offSets = aData.split(":")[2];
                         String[] offSetStrings = offSets.split(";");
+                        int[] offSetInts = new int[offSetStrings.length];
                         maxCor = getMaxCor(maxCor, offSetStrings);
-                        genomeWriter.write(offSets);
-                        genomeWriter.newLine();
+                        for (int i = 0; i < offSetStrings.length; i++) {
+                            offSetInts[i] = Integer.parseInt(offSetStrings[i]);
+                        }
+                        this.offSets.put(id, offSetInts);
                     }
                 }
                 sequenceMap.put((long) (id), data[2]);
+
             } else if (line.startsWith("L")) {
                 writeEdge(parentWriter, childWriter, line);
                 sizeOfFile++;
             }
         }
-        closeStreams(parentWriter, childWriter, genomeWriter, in, br);
+        closeStreams(parentWriter, childWriter, in, br);
         db.commit();
+        dbGenomes.commit();
+        dbOffSets.commit();
+        System.out.println(offSets.get(1).toString());
+        System.out.println(genomes.get(1).toString());
         updateProperties(sizeOfFile, maxCor);
     }
 
@@ -203,22 +240,18 @@ public class GfaParser extends Observable implements Runnable {
      *
      * @param parentWriter - parentWriter to close.
      * @param childWriter  - childWriter to close.
-     * @param genomeWriter - genomeWriter to close.
      * @param in           - input stream to close.
      * @param br           - buffered reader to close.
      * @throws IOException - throws IO exception.
      */
     private void closeStreams(BufferedWriter parentWriter,
                               BufferedWriter childWriter,
-                              BufferedWriter genomeWriter,
                               InputStream in,
                               BufferedReader br) throws IOException {
         in.close();
         br.close();
         parentWriter.flush();
         parentWriter.close();
-        genomeWriter.flush();
-        genomeWriter.close();
         childWriter.flush();
         childWriter.close();
     }
@@ -273,26 +306,25 @@ public class GfaParser extends Observable implements Runnable {
     /**
      * Writes the genomes to a file.
      *
-     * @param genomeWriter - the writer
-     * @param genomes      - the genomes
-     * @param j            - loop counter
+     * @param id - the id
      * @throws IOException - can throw IO exception
      */
-    private void writeGenomes(BufferedWriter genomeWriter, String[] genomes, int j)
+    private void writeGenomes(int id, String[] genomes)
             throws IOException {
-        if (genomesMap.get(genomes[j].split("\\.")[0]) != null) {
-            if (j == genomes.length - 1) {
-                genomeWriter.write(genomesMap.get(genomes[j].split("\\.")[0]) + "-");
-            } else {
-                genomeWriter.write(genomesMap.get(genomes[j].split("\\.")[0]) + ";");
+        int[] genomeInts = new int[genomes.length];
+        for (int i = 0; i < genomes.length; i++) {
+            String[] name = genomes[i].split("\\.");
+            String nameGenome = "";
+            for (int j = 0; j < name.length - 1; j++) {
+                nameGenome = nameGenome.concat(name[j]);
             }
-        } else {
-            if (j == genomes.length - 1) {
-                genomeWriter.write(genomes[j] + "-");
+            if (genomesMap.get(nameGenome) != null) {
+                genomeInts[i] = genomesMap.get(nameGenome);
             } else {
-                genomeWriter.write(genomes[j] + ";");
+                genomeInts[i] = Integer.parseInt(genomes[i]);
             }
         }
+        this.genomes.put(id,genomeInts);
     }
 
     /**
