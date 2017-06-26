@@ -22,7 +22,7 @@ public final class PanningController extends Observable {
     /**
      * The amount of nodes to render.
      */
-    public static final int RENDER_RANGE = 2000;
+    public static final int RENDER_RANGE = 4000;
 
     /**
      * The speed at which to pan.
@@ -32,12 +32,12 @@ public final class PanningController extends Observable {
     /**
      * The the threshold to update the subGraph.
      */
-    private static final int RENDER_THRESHOLD = 500;
+    private static final int RENDER_THRESHOLD = 1000;
 
     /**
      * The amount of nodes to shift.
      */
-    private static final int RENDER_SHIFT = 1000;
+    private static final int RENDER_SHIFT = 2000;
 
     private static final PanningController PANNING_CONTROLLER = new PanningController();
 
