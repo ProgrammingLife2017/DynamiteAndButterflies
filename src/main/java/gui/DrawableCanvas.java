@@ -94,7 +94,7 @@ public final class DrawableCanvas extends Observable implements Observer {
     }
 
     public void setAnnotationGenome(int annotationGenomeArg) {
-        annotationGenome = annotationGenomeArg;
+        this.annotationGenome = annotationGenomeArg;
     }
 
     public int getAnnotationGenome() {
