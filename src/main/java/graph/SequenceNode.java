@@ -244,10 +244,12 @@ public class SequenceNode {
      */
     private void appendGenomeCoords(StringBuilder stringBuilder) {
         stringBuilder.append("Genome coords:\t");
-        for (Integer i: offSets) {
-            stringBuilder.append(i).append(" ");
+        if(this.offSets != null) {
+            for (Integer i : this.offSets) {
+                stringBuilder.append(i).append(" ");
+            }
+            stringBuilder.append("\n");
         }
-        stringBuilder.append("\n");
     }
 
     /**
