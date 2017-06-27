@@ -16,7 +16,7 @@ import structures.Annotation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.TreeSet;
 
 
 /**
@@ -41,8 +41,8 @@ public class AnnotationTableController {
     private TableColumn<Annotation, Boolean> highlightColumn;
 
     private SortedList<Annotation> sortedData;
-    private HashMap<Integer, HashSet<Annotation>> annotations;
-    private HashMap<Integer, HashSet<Annotation>> updatedAnnotations;
+    private HashMap<Integer, TreeSet<Annotation>> annotations;
+    private HashMap<Integer, TreeSet<Annotation>> updatedAnnotations;
     private boolean allSelected;
 
     /**
@@ -60,13 +60,13 @@ public class AnnotationTableController {
      */
     @FXML
     @SuppressWarnings("MethodLength") //It is only 2 too long and the comments ensure clarity.
-    public void initialize(HashMap<Integer, HashSet<Annotation>> annotationsArg) {
+    public void initialize(HashMap<Integer, TreeSet<Annotation>> annotationsArg) {
         this.annotations = annotationsArg;
         this.updatedAnnotations = this.annotations;
         allSelected = false;
 
         ObservableList<Annotation> masterData =
-                FXCollections.observableArrayList(new ArrayList<>(bucketsToHashSet()));
+                FXCollections.observableArrayList(new ArrayList<>(bucketsToTreeSet()));
 
         // 0. Initialize the columns.
         initializeColumns();
@@ -107,8 +107,8 @@ public class AnnotationTableController {
      * @return a hash set of the buckets of annotations
      */
     @NotNull
-    private HashSet<Annotation> bucketsToHashSet() {
-        return bucketsToHashSet(this.annotations);
+    private TreeSet<Annotation> bucketsToTreeSet() {
+        return bucketsToTreeSet(this.annotations);
     }
 
     /**
@@ -116,13 +116,13 @@ public class AnnotationTableController {
      * @param hashMap The hashMap to be converted.
      * @return a hashSet of the hashMap.
      */
-    private HashSet<Annotation> bucketsToHashSet(HashMap<Integer, HashSet<Annotation>> hashMap) {
+    private TreeSet<Annotation> bucketsToTreeSet(HashMap<Integer, TreeSet<Annotation>> hashMap) {
         if (hashMap == null) {
             return null;
         }
-        HashSet<Annotation> drawThese = new HashSet<>();
+        TreeSet<Annotation> drawThese = new TreeSet<>();
         for (int i = 0; i <= hashMap.size(); i++) {
-            HashSet<Annotation> tempAnnotations = hashMap.get(i);
+            TreeSet<Annotation> tempAnnotations = hashMap.get(i);
             if (tempAnnotations != null) {
                 drawThese.addAll(tempAnnotations);
             }
@@ -193,7 +193,7 @@ public class AnnotationTableController {
         allSelected = !allSelected;
     }
 
-    public HashMap<Integer, HashSet<Annotation>> getAnnotations() {
+    public HashMap<Integer, TreeSet<Annotation>> getAnnotations() {
         return updatedAnnotations;
     }
 }
