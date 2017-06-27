@@ -261,7 +261,6 @@ public class SequenceNode {
         if (this.getGenomes().length != 0) {
             stringBuilder.append("Genomes:\t\t");
             int[] sortedGenomes = this.getGenomes();
-            Arrays.sort(sortedGenomes);
             for (Integer i: sortedGenomes) {
                 stringBuilder.append(DrawableCanvas.getInstance().getAllGenomesReversed().get(i)).append(" ");
             }
