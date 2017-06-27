@@ -1,10 +1,7 @@
 package parser;
 
 import gui.CustomProperties;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.mapdb.HTreeMap;
-import org.mapdb.Serializer;
+import org.mapdb.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -16,10 +13,10 @@ import java.util.regex.Pattern;
  * This class contains a parser to parse a .gfa file into our data structure.
  */
 public class GfaParser extends Observable implements Runnable {
-    private HTreeMap<Long, String> sequenceMap;
+    private BTreeMap<Long, String> sequenceMap;
 
-    private HTreeMap<Integer, int[]> genomes;
-    private HTreeMap<Integer, int[]> offSets;
+    private BTreeMap<Integer, int[]> genomes;
+    private BTreeMap<Integer, int[]> offSets;
 
     private String filePath;
 
@@ -90,29 +87,31 @@ public class GfaParser extends Observable implements Runnable {
         String[] partPaths = filePath.split(pattern);
         partPath = partPaths[partPaths.length - 1];
         db = DBMaker.fileDB(partPath + ".database.db").fileMmapEnable().
-                fileMmapPreclearDisable().cleanerHackEnable().
+                fileMmapPreclearDisable().
+                cleanerHackEnable().
+                allocateIncrement( 64 * 1024 * 1024 ).
                 closeOnJvmShutdown().checksumHeaderBypass().make();
         if (db.get(partPath + ".sequence.db") != null) {
-            sequenceMap = db.hashMap(partPath + ".sequence.db").
+            sequenceMap = db.treeMap(partPath + ".sequence.db").
                     keySerializer(Serializer.LONG).
                     valueSerializer(Serializer.STRING).createOrOpen();
-            genomes = db.hashMap(partPath + ".genomes.db").
+            genomes = db.treeMap(partPath + ".genomes.db").
                     keySerializer(Serializer.INTEGER).
                     valueSerializer(Serializer.INT_ARRAY).createOrOpen();
-            offSets = db.hashMap(partPath + ".offSets.db").
+            offSets = db.treeMap(partPath + ".offSets.db").
                     keySerializer(Serializer.INTEGER).
                     valueSerializer(Serializer.INT_ARRAY).createOrOpen();
             parseHeaders();
         } else {
             properties.setProperty(partPath, "false");
             properties.saveProperties();
-            sequenceMap = db.hashMap(partPath + ".sequence.db").
+            sequenceMap = db.treeMap(partPath + ".sequence.db").
                     keySerializer(Serializer.LONG).
                     valueSerializer(Serializer.STRING).createOrOpen();
-            genomes = db.hashMap(partPath + ".genomes.db").
+            genomes = db.treeMap(partPath + ".genomes.db").
                     keySerializer(Serializer.INTEGER).
                     valueSerializer(Serializer.INT_ARRAY).createOrOpen();
-            offSets = db.hashMap(partPath + ".offSets.db").
+            offSets = db.treeMap(partPath + ".offSets.db").
                     keySerializer(Serializer.INTEGER).
                     valueSerializer(Serializer.INT_ARRAY).createOrOpen();
             parseHeaders();
@@ -149,15 +148,15 @@ public class GfaParser extends Observable implements Runnable {
      *
      * @return The HashMap.
      */
-    public synchronized HTreeMap<Long, String> getSequenceHashMap() {
+    public synchronized BTreeMap<Long, String> getSequenceHashMap() {
         return sequenceMap;
     }
 
-    public synchronized HTreeMap<Integer, int[]> getOffSets() {
+    public synchronized BTreeMap<Integer, int[]> getOffSets() {
         return offSets;
     }
 
-    public synchronized HTreeMap<Integer, int[]> getGenomes() {
+    public synchronized BTreeMap<Integer, int[]> getGenomes() {
         return genomes;
     }
 

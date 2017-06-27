@@ -1,6 +1,7 @@
 package graph;
 
 import gui.DrawableCanvas;
+import org.mapdb.BTreeMap;
 import org.mapdb.HTreeMap;
 
 import java.io.IOException;
@@ -25,9 +26,9 @@ public class SequenceGraph {
     private int dummyNodeIDCounter = -1;
     private int maxColumnSize;
     private Boundary boundaries;
-    private HTreeMap<Long, String> sequenceHashMap;
-    private HTreeMap<Integer, int[]> offSetsMap;
-    private HTreeMap<Integer, int[]> genomesMap;
+    private BTreeMap<Long, String> sequenceHashMap;
+    private BTreeMap<Integer, int[]> offSetsMap;
+    private BTreeMap<Integer, int[]> genomesMap;
 
     private TreeMap<Integer, SequenceNode> nodes;
     private ArrayList<ArrayList<SequenceNode>> columns;
@@ -40,7 +41,7 @@ public class SequenceGraph {
      * @param sequenceHashMap - the sequenceHashMap.
      */
     public SequenceGraph(final int[] parentArray, final int[] childArray,
-                         HTreeMap<Long, String> sequenceHashMap, HTreeMap<Integer, int[]> offSetsMap, HTreeMap<Integer, int[]> genomesMap) {
+                         BTreeMap<Long, String> sequenceHashMap, BTreeMap<Integer, int[]> offSetsMap, BTreeMap<Integer, int[]> genomesMap) {
         this.sequenceHashMap = sequenceHashMap;
         this.parentArray = parentArray;
         this.childArray = childArray;
