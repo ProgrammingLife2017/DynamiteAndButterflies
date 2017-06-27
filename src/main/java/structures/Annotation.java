@@ -81,6 +81,7 @@ public class Annotation implements Comparable<Annotation> {
     public String toString() {
         String res = getInfo();
         res = res.replace("\t", "\n");
+        res = res.replace("=", ":\t");
         return res;
     }
 

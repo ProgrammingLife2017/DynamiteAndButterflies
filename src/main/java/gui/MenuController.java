@@ -327,17 +327,10 @@ public class MenuController implements Observer {
         Minimap.getInstance().clickMinimap(pressedX, pressedY);
         Object clicked = null;
         try {
-            clicked = GraphDrawer.getInstance().clickOnCanvas(pressedX, pressedY, mouseEvent);
+            GraphDrawer.getInstance().clickOnCanvas(pressedX, pressedY, mouseEvent);
         } catch (NullPointerException e) {
             System.err.println("The graph is not yet loaded!");
             e.printStackTrace();
-        }
-        if (clicked != null) {
-            if (clicked instanceof SequenceNode) {
-                updateInfoSeqNode(mouseEvent.isControlDown(), (SequenceNode) clicked);
-            } else if (clicked instanceof Annotation) {
-                updateInfoAnnotation(mouseEvent.isControlDown(), (Annotation) clicked);
-            }
         }
     }
 
@@ -347,7 +340,7 @@ public class MenuController implements Observer {
      * @param controlDown boolean true iff control is down
      * @param clicked     The annotation that was clicked
      */
-    private void updateInfoAnnotation(boolean controlDown, Annotation clicked) {
+    void updateInfoAnnotation(boolean controlDown, Annotation clicked) {
         if (!controlDown) {
             sequenceInfo.setText(clicked.toString());
         } else {
@@ -361,7 +354,7 @@ public class MenuController implements Observer {
      * @param controlDown boolean true iff control is down
      * @param clicked     The node that was clicked
      */
-    private void updateInfoSeqNode(boolean controlDown, SequenceNode clicked) {
+    void updateInfoSeqNode(boolean controlDown, SequenceNode clicked) {
         String sequence = DrawableCanvas.getInstance().getParser().
                 getSequenceHashMap().get((long) clicked.getId());
         if (!controlDown) {
