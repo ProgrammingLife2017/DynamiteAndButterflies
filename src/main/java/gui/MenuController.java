@@ -25,10 +25,7 @@ import structures.Annotation;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -104,7 +101,7 @@ public class MenuController implements Observer {
     private BookmarkController bookmarkController;
     private FileController fileController;
     private RecentController recentController;
-    private SpecificGenomeProperties specificGenomeProperties;
+    private RecentGenomeController recentGenomeController;
     private String filePath;
 
     public MenuController() {
@@ -124,18 +121,17 @@ public class MenuController implements Observer {
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
 
-        specificGenomeProperties = new SpecificGenomeProperties(genome1, genome2, genome3);
+        recentGenomeController = new RecentGenomeController(genome1, genome2, genome3);
 
         ps = new PrintStream(new Console(consoleArea));
         DrawableCanvas.getInstance().setMenuController(this);
-        DrawableCanvas.getInstance().setSpecificGenomeProperties(specificGenomeProperties);
+        DrawableCanvas.getInstance().setRecentGenomeController(recentGenomeController);
         ScrollbarController.getInstance().setScrollBar(scrollBar);
         ZoomController.getInstance().setMenuController(this);
         Minimap.getInstance().setMenuController(this);
         GraphDrawer.getInstance().setMenuController(this);
         PanningController.getInstance().setMenuController(this);
         PanningController.getInstance().initialize(leftPannButton, rightPannButton);
-        PanningController.getInstance().initializeKeys(canvasPanel);
 
         //System.setErr(ps);
         //System.setOut(ps);
@@ -169,6 +165,7 @@ public class MenuController implements Observer {
         fileController.openGfaFileClicked(filePath);
         recentController.update(filePath);
         annoBut.setDisable(true);
+        PanningController.getInstance().initializeKeys(canvasPanel);
     }
 
 
@@ -184,7 +181,7 @@ public class MenuController implements Observer {
         Stage stage = App.getStage();
         File file = fileController.chooseGffFile(stage);
         String filePath = file.getAbsolutePath();
-        HashMap<Integer, HashSet<Annotation>> annotations =
+        HashMap<Integer, TreeSet<Annotation>> annotations =
                 fileController.openGffFileClicked(filePath);
         Annotation.selectAll(annotations);
         GraphDrawer.getInstance().setAllAnnotations(annotations);
@@ -331,17 +328,10 @@ public class MenuController implements Observer {
         Minimap.getInstance().clickMinimap(pressedX, pressedY);
         Object clicked = null;
         try {
-            clicked = GraphDrawer.getInstance().clickOnCanvas(pressedX, pressedY, mouseEvent);
+            GraphDrawer.getInstance().clickOnCanvas(pressedX, pressedY, mouseEvent);
         } catch (NullPointerException e) {
             System.err.println("The graph is not yet loaded!");
             e.printStackTrace();
-        }
-        if (clicked != null) {
-            if (clicked instanceof SequenceNode) {
-                updateInfoSeqNode(mouseEvent.isControlDown(), (SequenceNode) clicked);
-            } else if (clicked instanceof Annotation) {
-                updateInfoAnnotation(mouseEvent.isControlDown(), (Annotation) clicked);
-            }
         }
     }
 
@@ -351,7 +341,7 @@ public class MenuController implements Observer {
      * @param controlDown boolean true iff control is down
      * @param clicked     The annotation that was clicked
      */
-    private void updateInfoAnnotation(boolean controlDown, Annotation clicked) {
+    void updateInfoAnnotation(boolean controlDown, Annotation clicked) {
         if (!controlDown) {
             sequenceInfo.setText(clicked.toString());
         } else {
@@ -365,7 +355,7 @@ public class MenuController implements Observer {
      * @param controlDown boolean true iff control is down
      * @param clicked     The node that was clicked
      */
-    private void updateInfoSeqNode(boolean controlDown, SequenceNode clicked) {
+    void updateInfoSeqNode(boolean controlDown, SequenceNode clicked) {
         String sequence = DrawableCanvas.getInstance().getParser().
                 getSequenceHashMap().get((long) clicked.getId());
         if (!controlDown) {
@@ -516,7 +506,7 @@ public class MenuController implements Observer {
                         String offTitle = parts[0];
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
-                        specificGenomeProperties.initialize();
+                        recentGenomeController.initialize();
                         displayInfo(GraphDrawer.getInstance().getGraph());
                         updateRadius();
                         updateCenterNode();
@@ -668,10 +658,12 @@ public class MenuController implements Observer {
             //We skip parts[0] because that is "Genomes".
             String listOfIds = parts[1];
 
+            HashMap<String, Integer> genomeIds = DrawableCanvas.getInstance().getAllGenomes();
+
             parts = listOfIds.split(", ");
             int[] res = new int[parts.length];
             for (int i = 0; i < parts.length; i++) {
-                int oneSelected = Integer.parseInt(parts[i]);
+                int oneSelected = genomeIds.get(parts[i]);
                 res[i] = oneSelected;
             }
 
@@ -693,7 +685,7 @@ public class MenuController implements Observer {
         final AnnotationTableController annotationTableController
                 = loader.<AnnotationTableController>getController();
 
-        HashMap<Integer, HashSet<Annotation>> allAnnotations =
+        HashMap<Integer, TreeSet<Annotation>> allAnnotations =
                 GraphDrawer.getInstance().getAllAnnotations();
         if (allAnnotations.size() == 0) {
             try {

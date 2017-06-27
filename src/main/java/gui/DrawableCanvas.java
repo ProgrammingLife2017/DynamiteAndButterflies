@@ -4,7 +4,7 @@ import graph.SequenceGraph;
 import gui.sub_controllers.FileController;
 import gui.sub_controllers.PanningController;
 import gui.sub_controllers.ScrollbarController;
-import gui.sub_controllers.SpecificGenomeProperties;
+import gui.sub_controllers.RecentGenomeController;
 import parser.GfaParser;
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ public final class DrawableCanvas extends Observable implements Observer {
 
     private GfaParser parser;
 
-    private SpecificGenomeProperties specificGenomeProperties;
+    private RecentGenomeController recentGenomeController;
 
 
     private DrawableCanvas() {
@@ -81,8 +81,8 @@ public final class DrawableCanvas extends Observable implements Observer {
         return this.parser;
     }
 
-    public SpecificGenomeProperties getSpecificGenomeProperties() {
-        return this.specificGenomeProperties;
+    public RecentGenomeController getRecentGenomeController() {
+        return this.recentGenomeController;
     }
 
     public HashMap<String, Integer> getAllGenomes() {
@@ -101,7 +101,7 @@ public final class DrawableCanvas extends Observable implements Observer {
         return annotationGenome;
     }
 
-    public void setSpecificGenomeProperties(SpecificGenomeProperties sgp) {
-        this.specificGenomeProperties = sgp;
+    public void setRecentGenomeController(RecentGenomeController sgp) {
+        this.recentGenomeController = sgp;
     }
 }
