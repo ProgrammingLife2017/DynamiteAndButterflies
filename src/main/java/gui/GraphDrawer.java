@@ -810,6 +810,7 @@ public class GraphDrawer {
                     }
                 }
             }
+            redraw();
 
             for (Object o : annotationCoordinates.entrySet()) {
                 Map.Entry pair = (Map.Entry) o;
@@ -818,7 +819,7 @@ public class GraphDrawer {
                     if (xEvent > annoCors[X_INDEX] && xEvent < annoCors[WIDTH_INDEX]
                             && yEvent > annoCors[Y_INDEX] && yEvent < annoCors[HEIGHT_INDEX]) {
                         redraw();
-                        gc.setLineWidth(HEIGHT_INDEX);
+                        gc.setLineWidth(LINE_WIDTH);
                         gc.setStroke(Color.BLACK);
                         gc.strokeRect(annoCors[X_INDEX], annoCors[Y_INDEX],
                                 annoCors[WIDTH_INDEX] - annoCors[X_INDEX],
@@ -835,7 +836,6 @@ public class GraphDrawer {
                     }
                 }
             }
-            redraw();
         } catch (NullPointerException e) {
             System.err.println("Graph not yet initialized");
         }
