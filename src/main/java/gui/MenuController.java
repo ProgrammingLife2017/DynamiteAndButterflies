@@ -100,7 +100,7 @@ public class MenuController implements Observer {
     private BookmarkController bookmarkController;
     private FileController fileController;
     private RecentController recentController;
-    private SpecificGenomeProperties specificGenomeProperties;
+    private RecentGenomeController recentGenomeController;
     private String filePath;
 
     public MenuController() {
@@ -120,11 +120,11 @@ public class MenuController implements Observer {
         bookmarkController = new BookmarkController(bookmark1, bookmark2, bookmark3);
         recentController = new RecentController(file1, file2, file3);
 
-        specificGenomeProperties = new SpecificGenomeProperties(genome1, genome2, genome3);
+        recentGenomeController = new RecentGenomeController(genome1, genome2, genome3);
 
         ps = new PrintStream(new Console(consoleArea));
         DrawableCanvas.getInstance().setMenuController(this);
-        DrawableCanvas.getInstance().setSpecificGenomeProperties(specificGenomeProperties);
+        DrawableCanvas.getInstance().setRecentGenomeController(recentGenomeController);
         ScrollbarController.getInstance().setScrollBar(scrollBar);
         ZoomController.getInstance().setMenuController(this);
         Minimap.getInstance().setMenuController(this);
@@ -505,7 +505,7 @@ public class MenuController implements Observer {
                         String offTitle = parts[0];
                         stage.setTitle(offTitle + split + filePath);
                         bookmarkController.initialize(filePath);
-                        specificGenomeProperties.initialize();
+                        recentGenomeController.initialize();
                         displayInfo(GraphDrawer.getInstance().getGraph());
                         updateRadius();
                         updateCenterNode();
@@ -657,10 +657,12 @@ public class MenuController implements Observer {
             //We skip parts[0] because that is "Genomes".
             String listOfIds = parts[1];
 
+            HashMap<String, Integer> genomeIds = DrawableCanvas.getInstance().getAllGenomes();
+
             parts = listOfIds.split(", ");
             int[] res = new int[parts.length];
             for (int i = 0; i < parts.length; i++) {
-                int oneSelected = Integer.parseInt(parts[i]);
+                int oneSelected = genomeIds.get(parts[i]);
                 res[i] = oneSelected;
             }
 
