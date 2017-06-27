@@ -331,7 +331,7 @@ public class GraphDrawer {
 
         int startBucketId;
         int endBucketId;
-        if (node != null) {
+        if (node != null && node.getOffsets() != null) {
             startBucketId = (node.getOffsets()[annotatedGenome] / BUCKET_SIZE);
             endBucketId = ((node.getOffsets()[annotatedGenome]
                     + node.getSequenceLength()) / BUCKET_SIZE);
@@ -361,8 +361,10 @@ public class GraphDrawer {
             return indexOfGenome;
         }
         int annotatedGenomeIndex = 0;
-        if (node.getGenomes().length == node.getOffsets().length) {
-            annotatedGenomeIndex = indexOfGenome;
+        if(node.getOffsets() != null) {
+            if (node.getGenomes().length == node.getOffsets().length) {
+                annotatedGenomeIndex = indexOfGenome;
+            }
         }
         return annotatedGenomeIndex;
     }
@@ -785,6 +787,7 @@ public class GraphDrawer {
             redraw();
             } catch (NullPointerException e) {
                 System.err.println("Graph not yet initialized");
+                e.printStackTrace();
             }
         }
 
@@ -795,7 +798,7 @@ public class GraphDrawer {
          */
 
     private SequenceNode findSNPNeighbour(SequenceNode node) {
-        ArrayList<SequenceNode> column = columns.get(node.getColumn());
+        ArrayList<SequenceNode> column = graph.getColumns().get(node.getColumn());
         int nodeID = node.getId();
         int columnNodeID = column.get(0).getId();
         if (nodeID == columnNodeID) {
