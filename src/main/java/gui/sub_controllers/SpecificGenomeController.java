@@ -204,5 +204,15 @@ public class SpecificGenomeController {
         table.setItems(sortedData);
         allSelected = !allSelected;
     }
+
+    /**
+     * Makes sure all the genomes are unselected.
+     */
+    public void resetPressed() {
+        for (Genome genome : sortedData) {
+            genome.setSelected(false);
+        }
+        table.setItems(sortedData);
+    }
 }
 
