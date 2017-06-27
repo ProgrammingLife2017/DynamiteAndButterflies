@@ -84,12 +84,13 @@ public class SpecificGenomeProperties {
     void saving(int[] selectedGenomes) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Genomes - ");
-
-        for (int addSelectedGen : selectedGenomes) {
-            stringBuilder.append(addSelectedGen).append(", ");
+        if (selectedGenomes.length != 0) {
+            for (int addSelectedGen : selectedGenomes) {
+                stringBuilder.append(addSelectedGen).append(", ");
+            }
+            String res = stringBuilder.toString();
+            res = res.replaceAll(", $", "");
+            update(res);
         }
-        String res = stringBuilder.toString();
-        res = res.replaceAll(", $", "");
-        update(res);
     }
 }
