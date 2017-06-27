@@ -563,7 +563,7 @@ public class GraphDrawer {
             double downY = midY + upperCoordinates[HEIGHT_INDEX];
 
             if (upperNode.isHighlighted()) {
-                gc.setLineWidth(LINE_WIDTH + (7/8 * LINE_WIDTH));
+                gc.setLineWidth(Math.log(stepSize + 1) / Math.log(LOG_BASE) * 5);
                 gc.setStroke(colourController.getEdgeBaseColour());
                 gc.strokePolygon(new double[]{leftX, midX, rightX},
                         new double[]{midY, upY, midY}, POLYGON_POINTS);
@@ -581,10 +581,8 @@ public class GraphDrawer {
             gc.fillPolygon(new double[]{leftX, midX, rightX},
                     new double[]{midY, downY, midY}, POLYGON_POINTS);
 
-            //TODO make this better -> Needs to be wider when more zoomed in and less when zoomed out
-            double realLineWidth = (double) (LINE_WIDTH * 8) / (Math.log(zoomLevel) * 2);
-
-            ArrayList<Color> colourMeBby = colourController.getEdgeColours(lowerNode.getGenomes());
+            double realLineWidth = (Math.log(stepSize + 1) / Math.log(LOG_BASE)) * 2.5;
+            ArrayList<Color> colourMeBby = colourController.getSNPEdgeColours(lowerNode.getGenomes());
             double tempHeight = realLineWidth / colourMeBby.size();
             double tempStartY = midY;
             double tempEndY = downY;
@@ -604,7 +602,7 @@ public class GraphDrawer {
                 tempEndY += tempHeight;
             }
 
-            colourMeBby = colourController.getEdgeColours(upperNode.getGenomes());
+            colourMeBby = colourController.getSNPEdgeColours(upperNode.getGenomes());
             tempHeight = realLineWidth / colourMeBby.size();
             tempStartY = midY;
             tempEndY = upY;

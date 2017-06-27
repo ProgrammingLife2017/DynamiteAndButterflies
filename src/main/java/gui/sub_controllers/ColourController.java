@@ -130,18 +130,16 @@ public class ColourController {
         // In rainbowView we assign a colour to each genome
         if (rainbowView) {
             res = rainbowViewColours(genomes);
+            if (res.isEmpty()) {
+                res.add(NODE_BASE_COLOUR);
+            }
+            return res;
         } else {
             // Else we choose a colour Red.
             int length = getSizeContained(genomes);
             res.add(notRainbowViewNode(length));
             return res;
         }
-
-        if (res.isEmpty()) {
-            res.add(NODE_BASE_COLOUR);
-        }
-
-        return res;
     }
 
     /**
@@ -196,6 +194,27 @@ public class ColourController {
             res.add(EDGE_BASE_COLOUR);
         }
 
+        return res;
+    }
+
+    /**
+     * This method gets an array of the different colours the SNPEdge should be.
+     *
+     * @param genomes The genomes through the SNPEdge.
+     * @return The list of colours the SNPEdge should be.
+     */
+    public ArrayList<Color> getSNPEdgeColours(int[] genomes) {
+        ArrayList<Color> res = new ArrayList<Color>();
+        //If there is no selection, it should not be drawn
+        if (selectedGenomes.length == 0) {
+            return res;
+        }
+
+        res = getNodeColours(genomes);
+        if (res.contains(NODE_BASE_COLOUR)) {
+            res = new ArrayList<>();
+            res.add(EDGE_BASE_COLOUR);
+        }
         return res;
     }
 

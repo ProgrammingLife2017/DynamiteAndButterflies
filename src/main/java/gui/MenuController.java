@@ -704,7 +704,6 @@ public class MenuController implements Observer {
                 new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent event) {
-                        //TODO HANDLE THIS SELECTION
                         GraphDrawer.getInstance().
                                 setAllAnnotations(annotationTableController.getAnnotations());
                         GraphDrawer.getInstance().redraw();
