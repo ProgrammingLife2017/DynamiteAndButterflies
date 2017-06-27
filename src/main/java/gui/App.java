@@ -59,6 +59,7 @@ public class App extends Application {
 
             // Set the pane onto the scene
             Scene scene = new Scene(pane);
+            scene.getStylesheets().add(App.class.getResource("/CSS/screenshotCSS").toExternalForm());
             stage.setTitle("Multiple Genome Visualiser - DynamiteAndButterflies  - TU Delft");
             stage.setScene(scene);
             stage.setResizable(true);

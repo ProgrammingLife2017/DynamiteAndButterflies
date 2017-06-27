@@ -1,0 +1,13 @@
+#screenshotButton {
+    -fx-background-image: url('/Images/screenshoticon.png');
+    -fx-background-size: 25px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#screenshotButton:hover{
+    -fx-background-image: url('/Images/screenshoticonhover.png');
+        -fx-background-size: 25px;
+        -fx-background-repeat: no-repeat;
+        -fx-background-position: center;
+}

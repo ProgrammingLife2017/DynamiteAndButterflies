@@ -137,6 +137,8 @@
                   </CheckBox>
                   <Separator layoutX="-23.0" layoutY="148.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
                   <Separator layoutX="9.0" layoutY="257.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+                  <Separator layoutX="11.0" layoutY="350.0" prefWidth="200.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="11.0" />
+                  <Button fx:id="screenshotButton" disable="true" layoutX="58.0" layoutY="368.0" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#saveAsPNG" prefHeight="28.0" prefWidth="35.0" />
                </children>
             </AnchorPane>
          </left>
