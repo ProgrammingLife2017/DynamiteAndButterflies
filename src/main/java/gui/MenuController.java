@@ -22,6 +22,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.mapdb.BTreeMap;
 import org.mapdb.HTreeMap;
 import structures.Annotation;
 
@@ -482,7 +483,7 @@ public class MenuController implements Observer {
      *
      * @return The sequenceMap.
      */
-    HTreeMap<Long, String> getSequenceHashMap() {
+    BTreeMap<Long, String> getSequenceHashMap() {
         try {
             return DrawableCanvas.getInstance().getParser().getSequenceHashMap();
         } catch (NullPointerException e) {
@@ -712,7 +713,6 @@ public class MenuController implements Observer {
                 new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent event) {
-                        //TODO HANDLE THIS SELECTION
                         GraphDrawer.getInstance().
                                 setAllAnnotations(annotationTableController.getAnnotations());
                         GraphDrawer.getInstance().redraw();

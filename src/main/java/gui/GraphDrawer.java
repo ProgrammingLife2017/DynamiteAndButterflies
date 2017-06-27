@@ -8,7 +8,11 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import structures.Annotation;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * Created by Jasper van Tilburg on 8-5-2017.
@@ -319,7 +323,7 @@ public class GraphDrawer {
     /**
      * Gets all relevant buckets of the node.
      *
-     * @param node the node in which we're searching for annotations.
+     * @param node            the node in which we're searching for annotations.
      * @param annotatedGenome the genome that is annotated
      * @return The hashSet of all annotations in the node.
      */
@@ -331,7 +335,7 @@ public class GraphDrawer {
 
         int startBucketId;
         int endBucketId;
-        if (node != null) {
+        if (node != null && node.getOffsets() != null) {
             startBucketId = (node.getOffsets()[annotatedGenome] / BUCKET_SIZE);
             endBucketId = ((node.getOffsets()[annotatedGenome]
                     + node.getSequenceLength()) / BUCKET_SIZE);
@@ -351,6 +355,7 @@ public class GraphDrawer {
 
     /**
      * Gets the position of the offSets relative to annotation.
+     *
      * @param node The node which we are finding he position on.
      * @return the position in offSets.
      */
@@ -361,18 +366,21 @@ public class GraphDrawer {
             return indexOfGenome;
         }
         int annotatedGenomeIndex = 0;
-        if (node.getGenomes().length == node.getOffsets().length) {
-            annotatedGenomeIndex = indexOfGenome;
+        if(node.getOffsets() != null) {
+            if (node.getGenomes().length == node.getOffsets().length) {
+                annotatedGenomeIndex = indexOfGenome;
+            }
         }
         return annotatedGenomeIndex;
     }
 
     /**
      * Checks if this annotation hits a node.
+     *
      * @param startXAnnotation The xStart of the annotation
-     * @param endXAnnotation The xEnd of the annotation
-     * @param startXNode The xStart of the of the node
-     * @param endXNode The xEnd of the node
+     * @param endXAnnotation   The xEnd of the annotation
+     * @param startXNode       The xStart of the of the node
+     * @param endXNode         The xEnd of the node
      * @return a boolean true if it hits. Else false.
      */
     private boolean isMyAnnnotation(int startXAnnotation, int endXAnnotation,
@@ -470,8 +478,8 @@ public class GraphDrawer {
             return;
         }
         if ((upperNode.getSequenceLength() != 1 || lowerNode.getSequenceLength() != 1)
-            || (upperNode.getParents().size() != 1 || lowerNode.getParents().size() != 1)
-            || (upperNode.getChildren().size() != 1 || lowerNode.getChildren().size() != 1)) {
+                || (upperNode.getParents().size() != 1 || lowerNode.getParents().size() != 1)
+                || (upperNode.getChildren().size() != 1 || lowerNode.getChildren().size() != 1)) {
             return;
         }
         int upperParent = upperNode.getParents().get(0);
@@ -501,12 +509,12 @@ public class GraphDrawer {
             double[] coordinates = this.coordinates.get(node.getId());
             if ((coordinates[X_INDEX] <= 0)
                     && (coordinates[X_INDEX] + coordinates[WIDTH_INDEX]
-                        / RELATIVE_X_DISTANCE > 0)) {
+                    / RELATIVE_X_DISTANCE > 0)) {
                 mostLeftNode = node;
             }
             if ((coordinates[X_INDEX] < canvas.getWidth())
                     && (coordinates[X_INDEX] + coordinates[WIDTH_INDEX]
-                        / RELATIVE_X_DISTANCE >= canvas.getWidth())) {
+                    / RELATIVE_X_DISTANCE >= canvas.getWidth())) {
                 mostRightNode = node;
             }
         }
@@ -557,18 +565,64 @@ public class GraphDrawer {
             double downY = midY + upperCoordinates[HEIGHT_INDEX];
 
             if (upperNode.isHighlighted()) {
-                gc.setLineWidth(LINE_WIDTH);
+                gc.setLineWidth(Math.log(stepSize + 1) / Math.log(LOG_BASE) * 5);
+                gc.setStroke(colourController.getEdgeBaseColour());
                 gc.strokePolygon(new double[]{leftX, midX, rightX},
-                                new double[]{midY, upY, midY}, POLYGON_POINTS);
+                        new double[]{midY, upY, midY}, POLYGON_POINTS);
                 gc.strokePolygon(new double[]{leftX, midX, rightX},
-                                new double[]{midY, downY, midY}, POLYGON_POINTS);
+                        new double[]{midY, downY, midY}, POLYGON_POINTS);
             }
-            gc.setFill(Color.CHOCOLATE);
+            gc.setFill(colourController.getSNPColour(
+                    DrawableCanvas.getInstance().getParser().getSequenceHashMap()
+                            .get((long) upperNode.getId())));
             gc.fillPolygon(new double[]{leftX, midX, rightX},
                     new double[]{midY, upY, midY}, POLYGON_POINTS);
-            gc.setFill(Color.BROWN);
+            gc.setFill(colourController.getSNPColour(
+                    DrawableCanvas.getInstance().getParser().getSequenceHashMap()
+                            .get((long) lowerNode.getId())));
             gc.fillPolygon(new double[]{leftX, midX, rightX},
                     new double[]{midY, downY, midY}, POLYGON_POINTS);
+
+            double realLineWidth = (Math.log(stepSize + 1) / Math.log(LOG_BASE)) * 2.5;
+            ArrayList<Color> colourMeBby = colourController.getSNPEdgeColours(lowerNode.getGenomes());
+            double tempHeight = realLineWidth / colourMeBby.size();
+            double tempStartY = midY;
+            double tempEndY = downY;
+            gc.setLineWidth(tempHeight);
+            for (Color beamColour : colourMeBby) {
+                gc.setStroke(beamColour);
+                gc.strokeLine(leftX, tempStartY, midX, tempEndY);
+                tempStartY += tempHeight;
+                tempEndY += tempHeight;
+            }
+            tempStartY = downY;
+            tempEndY = midY;
+            for (Color beamColour : colourMeBby) {
+                gc.setStroke(beamColour);
+                gc.strokeLine(midX, tempStartY, rightX, tempEndY);
+                tempStartY += tempHeight;
+                tempEndY += tempHeight;
+            }
+
+            colourMeBby = colourController.getSNPEdgeColours(upperNode.getGenomes());
+            tempHeight = realLineWidth / colourMeBby.size();
+            tempStartY = midY;
+            tempEndY = upY;
+            gc.setLineWidth(tempHeight);
+            for (Color beamColour : colourMeBby) {
+                gc.setStroke(beamColour);
+                gc.strokeLine(leftX, tempStartY, midX, tempEndY);
+                tempStartY += tempHeight;
+                tempEndY += tempHeight;
+            }
+            tempStartY = upY;
+            tempEndY = midY;
+            for (Color beamColour : colourMeBby) {
+                gc.setStroke(beamColour);
+                gc.strokeLine(midX, tempStartY, rightX, tempEndY);
+                tempStartY += tempHeight;
+                tempEndY += tempHeight;
+            }
         }
     }
 
@@ -584,9 +638,9 @@ public class GraphDrawer {
             gc.setLineWidth(LINE_WIDTH);
             gc.setStroke(Color.BLACK);
             gc.strokeRect(coordinates[X_INDEX],
-                            coordinates[Y_INDEX],
-                            coordinates[WIDTH_INDEX],
-                            coordinates[HEIGHT_INDEX]);
+                    coordinates[Y_INDEX],
+                    coordinates[WIDTH_INDEX],
+                    coordinates[HEIGHT_INDEX]);
         }
         colourMeBby = colourController.getNodeColours(node.getGenomes());
         double tempCoordinate = coordinates[Y_INDEX];
@@ -631,8 +685,8 @@ public class GraphDrawer {
                             colourController.getEdgeColours(
                                     allGenomesInEdge.stream().mapToInt(q -> q).toArray());
                     double columnWidth = (columnWidths[node.getColumn() + 1]
-                                            - columnWidths[node.getColumn()])
-                                            * stepSize * RELATIVE_X_DISTANCE;
+                            - columnWidths[node.getColumn()])
+                            * stepSize * RELATIVE_X_DISTANCE;
                     double endXHalf = (columnWidth - coordinatesParent[WIDTH_INDEX]);
 
                     colourThisEdge(startX, startY, endX, endY, endXHalf, colourMeBby);
@@ -644,10 +698,11 @@ public class GraphDrawer {
     /**
      * Method that colours the edge based on it's start point and endpoints.
      * As well as based on the colours it should be.
-     * @param startX startXPosition of the edge
-     * @param startY startYPosition of the edge
-     * @param endX endXPosition of the edge
-     * @param endY endYPosition of the edge
+     *
+     * @param startX      startXPosition of the edge
+     * @param startY      startYPosition of the edge
+     * @param endX        endXPosition of the edge
+     * @param endY        endYPosition of the edge
      * @param colourMeBby ArrayList of the colours it should be.
      */
     private void colourThisEdge(double startX, double startY,
@@ -757,6 +812,7 @@ public class GraphDrawer {
                     }
                 }
             }
+            redraw();
 
             for (Object o : annotationCoordinates.entrySet()) {
                 Map.Entry pair = (Map.Entry) o;
@@ -765,7 +821,7 @@ public class GraphDrawer {
                     if (xEvent > annoCors[X_INDEX] && xEvent < annoCors[WIDTH_INDEX]
                             && yEvent > annoCors[Y_INDEX] && yEvent < annoCors[HEIGHT_INDEX]) {
                         redraw();
-                        gc.setLineWidth(HEIGHT_INDEX);
+                        gc.setLineWidth(LINE_WIDTH);
                         gc.setStroke(Color.BLACK);
                         gc.strokeRect(annoCors[X_INDEX], annoCors[Y_INDEX],
                                 annoCors[WIDTH_INDEX] - annoCors[X_INDEX],
@@ -782,20 +838,20 @@ public class GraphDrawer {
                     }
                 }
             }
-            redraw();
-            } catch (NullPointerException e) {
-                System.err.println("Graph not yet initialized");
-            }
+        } catch (NullPointerException e) {
+            System.err.println("Graph not yet initialized");
         }
+    }
 
-        /**
-         * Find the neighbouring node in a SNP bubble.
-         * @param node The node to find the neighbour of.
-         * @return The neighbour node.
-         */
+    /**
+     * Find the neighbouring node in a SNP bubble.
+     *
+     * @param node The node to find the neighbour of.
+     * @return The neighbour node.
+     */
 
     private SequenceNode findSNPNeighbour(SequenceNode node) {
-        ArrayList<SequenceNode> column = columns.get(node.getColumn());
+        ArrayList<SequenceNode> column = graph.getColumns().get(node.getColumn());
         int nodeID = node.getId();
         int columnNodeID = column.get(0).getId();
         if (nodeID == columnNodeID) {
@@ -818,9 +874,9 @@ public class GraphDrawer {
             return ((xEvent > coordinates[X_INDEX])
                     && (xEvent < coordinates[X_INDEX] + coordinates[WIDTH_INDEX])
                     && (yEvent > coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX]
-                        / 2 - coordinates[HEIGHT_INDEX])
+                    / 2 - coordinates[HEIGHT_INDEX])
                     && (yEvent < coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX]
-                        / 2 + coordinates[HEIGHT_INDEX]));
+                    / 2 + coordinates[HEIGHT_INDEX]));
         } else {
             return ((xEvent > coordinates[X_INDEX])
                     && (xEvent < coordinates[X_INDEX] + coordinates[WIDTH_INDEX])
@@ -873,7 +929,9 @@ public class GraphDrawer {
      * Set the height of the node depending on the level of zoom.
      */
     private double getYSize(SequenceNode node) {
-        if (node.isSNP()) { return SNP_SIZE * stepSize / 2; }
+        if (node.isSNP()) {
+            return SNP_SIZE * stepSize / 2;
+        }
         double zoomHeight = Math.log(stepSize + 1) / Math.log(LOG_BASE);
         double relativeSize = 100 * (node.getGenomes().length / (double) DrawableCanvas.getInstance().getAllGenomes().size());
         double genomeWidth = Math.log(relativeSize + 1) / Math.log(LOG_BASE);
@@ -887,7 +945,7 @@ public class GraphDrawer {
     private void setLineWidth(double thickness) {
         double zoomWidth = Math.log(stepSize + 1) / Math.log(LOG_BASE) * LINE_WIDTH_FACTOR;
         double relativeSize = 100 * (thickness
-                                / (double) DrawableCanvas.getInstance().getAllGenomes().size());
+                / (double) DrawableCanvas.getInstance().getAllGenomes().size());
         double genomeWidth = Math.log(relativeSize + 1) / Math.log(LOG_BASE);
         gc.setLineWidth(genomeWidth * zoomWidth);
     }

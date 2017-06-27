@@ -1,7 +1,9 @@
 package graph;
 
 import gui.DrawableCanvas;
+import org.mapdb.BTreeMap;
 import org.mapdb.HTreeMap;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -24,7 +26,10 @@ public class SequenceGraph {
     private int dummyNodeIDCounter = -1;
     private int maxColumnSize;
     private Boundary boundaries;
-    private HTreeMap<Long, String> sequenceHashMap;
+    private BTreeMap<Long, String> sequenceHashMap;
+    private BTreeMap<Integer, int[]> offSetsMap;
+    private BTreeMap<Integer, int[]> genomesMap;
+
     private TreeMap<Integer, SequenceNode> nodes;
     private ArrayList<ArrayList<SequenceNode>> columns;
 
@@ -36,10 +41,12 @@ public class SequenceGraph {
      * @param sequenceHashMap - the sequenceHashMap.
      */
     public SequenceGraph(final int[] parentArray, final int[] childArray,
-                         HTreeMap<Long, String> sequenceHashMap) {
+                         BTreeMap<Long, String> sequenceHashMap, BTreeMap<Integer, int[]> offSetsMap, BTreeMap<Integer, int[]> genomesMap) {
         this.sequenceHashMap = sequenceHashMap;
         this.parentArray = parentArray;
         this.childArray = childArray;
+        this.offSetsMap = offSetsMap;
+        this.genomesMap = genomesMap;
     }
 
     /**
@@ -85,21 +92,12 @@ public class SequenceGraph {
      * Initialize the genomes.
      */
     private void initGenomes() {
-        try {
-            String[] genomeData = getGenomes();
-            int counter = 0;
-            for (Object o : nodes.entrySet()) {
-                Map.Entry pair = (Map.Entry) o;
-                SequenceNode node = (SequenceNode) pair.getValue();
-                String[] specificGenomeData = genomeData[counter].split("-");
-                node.setGenomes(splitOnStringToInt(specificGenomeData[0]));
-                node.setOffSets(splitOnStringToInt(specificGenomeData[1]));
-                counter++;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (Object o : nodes.entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
+            SequenceNode node = (SequenceNode) pair.getValue();
+            node.setOffSets(offSetsMap.get(node.getId()));
+            node.setGenomes(genomesMap.get(node.getId()));
         }
-
     }
 
     /**
@@ -137,32 +135,6 @@ public class SequenceGraph {
                 nodes.put(childID, node);
             }
         }
-    }
-
-    private int[] splitOnStringToInt(String text) {
-        String[] genomesText = text.split(";");
-        int[] genomes = new int[genomesText.length];
-        for (int j = 0; j < genomesText.length; j++) {
-            genomes[j] = Integer.parseInt(genomesText[j]);
-        }
-        return genomes;
-    }
-
-    /**
-     * Finds the longest path of the graph and sets columns accordingly.
-     */
-    private String[] getGenomes() throws IOException {
-        try {
-            String filePath = DrawableCanvas.getInstance()
-                    .getParser().getPartPath() + "genomes.txt";
-            Stream<String> lines = Files.lines(Paths.get(filePath));
-            Stream<String> line = lines.skip(boundaries.getLeftBoundID() - 1)
-                    .limit(boundaries.getRightBoundID() + EXTRA_BOUNDS);
-            return line.toArray(String[]::new);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        throw new IOException("Node not in genome list");
     }
 
     /**
@@ -348,7 +320,7 @@ public class SequenceGraph {
      * @return Copy of the graph.
      */
     public SequenceGraph copy() {
-        return new SequenceGraph(parentArray, childArray, sequenceHashMap);
+        return new SequenceGraph(parentArray, childArray, sequenceHashMap, offSetsMap, genomesMap);
     }
 
 
