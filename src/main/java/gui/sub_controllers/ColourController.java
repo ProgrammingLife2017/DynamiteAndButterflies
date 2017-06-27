@@ -213,7 +213,6 @@ public class ColourController {
         res = getNodeColours(genomes);
         if (res.contains(NODE_BASE_COLOUR)) {
             res = new ArrayList<>();
-            res.add(EDGE_BASE_COLOUR);
         }
         return res;
     }
