@@ -171,7 +171,7 @@ public class SpecificGenomeController {
         }
 
         close();
-        DrawableCanvas.getInstance().getSpecificGenomeProperties().saving(selectedGenomes);
+        DrawableCanvas.getInstance().getRecentGenomeController().saving(selectedGenomes);
     }
 
     /**

@@ -55,7 +55,7 @@ public class GraphDrawer {
     private ArrayList<ArrayList<SequenceNode>> columns;
     private HashMap<Integer, double[]> coordinates;
     private HashMap<Integer, ArrayList<double[]>> annotationCoordinates;
-    private HashMap<Integer, HashSet<Annotation>> allAnnotations
+    private HashMap<Integer, TreeSet<Annotation>> allAnnotations
             = new HashMap<>();
 
     /**
@@ -323,8 +323,8 @@ public class GraphDrawer {
      * @param annotatedGenome the genome that is annotated
      * @return The hashSet of all annotations in the node.
      */
-    private HashSet<Annotation> getAnnotationBuckets(SequenceNode node, int annotatedGenome) {
-        HashSet<Annotation> annotationHashSet = new HashSet<>();
+    private TreeSet<Annotation> getAnnotationBuckets(SequenceNode node, int annotatedGenome) {
+        TreeSet<Annotation> annotationHashSet = new TreeSet<>();
         if (annotatedGenome == -1) {
             return annotationHashSet;
         }
@@ -341,7 +341,7 @@ public class GraphDrawer {
         }
 
         for (int i = startBucketId; i <= endBucketId; i++) {
-            HashSet<Annotation> tempAnnotations = allAnnotations.get(i);
+            TreeSet<Annotation> tempAnnotations = allAnnotations.get(i);
             if (tempAnnotations != null) {
                 annotationHashSet.addAll(tempAnnotations);
             }
@@ -388,11 +388,8 @@ public class GraphDrawer {
      */
     private void drawAnnotations(SequenceNode node, double[] coordinates) {
         int annotatedGenome = getAnnotatedGenomeIndex(node);
-        HashSet<Annotation> annotations = getAnnotationBuckets(node, annotatedGenome);
-
-
-        double annoHeight = coordinates[HEIGHT_INDEX] / 2;
-        double startYAnno = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] - annoHeight;
+        TreeSet<Annotation> annotations = getAnnotationBuckets(node, annotatedGenome);
+        HashMap<Integer, Integer> drawnLayers = new HashMap<>();
 
         for (Annotation annotation : annotations) {
             if (annotation.getSelected().getValue()) {
@@ -420,8 +417,24 @@ public class GraphDrawer {
                             * (1 - (emptyAtEnd / (node.getSequenceLength() - emptyAtStart))));
                 }
 
+                double annoHeight = coordinates[HEIGHT_INDEX] / 2;
+                double startYAnno = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] - annoHeight;
+
+                for (int i = 1; i <= drawnLayers.size() + 1; i++) {
+                    Integer filled = drawnLayers.get(i);
+                    if (filled == null) {
+                        drawnLayers.put(i, endOfAnno);
+                        startYAnno = startYAnno + (annoHeight * i);
+                        break;
+                    } else if (filled < endOfAnno) {
+                        startYAnno = startYAnno + (annoHeight * i);
+                        drawnLayers.put(i, endOfAnno);
+                        break;
+                    }
+                }
+
+
                 gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
-                startYAnno += annoHeight;
 
                 double[] annoCoordinates = new double[COORDINATES];
                 annoCoordinates[X_INDEX] = startXAnno;
@@ -718,7 +731,7 @@ public class GraphDrawer {
      * @param mouseEvent The click event.
      * @return an Object that was clicked.
      */
-    Object clickOnCanvas(double xEvent, double yEvent, MouseEvent mouseEvent) {
+    void clickOnCanvas(double xEvent, double yEvent, MouseEvent mouseEvent) {
         try {
             for (Object o : graph.getNodes().entrySet()) {
                 Map.Entry pair = (Map.Entry) o;
@@ -727,9 +740,11 @@ public class GraphDrawer {
                     highlight(node.getId());
                     if (node.isSNP()) {
                         SequenceNode neighbour = findSNPNeighbour(node);
-                        menuController.updateSequenceInfo(node);
                         if (node.isCollapsed()) {
+                            menuController.updateSequenceInfo(node);
                             menuController.updateSequenceInfoAlt(neighbour);
+                        } else {
+                            menuController.updateInfoSeqNode(mouseEvent.isControlDown(), node);
                         }
                         if (mouseEvent.getClickCount() == 2) {
                             if (!node.isCollapsed()) {
@@ -738,7 +753,7 @@ public class GraphDrawer {
                             node.setCollapsed(!node.isCollapsed());
                         }
                     } else {
-                        return node;
+                        menuController.updateInfoSeqNode(mouseEvent.isControlDown(), node);
                     }
                 }
             }
@@ -758,10 +773,10 @@ public class GraphDrawer {
                         //TODO make sure this stays there when zooming.
 
                         int annoId = (int) pair.getKey();
-                        HashSet<Annotation> setOfAllAnnotations = getAnnotationBuckets(null, 1);
+                        TreeSet<Annotation> setOfAllAnnotations = getAnnotationBuckets(null, 1);
                         for (Annotation annotation : setOfAllAnnotations) {
                             if (annotation.getId() == annoId) {
-                                return annotation;
+                                menuController.updateInfoAnnotation(mouseEvent.isControlDown(), annotation);
                             }
                         }
                     }
@@ -771,7 +786,6 @@ public class GraphDrawer {
             } catch (NullPointerException e) {
                 System.err.println("Graph not yet initialized");
             }
-            return null;
         }
 
         /**
@@ -1004,11 +1018,11 @@ public class GraphDrawer {
         return selected;
     }
 
-    public HashMap<Integer, HashSet<Annotation>> getAllAnnotations() {
+    public HashMap<Integer, TreeSet<Annotation>> getAllAnnotations() {
         return allAnnotations;
     }
 
-    public void setAllAnnotations(HashMap<Integer, HashSet<Annotation>> newAnnotations) {
+    public void setAllAnnotations(HashMap<Integer, TreeSet<Annotation>> newAnnotations) {
         this.allAnnotations = newAnnotations;
     }
 
