@@ -234,4 +234,8 @@ public class ColourController {
     public void setRainbowView(boolean rainbowView) {
         this.rainbowView = rainbowView;
     }
+
+    public Color getEdgeBaseColour() {
+        return EDGE_BASE_COLOUR;
+    }
 }
