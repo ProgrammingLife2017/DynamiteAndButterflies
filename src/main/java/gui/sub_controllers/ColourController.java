@@ -130,18 +130,16 @@ public class ColourController {
         // In rainbowView we assign a colour to each genome
         if (rainbowView) {
             res = rainbowViewColours(genomes);
+            if (res.isEmpty()) {
+                res.add(NODE_BASE_COLOUR);
+            }
+            return res;
         } else {
             // Else we choose a colour Red.
             int length = getSizeContained(genomes);
             res.add(notRainbowViewNode(length));
             return res;
         }
-
-        if (res.isEmpty()) {
-            res.add(NODE_BASE_COLOUR);
-        }
-
-        return res;
     }
 
     /**
@@ -199,6 +197,26 @@ public class ColourController {
         return res;
     }
 
+    /**
+     * This method gets an array of the different colours the SNPEdge should be.
+     *
+     * @param genomes The genomes through the SNPEdge.
+     * @return The list of colours the SNPEdge should be.
+     */
+    public ArrayList<Color> getSNPEdgeColours(int[] genomes) {
+        ArrayList<Color> res = new ArrayList<Color>();
+        //If there is no selection, it should not be drawn
+        if (selectedGenomes.length == 0) {
+            return res;
+        }
+
+        res = getNodeColours(genomes);
+        if (res.contains(NODE_BASE_COLOUR)) {
+            res = new ArrayList<>();
+        }
+        return res;
+    }
+
     private int getSizeContained(int[] genomes) {
         int res = 0;
         for (int genome : genomes) {
@@ -233,5 +251,27 @@ public class ColourController {
 
     public void setRainbowView(boolean rainbowView) {
         this.rainbowView = rainbowView;
+    }
+
+    public Color getSNPColour(String base) {
+        if (base != null) {
+            switch (base) {
+                case "C":
+                    return Color.color(0, 0, 0.6196);
+                case "A":
+                    return Color.color(0, 0.6196, 0);
+                case "G":
+                    return Color.color(0.6196, 0.6196, 0);
+                case "T":
+                    return Color.color(0.6196, 0, 0);
+                default:
+                    return Color.CHOCOLATE;
+            }
+        }
+        return Color.CHOCOLATE;
+    }
+
+    public Color getEdgeBaseColour() {
+        return EDGE_BASE_COLOUR;
     }
 }

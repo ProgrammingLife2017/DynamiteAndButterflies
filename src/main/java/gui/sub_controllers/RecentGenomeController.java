@@ -105,14 +105,15 @@ public class RecentGenomeController {
         HashMap<Integer, String> genomeNames = DrawableCanvas.getInstance().getAllGenomesReversed();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Genomes - ");
-
-        for (int selectedGen : selectedGenomes) {
-            String nameOfGenome = genomeNames.get(selectedGen);
-            stringBuilder.append(nameOfGenome).append(", ");
+        if (selectedGenomes.length != 0) {
+            for (int selectedGen : selectedGenomes) {
+                String nameOfGenome = genomeNames.get(selectedGen);
+                stringBuilder.append(nameOfGenome).append(", ");
+            }
+            String res = stringBuilder.toString();
+            res = res.replaceAll(", $", "");
+            update(res);
         }
-        String res = stringBuilder.toString();
-        res = res.replaceAll(", $", "");
-        update(res);
     }
 
     /**
