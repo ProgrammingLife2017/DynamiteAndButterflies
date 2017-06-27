@@ -8,6 +8,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -126,6 +127,17 @@ public class SpecificGenomeController {
                     }
                 });
         highlightCol.setCellFactory(CheckBoxTableCell.forTableColumn(highlightCol));
+
+        table.setRowFactory(tv -> {
+            TableRow<Genome> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    Genome rowData = row.getItem();
+                    rowData.setSelected(true);
+                }
+            });
+            return row;
+        });
     }
 
     /**
