@@ -137,7 +137,7 @@ public class FileController extends Observable implements Observer {
      * @return A bucketList of all the annotations.
      * @throws IOException If the filepath does not exist.
      */
-    public HashMap<Integer, HashSet<Annotation>>
+    public HashMap<Integer, TreeSet<Annotation>>
     openGffFileClicked(String filePath) throws IOException {
         GffParser parser = new GffParser(filePath);
         return parser.parseGff();

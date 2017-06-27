@@ -24,10 +24,7 @@ import structures.Annotation;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -183,7 +180,7 @@ public class MenuController implements Observer {
         Stage stage = App.getStage();
         File file = fileController.chooseGffFile(stage);
         String filePath = file.getAbsolutePath();
-        HashMap<Integer, HashSet<Annotation>> annotations =
+        HashMap<Integer, TreeSet<Annotation>> annotations =
                 fileController.openGffFileClicked(filePath);
         Annotation.selectAll(annotations);
         GraphDrawer.getInstance().setAllAnnotations(annotations);
@@ -685,7 +682,7 @@ public class MenuController implements Observer {
         final AnnotationTableController annotationTableController
                 = loader.<AnnotationTableController>getController();
 
-        HashMap<Integer, HashSet<Annotation>> allAnnotations =
+        HashMap<Integer, TreeSet<Annotation>> allAnnotations =
                 GraphDrawer.getInstance().getAllAnnotations();
         if (allAnnotations.size() == 0) {
             try {

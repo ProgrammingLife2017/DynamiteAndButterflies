@@ -3,9 +3,10 @@ package structures;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.TreeSet;
 
 /**
  * Created by lex_b on 13/06/2017.
@@ -13,7 +14,7 @@ import java.util.HashSet;
  * Saves the annotations in an annotation object.
  * Uses this setUp to ensure that it can be loaded into a tableView.
  */
-public class Annotation {
+public class Annotation implements Comparable<Annotation> {
     private SimpleIntegerProperty start = new SimpleIntegerProperty();
     private SimpleIntegerProperty end = new SimpleIntegerProperty();
     private SimpleStringProperty info = new SimpleStringProperty();
@@ -62,14 +63,15 @@ public class Annotation {
      * Selects all the annotations.
      * @param allAnnotations Selects all these annotations
      */
-    public static void selectAll(HashMap<Integer, HashSet<Annotation>> allAnnotations) {
-        HashSet<Annotation> selectThese = new HashSet<>();
+    public static void selectAll(HashMap<Integer, TreeSet<Annotation>> allAnnotations) {
+        TreeSet<Annotation> selectThese = new TreeSet<>();
         for (int i = 0; i <= allAnnotations.size(); i++) {
-            HashSet<Annotation> tempAnnotations = allAnnotations.get(i);
+            TreeSet<Annotation> tempAnnotations = allAnnotations.get(i);
             if (tempAnnotations != null) {
                 selectThese.addAll(tempAnnotations);
             }
         }
+        //TODO make this a lambda
         for (Annotation annotation : selectThese) {
             annotation.setSelected(true);
         }
@@ -81,5 +83,22 @@ public class Annotation {
         res = res.replace("\t", "\n");
         res = res.replace("=", ":\t");
         return res;
+    }
+
+    @Override
+    public int compareTo(@NotNull Annotation o) {
+        if (this.getStart() < o.getStart()) {
+            return -1;
+        } else if (this.getStart() > o.getStart()) {
+            return 1;
+        } else {
+            if (this.getEnd() > o.getEnd()) {
+                return 1;
+            } else if (this.getEnd() < o.getEnd()) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
     }
 }
