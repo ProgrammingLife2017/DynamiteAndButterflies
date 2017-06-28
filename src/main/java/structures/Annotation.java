@@ -93,9 +93,9 @@ public class Annotation implements Comparable<Annotation> {
             return 1;
         } else {
             if (this.getEnd() > o.getEnd()) {
-                return 1;
-            } else if (this.getEnd() < o.getEnd()) {
                 return -1;
+            } else if (this.getEnd() < o.getEnd()) {
+                return 1;
             } else {
                 return 0;
             }

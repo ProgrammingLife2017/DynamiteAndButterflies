@@ -262,15 +262,16 @@ public class GraphDrawer {
             width *= RELATIVE_X_DISTANCE;
         }
         double height = getYSize(node);
-        double x = (columnWidths[node.getColumn()] - xDifference) * stepSize;
-        double y = Y_BASE + (node.getIndex() * RELATIVE_Y_DISTANCE) - yDifference - (height / 2);
-        if (height > width) {
-            y += (height - width) / 2;
-            height = width;
+        if (node != null && columnWidths.length > node.getColumn()) {
+            double x = (columnWidths[node.getColumn()] - xDifference) * stepSize;
+            double y = Y_BASE + (node.getIndex() * RELATIVE_Y_DISTANCE) - yDifference - (height / 2);
+            if (height > width) {
+                y += (height - width) / 2;
+                height = width;
+            }
+            coordinates[X_INDEX] = x;
+            coordinates[Y_INDEX] = y;
         }
-
-        coordinates[X_INDEX] = x;
-        coordinates[Y_INDEX] = y;
         coordinates[WIDTH_INDEX] = width;
         coordinates[HEIGHT_INDEX] = height;
 
@@ -293,7 +294,7 @@ public class GraphDrawer {
         }
         if (!node.getChildren().isEmpty()) {
             SequenceNode child = graph.getNode(node.getChild(0));
-            if (child.isSNP() && child.isCollapsed()) {
+            if (child != null && child.isSNP() && child.isCollapsed()) {
                 return false;
             }
         }
@@ -315,7 +316,9 @@ public class GraphDrawer {
                 drawEdges(node);
             } else if (node.getIndex() == 0) {
                 SequenceNode neighbour = findSNPNeighbour(node);
-                drawSNPBubble(node, neighbour);
+                if (neighbour != null) {
+                    drawSNPBubble(node, neighbour);
+                }
             }
         }
     }
@@ -365,13 +368,13 @@ public class GraphDrawer {
         if (indexOfGenome == -1) {
             return indexOfGenome;
         }
-        int annotatedGenomeIndex = 0;
-        if(node.getOffsets() != null) {
+        int res = 0;
+        if (node.getOffsets() != null) {
             if (node.getGenomes().length == node.getOffsets().length) {
-                annotatedGenomeIndex = indexOfGenome;
+                res = indexOfGenome;
             }
         }
-        return annotatedGenomeIndex;
+        return res;
     }
 
     /**
@@ -434,13 +437,12 @@ public class GraphDrawer {
                         drawnLayers.put(i, endOfAnno);
                         startYAnno = startYAnno + (annoHeight * i);
                         break;
-                    } else if (filled < endOfAnno) {
+                    } else if (filled < startOfAnno) {
                         startYAnno = startYAnno + (annoHeight * i);
                         drawnLayers.put(i, endOfAnno);
                         break;
                     }
                 }
-
 
                 gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
 
@@ -663,33 +665,36 @@ public class GraphDrawer {
         int nodeID = node.getId();
         SequenceNode parent = graph.getNode(nodeID);
         double[] coordinatesParent = this.coordinates.get(node.getId());
-        for (int j = 0; j < parent.getChildren().size(); j++) {
-            SequenceNode child = graph.getNode(parent.getChild(j));
-            if (!node.isCollapsed() && !child.isCollapsed()) {
-                double[] coordinatesChild = computeCoordinates(child);
-                double startX = coordinatesParent[X_INDEX] + coordinatesParent[WIDTH_INDEX];
-                double startY = coordinatesParent[Y_INDEX] + (coordinatesParent[HEIGHT_INDEX] / 2);
-                double endX = coordinatesChild[X_INDEX];
-                double endY = coordinatesChild[Y_INDEX] + (coordinatesChild[HEIGHT_INDEX] / 2);
-                setLineWidth(Math.min(child.getGenomes().length, parent.getGenomes().length));
+        if (parent != null && parent.getChildren() != null) {
+            for (int j = 0; j < parent.getChildren().size(); j++) {
+                SequenceNode child = graph.getNode(parent.getChild(j));
+                if (!node.isCollapsed() && !child.isCollapsed()) {
+                    double[] coordinatesChild = computeCoordinates(child);
+                    double startX = coordinatesParent[X_INDEX] + coordinatesParent[WIDTH_INDEX];
+                    double startY = coordinatesParent[Y_INDEX] + (coordinatesParent[HEIGHT_INDEX] / 2);
+                    double endX = coordinatesChild[X_INDEX];
+                    double endY = coordinatesChild[Y_INDEX] + (coordinatesChild[HEIGHT_INDEX] / 2);
+                    setLineWidth(Math.min(child.getGenomes().length, parent.getGenomes().length));
 
-                ArrayList<Integer> allGenomesInEdge = new ArrayList<>();
-                for (int genomeID : parent.getGenomes()) {
-                    if (contains(child.getGenomes(), genomeID)) {
-                        allGenomesInEdge.add(genomeID);
+                    ArrayList<Integer> allGenomesInEdge = new ArrayList<>();
+                    for (int genomeID : parent.getGenomes()) {
+                        if (contains(child.getGenomes(), genomeID)) {
+                            allGenomesInEdge.add(genomeID);
+                        }
                     }
-                }
 
-                if (edgeInView(startX, endX)) {
-                    ArrayList<Color> colourMeBby =
-                            colourController.getEdgeColours(
-                                    allGenomesInEdge.stream().mapToInt(q -> q).toArray());
-                    double columnWidth = (columnWidths[node.getColumn() + 1]
-                            - columnWidths[node.getColumn()])
-                            * stepSize * RELATIVE_X_DISTANCE;
-                    double endXHalf = (columnWidth - coordinatesParent[WIDTH_INDEX]);
-
-                    colourThisEdge(startX, startY, endX, endY, endXHalf, colourMeBby);
+                    if (edgeInView(startX, endX)) {
+                        ArrayList<Color> colourMeBby =
+                                colourController.getEdgeColours(
+                                        allGenomesInEdge.stream().mapToInt(q -> q).toArray());
+                        if (columnWidths.length > node.getColumn() + 1) {
+                            double columnWidth = (columnWidths[node.getColumn() + 1]
+                                    - columnWidths[node.getColumn()])
+                                    * stepSize * RELATIVE_X_DISTANCE;
+                            double endXHalf = (columnWidth - coordinatesParent[WIDTH_INDEX]);
+                            colourThisEdge(startX, startY, endX, endY, endXHalf, colourMeBby);
+                        }
+                    }
                 }
             }
         }
@@ -771,7 +776,10 @@ public class GraphDrawer {
         if (node.isDummy()) {
             return columnWidths[node.getColumn() + 1] - columnWidths[node.getColumn()];
         }
-        return Math.log(node.getSequenceLength() + (LOG_BASE - 1)) / Math.log(LOG_BASE);
+        if (node.getSequenceLength() <= 10) {
+            return node.getSequenceLength();
+        }
+        return 10 + Math.log(node.getSequenceLength() + (LOG_BASE - 1)) / Math.log(LOG_BASE);
     }
 
     /**
@@ -797,12 +805,14 @@ public class GraphDrawer {
                         SequenceNode neighbour = findSNPNeighbour(node);
                         if (node.isCollapsed()) {
                             menuController.updateSequenceInfo(node);
-                            menuController.updateSequenceInfoAlt(neighbour);
+                            if (neighbour != null) {
+                                menuController.updateSequenceInfoAlt(neighbour);
+                            }
                         } else {
                             menuController.updateInfoSeqNode(mouseEvent.isControlDown(), node);
                         }
                         if (mouseEvent.getClickCount() == 2) {
-                            if (!node.isCollapsed()) {
+                            if (!node.isCollapsed() && neighbour != null) {
                                 neighbour.setCollapsed(!neighbour.isCollapsed());
                             }
                             node.setCollapsed(!node.isCollapsed());
@@ -851,14 +861,19 @@ public class GraphDrawer {
      */
 
     private SequenceNode findSNPNeighbour(SequenceNode node) {
-        ArrayList<SequenceNode> column = graph.getColumns().get(node.getColumn());
-        int nodeID = node.getId();
-        int columnNodeID = column.get(0).getId();
-        if (nodeID == columnNodeID) {
-            return column.get(1);
-        } else {
-            return column.get(0);
+        try {
+            ArrayList<SequenceNode> column = graph.getColumns().get(node.getColumn());
+            int nodeID = node.getId();
+            int columnNodeID = column.get(0).getId();
+            if (nodeID == columnNodeID) {
+                return column.get(1);
+            } else {
+                return column.get(0);
+            }
+        } catch (IndexOutOfBoundsException e) {
+            return null;
         }
+
     }
 
     /**
@@ -981,9 +996,13 @@ public class GraphDrawer {
             leftNodeID = graph.getFullGraphLeftBoundID();
             mostLeftNode = graph.getNode(graph.getFullGraphLeftBoundID());
         }
-        int rightColumn = graph.getNode(rightNodeID).getColumn();
-        int leftColumn = graph.getNode(leftNodeID).getColumn();
-        return columnWidths[rightColumn] - columnWidths[leftColumn];
+        try {
+            int rightColumn = graph.getNode(rightNodeID).getColumn();
+            int leftColumn = graph.getNode(leftNodeID).getColumn();
+            return columnWidths[rightColumn] - columnWidths[leftColumn];
+        } catch (NullPointerException e) {
+            return this.zoomLevel;
+        }
     }
 
     /**

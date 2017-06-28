@@ -23,14 +23,16 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.mapdb.BTreeMap;
-import org.mapdb.HTreeMap;
 import structures.Annotation;
 
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.TreeSet;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -436,24 +438,6 @@ public class MenuController implements Observer {
     }
 
     /**
-     * Handles pressing the manage bookmark button.
-     *
-     * @throws IOException if the fxml file doesn't exist.
-     */
-    @FXML
-    private void manageBookmarks() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/manageBookmarks.fxml"));
-        Stage stage;
-        Parent root = loader.load();
-
-        stage = new Stage();
-        stage.setScene(new Scene(root));
-        stage.setTitle("Manage bookmarks");
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.showAndWait();
-    }
-
-    /**
      * Method used to not duplicate code in working out bookmarks.
      *
      * @param bookmark the button that specifies the bookmark
@@ -797,4 +781,13 @@ public class MenuController implements Observer {
         return centreNode;
     }
 
+    public void aboutUsClicked() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/aboutUs.fxml"));
+        Stage stage = new Stage();
+        Parent root = loader.load();
+        stage.setScene(new Scene(root));
+        stage.setTitle("About us");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+    }
 }
