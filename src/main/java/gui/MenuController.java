@@ -5,22 +5,28 @@ import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.*;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.mapdb.BTreeMap;
 import org.mapdb.HTreeMap;
 import structures.Annotation;
 
+import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -94,6 +100,8 @@ public class MenuController implements Observer {
     private CheckBox collapseSNPButton;
     @FXML
     private ScrollBar scrollBar;
+    @FXML
+    private Button screenshotButton;
 
     private PrintStream ps;
     private CustomProperties properties;
@@ -475,7 +483,7 @@ public class MenuController implements Observer {
      *
      * @return The sequenceMap.
      */
-    HTreeMap<Long, String> getSequenceHashMap() {
+    BTreeMap<Long, String> getSequenceHashMap() {
         try {
             return DrawableCanvas.getInstance().getParser().getSequenceHashMap();
         } catch (NullPointerException e) {
@@ -530,6 +538,7 @@ public class MenuController implements Observer {
         chooseGenome.setDisable(false);
         rainbowBut.setDisable(false);
         collapseSNPButton.setDisable(false);
+        screenshotButton.setDisable(false);
     }
 
     /**
@@ -704,7 +713,6 @@ public class MenuController implements Observer {
                 new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent event) {
-                        //TODO HANDLE THIS SELECTION
                         GraphDrawer.getInstance().
                                 setAllAnnotations(annotationTableController.getAnnotations());
                         GraphDrawer.getInstance().redraw();
@@ -730,6 +738,28 @@ public class MenuController implements Observer {
     public void collapseSNPClicked() {
         GraphDrawer.getInstance().collapse(collapseSNPButton.isSelected());
         GraphDrawer.getInstance().redraw();
+    }
+
+    @FXML
+    public void saveAsPNG() {
+        WritableImage image = canvas.snapshot(new SnapshotParameters(), null);
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Image");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("PNG", "*.png")
+        );
+        fileChooser.setInitialDirectory(
+                new File(System.getProperty("user.dir")).getParentFile()
+        );
+        File file = fileChooser.showSaveDialog(App.getStage());
+        if (file != null) {
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
     }
 
     /**

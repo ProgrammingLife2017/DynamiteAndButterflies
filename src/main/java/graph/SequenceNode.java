@@ -3,7 +3,6 @@ package graph;
 import gui.DrawableCanvas;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Class Node2, which represents sequences of DNA. A sequence is a part of a genome.
@@ -245,10 +244,12 @@ public class SequenceNode {
      */
     private void appendGenomeCoords(StringBuilder stringBuilder) {
         stringBuilder.append("Genome coords:\t");
-        for (Integer i: offSets) {
-            stringBuilder.append(i).append(" ");
+        if(this.offSets != null) {
+            for (Integer i : this.offSets) {
+                stringBuilder.append(i).append(" ");
+            }
+            stringBuilder.append("\n");
         }
-        stringBuilder.append("\n");
     }
 
     /**
@@ -258,9 +259,7 @@ public class SequenceNode {
     private void appendGenomes(StringBuilder stringBuilder) {
         if (this.getGenomes().length != 0) {
             stringBuilder.append("Genomes:\t\t");
-            int[] sortedGenomes = this.getGenomes();
-            Arrays.sort(sortedGenomes);
-            for (Integer i: sortedGenomes) {
+            for (Integer i: this.getGenomes()) {
                 stringBuilder.append(DrawableCanvas.getInstance().getAllGenomesReversed().get(i)).append(" ");
             }
             stringBuilder.append("\n");
