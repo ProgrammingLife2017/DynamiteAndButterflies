@@ -771,7 +771,10 @@ public class GraphDrawer {
         if (node.isDummy()) {
             return columnWidths[node.getColumn() + 1] - columnWidths[node.getColumn()];
         }
-        return Math.log(node.getSequenceLength() + (LOG_BASE - 1)) / Math.log(LOG_BASE);
+        if (node.getSequenceLength() <= 10) {
+            return node.getSequenceLength();
+        }
+        return 10 + Math.log(node.getSequenceLength() + (LOG_BASE - 1)) / Math.log(LOG_BASE);
     }
 
     /**
