@@ -1,5 +1,6 @@
 package gui.sub_controllers;
 
+import gui.GraphDrawer;
 import structures.Annotation;
 import gui.CustomProperties;
 import gui.DrawableCanvas;
@@ -114,6 +115,7 @@ public class FileController extends Observable implements Observer {
         String[] partPaths = filePath.split(pattern);
         String partPath = partPaths[partPaths.length - 1];
         properties.updateProperties();
+        GraphDrawer.getInstance().setyDifference(0);
         boolean flag = Boolean.parseBoolean(properties.getProperty(partPath, "true"));
         if (!flag) {
             PopUpController popUpController = new PopUpController();
