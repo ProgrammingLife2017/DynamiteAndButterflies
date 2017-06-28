@@ -138,6 +138,7 @@ public class GffGenomeController {
             table.getItems().get(0).setSelected(true);
             temp.add(table.getItems().get(0).getId());
         }
+        selectedGenome = temp.get(0);
         DrawableCanvas.getInstance().setAnnotationGenome(temp.get(0));
         close();
     }

@@ -365,13 +365,13 @@ public class GraphDrawer {
         if (indexOfGenome == -1) {
             return indexOfGenome;
         }
-        int annotatedGenomeIndex = 0;
-        if(node.getOffsets() != null) {
+        int res = 0;
+        if (node.getOffsets() != null) {
             if (node.getGenomes().length == node.getOffsets().length) {
-                annotatedGenomeIndex = indexOfGenome;
+                res = indexOfGenome;
             }
         }
-        return annotatedGenomeIndex;
+        return res;
     }
 
     /**
