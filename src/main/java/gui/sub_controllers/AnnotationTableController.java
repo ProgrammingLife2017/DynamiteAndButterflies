@@ -1,5 +1,6 @@
 package gui.sub_controllers;
 
+import gui.GraphDrawer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -157,7 +158,10 @@ public class AnnotationTableController {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Annotation rowData = row.getItem();
-                    rowData.setSelected(!rowData.getSelected().getValue());
+                    int nodeID = GraphDrawer.getInstance().hongerInAfrika(rowData.getStart());
+                    //TODO radius echt iets maken.
+                    int soortVanRadius = GraphDrawer.getInstance().hongerInAfrika(rowData.getEnd());
+                    ZoomController.getInstance().traverseGraphClicked(nodeID, soortVanRadius - nodeID);
                 }
             });
             return row;

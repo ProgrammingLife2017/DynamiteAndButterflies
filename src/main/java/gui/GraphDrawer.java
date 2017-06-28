@@ -832,6 +832,7 @@ public class GraphDrawer {
                     if (xEvent > annoCors[X_INDEX] && xEvent < annoCors[WIDTH_INDEX]
                             && yEvent > annoCors[Y_INDEX] && yEvent < annoCors[HEIGHT_INDEX]) {
                         redraw();
+                        //TODO make a highlight boolean on a annotation
                         gc.setLineWidth(LINE_WIDTH);
                         gc.setStroke(Color.BLACK);
                         gc.strokeRect(annoCors[X_INDEX], annoCors[Y_INDEX],
