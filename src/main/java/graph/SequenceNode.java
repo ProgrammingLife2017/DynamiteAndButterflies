@@ -275,20 +275,7 @@ public class SequenceNode {
             stringBuilder.append(sequence).append("\n");
         }
     }
-
-
-
-    /**
-     * Appends children to a string builder.
-     * @param stringBuilder string builder to append to.
-     */
-    private void appendChildren(StringBuilder stringBuilder) {
-        stringBuilder.append("Children:\t\t\t");
-        for (Integer i : children) {
-            stringBuilder.append(i).append(" ");
-        }
-        stringBuilder.append("\n");
-    }
+    
 
     public int getOutDegree() {
         return children.size();
