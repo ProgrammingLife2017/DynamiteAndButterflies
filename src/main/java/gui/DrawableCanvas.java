@@ -5,6 +5,7 @@ import gui.sub_controllers.FileController;
 import gui.sub_controllers.PanningController;
 import gui.sub_controllers.ScrollbarController;
 import gui.sub_controllers.RecentGenomeController;
+import javafx.application.Platform;
 import parser.GfaParser;
 
 import java.io.IOException;
@@ -49,16 +50,19 @@ public final class DrawableCanvas extends Observable implements Observer {
                     try {
                         int[] childArray = parser.getChildArray();
                         int[] parentArray = parser.getParentArray();
-                        SequenceGraph graph = new SequenceGraph(
-                                parentArray, childArray, getParser().getSequenceHashMap(), getParser().getOffSets(), getParser().getGenomes());
-                        graph.createSubGraph(START_NODE_ID, PanningController.RENDER_RANGE);
-                        Minimap.getInstance().initialize(graph.getFullGraphRightBoundID());
-                        GraphDrawer.getInstance().setGraph(graph);
-                        GraphDrawer.getInstance().redraw();
-                        ScrollbarController.getInstance().initialize(graph.getMaxColumnSize());
-                        setChanged();
-                        notifyObservers(parser.getFilePath());
-                        setChanged();
+                        Platform.runLater(new Runnable() {
+                            public void run() {
+                                SequenceGraph graph = new SequenceGraph(
+                                        parentArray, childArray, getParser().getSequenceHashMap(), getParser().getOffSets(), getParser().getGenomes());
+                                graph.createSubGraph(START_NODE_ID, PanningController.RENDER_RANGE);
+                                Minimap.getInstance().initialize(graph.getFullGraphRightBoundID());
+                                GraphDrawer.getInstance().setGraph(graph);
+                                GraphDrawer.getInstance().redraw();
+                                ScrollbarController.getInstance().initialize(graph.getMaxColumnSize());
+                                setChanged();
+                                notifyObservers(parser.getFilePath());
+                            }
+                        });
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
