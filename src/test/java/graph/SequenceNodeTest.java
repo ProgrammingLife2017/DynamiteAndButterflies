@@ -126,10 +126,6 @@ public class SequenceNodeTest {
         String info = node.toString("testsequence");
         System.out.println(info);
         assertTrue(info.contains("Node ID:"));
-        assertTrue(info.contains("Column index:"));
-        assertTrue(info.contains("Children:"));
-        assertTrue(info.contains("Parents:"));
-        assertTrue(info.contains("SequenceLength:"));
         assertTrue(info.contains("Sequence:"));
         assertTrue(info.contains("Genome coords:"));
 

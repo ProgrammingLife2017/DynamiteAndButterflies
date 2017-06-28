@@ -275,7 +275,8 @@ public class SequenceNode {
             stringBuilder.append(sequence).append("\n");
         }
     }
-    
+
+
 
     public int getOutDegree() {
         return children.size();
