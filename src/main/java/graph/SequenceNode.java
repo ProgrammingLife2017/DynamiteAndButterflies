@@ -276,17 +276,7 @@ public class SequenceNode {
         }
     }
 
-    /**
-     * Appends parents to a string builder.
-     * @param stringBuilder string builder to append to.
-     */
-    private void appendParents(StringBuilder stringBuilder) {
-        stringBuilder.append("Parents:\t\t\t");
-        for (Integer i: parents) {
-            stringBuilder.append(i).append(" ");
-        }
-        stringBuilder.append("\n");
-    }
+
 
     /**
      * Appends children to a string builder.
