@@ -227,10 +227,6 @@ public class SequenceNode {
     public String toString(String sequence) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Node ID:\t\t\t").append(this.id).append("\n");
-        stringBuilder.append("Column index:\t\t").append(this.column).append("\n");
-        appendChildren(stringBuilder);
-        appendParents(stringBuilder);
-        stringBuilder.append("SequenceLength:\t").append(this.sequenceLength).append("\n");
         appendSequence(sequence, stringBuilder);
         appendGenomes(stringBuilder);
         appendGenomeCoords(stringBuilder);
@@ -272,7 +268,7 @@ public class SequenceNode {
      * @param stringBuilder string builder to append to.
      */
     private void appendSequence(String sequence, StringBuilder stringBuilder) {
-        stringBuilder.append("Sequence:\t\t");
+        stringBuilder.append("Sequence: " + "(length: " + this.sequenceLength + ")" + "\t\t");
         if (isDummy) {
             stringBuilder.append("-\n");
         } else {
@@ -280,29 +276,7 @@ public class SequenceNode {
         }
     }
 
-    /**
-     * Appends parents to a string builder.
-     * @param stringBuilder string builder to append to.
-     */
-    private void appendParents(StringBuilder stringBuilder) {
-        stringBuilder.append("Parents:\t\t\t");
-        for (Integer i: parents) {
-            stringBuilder.append(i).append(" ");
-        }
-        stringBuilder.append("\n");
-    }
 
-    /**
-     * Appends children to a string builder.
-     * @param stringBuilder string builder to append to.
-     */
-    private void appendChildren(StringBuilder stringBuilder) {
-        stringBuilder.append("Children:\t\t\t");
-        for (Integer i : children) {
-            stringBuilder.append(i).append(" ");
-        }
-        stringBuilder.append("\n");
-    }
 
     public int getOutDegree() {
         return children.size();
