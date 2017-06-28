@@ -7,6 +7,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import org.mapdb.BTreeMap;
 import structures.Annotation;
 
 import java.util.ArrayList;
@@ -1139,6 +1140,34 @@ public class GraphDrawer {
         if (newSelection != null) {
             this.colourController.setSelectedGenomes(this.selected);
         }
+    }
+
+    public int hongerInAfrika(int startCorAnno) {
+        BTreeMap<Integer, int[]> alleOffsets = graph.getOffSetsMap();
+        BTreeMap<Integer, int[]> alleGenomen = graph.getGenomesMap();
+        int annotationGenome = DrawableCanvas.getInstance().getAnnotationGenome();
+        int res = 1;
+        for (int i = 1; i < alleOffsets.size(); i++) {
+            int[] offSetsOpNode = alleOffsets.get(i);
+            if (offSetsOpNode != null) {
+                int[] genomenOpNode = alleGenomen.get(i);
+                if (genomenOpNode != null) {
+                    int posInArrays = colourController.containsPos(genomenOpNode, annotationGenome);
+                    if (posInArrays != -1) {
+                        if (genomenOpNode.length != offSetsOpNode.length) {
+                            posInArrays = 0;
+                        }
+                        int genomeOffSetNode = offSetsOpNode[posInArrays];
+                        if (genomeOffSetNode > startCorAnno) {
+                            return res;
+                        } else {
+                            res = i;
+                        }
+                    }
+                }
+            }
+        }
+        return -1;
     }
 }
 

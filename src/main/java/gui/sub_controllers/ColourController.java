@@ -163,7 +163,7 @@ public class ColourController {
      * @param genome   The genome to see if it is in the check set.
      * @return a boolean true if it is in the set or false if it is not.
      */
-    private boolean contains(int[] checkSet, int genome) {
+    public boolean contains(int[] checkSet, int genome) {
         for (int check : checkSet) {
             if (check == genome) {
                 return true;

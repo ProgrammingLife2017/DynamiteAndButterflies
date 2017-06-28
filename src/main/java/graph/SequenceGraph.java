@@ -1,14 +1,10 @@
 package graph;
 
-import gui.DrawableCanvas;
 import org.mapdb.BTreeMap;
-import org.mapdb.HTreeMap;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Our own Graph Class.
@@ -381,4 +377,11 @@ public class SequenceGraph {
         return maxColumnSize;
     }
 
+    public BTreeMap<Integer, int[]> getOffSetsMap() {
+        return offSetsMap;
+    }
+
+    public BTreeMap<Integer, int[]> getGenomesMap() {
+        return genomesMap;
+    }
 }
