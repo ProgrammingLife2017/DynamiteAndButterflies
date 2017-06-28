@@ -15,5 +15,4 @@ Genome parser and visualisation
 When opening the current release for the first time, there might be some problems with the database files already on your computer. To fix this, please delete those files once (they can be found in the folder that also holds you .jar file).
 
 ## List of Known issues
-* pg canvas token error; happens very randomly and we don't know the cause.
-* Sometimes loading a new subgraph stops loading, zooming sometimes fixes this.
+* Sometimes, when clicking on the minimap, the graph zooms in.
