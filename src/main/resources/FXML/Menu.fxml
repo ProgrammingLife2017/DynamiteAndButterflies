@@ -58,11 +58,6 @@
                       </Menu>
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Help">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
-                  </items>
-                </Menu>
                   <Menu mnemonicParsing="false" text="Bookmarks">
                     <items>
                         <Menu mnemonicParsing="false" text="Open bookmarks">
@@ -73,19 +68,23 @@
                           </items>
                         </Menu>
                         <MenuItem fx:id="saveBookmark" mnemonicParsing="false" onAction="#newSaveBookmarkPress" text="Add bookmark" />
-                        <MenuItem mnemonicParsing="false" onAction="#manageBookmarks" text="Manage bookmarks" />
                     </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Genomes">
                     <items>
                         <Menu mnemonicParsing="false" text="Open genomes">
                           <items>
-                            <MenuItem fx:id="genome1" mnemonicParsing="false" onAction="#genome1Click" text="-" />
+                              <MenuItem fx:id="genome1" mnemonicParsing="false" onAction="#genome1Click" text="-" />
                               <MenuItem fx:id="genome2" mnemonicParsing="false" onAction="#genome2Click" text="-" />
                               <MenuItem fx:id="genome3" mnemonicParsing="false" onAction="#genome3Click" text="-" />
                           </items>
                         </Menu>
                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Help">
+                      <items>
+                          <MenuItem mnemonicParsing="false" onAction="#aboutUsClicked" text="About" />
+                      </items>
                   </Menu>
               </menus>
             </MenuBar>
@@ -137,6 +136,8 @@
                   </CheckBox>
                   <Separator layoutX="-23.0" layoutY="148.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
                   <Separator layoutX="9.0" layoutY="257.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+                  <Separator layoutX="11.0" layoutY="350.0" prefWidth="200.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="11.0" />
+                  <Button fx:id="screenshotButton" disable="true" layoutX="58.0" layoutY="368.0" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#saveAsPNG" prefHeight="28.0" prefWidth="35.0" />
                </children>
             </AnchorPane>
          </left>

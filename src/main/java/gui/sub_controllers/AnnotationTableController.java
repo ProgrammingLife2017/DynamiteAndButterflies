@@ -6,6 +6,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -151,6 +152,16 @@ public class AnnotationTableController {
         highlightColumn.setCellValueFactory(
                 param -> param.getValue().getSelected());
         highlightColumn.setCellFactory(CheckBoxTableCell.forTableColumn(highlightColumn));
+        annotationTable.setRowFactory(tv -> {
+            TableRow<Annotation> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    Annotation rowData = row.getItem();
+                    rowData.setSelected(!rowData.getSelected().getValue());
+                }
+            });
+            return row;
+        });
     }
 
     /**

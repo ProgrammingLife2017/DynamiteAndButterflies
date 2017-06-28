@@ -312,7 +312,6 @@ public class GfaParser extends Observable implements Runnable {
                 genomeInts[i] = Integer.parseInt(genomes[i]);
             }
         }
-        Arrays.sort(genomeInts);
         this.genomes.put(id,genomeInts);
     }
 

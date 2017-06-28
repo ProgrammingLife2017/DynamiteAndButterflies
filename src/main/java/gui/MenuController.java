@@ -5,27 +5,34 @@ import graph.SequenceGraph;
 import graph.SequenceNode;
 import gui.sub_controllers.*;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.mapdb.BTreeMap;
-import org.mapdb.HTreeMap;
 import structures.Annotation;
 
+import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.TreeSet;
 
 /**
  * Created by Jasper van Tilburg on 1-5-2017.
@@ -95,6 +102,8 @@ public class MenuController implements Observer {
     private CheckBox collapseSNPButton;
     @FXML
     private ScrollBar scrollBar;
+    @FXML
+    private Button screenshotButton;
 
     private PrintStream ps;
     private CustomProperties properties;
@@ -429,24 +438,6 @@ public class MenuController implements Observer {
     }
 
     /**
-     * Handles pressing the manage bookmark button.
-     *
-     * @throws IOException if the fxml file doesn't exist.
-     */
-    @FXML
-    private void manageBookmarks() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/manageBookmarks.fxml"));
-        Stage stage;
-        Parent root = loader.load();
-
-        stage = new Stage();
-        stage.setScene(new Scene(root));
-        stage.setTitle("Manage bookmarks");
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.showAndWait();
-    }
-
-    /**
      * Method used to not duplicate code in working out bookmarks.
      *
      * @param bookmark the button that specifies the bookmark
@@ -531,6 +522,7 @@ public class MenuController implements Observer {
         chooseGenome.setDisable(false);
         rainbowBut.setDisable(false);
         collapseSNPButton.setDisable(false);
+        screenshotButton.setDisable(false);
     }
 
     /**
@@ -732,6 +724,28 @@ public class MenuController implements Observer {
         GraphDrawer.getInstance().redraw();
     }
 
+    @FXML
+    public void saveAsPNG() {
+        WritableImage image = canvas.snapshot(new SnapshotParameters(), null);
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Image");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("PNG", "*.png")
+        );
+        fileChooser.setInitialDirectory(
+                new File(System.getProperty("user.dir")).getParentFile()
+        );
+        File file = fileChooser.showSaveDialog(App.getStage());
+        if (file != null) {
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
     /**
      * Gets the radius of the radiusTextField.
      * @return The integer in the radiusTextField
@@ -767,4 +781,13 @@ public class MenuController implements Observer {
         return centreNode;
     }
 
+    public void aboutUsClicked() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/aboutUs.fxml"));
+        Stage stage = new Stage();
+        Parent root = loader.load();
+        stage.setScene(new Scene(root));
+        stage.setTitle("About us");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+    }
 }

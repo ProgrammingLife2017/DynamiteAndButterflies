@@ -61,10 +61,8 @@ public final class DrawableCanvas extends Observable implements Observer {
                                 ScrollbarController.getInstance().initialize(graph.getMaxColumnSize());
                                 setChanged();
                                 notifyObservers(parser.getFilePath());
-                                setChanged();
                             }
                         });
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -100,7 +98,7 @@ public final class DrawableCanvas extends Observable implements Observer {
     }
 
     public void setAnnotationGenome(int annotationGenomeArg) {
-        annotationGenome = annotationGenomeArg;
+        this.annotationGenome = annotationGenomeArg;
     }
 
     public int getAnnotationGenome() {

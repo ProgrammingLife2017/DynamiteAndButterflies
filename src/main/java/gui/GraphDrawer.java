@@ -368,13 +368,13 @@ public class GraphDrawer {
         if (indexOfGenome == -1) {
             return indexOfGenome;
         }
-        int annotatedGenomeIndex = 0;
-        if(node.getOffsets() != null) {
+        int res = 0;
+        if (node.getOffsets() != null) {
             if (node.getGenomes().length == node.getOffsets().length) {
-                annotatedGenomeIndex = indexOfGenome;
+                res = indexOfGenome;
             }
         }
-        return annotatedGenomeIndex;
+        return res;
     }
 
     /**
@@ -437,13 +437,12 @@ public class GraphDrawer {
                         drawnLayers.put(i, endOfAnno);
                         startYAnno = startYAnno + (annoHeight * i);
                         break;
-                    } else if (filled < endOfAnno) {
+                    } else if (filled < startOfAnno) {
                         startYAnno = startYAnno + (annoHeight * i);
                         drawnLayers.put(i, endOfAnno);
                         break;
                     }
                 }
-
 
                 gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
 
@@ -777,7 +776,10 @@ public class GraphDrawer {
         if (node.isDummy()) {
             return columnWidths[node.getColumn() + 1] - columnWidths[node.getColumn()];
         }
-        return Math.log(node.getSequenceLength() + (LOG_BASE - 1)) / Math.log(LOG_BASE);
+        if (node.getSequenceLength() <= 10) {
+            return node.getSequenceLength();
+        }
+        return 10 + Math.log(node.getSequenceLength() + (LOG_BASE - 1)) / Math.log(LOG_BASE);
     }
 
     /**
