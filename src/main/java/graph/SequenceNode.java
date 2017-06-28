@@ -227,6 +227,7 @@ public class SequenceNode {
     public String toString(String sequence) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Node ID:\t\t\t").append(this.id).append("\n");
+        stringBuilder.append("SequenceLength:\t").append(this.sequenceLength).append("\n");
         appendSequence(sequence, stringBuilder);
         appendGenomes(stringBuilder);
         appendGenomeCoords(stringBuilder);
@@ -268,14 +269,13 @@ public class SequenceNode {
      * @param stringBuilder string builder to append to.
      */
     private void appendSequence(String sequence, StringBuilder stringBuilder) {
-        stringBuilder.append("Sequence: " + "(length: " + this.sequenceLength + ")" + "\t\t");
+        stringBuilder.append("Sequence:\t\t");
         if (isDummy) {
             stringBuilder.append("-\n");
         } else {
             stringBuilder.append(sequence).append("\n");
         }
     }
-
 
 
     public int getOutDegree() {
