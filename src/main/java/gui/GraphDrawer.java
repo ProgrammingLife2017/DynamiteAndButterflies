@@ -316,7 +316,9 @@ public class GraphDrawer {
                 drawEdges(node);
             } else if (node.getIndex() == 0) {
                 SequenceNode neighbour = findSNPNeighbour(node);
-                drawSNPBubble(node, neighbour);
+                if (neighbour != null) {
+                    drawSNPBubble(node, neighbour);
+                }
             }
         }
     }
@@ -801,12 +803,14 @@ public class GraphDrawer {
                         SequenceNode neighbour = findSNPNeighbour(node);
                         if (node.isCollapsed()) {
                             menuController.updateSequenceInfo(node);
-                            menuController.updateSequenceInfoAlt(neighbour);
+                            if (neighbour != null) {
+                                menuController.updateSequenceInfoAlt(neighbour);
+                            }
                         } else {
                             menuController.updateInfoSeqNode(mouseEvent.isControlDown(), node);
                         }
                         if (mouseEvent.getClickCount() == 2) {
-                            if (!node.isCollapsed()) {
+                            if (!node.isCollapsed() && neighbour != null) {
                                 neighbour.setCollapsed(!neighbour.isCollapsed());
                             }
                             node.setCollapsed(!node.isCollapsed());
@@ -855,14 +859,19 @@ public class GraphDrawer {
      */
 
     private SequenceNode findSNPNeighbour(SequenceNode node) {
-        ArrayList<SequenceNode> column = graph.getColumns().get(node.getColumn());
-        int nodeID = node.getId();
-        int columnNodeID = column.get(0).getId();
-        if (nodeID == columnNodeID) {
-            return column.get(1);
-        } else {
-            return column.get(0);
+        try {
+            ArrayList<SequenceNode> column = graph.getColumns().get(node.getColumn());
+            int nodeID = node.getId();
+            int columnNodeID = column.get(0).getId();
+            if (nodeID == columnNodeID) {
+                return column.get(1);
+            } else {
+                return column.get(0);
+            }
+        } catch (IndexOutOfBoundsException e) {
+            return null;
         }
+
     }
 
     /**
