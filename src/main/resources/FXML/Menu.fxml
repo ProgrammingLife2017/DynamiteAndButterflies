@@ -58,11 +58,6 @@
                       </Menu>
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Help">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
-                  </items>
-                </Menu>
                   <Menu mnemonicParsing="false" text="Bookmarks">
                     <items>
                         <Menu mnemonicParsing="false" text="Open bookmarks">
@@ -73,19 +68,23 @@
                           </items>
                         </Menu>
                         <MenuItem fx:id="saveBookmark" mnemonicParsing="false" onAction="#newSaveBookmarkPress" text="Add bookmark" />
-                        <MenuItem mnemonicParsing="false" onAction="#manageBookmarks" text="Manage bookmarks" />
                     </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Genomes">
                     <items>
                         <Menu mnemonicParsing="false" text="Open genomes">
                           <items>
-                            <MenuItem fx:id="genome1" mnemonicParsing="false" onAction="#genome1Click" text="-" />
+                              <MenuItem fx:id="genome1" mnemonicParsing="false" onAction="#genome1Click" text="-" />
                               <MenuItem fx:id="genome2" mnemonicParsing="false" onAction="#genome2Click" text="-" />
                               <MenuItem fx:id="genome3" mnemonicParsing="false" onAction="#genome3Click" text="-" />
                           </items>
                         </Menu>
                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Help">
+                      <items>
+                          <MenuItem mnemonicParsing="false" onAction="#aboutUsClicked" text="About" />
+                      </items>
                   </Menu>
               </menus>
             </MenuBar>

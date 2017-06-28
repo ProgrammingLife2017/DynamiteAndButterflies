@@ -434,13 +434,12 @@ public class GraphDrawer {
                         drawnLayers.put(i, endOfAnno);
                         startYAnno = startYAnno + (annoHeight * i);
                         break;
-                    } else if (filled < endOfAnno) {
+                    } else if (filled < startOfAnno) {
                         startYAnno = startYAnno + (annoHeight * i);
                         drawnLayers.put(i, endOfAnno);
                         break;
                     }
                 }
-
 
                 gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
 

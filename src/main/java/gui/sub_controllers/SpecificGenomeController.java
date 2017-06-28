@@ -133,7 +133,7 @@ public class SpecificGenomeController {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Genome rowData = row.getItem();
-                    rowData.setSelected(true);
+                    rowData.setSelected(!rowData.getSelectedProperty().getValue());
                 }
             });
             return row;
