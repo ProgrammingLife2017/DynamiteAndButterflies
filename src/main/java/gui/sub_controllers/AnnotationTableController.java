@@ -158,12 +158,12 @@ public class AnnotationTableController {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Annotation annotation = row.getItem();
-                    int nodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getStart());
-                    //TODO radius echt iets maken.
-                    //int soortVanRadius = GraphDrawer.getInstance().hongerInAfrika(annotation.getEnd());
-                    int soortVanRadius = 400;
+                    int startNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getStart());
+                    int endNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getEnd());
                     GraphDrawer.getInstance().highlightAnnotation(annotation);
-                    ZoomController.getInstance().traverseGraphClicked(nodeID, soortVanRadius - nodeID);
+                    int soortVanRadius = (int) ((endNodeID - startNodeID) * 1.2);
+                    ZoomController.getInstance().traverseGraphClicked(((endNodeID + startNodeID) / 2),
+                            Math.max(soortVanRadius, (int) Math.sqrt(49)));
                 }
             });
             return row;
