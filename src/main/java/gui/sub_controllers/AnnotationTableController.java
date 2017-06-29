@@ -16,7 +16,6 @@ import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 import structures.Annotation;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
@@ -201,7 +200,9 @@ public class AnnotationTableController {
     public void saveButtonClicked() {
         updatedAnnotations = annotations;
         Annotation annotation = annotationTable.getSelectionModel().getSelectedItem();
-        goToAnnotation(annotation);
+        if (annotation != null) {
+            goToAnnotation(annotation);
+        }
         close();
     }
 
