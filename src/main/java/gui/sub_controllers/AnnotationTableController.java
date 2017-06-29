@@ -173,10 +173,10 @@ public class AnnotationTableController {
     private void goToAnnotation(Annotation annotation) {
         int startNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getStart());
         int endNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getEnd());
-        GraphDrawer.getInstance().highlightAnnotation(annotation);
         int soortVanRadius = (int) ((endNodeID - startNodeID) * 1.2);
         ZoomController.getInstance().traverseGraphClicked(((endNodeID + startNodeID) / 2),
                 Math.max(soortVanRadius, (int) Math.sqrt(49)));
+        GraphDrawer.getInstance().highlightAnnotation(annotation);
     }
 
     /**

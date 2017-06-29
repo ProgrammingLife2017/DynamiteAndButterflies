@@ -992,7 +992,7 @@ public class GraphDrawer {
             highlightedAnno.setHighlighted(false);
         }
         annotation.setHighlighted(true);
-        highlightedAnno = annotation;
+        this.highlightedAnno = annotation;
     }
 
     /**
