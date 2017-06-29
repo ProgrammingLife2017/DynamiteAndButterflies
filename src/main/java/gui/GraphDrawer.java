@@ -68,7 +68,6 @@ public class GraphDrawer {
     private BTreeMap<Integer, int[]> alleOffsets;
     private BTreeMap<Integer, int[]> alleGenomen;
     private BTreeMap<Long, String> sequenceMap;
-    private int annotationGenome;
 
     /**
      * Getter for the singleton GraphDrawer.
@@ -117,7 +116,6 @@ public class GraphDrawer {
         this.alleOffsets = graph.getOffSetsMap();
         this.alleGenomen = graph.getGenomesMap();
         this.sequenceMap = graph.getSequenceHashMap();
-        this.annotationGenome = DrawableCanvas.getInstance().getAnnotationGenome();
     }
 
     /**
@@ -376,11 +374,12 @@ public class GraphDrawer {
      * @return the position in offSets.
      */
     private int getAnnotatedGenomeIndex(SequenceNode node) {
-        int indexOfGenome = colourController.containsPos(node.getGenomes(), annotationGenome);
+        int indexOfGenome = colourController.containsPos(node.getGenomes(),
+                DrawableCanvas.getInstance().getAnnotationGenome());
         if (indexOfGenome < 0) {
             return indexOfGenome;
         }
-        if (node.getGenomes().length == node.getOffsets().length) {
+        if (node.getGenomes().length != node.getOffsets().length) {
             indexOfGenome = 0;
         }
         return indexOfGenome;
@@ -1171,13 +1170,14 @@ public class GraphDrawer {
         int median = ((lower + upper) / 2) + offSet;
         int[] offSets = alleOffsets.get(median);
         int[] genomes = alleGenomen.get(median);
-        int index = colourController.containsPos(genomes, annotationGenome);
+        int index = colourController.containsPos(genomes,
+                DrawableCanvas.getInstance().getAnnotationGenome());
         if (index < 0) {
             offSet += 1;
             return divideAndConquer(lower, upper, startCorAnno, offSet);
         }
 
-        if (genomes.length == offSets.length) {
+        if (genomes.length != offSets.length) {
             index = 0;
         }
 

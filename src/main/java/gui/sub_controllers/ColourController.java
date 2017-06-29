@@ -71,10 +71,12 @@ public class ColourController {
      * @return returns the position of genome in the checkset.
      */
     public int containsPos(int[] checkSet, int genome) {
-        for (int i = 0; i < checkSet.length; i++) {
-            int check = checkSet[i];
-            if (check == genome) {
-                return i;
+        if (checkSet != null) {
+            for (int i = 0; i < checkSet.length; i++) {
+                int check = checkSet[i];
+                if (check == genome) {
+                    return i;
+                }
             }
         }
         return -1;
