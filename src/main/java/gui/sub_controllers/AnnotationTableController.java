@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 import structures.Annotation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
@@ -106,6 +107,7 @@ public class AnnotationTableController {
 
     /**
      * Sets the hashMap annotations to a HashSet.
+     *
      * @return a hash set of the buckets of annotations
      */
     @NotNull
@@ -115,6 +117,7 @@ public class AnnotationTableController {
 
     /**
      * Converts the hashMap to a hashSet.
+     *
      * @param hashMap The hashMap to be converted.
      * @return a hashSet of the hashMap.
      */
@@ -168,15 +171,27 @@ public class AnnotationTableController {
 
     /**
      * Method that goes to the annotation and highlights it.
+     *
      * @param annotation the Annotation to go to.
      */
     private void goToAnnotation(Annotation annotation) {
-        int startNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getStart());
-        int endNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getEnd());
-        int soortVanRadius = (int) ((endNodeID - startNodeID) * 1.2);
-        ZoomController.getInstance().traverseGraphClicked(((endNodeID + startNodeID) / 2),
-                Math.max(soortVanRadius, (int) Math.sqrt(49)));
-        GraphDrawer.getInstance().highlightAnnotation(annotation);
+        try {
+            int startNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getStart());
+            int endNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getEnd());
+            int soortVanRadius = (int) ((endNodeID - startNodeID) * 1.2);
+            if (soortVanRadius > 4000) {
+                ZoomController.getInstance().traverseGraphClicked(startNodeID, 4000);
+            } else {
+                ZoomController.getInstance().traverseGraphClicked(((endNodeID + startNodeID) / 2),
+                        Math.max(soortVanRadius, (int) Math.sqrt(49)));
+            }
+            GraphDrawer.getInstance().highlightAnnotation(annotation);
+        } catch (StackOverflowError e) {
+            AnnotationPopUpController popUp = new AnnotationPopUpController();
+            popUp.loadNoAnnotationFound();
+
+            System.out.println("Sorry, too many nodes without ref to hold in memory.");
+        }
     }
 
     /**
