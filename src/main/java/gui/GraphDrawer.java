@@ -8,7 +8,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import org.mapdb.BTreeMap;
-import parser.GfaParser;
 import structures.Annotation;
 
 import java.util.ArrayList;
@@ -70,6 +69,7 @@ public class GraphDrawer {
     private BTreeMap<Integer, int[]> alleGenomen;
     private BTreeMap<Long, String> sequenceMap;
     private int annotationGenome;
+
     /**
      * Getter for the singleton GraphDrawer.
      *
@@ -1177,32 +1177,22 @@ public class GraphDrawer {
         int median = ((lower + upper) / 2) + offSet;
         int[] offSets = alleOffsets.get(median);
         int[] genomes = alleGenomen.get(median);
-        int index = Integer.MIN_VALUE;
-
-        for (int j = 0; j < genomes.length; j++) {
-            if (genomes[j] == annotationGenome) {
-                index = j;
-            }
-        }
+        int index = colourController.containsPos(genomes, annotationGenome);
         if (index < 0) {
             offSet += 1;
             return divideAndConquer(lower, upper, startCorAnno, offSet);
-        } else if (genomes.length == offSets.length) {
-            if (offSets[index] <= startCorAnno && offSets[index] + sequenceMap.get(Long.valueOf(median)).length() >= startCorAnno) {
-                return median;
-            } else if (offSets[index] > startCorAnno) {
-                return divideAndConquer(lower, median, startCorAnno, 0);
-            } else {
-                return divideAndConquer(median, upper, startCorAnno, 0);
-            }
+        }
+
+        if (genomes.length == offSets.length) {
+            index = 0;
+        }
+
+        if (offSets[index] <= startCorAnno && offSets[0] + sequenceMap.get(Long.valueOf(median)).length() >= startCorAnno) {
+            return median;
+        } else if (offSets[index] > startCorAnno) {
+            return divideAndConquer(lower, median, startCorAnno, 0);
         } else {
-            if (offSets[0] <= startCorAnno && offSets[0] + sequenceMap.get(Long.valueOf(median)).length() >= startCorAnno) {
-                return median;
-            } else if (offSets[0] > startCorAnno) {
-                return divideAndConquer(lower, median, startCorAnno, 0);
-            } else {
-                return divideAndConquer(median, upper, startCorAnno, 0);
-            }
+            return divideAndConquer(median, upper, startCorAnno, 0);
         }
     }
 }
