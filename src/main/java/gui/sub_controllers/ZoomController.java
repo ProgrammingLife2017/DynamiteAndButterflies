@@ -71,7 +71,7 @@ public final class ZoomController {
         double xDiff = drawer.getColumnWidth(
                 drawer.getGraph().getNode(centreNode).getColumn())
                 - drawer.getZoomLevel() / 2;
-        GraphDrawer.getInstance().highlight(centreNode);
+        GraphDrawer.getInstance().highlightNode(centreNode);
         GraphDrawer.getInstance().moveShapes(xDiff);
     }
 

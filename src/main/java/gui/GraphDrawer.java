@@ -47,6 +47,7 @@ public class GraphDrawer {
     private GraphicsContext gc;
     private SequenceGraph graph;
     private int highlightedNode;
+    private Annotation highlightedAnno;
     private int[] selected = null;
     private double zoomLevel;
     private double range;
@@ -106,6 +107,7 @@ public class GraphDrawer {
         }
         colourController = new ColourController(selected, rainbowView);
         highlightedNode = 0;
+        highlightedAnno = null;
     }
 
     /**
@@ -459,6 +461,12 @@ public class GraphDrawer {
                 annoOverNodes.add(annoCoordinates);
                 annotationCoordinates.put(annotation.getId(), annoOverNodes);
 
+                if (annotation.getHighlighted()) {
+                    gc.setLineWidth(LINE_WIDTH);
+                    gc.setStroke(Color.BLACK);
+                    gc.strokeRect(startXAnno, startYAnno, annoWidth, annoHeight);
+                }
+
                 gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
             }
         }
@@ -801,7 +809,7 @@ public class GraphDrawer {
                 Map.Entry pair = (Map.Entry) o;
                 SequenceNode node = (SequenceNode) pair.getValue();
                 if (checkClick(node, xEvent, yEvent)) {
-                    highlight(node.getId());
+                    highlightNode(node.getId());
                     if (node.isSNP()) {
                         SequenceNode neighbour = findSNPNeighbour(node);
                         if (node.isCollapsed()) {
@@ -823,33 +831,24 @@ public class GraphDrawer {
                     }
                 }
             }
-            redraw();
-
             for (Object o : annotationCoordinates.entrySet()) {
                 Map.Entry pair = (Map.Entry) o;
                 ArrayList<double[]> allAnnoCors = (ArrayList<double[]>) pair.getValue();
                 for (double[] annoCors : allAnnoCors) {
                     if (xEvent > annoCors[X_INDEX] && xEvent < annoCors[WIDTH_INDEX]
                             && yEvent > annoCors[Y_INDEX] && yEvent < annoCors[HEIGHT_INDEX]) {
-                        redraw();
-                        //TODO make a highlight boolean on a annotation
-                        gc.setLineWidth(LINE_WIDTH);
-                        gc.setStroke(Color.BLACK);
-                        gc.strokeRect(annoCors[X_INDEX], annoCors[Y_INDEX],
-                                annoCors[WIDTH_INDEX] - annoCors[X_INDEX],
-                                annoCors[HEIGHT_INDEX] - annoCors[Y_INDEX]);
-                        //TODO make sure this stays there when zooming.
-
                         int annoId = (int) pair.getKey();
                         TreeSet<Annotation> setOfAllAnnotations = getAnnotationBuckets(null, 1);
                         for (Annotation annotation : setOfAllAnnotations) {
                             if (annotation.getId() == annoId) {
                                 menuController.updateInfoAnnotation(mouseEvent.isControlDown(), annotation);
+                                highlightAnnotation(annotation);
                             }
                         }
                     }
                 }
             }
+            redraw();
         } catch (NullPointerException e) {
             System.err.println("Graph not yet initialized");
         }
@@ -972,12 +971,25 @@ public class GraphDrawer {
      *
      * @param node The node that should be highlighted
      */
-    public void highlight(int node) {
+    public void highlightNode(int node) {
         if (highlightedNode != 0) {
             graph.getNode(highlightedNode).lowlight();
         }
         graph.getNode(node).highlight();
         highlightedNode = node;
+    }
+
+    /**
+     * Highlight the given annotation and lowlight the previous highlighted annotation.
+     *
+     * @param annotation The annotation that should be highlighted
+     */
+    public void highlightAnnotation(Annotation annotation) {
+        if (highlightedAnno != null) {
+            highlightedAnno.setHighlighted(false);
+        }
+        annotation.setHighlighted(true);
+        highlightedAnno = annotation;
     }
 
     /**

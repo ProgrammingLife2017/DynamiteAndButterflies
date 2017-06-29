@@ -20,6 +20,7 @@ public class Annotation implements Comparable<Annotation> {
     private SimpleStringProperty info = new SimpleStringProperty();
     private SimpleBooleanProperty selected  = new SimpleBooleanProperty();
     private int identifier;
+    private boolean highlighted;
     /**
      * Constructor of the object.
      * @param identifier the ID of the annotation
@@ -33,6 +34,7 @@ public class Annotation implements Comparable<Annotation> {
         end.set(endArg);
         info.set(infoArg);
         selected.set(false);
+        this.highlighted = false;
     }
 
     public int getId() {
@@ -57,6 +59,14 @@ public class Annotation implements Comparable<Annotation> {
 
     public void setSelected(boolean selected) {
         this.selected.set(selected);
+    }
+
+    public void setHighlighted(boolean highlighted) {
+        this.highlighted = highlighted;
+    }
+
+    public boolean getHighlighted() {
+        return this.highlighted;
     }
 
     /**
