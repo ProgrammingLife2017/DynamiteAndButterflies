@@ -792,4 +792,11 @@ public class MenuController implements Observer {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
     }
+
+    public void reset() {
+        nodeTextField.setText("");
+        radiusTextField.setText("");
+        sequenceInfo.setText("");
+        sequenceInfoAlt.setText("");
+    }
 }
