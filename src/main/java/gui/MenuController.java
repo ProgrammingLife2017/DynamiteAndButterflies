@@ -828,7 +828,7 @@ public class MenuController implements Observer {
 
         HashMap<Integer, String> hashMap = DrawableCanvas.getInstance().getAllGenomesReversed();
         genomeTraverseGraphChooser.initialize(hashMap,
-                DrawableCanvas.getInstance().getAnnotationGenome());
+                DrawableCanvas.getInstance().getGenomeToTraverse());
 
         newStage = new Stage();
         newStage.setScene(new Scene(root));
