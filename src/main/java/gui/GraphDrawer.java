@@ -8,6 +8,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import org.mapdb.BTreeMap;
+import parser.GfaParser;
 import structures.Annotation;
 
 import java.util.ArrayList;
@@ -64,6 +65,11 @@ public class GraphDrawer {
     private HashMap<Integer, TreeSet<Annotation>> allAnnotations
             = new HashMap<>();
 
+
+    private BTreeMap<Integer, int[]> alleOffsets;
+    private BTreeMap<Integer, int[]> alleGenomen;
+    private BTreeMap<Long, String> sequenceMap;
+    private int annotationGenome;
     /**
      * Getter for the singleton GraphDrawer.
      *
@@ -108,6 +114,10 @@ public class GraphDrawer {
         colourController = new ColourController(selected, rainbowView);
         highlightedNode = 0;
         highlightedAnno = null;
+        this.alleOffsets = graph.getOffSetsMap();
+        this.alleGenomen = graph.getGenomesMap();
+        this.sequenceMap = graph.getSequenceHashMap();
+        this.annotationGenome = DrawableCanvas.getInstance().getAnnotationGenome();
     }
 
     /**
@@ -1156,31 +1166,42 @@ public class GraphDrawer {
     }
 
     public int hongerInAfrika(int startCorAnno) {
-        BTreeMap<Integer, int[]> alleOffsets = graph.getOffSetsMap();
-        BTreeMap<Integer, int[]> alleGenomen = graph.getGenomesMap();
-        int annotationGenome = DrawableCanvas.getInstance().getAnnotationGenome();
-        int res = 1;
-        for (int i = 1; i < alleOffsets.size(); i++) {
-            int[] offSetsOpNode = alleOffsets.get(i);
-            if (offSetsOpNode != null) {
-                int[] genomenOpNode = alleGenomen.get(i);
-                if (genomenOpNode != null) {
-                    int posInArrays = colourController.containsPos(genomenOpNode, annotationGenome);
-                    if (posInArrays != -1) {
-                        if (genomenOpNode.length != offSetsOpNode.length) {
-                            posInArrays = 0;
-                        }
-                        int genomeOffSetNode = offSetsOpNode[posInArrays];
-                        if (genomeOffSetNode > startCorAnno) {
-                            return res;
-                        } else {
-                            res = i;
-                        }
-                    }
-                }
+        return divideAndConquer(1, alleOffsets.size(), startCorAnno, 0);
+    }
+
+    public int divideAndConquer(int lower, int upper, int startCorAnno, int offSet) {
+        int median = ((lower + upper) / 2) + offSet;
+        int[] offSets = alleOffsets.get(median);
+        int[] genomes = alleGenomen.get(median);
+        //System.out.println(median);
+        int index = Integer.MIN_VALUE;
+
+        for (int j = 0; j < genomes.length; j++) {
+            if (genomes[j] == annotationGenome) {
+                index = j;
             }
         }
-        return -1;
+        if (index < 0) {
+            offSet += 1;
+            return divideAndConquer(lower, upper, startCorAnno, offSet);
+        } else if (genomes.length == offSets.length) {
+            if (offSets[index] <= startCorAnno && offSets[index] + sequenceMap.get(Long.valueOf(median)).length() >= startCorAnno) {
+                //System.out.println("Fissa!");
+                return median;
+            } else if (offSets[index] > startCorAnno) {
+                return divideAndConquer(lower, median, startCorAnno, 0);
+            } else {
+                return divideAndConquer(median, upper, startCorAnno, 0);
+            }
+        } else {
+            if (offSets[0] <= startCorAnno && offSets[0] + sequenceMap.get(Long.valueOf(median)).length() >= startCorAnno) {
+                //System.out.println("Fissa++!");
+                return median;
+            } else if (offSets[0] > startCorAnno) {
+                return divideAndConquer(lower, median, startCorAnno, 0);
+            } else {
+                return divideAndConquer(median, upper, startCorAnno, 0);
+            }
+        }
     }
 }
-

@@ -384,4 +384,7 @@ public class SequenceGraph {
     public BTreeMap<Integer, int[]> getGenomesMap() {
         return genomesMap;
     }
+    public BTreeMap<Long, String> getSequenceHashMap() {
+        return sequenceHashMap;
+    }
 }
