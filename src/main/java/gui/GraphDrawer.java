@@ -1124,6 +1124,9 @@ public class GraphDrawer {
     }
 
     public void reset() {
+        zoomLevel = 0;
+        setxDifference(0);
+        setyDifference(0);
         setAllAnnotations(new HashMap<>());
         setSelected(null);
         this.annotationCoordinates = null;
