@@ -172,7 +172,6 @@ public class AnnotationTableController {
      */
     private void goToAnnotation(Annotation annotation) {
         int startNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getStart());
-        System.out.println(startNodeID);
         int endNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getEnd());
         GraphDrawer.getInstance().highlightAnnotation(annotation);
         int soortVanRadius = (int) ((endNodeID - startNodeID) * 1.2);

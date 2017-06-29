@@ -1177,7 +1177,6 @@ public class GraphDrawer {
         int median = ((lower + upper) / 2) + offSet;
         int[] offSets = alleOffsets.get(median);
         int[] genomes = alleGenomen.get(median);
-        //System.out.println(median);
         int index = Integer.MIN_VALUE;
 
         for (int j = 0; j < genomes.length; j++) {
@@ -1190,7 +1189,6 @@ public class GraphDrawer {
             return divideAndConquer(lower, upper, startCorAnno, offSet);
         } else if (genomes.length == offSets.length) {
             if (offSets[index] <= startCorAnno && offSets[index] + sequenceMap.get(Long.valueOf(median)).length() >= startCorAnno) {
-                //System.out.println("Fissa!");
                 return median;
             } else if (offSets[index] > startCorAnno) {
                 return divideAndConquer(lower, median, startCorAnno, 0);
@@ -1199,7 +1197,6 @@ public class GraphDrawer {
             }
         } else {
             if (offSets[0] <= startCorAnno && offSets[0] + sequenceMap.get(Long.valueOf(median)).length() >= startCorAnno) {
-                //System.out.println("Fissa++!");
                 return median;
             } else if (offSets[0] > startCorAnno) {
                 return divideAndConquer(lower, median, startCorAnno, 0);
