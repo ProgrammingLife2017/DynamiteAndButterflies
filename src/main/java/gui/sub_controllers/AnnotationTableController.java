@@ -157,10 +157,12 @@ public class AnnotationTableController {
             TableRow<Annotation> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                    Annotation rowData = row.getItem();
-                    int nodeID = GraphDrawer.getInstance().hongerInAfrika(rowData.getStart());
+                    Annotation annotation = row.getItem();
+                    int nodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getStart());
                     //TODO radius echt iets maken.
-                    int soortVanRadius = GraphDrawer.getInstance().hongerInAfrika(rowData.getEnd());
+                    //int soortVanRadius = GraphDrawer.getInstance().hongerInAfrika(annotation.getEnd());
+                    int soortVanRadius = 400;
+                    GraphDrawer.getInstance().highlightAnnotation(annotation);
                     ZoomController.getInstance().traverseGraphClicked(nodeID, soortVanRadius - nodeID);
                 }
             });
