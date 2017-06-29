@@ -1130,6 +1130,7 @@ public class GraphDrawer {
         setAllAnnotations(new HashMap<>());
         setSelected(null);
         this.annotationCoordinates = null;
+        menuController.reset();
     }
 
     void setRainbowView(boolean rainbowView) {
