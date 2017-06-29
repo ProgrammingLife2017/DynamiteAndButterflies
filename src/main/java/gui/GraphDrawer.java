@@ -340,8 +340,8 @@ public class GraphDrawer {
      * Gets all relevant buckets of the node.
      *
      * @param node            the node in which we're searching for annotations.
-     * @param annotatedGenome the genome that is annotated
-     * @return The hashSet of all annotations in the node.
+     * @param annotatedGenome the place of the genome that is annotated
+     * @return The hashSet of all possible annotations in the node.
      */
     private TreeSet<Annotation> getAnnotationBuckets(SequenceNode node, int annotatedGenome) {
         TreeSet<Annotation> annotationHashSet = new TreeSet<>();
@@ -376,18 +376,14 @@ public class GraphDrawer {
      * @return the position in offSets.
      */
     private int getAnnotatedGenomeIndex(SequenceNode node) {
-        int indexOfGenome = colourController.containsPos(node.getGenomes(),
-                DrawableCanvas.getInstance().getAnnotationGenome());
-        if (indexOfGenome == -1) {
+        int indexOfGenome = colourController.containsPos(node.getGenomes(), annotationGenome);
+        if (indexOfGenome < 0) {
             return indexOfGenome;
         }
-        int res = 0;
-        if (node.getOffsets() != null) {
-            if (node.getGenomes().length == node.getOffsets().length) {
-                res = indexOfGenome;
-            }
+        if (node.getGenomes().length == node.getOffsets().length) {
+            indexOfGenome = 0;
         }
-        return res;
+        return indexOfGenome;
     }
 
     /**
@@ -421,7 +417,6 @@ public class GraphDrawer {
                 double annoWidth = coordinates[WIDTH_INDEX];
                 int startOfAnno = annotation.getStart();
                 int endOfAnno = annotation.getEnd();
-
                 int startCorNode = node.getOffsets()[annotatedGenome];
                 int endCorNode = startCorNode + node.getSequenceLength();
 
@@ -433,7 +428,7 @@ public class GraphDrawer {
                 if (startOfAnno > startCorNode) {
                     emptyAtStart = startOfAnno - startCorNode;
                     annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
-                    startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                    startXAnno = startXAnno + (coordinates[WIDTH_INDEX] - annoWidth);
                 }
                 if (endOfAnno < endCorNode) {
                     int emptyAtEnd = endCorNode - endOfAnno;
@@ -456,7 +451,6 @@ public class GraphDrawer {
                         break;
                     }
                 }
-
                 gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
 
                 double[] annoCoordinates = new double[COORDINATES];
@@ -1187,7 +1181,7 @@ public class GraphDrawer {
             index = 0;
         }
 
-        if (offSets[index] <= startCorAnno && offSets[0] + sequenceMap.get(Long.valueOf(median)).length() >= startCorAnno) {
+        if (offSets[index] <= startCorAnno && offSets[index] + sequenceMap.get(Long.valueOf(median)).length() >= startCorAnno) {
             return median;
         } else if (offSets[index] > startCorAnno) {
             return divideAndConquer(lower, median, startCorAnno, 0);
