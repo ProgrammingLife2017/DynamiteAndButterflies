@@ -56,11 +56,14 @@ public class PopUpController {
             openLoc.addEventHandler(MouseEvent.MOUSE_CLICKED,
                     new EventHandler<MouseEvent>() {
                         public void handle(MouseEvent e) {
-                            File seq = new File(partPath + ".sequence.db");
-                            File adj = new File(partPath + ".adjacency.db");
-                            boolean success = adj.delete();
+                            File db = new File(partPath + ".database.db");
+                            File child = new File(partPath + ".childArray.txt");
+                            File parent = new File(partPath + ".parentArray.txt");
+                            boolean success = db.delete();
                             assert success;
-                            success = seq.delete();
+                            success = child.delete();
+                            assert success;
+                            success = parent.delete();
                             assert success;
                             stage.close();
                         }
