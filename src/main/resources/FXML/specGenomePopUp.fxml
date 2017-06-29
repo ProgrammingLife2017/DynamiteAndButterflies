@@ -24,6 +24,6 @@
       <Button layoutX="33.0" layoutY="370.0" mnemonicParsing="false" onAction="#saveSelected" prefWidth="60.0" text="Save" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="35.0" />
       <Button layoutX="306.0" layoutY="370.0" mnemonicParsing="false" onAction="#cancelClicked" prefWidth="60.0" text="Cancel" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="35.0" />
        <Button layoutX="93.0" layoutY="370.0" mnemonicParsing="false" onAction="#selectAllFiltered" prefHeight="25.0" prefWidth="88.0" text="(De)Select all" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="115.0" />
-      <Button layoutX="220.0" layoutY="370.0" mnemonicParsing="false" onAction="#resetPressed" text="Reset" AnchorPane.rightAnchor="115.0" />
+      <Button layoutX="220.0" layoutY="370.0" mnemonicParsing="false" onAction="#resetPressed" text="Reset" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="115.0" />
    </children>
 </AnchorPane>

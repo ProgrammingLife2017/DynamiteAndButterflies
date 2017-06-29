@@ -158,16 +158,25 @@ public class AnnotationTableController {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Annotation annotation = row.getItem();
-                    int startNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getStart());
-                    int endNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getEnd());
-                    GraphDrawer.getInstance().highlightAnnotation(annotation);
-                    int soortVanRadius = (int) ((endNodeID - startNodeID) * 1.2);
-                    ZoomController.getInstance().traverseGraphClicked(((endNodeID + startNodeID) / 2),
-                            Math.max(soortVanRadius, (int) Math.sqrt(49)));
+                    goToAnnotation(annotation);
+                    close();
                 }
             });
             return row;
         });
+    }
+
+    /**
+     * Method that goes to the annotation and highlights it.
+     * @param annotation the Annotation to go to.
+     */
+    private void goToAnnotation(Annotation annotation) {
+        int startNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getStart());
+        int endNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getEnd());
+        GraphDrawer.getInstance().highlightAnnotation(annotation);
+        int soortVanRadius = (int) ((endNodeID - startNodeID) * 1.2);
+        ZoomController.getInstance().traverseGraphClicked(((endNodeID + startNodeID) / 2),
+                Math.max(soortVanRadius, (int) Math.sqrt(49)));
     }
 
     /**
@@ -176,6 +185,8 @@ public class AnnotationTableController {
     @FXML
     public void saveButtonClicked() {
         updatedAnnotations = annotations;
+        Annotation annotation = annotationTable.getSelectionModel().getSelectedItem();
+        goToAnnotation(annotation);
         close();
     }
 
