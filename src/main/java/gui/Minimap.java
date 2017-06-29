@@ -138,8 +138,8 @@ public final class Minimap {
         if (checkClick(pressedX, pressedY)) {
             double xLoc = (pressedX - xCoordinate) / width;
             int node = (int) (GraphDrawer.getInstance().getGraph().getFullGraphRightBoundID() * xLoc);
-            GraphDrawer.getInstance().highlightNode(node);
             ZoomController.getInstance().traverseGraphClicked(node, menuController.getRadius());
+            GraphDrawer.getInstance().highlightNode(node);
             menuController.updateRadius();
         }
     }

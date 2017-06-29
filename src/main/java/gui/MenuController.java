@@ -384,11 +384,11 @@ public class MenuController implements Observer {
         int centreNodeID = getCentreNodeID();
         int radius = getRadius();
         if (centreNodeID != -1 && radius != -1) {
-            GraphDrawer.getInstance().highlightNode(centreNodeID);
             ZoomController.getInstance().traverseGraphClicked(centreNodeID, radius);
             SequenceNode node = GraphDrawer.getInstance().getGraph().getNode(centreNodeID);
             String sequence = DrawableCanvas.getInstance().getParser()
                     .getSequenceHashMap().get((long) centreNodeID);
+            GraphDrawer.getInstance().highlightNode(centreNodeID);
             nodeTextField.setText(Integer.toString(centreNodeID));
             sequenceInfo.setText(node.toString(sequence));
         }
@@ -450,8 +450,8 @@ public class MenuController implements Observer {
             //We skip parts[0] because that is the note.
             int centre = Integer.parseInt(parts[1]);
             int radius = Integer.parseInt(parts[2]);
-            GraphDrawer.getInstance().highlightNode(centre);
             ZoomController.getInstance().traverseGraphClicked(centre, radius);
+            GraphDrawer.getInstance().highlightNode(centre);
             nodeTextField.setText(centre + "");
         }
     }
