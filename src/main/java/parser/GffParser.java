@@ -74,7 +74,7 @@ public class GffParser {
                     set = new TreeSet<>();
                 }
                 set.add(anno);
-                buckets.put(startBucket, set);
+                buckets.put(i, set);
             }
         }
         br.close();
