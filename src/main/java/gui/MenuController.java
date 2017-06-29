@@ -228,6 +228,8 @@ public class MenuController implements Observer {
                     public void handle(WindowEvent event) {
                         DrawableCanvas.getInstance().setAnnotationGenome(
                                 gffGenomeController.getSelectedGenome());
+                        DrawableCanvas.getInstance().setGenomeToTraverse(
+                                gffGenomeController.getSelectedGenome());
                         GraphDrawer.getInstance().redraw();
                     }
                 }
