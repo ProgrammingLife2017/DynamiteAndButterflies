@@ -432,16 +432,16 @@ public class GraphDrawer {
                 }
 
                 double annoHeight = coordinates[HEIGHT_INDEX] / 2;
-                double startYAnno = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] - annoHeight;
+                double startYAnno = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] - annoHeight + 1;
 
                 for (int i = 1; i <= drawnLayers.size() + 1; i++) {
                     Integer filled = drawnLayers.get(i);
                     if (filled == null) {
                         drawnLayers.put(i, endOfAnno);
-                        startYAnno = startYAnno + (annoHeight * i);
+                        startYAnno = startYAnno + ((annoHeight + 1) * i);
                         break;
                     } else if (filled < startOfAnno) {
-                        startYAnno = startYAnno + (annoHeight * i);
+                        startYAnno = startYAnno + ((annoHeight + 1) * i);
                         drawnLayers.put(i, endOfAnno);
                         break;
                     }
