@@ -43,6 +43,12 @@ import java.util.TreeSet;
 public class MenuController implements Observer {
 
     @FXML
+    private TextField genomeCoordinate;
+    @FXML
+    private Button goToGenCorBut;
+    @FXML
+    private Button chooseGenTraverseBut;
+    @FXML
     private Button annoBut;
     @FXML
     private Button chooseGenome;
@@ -525,6 +531,7 @@ public class MenuController implements Observer {
         rainbowBut.setDisable(false);
         collapseSNPButton.setDisable(false);
         screenshotButton.setDisable(false);
+        chooseGenTraverseBut.setDisable(false);
     }
 
     /**
@@ -798,5 +805,46 @@ public class MenuController implements Observer {
         radiusTextField.setText("");
         sequenceInfo.setText("");
         sequenceInfoAlt.setText("");
+        genomeCoordinate.setText("");
+    }
+
+    @FXML
+    public void goToGenCorClicked() {
+        int nodeId = GraphDrawer.getInstance().hongerInAfrika(Integer.parseInt(genomeCoordinate.getText()),
+                DrawableCanvas.getInstance().getGenomeToTraverse());
+        ZoomController.getInstance().traverseGraphClicked(nodeId, getRadius());
+        GraphDrawer.getInstance().highlightNode(nodeId);
+    }
+
+    @FXML
+    public void chooseGenTraverseClicked() throws IOException {
+        Stage stage = App.getStage();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                "/FXML/chooseGenomeToTraverse.fxml"));
+        Stage newStage;
+        Parent root = loader.load();
+        final GenomeTraverseGraphChooser genomeTraverseGraphChooser
+                = loader.<GenomeTraverseGraphChooser>getController();
+
+        HashMap<Integer, String> hashMap = DrawableCanvas.getInstance().getAllGenomesReversed();
+        genomeTraverseGraphChooser.initialize(hashMap,
+                DrawableCanvas.getInstance().getAnnotationGenome());
+
+        newStage = new Stage();
+        newStage.setScene(new Scene(root));
+        newStage.setTitle("Choose a genome to traverse");
+        newStage.initModality(Modality.APPLICATION_MODAL);
+        newStage.setOnHidden(
+                new EventHandler<WindowEvent>() {
+                    @Override
+                    public void handle(WindowEvent event) {
+                        DrawableCanvas.getInstance().
+                                setGenomeToTraverse(genomeTraverseGraphChooser.getSelectedGenomeToTraverse());
+                        goToGenCorBut.setDisable(false);
+                        genomeCoordinate.setDisable(false);
+                    }
+                }
+        );
+        newStage.showAndWait();
     }
 }
