@@ -1,17 +1,18 @@
 package gui.sub_controllers;
 
-import structures.Genome;
-import gui.DrawableCanvas;
+import gui.GraphDrawer;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import structures.Genome;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +24,10 @@ import java.util.HashMap;
  */
 public class GenomeTraverseGraphChooser {
 
+    @FXML
+    public TextField genomeCorField;
     private int selectedGenomeToTraverse;
+    private int selectedNodeToGoTo;
     @FXML
     private TableView<Genome> table;
     @FXML
@@ -42,6 +46,7 @@ public class GenomeTraverseGraphChooser {
      */
     public void initialize(HashMap<Integer, String> hashMap, int suggestion) {
         selectedGenomeToTraverse = suggestion;
+        selectedNodeToGoTo = -1;
 
         ArrayList<Genome> realData = createGenomeTable(hashMap, suggestion, true);
         if (realData.size() == 0) {
@@ -118,6 +123,10 @@ public class GenomeTraverseGraphChooser {
         return selectedGenomeToTraverse;
     }
 
+    public int getSelectedNodeToGoTo() {
+        return selectedNodeToGoTo;
+    }
+
     /**
      * Handles pressing the save button.
      * Updates the selectedgenomes with what is in the table.
@@ -139,7 +148,14 @@ public class GenomeTraverseGraphChooser {
             temp.add(table.getItems().get(0).getId());
         }
         selectedGenomeToTraverse = temp.get(0);
-        DrawableCanvas.getInstance().setGenomeToTraverse(temp.get(0));
+
+        try {
+            selectedNodeToGoTo = GraphDrawer.getInstance().hongerInAfrika(
+                    Integer.parseInt(genomeCorField.getText()),
+                    selectedGenomeToTraverse);
+        } catch (StackOverflowError e) {
+            //TODO invullen.
+        }
         close();
     }
 
@@ -149,5 +165,9 @@ public class GenomeTraverseGraphChooser {
     private void close() {
         Stage stage = (Stage) table.getScene().getWindow();
         stage.close();
+    }
+
+    public void cancelButClicked() {
+        close();
     }
 }

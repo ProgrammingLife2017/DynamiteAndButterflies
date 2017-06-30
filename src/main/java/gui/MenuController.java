@@ -43,11 +43,7 @@ import java.util.TreeSet;
 public class MenuController implements Observer {
 
     @FXML
-    private TextField genomeCoordinate;
-    @FXML
     private Button goToGenCorBut;
-    @FXML
-    private Button chooseGenTraverseBut;
     @FXML
     private Button annoBut;
     @FXML
@@ -228,7 +224,7 @@ public class MenuController implements Observer {
                     public void handle(WindowEvent event) {
                         DrawableCanvas.getInstance().setAnnotationGenome(
                                 gffGenomeController.getSelectedGenome());
-                        DrawableCanvas.getInstance().setGenomeToTraverse(
+                        DrawableCanvas.getInstance().setPrefGenomeToTraverse(
                                 gffGenomeController.getSelectedGenome());
                         GraphDrawer.getInstance().redraw();
                     }
@@ -533,7 +529,7 @@ public class MenuController implements Observer {
         rainbowBut.setDisable(false);
         collapseSNPButton.setDisable(false);
         screenshotButton.setDisable(false);
-        chooseGenTraverseBut.setDisable(false);
+        goToGenCorBut.setDisable(false);
     }
 
     /**
@@ -761,7 +757,7 @@ public class MenuController implements Observer {
      * Gets the radius of the radiusTextField.
      * @return The integer in the radiusTextField
      */
-    int getRadius() {
+    public int getRadius() {
         int radius = -1;
         try {
             radius = Integer.parseInt(radiusTextField.getText());
@@ -807,19 +803,10 @@ public class MenuController implements Observer {
         radiusTextField.setText("");
         sequenceInfo.setText("");
         sequenceInfoAlt.setText("");
-        genomeCoordinate.setText("");
     }
 
     @FXML
-    public void goToGenCorClicked() {
-        int nodeId = GraphDrawer.getInstance().hongerInAfrika(Integer.parseInt(genomeCoordinate.getText()),
-                DrawableCanvas.getInstance().getGenomeToTraverse());
-        ZoomController.getInstance().traverseGraphClicked(nodeId, getRadius());
-        GraphDrawer.getInstance().highlightNode(nodeId);
-    }
-
-    @FXML
-    public void chooseGenTraverseClicked() throws IOException {
+    public void goToGenCorClicked() throws IOException {
         Stage stage = App.getStage();
         FXMLLoader loader = new FXMLLoader(getClass().getResource(
                 "/FXML/chooseGenomeToTraverse.fxml"));
@@ -830,7 +817,7 @@ public class MenuController implements Observer {
 
         HashMap<Integer, String> hashMap = DrawableCanvas.getInstance().getAllGenomesReversed();
         genomeTraverseGraphChooser.initialize(hashMap,
-                DrawableCanvas.getInstance().getGenomeToTraverse());
+                DrawableCanvas.getInstance().getPrefGenomeToTraverse());
 
         newStage = new Stage();
         newStage.setScene(new Scene(root));
@@ -840,10 +827,15 @@ public class MenuController implements Observer {
                 new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent event) {
-                        DrawableCanvas.getInstance().
-                                setGenomeToTraverse(genomeTraverseGraphChooser.getSelectedGenomeToTraverse());
-                        goToGenCorBut.setDisable(false);
-                        genomeCoordinate.setDisable(false);
+                        int nodeId = genomeTraverseGraphChooser.getSelectedNodeToGoTo();
+                        if (nodeId != -1) {
+                            ZoomController.getInstance().traverseGraphClicked(
+                                    nodeId,
+                                    getRadius());
+                            DrawableCanvas.getInstance().setPrefGenomeToTraverse(
+                                    genomeTraverseGraphChooser.getSelectedGenomeToTraverse());
+                            GraphDrawer.getInstance().highlightNode(nodeId);
+                        }
                     }
                 }
         );
