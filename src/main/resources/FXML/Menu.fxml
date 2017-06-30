@@ -108,7 +108,7 @@
                      <font>
                         <Font size="12.0" />
                      </font></TextField>
-                  <Button fx:id="chooseGenome" disable="true" layoutX="15.0" layoutY="171.0" mnemonicParsing="false" onAction="#chooseGenomePress" prefHeight="25.0" prefWidth="120.0" text="Specific Genome">
+                  <Button fx:id="chooseGenome" disable="true" layoutX="13.0" layoutY="201.0" mnemonicParsing="false" onAction="#chooseGenomePress" prefHeight="25.0" prefWidth="120.0" text="View Genomes" AnchorPane.leftAnchor="12.0" AnchorPane.rightAnchor="12.0">
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
@@ -116,7 +116,7 @@
                         <Font size="12.0" />
                      </font>
                   </Button>
-                  <Button fx:id="annoBut" disable="true" layoutX="17.0" layoutY="208.0" mnemonicParsing="false" onAction="#chooseAnnoClicked" prefHeight="25.0" prefWidth="120.0" text="Choose Annotation">
+                  <Button fx:id="annoBut" disable="true" layoutX="14.0" layoutY="238.0" mnemonicParsing="false" onAction="#chooseAnnoClicked" prefHeight="25.0" prefWidth="120.0" text="Choose Annotation" AnchorPane.leftAnchor="13.0" AnchorPane.rightAnchor="13.0">
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
@@ -124,20 +124,22 @@
                         <Font size="12.0" />
                      </font>
                   </Button>
-                  <CheckBox fx:id="rainbowBut" disable="true" layoutX="29.0" layoutY="278.0" mnemonicParsing="false" onAction="#rainbowButtonClicked" selected="true" text="Rainbow view">
+                  <CheckBox fx:id="rainbowBut" disable="true" layoutX="25.0" layoutY="307.0" mnemonicParsing="false" onAction="#rainbowButtonClicked" selected="true" text="Rainbow view">
                      <font>
                         <Font size="12.0" />
                      </font>
                   </CheckBox>
-                  <CheckBox fx:id="collapseSNPButton" disable="true" layoutX="29.0" layoutY="308.0" mnemonicParsing="false" onAction="#collapseSNPClicked" selected="true" text="Collapse SNPs">
+                  <CheckBox fx:id="collapseSNPButton" disable="true" layoutX="25.0" layoutY="337.0" mnemonicParsing="false" onAction="#collapseSNPClicked" selected="true" text="Collapse SNPs">
                      <font>
                         <Font size="12.0" />
                      </font>
                   </CheckBox>
-                  <Separator layoutX="-23.0" layoutY="148.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
-                  <Separator layoutX="9.0" layoutY="257.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
-                  <Separator layoutX="11.0" layoutY="350.0" prefWidth="200.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="11.0" />
-                  <Button fx:id="screenshotButton" disable="true" layoutX="58.0" layoutY="368.0" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#saveAsPNG" prefHeight="28.0" prefWidth="35.0" />
+                  <Separator layoutX="16.0" layoutY="188.0" prefWidth="200.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="8.0" />
+                  <Separator layoutX="12.0" layoutY="287.0" prefWidth="200.0" AnchorPane.leftAnchor="12.0" AnchorPane.rightAnchor="16.0" />
+                  <Separator layoutX="12.0" layoutY="380.0" prefWidth="200.0" AnchorPane.leftAnchor="12.0" AnchorPane.rightAnchor="16.0" />
+                  <Button fx:id="screenshotButton" disable="true" layoutX="56.0" layoutY="396.0" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#saveAsPNG" prefHeight="28.0" prefWidth="35.0" />
+                  <Separator layoutX="13.0" layoutY="140.0" AnchorPane.leftAnchor="13.0" AnchorPane.rightAnchor="11.0" />
+                  <Button fx:id="goToGenCorBut" disable="true" layoutX="10.0" layoutY="152.0" mnemonicParsing="false" onAction="#goToGenCorClicked" prefHeight="25.0" prefWidth="125.0" text="Go to genome place" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
                </children>
             </AnchorPane>
          </left>

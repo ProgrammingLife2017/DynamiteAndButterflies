@@ -189,7 +189,7 @@ public class AnnotationTableController {
             AnnotationPopUpController popUp = new AnnotationPopUpController();
             popUp.loadNoAnnotationFound();
 
-            System.out.println("Sorry, too many nodes without ref to hold in memory.");
+            System.err.println("Sorry, too many nodes without ref to hold in memory.");
         }
     }
 

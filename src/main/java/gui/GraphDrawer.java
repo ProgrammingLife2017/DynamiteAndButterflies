@@ -984,6 +984,7 @@ public class GraphDrawer {
         }
         graph.getNode(node).highlight();
         highlightedNode = node;
+        redraw();
     }
 
     /**
@@ -997,6 +998,7 @@ public class GraphDrawer {
         }
         annotation.setHighlighted(true);
         this.highlightedAnno = annotation;
+        redraw();
     }
 
     /**
@@ -1166,7 +1168,15 @@ public class GraphDrawer {
         }
     }
 
-    public int hongerInAfrika(int startCorAnno) throws StackOverflowError{
+    private int genomeToTraverse;
+
+    public int hongerInAfrika(int startCorAnno) throws StackOverflowError {
+        genomeToTraverse = DrawableCanvas.getInstance().getAnnotationGenome();
+        return divideAndConquer(1, alleOffsets.size(), startCorAnno, 0);
+    }
+
+    public int hongerInAfrika(int startCorAnno, int difGenome) throws StackOverflowError {
+        genomeToTraverse = difGenome;
         return divideAndConquer(1, alleOffsets.size(), startCorAnno, 0);
     }
 
@@ -1175,7 +1185,7 @@ public class GraphDrawer {
         int[] offSets = alleOffsets.get(median);
         int[] genomes = alleGenomen.get(median);
         int index = colourController.containsPos(genomes,
-                DrawableCanvas.getInstance().getAnnotationGenome());
+                genomeToTraverse);
         if (index < 0) {
             offSet += 1;
             return divideAndConquer(lower, upper, startCorAnno, offSet);

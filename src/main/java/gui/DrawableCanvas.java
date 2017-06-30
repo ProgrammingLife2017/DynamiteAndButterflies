@@ -24,6 +24,7 @@ public final class DrawableCanvas extends Observable implements Observer {
 
     private static DrawableCanvas canvas = new DrawableCanvas();
     private int annotationGenome;
+    private int prefGenomeToTraverse;
 
     private GfaParser parser;
 
@@ -107,5 +108,13 @@ public final class DrawableCanvas extends Observable implements Observer {
 
     public void setRecentGenomeController(RecentGenomeController sgp) {
         this.recentGenomeController = sgp;
+    }
+
+    public void setPrefGenomeToTraverse(int genomeToTraverse) {
+        this.prefGenomeToTraverse = genomeToTraverse;
+    }
+
+    public int getPrefGenomeToTraverse() {
+        return prefGenomeToTraverse;
     }
 }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="449.0" prefWidth="451.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.sub_controllers.GenomeTraverseGraphChooser">
+    <children>
+        <TableView fx:id="table" layoutX="29.0" layoutY="71.0" prefHeight="343.0" prefWidth="441.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="71.0">
+            <columns>
+                <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
+                <TableColumn fx:id="nameCol" prefWidth="265.0" text="Name" />
+                <TableColumn fx:id="selectCol" prefWidth="75.0" text="Select" />
+            </columns>
+        </TableView>
+        <Label alignment="CENTER" layoutX="208.0" layoutY="14.0" prefHeight="30.0" prefWidth="390.0" text="Choose a Genome to traverse" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+            <font>
+                <Font size="22.0" />
+            </font>
+        </Label>
+        <Button layoutX="88.0" layoutY="365.0" mnemonicParsing="false" onAction="#continueClicked" text="Continue" AnchorPane.bottomAnchor="5.0" />
+      <HBox id="HBox" alignment="CENTER" layoutX="13.0" layoutY="37.0" spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+         <children>
+            <Label text="Genome Coordinate:" />
+            <TextField fx:id="genomeCorField" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
+         </children>
+      </HBox>
+      <Button layoutX="291.0" layoutY="419.0" mnemonicParsing="false" onAction="#cancelButClicked" text="Cancel" />
+    </children>
+</AnchorPane>

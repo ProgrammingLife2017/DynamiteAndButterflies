@@ -43,6 +43,8 @@ import java.util.TreeSet;
 public class MenuController implements Observer {
 
     @FXML
+    private Button goToGenCorBut;
+    @FXML
     private Button annoBut;
     @FXML
     private Button chooseGenome;
@@ -221,6 +223,8 @@ public class MenuController implements Observer {
                     @Override
                     public void handle(WindowEvent event) {
                         DrawableCanvas.getInstance().setAnnotationGenome(
+                                gffGenomeController.getSelectedGenome());
+                        DrawableCanvas.getInstance().setPrefGenomeToTraverse(
                                 gffGenomeController.getSelectedGenome());
                         GraphDrawer.getInstance().redraw();
                     }
@@ -525,6 +529,7 @@ public class MenuController implements Observer {
         rainbowBut.setDisable(false);
         collapseSNPButton.setDisable(false);
         screenshotButton.setDisable(false);
+        goToGenCorBut.setDisable(false);
     }
 
     /**
@@ -752,7 +757,7 @@ public class MenuController implements Observer {
      * Gets the radius of the radiusTextField.
      * @return The integer in the radiusTextField
      */
-    int getRadius() {
+    public int getRadius() {
         int radius = -1;
         try {
             radius = Integer.parseInt(radiusTextField.getText());
@@ -798,5 +803,42 @@ public class MenuController implements Observer {
         radiusTextField.setText("");
         sequenceInfo.setText("");
         sequenceInfoAlt.setText("");
+    }
+
+    @FXML
+    public void goToGenCorClicked() throws IOException {
+        Stage stage = App.getStage();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                "/FXML/chooseGenomeToTraverse.fxml"));
+        Stage newStage;
+        Parent root = loader.load();
+        final GenomeTraverseGraphChooser genomeTraverseGraphChooser
+                = loader.<GenomeTraverseGraphChooser>getController();
+
+        HashMap<Integer, String> hashMap = DrawableCanvas.getInstance().getAllGenomesReversed();
+        genomeTraverseGraphChooser.initialize(hashMap,
+                DrawableCanvas.getInstance().getPrefGenomeToTraverse());
+
+        newStage = new Stage();
+        newStage.setScene(new Scene(root));
+        newStage.setTitle("Choose a genome to traverse");
+        newStage.initModality(Modality.APPLICATION_MODAL);
+        newStage.setOnHidden(
+                new EventHandler<WindowEvent>() {
+                    @Override
+                    public void handle(WindowEvent event) {
+                        int nodeId = genomeTraverseGraphChooser.getSelectedNodeToGoTo();
+                        if (nodeId != -1) {
+                            ZoomController.getInstance().traverseGraphClicked(
+                                    nodeId,
+                                    getRadius());
+                            DrawableCanvas.getInstance().setPrefGenomeToTraverse(
+                                    genomeTraverseGraphChooser.getSelectedGenomeToTraverse());
+                            GraphDrawer.getInstance().highlightNode(nodeId);
+                        }
+                    }
+                }
+        );
+        newStage.showAndWait();
     }
 }
