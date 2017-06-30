@@ -36,7 +36,7 @@ public class AnnotationPopUpController {
     public AnnotationPopUpController() {
     }
 
-    public void loadNoAnnotationFound() {
+    public void loadNoAnnotationFound(String message) {
         try {
             popUp();
             Ok.addEventHandler(MouseEvent.MOUSE_CLICKED,
@@ -46,7 +46,7 @@ public class AnnotationPopUpController {
                             stage.close();
                         }
                     });
-            setMessage("Sorry, can't find this annotation.");
+            setMessage(message);
             stage.showAndWait();
         } catch (Exception e) {
             e.printStackTrace();

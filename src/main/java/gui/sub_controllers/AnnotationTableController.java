@@ -187,7 +187,7 @@ public class AnnotationTableController {
             GraphDrawer.getInstance().highlightAnnotation(annotation);
         } catch (StackOverflowError e) {
             AnnotationPopUpController popUp = new AnnotationPopUpController();
-            popUp.loadNoAnnotationFound();
+            popUp.loadNoAnnotationFound("Sorry, can't find this annotation.");
 
             System.err.println("Sorry, too many nodes without ref to hold in memory.");
         }
