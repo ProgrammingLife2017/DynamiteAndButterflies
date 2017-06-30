@@ -155,7 +155,11 @@ public class GenomeTraverseGraphChooser {
                     selectedGenomeToTraverse);
         } catch (StackOverflowError e) {
             AnnotationPopUpController popUp = new AnnotationPopUpController();
-            popUp.loadNoAnnotationFound();
+            popUp.loadNoAnnotationFound("Sorry, can't find this annotation.");
+            System.err.println("Sorry, too many nodes without ref to hold in memory.");
+        } catch (NumberFormatException e) {
+            AnnotationPopUpController popUp = new AnnotationPopUpController();
+            popUp.loadNoAnnotationFound("Please, input a number within the range of the graph.");
             System.err.println("Sorry, too many nodes without ref to hold in memory.");
         }
         close();
