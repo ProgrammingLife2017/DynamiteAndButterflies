@@ -2,13 +2,18 @@ package gui;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
+import gui.sub_controllers.AnnotationPopUpController;
 import gui.sub_controllers.ColourController;
+import gui.sub_controllers.PopUpController;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import org.mapdb.BTreeMap;
 import structures.Annotation;
 
+import java.io.IOException;
+import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +51,7 @@ public class GraphDrawer {
     private GraphicsContext gc;
     private SequenceGraph graph;
     private int highlightedNode;
+    private Annotation highlightedAnno;
     private int[] selected = null;
     private double zoomLevel;
     private double range;
@@ -61,6 +67,11 @@ public class GraphDrawer {
     private HashMap<Integer, ArrayList<double[]>> annotationCoordinates;
     private HashMap<Integer, TreeSet<Annotation>> allAnnotations
             = new HashMap<>();
+
+
+    private BTreeMap<Integer, int[]> alleOffsets;
+    private BTreeMap<Integer, int[]> alleGenomen;
+    private BTreeMap<Long, String> sequenceMap;
 
     /**
      * Getter for the singleton GraphDrawer.
@@ -105,6 +116,10 @@ public class GraphDrawer {
         }
         colourController = new ColourController(selected, rainbowView);
         highlightedNode = 0;
+        highlightedAnno = null;
+        this.alleOffsets = graph.getOffSetsMap();
+        this.alleGenomen = graph.getGenomesMap();
+        this.sequenceMap = graph.getSequenceHashMap();
     }
 
     /**
@@ -327,8 +342,8 @@ public class GraphDrawer {
      * Gets all relevant buckets of the node.
      *
      * @param node            the node in which we're searching for annotations.
-     * @param annotatedGenome the genome that is annotated
-     * @return The hashSet of all annotations in the node.
+     * @param annotatedGenome the place of the genome that is annotated
+     * @return The hashSet of all possible annotations in the node.
      */
     private TreeSet<Annotation> getAnnotationBuckets(SequenceNode node, int annotatedGenome) {
         TreeSet<Annotation> annotationHashSet = new TreeSet<>();
@@ -365,16 +380,13 @@ public class GraphDrawer {
     private int getAnnotatedGenomeIndex(SequenceNode node) {
         int indexOfGenome = colourController.containsPos(node.getGenomes(),
                 DrawableCanvas.getInstance().getAnnotationGenome());
-        if (indexOfGenome == -1) {
+        if (indexOfGenome < 0) {
             return indexOfGenome;
         }
-        int res = 0;
-        if (node.getOffsets() != null) {
-            if (node.getGenomes().length == node.getOffsets().length) {
-                res = indexOfGenome;
-            }
+        if (node.getGenomes().length != node.getOffsets().length) {
+            indexOfGenome = 0;
         }
-        return res;
+        return indexOfGenome;
     }
 
     /**
@@ -408,7 +420,6 @@ public class GraphDrawer {
                 double annoWidth = coordinates[WIDTH_INDEX];
                 int startOfAnno = annotation.getStart();
                 int endOfAnno = annotation.getEnd();
-
                 int startCorNode = node.getOffsets()[annotatedGenome];
                 int endCorNode = startCorNode + node.getSequenceLength();
 
@@ -420,7 +431,7 @@ public class GraphDrawer {
                 if (startOfAnno > startCorNode) {
                     emptyAtStart = startOfAnno - startCorNode;
                     annoWidth = (annoWidth * (1 - (emptyAtStart / node.getSequenceLength())));
-                    startXAnno = startXAnno + (coordinates[2] - annoWidth);
+                    startXAnno = startXAnno + (coordinates[WIDTH_INDEX] - annoWidth);
                 }
                 if (endOfAnno < endCorNode) {
                     int emptyAtEnd = endCorNode - endOfAnno;
@@ -429,21 +440,20 @@ public class GraphDrawer {
                 }
 
                 double annoHeight = coordinates[HEIGHT_INDEX] / 2;
-                double startYAnno = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] - annoHeight;
+                double startYAnno = coordinates[Y_INDEX] + coordinates[HEIGHT_INDEX] - annoHeight + 1;
 
                 for (int i = 1; i <= drawnLayers.size() + 1; i++) {
                     Integer filled = drawnLayers.get(i);
                     if (filled == null) {
                         drawnLayers.put(i, endOfAnno);
-                        startYAnno = startYAnno + (annoHeight * i);
+                        startYAnno = startYAnno + ((annoHeight + 1) * i);
                         break;
                     } else if (filled < startOfAnno) {
-                        startYAnno = startYAnno + (annoHeight * i);
+                        startYAnno = startYAnno + ((annoHeight + 1) * i);
                         drawnLayers.put(i, endOfAnno);
                         break;
                     }
                 }
-
                 gc.setFill(colourController.getAnnotationColor(startOfAnno, BUCKET_SIZE));
 
                 double[] annoCoordinates = new double[COORDINATES];
@@ -457,6 +467,12 @@ public class GraphDrawer {
                 }
                 annoOverNodes.add(annoCoordinates);
                 annotationCoordinates.put(annotation.getId(), annoOverNodes);
+
+                if (annotation.getHighlighted()) {
+                    gc.setLineWidth(LINE_WIDTH);
+                    gc.setStroke(Color.BLACK);
+                    gc.strokeRect(startXAnno, startYAnno, annoWidth, annoHeight);
+                }
 
                 gc.fillRect(startXAnno, startYAnno, annoWidth, annoHeight);
             }
@@ -800,7 +816,7 @@ public class GraphDrawer {
                 Map.Entry pair = (Map.Entry) o;
                 SequenceNode node = (SequenceNode) pair.getValue();
                 if (checkClick(node, xEvent, yEvent)) {
-                    highlight(node.getId());
+                    highlightNode(node.getId());
                     if (node.isSNP()) {
                         SequenceNode neighbour = findSNPNeighbour(node);
                         if (node.isCollapsed()) {
@@ -822,32 +838,24 @@ public class GraphDrawer {
                     }
                 }
             }
-            redraw();
-
             for (Object o : annotationCoordinates.entrySet()) {
                 Map.Entry pair = (Map.Entry) o;
                 ArrayList<double[]> allAnnoCors = (ArrayList<double[]>) pair.getValue();
                 for (double[] annoCors : allAnnoCors) {
                     if (xEvent > annoCors[X_INDEX] && xEvent < annoCors[WIDTH_INDEX]
                             && yEvent > annoCors[Y_INDEX] && yEvent < annoCors[HEIGHT_INDEX]) {
-                        redraw();
-                        gc.setLineWidth(LINE_WIDTH);
-                        gc.setStroke(Color.BLACK);
-                        gc.strokeRect(annoCors[X_INDEX], annoCors[Y_INDEX],
-                                annoCors[WIDTH_INDEX] - annoCors[X_INDEX],
-                                annoCors[HEIGHT_INDEX] - annoCors[Y_INDEX]);
-                        //TODO make sure this stays there when zooming.
-
                         int annoId = (int) pair.getKey();
                         TreeSet<Annotation> setOfAllAnnotations = getAnnotationBuckets(null, 1);
                         for (Annotation annotation : setOfAllAnnotations) {
                             if (annotation.getId() == annoId) {
                                 menuController.updateInfoAnnotation(mouseEvent.isControlDown(), annotation);
+                                highlightAnnotation(annotation);
                             }
                         }
                     }
                 }
             }
+            redraw();
         } catch (NullPointerException e) {
             System.err.println("Graph not yet initialized");
         }
@@ -970,12 +978,25 @@ public class GraphDrawer {
      *
      * @param node The node that should be highlighted
      */
-    public void highlight(int node) {
+    public void highlightNode(int node) {
         if (highlightedNode != 0) {
             graph.getNode(highlightedNode).lowlight();
         }
         graph.getNode(node).highlight();
         highlightedNode = node;
+    }
+
+    /**
+     * Highlight the given annotation and lowlight the previous highlighted annotation.
+     *
+     * @param annotation The annotation that should be highlighted
+     */
+    public void highlightAnnotation(Annotation annotation) {
+        if (highlightedAnno != null) {
+            highlightedAnno.setHighlighted(false);
+        }
+        annotation.setHighlighted(true);
+        this.highlightedAnno = annotation;
     }
 
     /**
@@ -1144,5 +1165,32 @@ public class GraphDrawer {
             this.colourController.setSelectedGenomes(this.selected);
         }
     }
-}
 
+    public int hongerInAfrika(int startCorAnno) throws StackOverflowError{
+        return divideAndConquer(1, alleOffsets.size(), startCorAnno, 0);
+    }
+
+    public int divideAndConquer(int lower, int upper, int startCorAnno, int offSet) throws StackOverflowError {
+        int median = ((lower + upper) / 2) + offSet;
+        int[] offSets = alleOffsets.get(median);
+        int[] genomes = alleGenomen.get(median);
+        int index = colourController.containsPos(genomes,
+                DrawableCanvas.getInstance().getAnnotationGenome());
+        if (index < 0) {
+            offSet += 1;
+            return divideAndConquer(lower, upper, startCorAnno, offSet);
+        }
+
+        if (genomes.length != offSets.length) {
+            index = 0;
+        }
+
+        if (offSets[index] <= startCorAnno && offSets[index] + sequenceMap.get(Long.valueOf(median)).length() >= startCorAnno) {
+            return median;
+        } else if (offSets[index] > startCorAnno) {
+            return divideAndConquer(lower, median, startCorAnno, 0);
+        } else {
+            return divideAndConquer(median, upper, startCorAnno, 0);
+        }
+    }
+}

@@ -7,10 +7,11 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane minWidth="315.0" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.sub_controllers.AnnotationTableController">
   <children>
-    <TableView fx:id="annotationTable" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="40.0">
+    <TableView fx:id="annotationTable" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="65.0">
       <columns>
           <TableColumn fx:id="startColumn" maxWidth="850.0" prefWidth="120.0" text="startPoint" />
           <TableColumn fx:id="endColumn" maxWidth="850.0" prefWidth="120.0" text="endPoint" />
@@ -21,7 +22,7 @@
 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
 </columnResizePolicy>
     </TableView>
-    <HBox id="HBox" alignment="CENTER" spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+    <HBox id="HBox" alignment="CENTER" spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="35.0">
       <children>
         <Label text="Filter Table:" />
         <TextField fx:id="filterField" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
@@ -30,5 +31,10 @@
       <Button layoutX="142.0" layoutY="474.0" mnemonicParsing="false" onAction="#saveButtonClicked" text="Save" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="100.0" />
       <Button layoutX="480.0" layoutY="474.0" mnemonicParsing="false" onAction="#cancelButtonClicked" text="Cancel" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="100.0" />
       <Button layoutX="306.0" layoutY="458.0" mnemonicParsing="false" onAction="#selectAllFiltered" prefHeight="25.0" prefWidth="88.0" text="(De)Select all" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="306.0" AnchorPane.rightAnchor="306.0" />
+      <Label layoutX="39.0" layoutY="14.0" text="Search through annotations here. Double-click or select and save a annotation to view it in the graph" AnchorPane.topAnchor="10.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
   </children>
 </AnchorPane>

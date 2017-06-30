@@ -4,8 +4,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="174.0" prefWidth="434.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="175.0" prefWidth="425.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label layoutX="33.0" layoutY="43.0" text="This multiple genome browser was built by:" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
          <font>
@@ -37,6 +36,6 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <Label layoutX="20.0" layoutY="140.0" text="This project is powered bu TU Delft" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="140.0" />
+      <Label layoutX="20.0" layoutY="140.0" text="This project is powered by TU Delft" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="140.0" />
    </children>
 </AnchorPane>

@@ -1,5 +1,6 @@
 package gui.sub_controllers;
 
+import gui.GraphDrawer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -105,6 +106,7 @@ public class AnnotationTableController {
 
     /**
      * Sets the hashMap annotations to a HashSet.
+     *
      * @return a hash set of the buckets of annotations
      */
     @NotNull
@@ -114,6 +116,7 @@ public class AnnotationTableController {
 
     /**
      * Converts the hashMap to a hashSet.
+     *
      * @param hashMap The hashMap to be converted.
      * @return a hashSet of the hashMap.
      */
@@ -156,12 +159,38 @@ public class AnnotationTableController {
             TableRow<Annotation> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                    Annotation rowData = row.getItem();
-                    rowData.setSelected(!rowData.getSelected().getValue());
+                    Annotation annotation = row.getItem();
+                    goToAnnotation(annotation);
+                    close();
                 }
             });
             return row;
         });
+    }
+
+    /**
+     * Method that goes to the annotation and highlights it.
+     *
+     * @param annotation the Annotation to go to.
+     */
+    private void goToAnnotation(Annotation annotation) {
+        try {
+            int startNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getStart());
+            int endNodeID = GraphDrawer.getInstance().hongerInAfrika(annotation.getEnd());
+            int soortVanRadius = (int) ((endNodeID - startNodeID) * 1.2);
+            if (soortVanRadius > 4000) {
+                ZoomController.getInstance().traverseGraphClicked(startNodeID, 4000);
+            } else {
+                ZoomController.getInstance().traverseGraphClicked(((endNodeID + startNodeID) / 2),
+                        Math.max(soortVanRadius, (int) Math.sqrt(49)));
+            }
+            GraphDrawer.getInstance().highlightAnnotation(annotation);
+        } catch (StackOverflowError e) {
+            AnnotationPopUpController popUp = new AnnotationPopUpController();
+            popUp.loadNoAnnotationFound();
+
+            System.out.println("Sorry, too many nodes without ref to hold in memory.");
+        }
     }
 
     /**
@@ -170,6 +199,10 @@ public class AnnotationTableController {
     @FXML
     public void saveButtonClicked() {
         updatedAnnotations = annotations;
+        Annotation annotation = annotationTable.getSelectionModel().getSelectedItem();
+        if (annotation != null) {
+            goToAnnotation(annotation);
+        }
         close();
     }
 
