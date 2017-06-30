@@ -154,7 +154,9 @@ public class GenomeTraverseGraphChooser {
                     Integer.parseInt(genomeCorField.getText()),
                     selectedGenomeToTraverse);
         } catch (StackOverflowError e) {
-            //TODO invullen.
+            AnnotationPopUpController popUp = new AnnotationPopUpController();
+            popUp.loadNoAnnotationFound();
+            System.err.println("Sorry, too many nodes without ref to hold in memory.");
         }
         close();
     }

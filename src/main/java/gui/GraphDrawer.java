@@ -2,7 +2,9 @@ package gui;
 
 import graph.SequenceGraph;
 import graph.SequenceNode;
+import gui.sub_controllers.AnnotationPopUpController;
 import gui.sub_controllers.ColourController;
+import gui.sub_controllers.PopUpController;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
@@ -10,6 +12,8 @@ import javafx.scene.paint.Color;
 import org.mapdb.BTreeMap;
 import structures.Annotation;
 
+import java.io.IOException;
+import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -1166,17 +1170,17 @@ public class GraphDrawer {
 
     private int genomeToTraverse;
 
-    public int hongerInAfrika(int startCorAnno) {
+    public int hongerInAfrika(int startCorAnno) throws StackOverflowError {
         genomeToTraverse = DrawableCanvas.getInstance().getAnnotationGenome();
         return divideAndConquer(1, alleOffsets.size(), startCorAnno, 0);
     }
 
-    public int hongerInAfrika(int startCorAnno, int difGenome) {
+    public int hongerInAfrika(int startCorAnno, int difGenome) throws StackOverflowError {
         genomeToTraverse = difGenome;
         return divideAndConquer(1, alleOffsets.size(), startCorAnno, 0);
     }
 
-    public int divideAndConquer(int lower, int upper, int startCorAnno, int offSet) {
+    public int divideAndConquer(int lower, int upper, int startCorAnno, int offSet) throws StackOverflowError {
         int median = ((lower + upper) / 2) + offSet;
         int[] offSets = alleOffsets.get(median);
         int[] genomes = alleGenomen.get(median);

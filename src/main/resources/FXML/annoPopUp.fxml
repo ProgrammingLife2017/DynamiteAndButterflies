@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="133.0"
+            prefWidth="325.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <Button fx:id="Ok" layoutX="134.0" layoutY="86.0" mnemonicParsing="false" text="Ok"/>
+    <Label fx:id="message" layoutX="15.0" layoutY="14.0" maxHeight="1.7976931348623157E308"
+           text="Database File is corrupt, press 'Reload' to reload the file" wrapText="true"/>
+</AnchorPane>
