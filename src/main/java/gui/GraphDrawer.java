@@ -383,8 +383,10 @@ public class GraphDrawer {
         if (indexOfGenome < 0) {
             return indexOfGenome;
         }
-        if (node.getGenomes().length != node.getOffsets().length) {
-            indexOfGenome = 0;
+        if (node.getGenomes() != null && node.getOffsets() != null) {
+            if (node.getGenomes().length != node.getOffsets().length) {
+                indexOfGenome = 0;
+            }
         }
         return indexOfGenome;
     }
