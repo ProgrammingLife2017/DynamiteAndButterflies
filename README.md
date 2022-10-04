@@ -6,9 +6,9 @@ This application was built by the team Dynamite and Butterflies. The core usabil
  Besides this the application can parse and visualize annotations on this graph structure in the form of annotations that can be loaded in with a .gff file.
 
 ## Team members
-| Jasper van Tilburg                        | Lex Boleij                             | Eric Dammeijer                          | Marc Visser                             | Jip Rietveld                           |
+| Jasper van Tilburg                        | Eric Dammeijer                          | Marc Visser                             | Jip Rietveld                           |
 |-------------------------------------------|----------------------------------------|-----------------------------------------|-----------------------------------------|----------------------------------------|
-| ![jasper](http://i.imgur.com/xHGjfa3.jpg) | ![Lex](http://i.imgur.com/s8z6wXz.jpg) | ![Eric](http://i.imgur.com/N381Hu6.jpg) | ![marc](http://i.imgur.com/3Y9fqJA.jpg) | ![jip](http://i.imgur.com/W3MpLr7.jpg) |
+| ![jasper](http://i.imgur.com/xHGjfa3.jpg) | ![Eric](http://i.imgur.com/N381Hu6.jpg) | ![marc](http://i.imgur.com/3Y9fqJA.jpg) | ![jip](http://i.imgur.com/W3MpLr7.jpg) |
 
 ## Preview
 ![main screen](http://imgur.com/hWiM9Cs.png)
